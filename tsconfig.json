@@ -9,6 +9,9 @@
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "paths": {
+      "@lib/*": ["src/*"]
+    }
   },
   "include": [
     "src/**/*",
