@@ -1,24 +1,5 @@
 export type AttestationCredentials = {
-  publicKey: {
-    // Cryptographically random bytes to prevent replay attacks
-    challenge: Uint8Array,
-    // The organization registering and authenticating the user
-    rp: {
-      name: string,
-      id: string,
-    },
-    user: {
-      id: Uint8Array,
-      name: string,
-      displayName: string,
-    },
-    pubKeyCredParams: [{
-      alg: -7,
-      type: 'public-key',
-    }],
-    timeout: number,
-    attestation: 'none' | 'direct' | 'indirect',
-  },
+  publicKey: PublicKeyCredentialCreationOptions,
 }
 
 /**

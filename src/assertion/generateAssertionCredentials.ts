@@ -1,5 +1,9 @@
 import base64url from 'base64url';
 
+export type AssertionCredentials = {
+  publicKey: PublicKeyCredentialRequestOptions,
+}
+
 /**
  * Prepare credentials for user registration via navigator.credentials.get(...)
  *
@@ -12,7 +16,7 @@ export default function generateAssertionCredentials(
   challenge: string,
   credentialIDs: string[],
   timeout: number = 60000,
-) {
+): AssertionCredentials {
   return {
     publicKey: {
       challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
