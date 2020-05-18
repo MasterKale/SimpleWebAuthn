@@ -1,8 +1,6 @@
 import base64url from 'base64url';
 
-export type AssertionCredentials = {
-  publicKey: PublicKeyCredentialRequestOptions,
-}
+import { AssertionCredentials } from '@types';
 
 /**
  * Prepare credentials for user registration via navigator.credentials.get(...)

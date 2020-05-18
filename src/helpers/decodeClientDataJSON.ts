@@ -1,3 +1,5 @@
+import { ClientDataJSON } from '@types';
+
 import asciiToBinary from './asciiToBinary';
 
 /**
@@ -6,7 +8,7 @@ import asciiToBinary from './asciiToBinary';
  * @param data
  * @returns {Object} - the data as JSON
  */
-export default function decodeClientDataJSON(data: string) {
+export default function decodeClientDataJSON(data: string): ClientDataJSON {
   const toString = asciiToBinary(data);
   return JSON.parse(toString);
 }

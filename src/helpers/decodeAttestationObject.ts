@@ -1,16 +1,7 @@
 import base64url from 'base64url';
 import cbor from 'cbor';
 
-import { ATTESTATION_FORMATS } from './constants';
-
-type AttestationObject = {
-  fmt: ATTESTATION_FORMATS,
-  attStmt: {
-    sig?: Buffer,
-    x5c?: Buffer,
-  },
-  authData: Buffer,
-};
+import { AttestationObject } from '@types';
 
 /**
  *

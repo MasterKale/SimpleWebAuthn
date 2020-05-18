@@ -10,7 +10,9 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "paths": {
-      "@lib/*": ["src/*"]
+      "@lib/*": ["src/*"],
+      "@types": ["src/types.ts"],
+      "@helpers/*": ["src/helpers/*"],
     }
   },
   "include": [

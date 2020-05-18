@@ -1,10 +1,3 @@
-export enum ATTESTATION_FORMATS {
-  FIDO_U2F = 'fido-u2f',
-  PACKED = 'packed',
-  ANDROID_SAFETYNET = 'android-safetynet',
-  NONE = 'none',
-};
-
 /**
  * U2F Presence constant
  */

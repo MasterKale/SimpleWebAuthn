@@ -1,6 +1,4 @@
-export type AttestationCredentials = {
-  publicKey: PublicKeyCredentialCreationOptions,
-}
+import { AttestationCredentials } from '@types';
 
 /**
  * Prepare credentials for user registration via navigator.credentials.create(...)
