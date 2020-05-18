@@ -13,16 +13,18 @@
     "test:watch": "jest --watch"
   },
   "devDependencies": {
+    "@types/cbor": "^5.0.0",
     "@types/jest": "^25.1.2",
     "jest": "^25.1.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.2.0",
-    "typescript": "^3.7.5"
+    "typescript": "^3.9.2"
   },
   "keywords": [
     "webauthn"
   ],
   "dependencies": {
-    "base64url": "^3.0.1"
+    "base64url": "^3.0.1",
+    "cbor": "^5.0.2"
   }
 }
