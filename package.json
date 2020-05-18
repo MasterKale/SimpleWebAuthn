@@ -18,6 +18,7 @@
     "jest": "^25.1.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.2.0",
+    "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },
   "keywords": [
