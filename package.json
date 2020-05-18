@@ -1,0 +1,25 @@
+{
+  "name": "webauthntine",
+  "version": "1.0.0",
+  "description": "It's like FIDO2 and Constantine had a baby.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Matthew Miller<matthew@millerti.me>",
+  "license": "MIT",
+  "homepage": "https://github.com/MasterKale/webauthntine#readme",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.2",
+    "jest": "^25.1.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^25.2.0",
+    "typescript": "^3.7.5"
+  },
+  "keywords": [
+    "webauthn"
+  ]
+}
