@@ -85,3 +85,20 @@ export enum COSEKEYS {
 };
 
 export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
+
+export type SafetyNetJWTHeader = {
+  alg: 'string',
+  x5c: string[],
+};
+
+export type SafetyNetJWTPayload = {
+  nonce: string,
+  timestampMs: number,
+  apkPackageName: string,
+  apkDigestSha256: string,
+  ctsProfileMatch: boolean,
+  apkCertificateDigestSha256: string[],
+  basicIntegrity: boolean,
+};
+
+export type SafetyNetJWTSignature = string;

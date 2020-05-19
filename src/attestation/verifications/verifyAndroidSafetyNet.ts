@@ -1,6 +1,12 @@
 import base64url from 'base64url';
 
-import { AttestationObject, VerifiedAttestation } from "@types";
+import {
+  AttestationObject,
+  VerifiedAttestation,
+  SafetyNetJWTHeader,
+  SafetyNetJWTPayload,
+  SafetyNetJWTSignature,
+} from "@types";
 import toHash from "@helpers/toHash";
 import verifySignature from '@helpers/verifySignature';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
@@ -23,9 +29,9 @@ export default function verifyAttestationAndroidSafetyNet(
   const jwt = attStmt.response.toString('utf8');
   const jwtParts = jwt.split('.');
 
-  const HEADER = JSON.parse(base64url.decode(jwtParts[0]));
-  const PAYLOAD = JSON.parse(base64url.decode(jwtParts[1]));
-  const SIGNATURE = jwtParts[2];
+  const HEADER: SafetyNetJWTHeader = JSON.parse(base64url.decode(jwtParts[0]));
+  const PAYLOAD: SafetyNetJWTPayload = JSON.parse(base64url.decode(jwtParts[1]));
+  const SIGNATURE: SafetyNetJWTSignature = jwtParts[2];
 
   console.debug('HEADER:', HEADER);
   console.debug('PAYLOAD:', PAYLOAD);
@@ -64,7 +70,7 @@ export default function verifyAttestationAndroidSafetyNet(
    * START Verify Header
    */
   // Generate an array of certs constituting a full certificate chain
-  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map((cert: string) => {
+  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map((cert) => {
     let pem = '';
     // Take a string of characters and chop them up into 64-char lines (just like a PEM cert)
     for (let i = 0; i < cert.length; i += 64) {
