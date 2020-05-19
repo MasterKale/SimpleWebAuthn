@@ -13,8 +13,8 @@ export type AssertionCredentials = {
 export interface EncodedAuthenticatorAttestationResponse extends Omit<
 AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
 > {
-  clientDataJSON: string,
-  attestationObject: string;
+  base64ClientDataJSON: string,
+  base64AttestationObject: string;
 }
 
 export enum ATTESTATION_FORMATS {
