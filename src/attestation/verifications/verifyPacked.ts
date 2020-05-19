@@ -4,7 +4,7 @@ import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
 
 import { AttestationObject, VerifiedAttestation } from "@types";
-import convertCOSEECDHAtoPKCS from "@helpers/convertCOSEECDHAtoPKCS";
+import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
 import toHash from "@helpers/toHash";
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import getCertificateInfo from '@helpers/getCertificateInfo';
@@ -43,7 +43,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
   ]);
 
   const toReturn: VerifiedAttestation = { verified: false };
-  const publicKey = convertCOSEECDHAtoPKCS(COSEPublicKey);
+  const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 
   if (x5c) {
     console.log('FULL Attestation');
@@ -89,12 +89,10 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
   } else {
     console.log('SELF Attestation');
 
-    const publicKeyCOSE: Map<COSEAlgorithmIdentifier, number | Buffer> = cbor.decodeAllSync(COSEPublicKey)[0];
+    const cosePublicKey: COSEPublicKey = cbor.decodeAllSync(COSEPublicKey)[0];
 
-    const kty = publicKeyCOSE.get(COSEKEYS.kty);
-    const alg = publicKeyCOSE.get(COSEKEYS.alg);
-    const x = publicKeyCOSE.get(COSEKEYS.x);
-    const y = publicKeyCOSE.get(COSEKEYS.y);
+    const kty = cosePublicKey.get(COSEKEYS.kty);
+    const alg = cosePublicKey.get(COSEKEYS.alg);
 
     if (!alg) {
       throw new Error('COSE public key was missing alg');
@@ -104,44 +102,31 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
       throw new Error('COSE public key was missing kty');
     }
 
-    if (!x) {
-      throw new Error('COSE public key was missing x');
-    }
-
-    if (!y) {
-      throw new Error('COSE public key was missing y');
-    }
-
     const hashAlg: string = COSEALGHASH[(alg as number)];
 
     if (kty === COSEKTY.EC2) {
       console.log('EC2');
 
-      const crv = publicKeyCOSE.get(COSEKEYS.crv);
+      const crv = cosePublicKey.get(COSEKEYS.crv);
 
       if (!crv) {
         throw new Error('COSE public key was missing kty crv');
       }
 
-      const ansiKey = Buffer.concat([
-        Buffer.from([0x04]),
-        (x as Buffer),
-        (y as Buffer),
-      ]);
-
+      const pkcsPublicKey = convertCOSEtoPKCS(cosePublicKey);
       const signatureBaseHash = toHash(signatureBase, hashAlg);
 
       const ec = new elliptic.ec(COSECRV[(crv as number)]);
-      const key = ec.keyFromPublic(ansiKey);
+      const key = ec.keyFromPublic(pkcsPublicKey);
 
       toReturn.verified = key.verify(signatureBaseHash, sig);
     } else if (kty === COSEKTY.RSA) {
       console.log('RSA');
 
-      const n = publicKeyCOSE.get(COSEKEYS.n);
+      const n = cosePublicKey.get(COSEKEYS.n);
 
       if (!n) {
-        throw new Error('COSE public key was missing kty n');
+        throw new Error('COSE public key was missing n');
       }
 
       const signingScheme = COSERSASCHEME[alg as number];
@@ -157,6 +142,12 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
       toReturn.verified = key.verify(signatureBase, sig);
     } else if (kty === COSEKTY.OKP) {
       console.log('OKP');
+
+      const x = cosePublicKey.get(COSEKEYS.x);
+
+      if (!x) {
+        throw new Error('COSE public key was missing x');
+      }
 
       const signatureBaseHash = toHash(signatureBase, hashAlg);
 

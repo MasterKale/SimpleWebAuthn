@@ -1,11 +1,14 @@
 import cbor from 'cbor';
 
+import { COSEKEYS, COSEPublicKey } from '@types';
+
 /**
- * Takes COSE encoded public key and converts it to RAW PKCS ECDHA key
- * @param COSEPublicKey COSE-encoded public key
+ * Takes COSE-encoded public key and converts it to PKCS key
+ *
+ * @param cosePublicKey COSE-encoded public key
  * @return RAW PKCS encoded public key
  */
-export default function COSEECDHAtoPKCS(COSEPublicKey: Buffer) {
+export default function convertCOSEtoPKCS(cosePublicKey: Buffer | COSEPublicKey) {
   /*
     +------+-------+-------+---------+----------------------------------+
     | name | key   | label | type    | description                      |
@@ -22,11 +25,25 @@ export default function COSEECDHAtoPKCS(COSEPublicKey: Buffer) {
     | d    | 2     | -4    | bstr    | Private key                      |
     +------+-------+-------+---------+----------------------------------+
   */
+ let struct: COSEPublicKey;
+ if (cosePublicKey instanceof Buffer) {
+   struct = cbor.decodeFirstSync(cosePublicKey);
+ } else {
+   struct = cosePublicKey;
+ }
 
-  const coseStruct = cbor.decodeAllSync(COSEPublicKey)[0];
   const tag = Buffer.from([0x04]);
-  const x = coseStruct.get(-2);
-  const y = coseStruct.get(-3);
+  const x = struct.get(COSEKEYS.x);
+  const y = struct.get(COSEKEYS.y);
 
-  return Buffer.concat([tag, x, y]);
+
+  if (!x) {
+    throw new Error('COSE public key was missing x');
+  }
+
+  if (!y) {
+    throw new Error('COSE public key was missing y');
+  }
+
+  return Buffer.concat([tag, (x as Buffer), (y as Buffer)]);
 }

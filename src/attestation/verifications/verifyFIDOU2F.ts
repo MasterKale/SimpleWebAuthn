@@ -2,7 +2,7 @@ import base64url from 'base64url';
 
 import { AttestationObject, VerifiedAttestation } from '@types';
 import toHash from '@helpers/toHash';
-import convertCOSEECDHAtoPKCS from '@helpers/convertCOSEECDHAtoPKCS';
+import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import verifySignature from '@helpers/verifySignature';
 
@@ -43,7 +43,7 @@ export default function verifyAttestationFIDOU2F(
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
   const reservedByte = Buffer.from([0x00]);
-  const publicKey = convertCOSEECDHAtoPKCS(COSEPublicKey);
+  const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 
   const signatureBase = Buffer.concat([
     reservedByte,

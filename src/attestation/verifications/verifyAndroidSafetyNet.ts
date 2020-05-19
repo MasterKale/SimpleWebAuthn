@@ -3,7 +3,7 @@ import base64url from 'base64url';
 import { AttestationObject, VerifiedAttestation } from "@types";
 import toHash from "@helpers/toHash";
 import verifySignature from '@helpers/verifySignature';
-import convertCOSEECDHAtoPKCS from '@helpers/convertCOSEECDHAtoPKCS';
+import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import getCertificateInfo from '@helpers/getCertificateInfo';
 
 import parseAttestationAuthData from '../parseAttestationAuthData';
@@ -122,7 +122,7 @@ export default function verifyAttestationAndroidSafetyNet(
       throw new Error('No credential ID was provided by authenticator');
     }
 
-    const publicKey = convertCOSEECDHAtoPKCS(COSEPublicKey);
+    const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 
     toReturn.authenticatorInfo = {
       fmt,

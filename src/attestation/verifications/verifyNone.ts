@@ -1,7 +1,7 @@
 import base64url from 'base64url';
 
 import { AttestationObject, VerifiedAttestation } from "@types";
-import convertCOSEECDHAtoPKCS from "@helpers/convertCOSEECDHAtoPKCS";
+import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
 
 import parseAttestationAuthData from '../parseAttestationAuthData';
 
@@ -42,7 +42,7 @@ export default function verifyAttestationNone(
     console.warn('The authenticator could not uniquely Verify the user');
   }
 
-  const publicKey = convertCOSEECDHAtoPKCS(COSEPublicKey);
+  const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 
   const toReturn: VerifiedAttestation = {
     verified: true,
