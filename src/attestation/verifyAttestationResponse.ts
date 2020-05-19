@@ -5,6 +5,7 @@ import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse, VerifiedA
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyNone from './verifications/verifyNone';
+import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -54,10 +55,10 @@ export default function verifyAttestationResponse(
     return verifyPacked(attestationObject, base64ClientDataJSON);
   }
 
-  // if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
-  //   console.log('Decoding Android Safetynet attestation');
-  //   return WebauthnService.verifyAttestationAndroidSafetynet(decodedAttestation, clientDataJSON);
-  // }
+  if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
+    console.log('Decoding Android Safetynet attestation');
+    return verifyAndroidSafetynet(attestationObject, base64ClientDataJSON);
+  }
 
   if (fmt === ATTESTATION_FORMATS.NONE) {
     console.log('Decoding None attestation');
