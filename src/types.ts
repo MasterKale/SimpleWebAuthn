@@ -29,6 +29,7 @@ export type AttestationObject = {
   attStmt: {
     sig?: Buffer,
     x5c?: Buffer[],
+    ecdaaKeyId?: Buffer,
   },
   authData: Buffer,
 };
