@@ -3,6 +3,7 @@ import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
 import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse, VerifiedAttestation } from '@types';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
+import verifyPacked from './verifications/verifyPacked';
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -47,10 +48,10 @@ export default function verifyAttestationResponse(
     return verifyFIDOU2F(attestationObject, base64ClientDataJSON);
   }
 
-  // if (fmt === ATTESTATION_FORMATS.PACKED) {
-  //   console.log('Decoding Packed attestation');
-  //   return WebauthnService.verifyAttestationPacked(decodedAttestation, clientDataJSON);
-  // }
+  if (fmt === ATTESTATION_FORMATS.PACKED) {
+    console.log('Decoding Packed attestation');
+    return verifyPacked(attestationObject, base64ClientDataJSON);
+  }
 
   // if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
   //   console.log('Decoding Android Safetynet attestation');
