@@ -102,3 +102,11 @@ export type SafetyNetJWTPayload = {
 };
 
 export type SafetyNetJWTSignature = string;
+
+export type ParsedAssertionAuthData = {
+  rpIdHash: Buffer,
+  flagsBuf: Buffer,
+  flags: number,
+  counter: number,
+  counterBuf: Buffer,
+};
