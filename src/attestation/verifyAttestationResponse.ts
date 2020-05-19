@@ -9,7 +9,8 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 
 /**
  * Verify that the user has legitimately completed the registration process
- * @param response
+ *
+ * @param response Authenticator attestation response with base64-encoded values
  * @param expectedOrigin Expected URL of website attestation should have occurred on
  */
 export default function verifyAttestationResponse(

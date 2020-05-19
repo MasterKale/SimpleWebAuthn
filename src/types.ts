@@ -1,7 +1,13 @@
+/**
+ * An object that can be passed into navigator.credentials.create(...) in the browser
+ */
 export type AttestationCredentials = {
   publicKey: PublicKeyCredentialCreationOptions,
 };
 
+/**
+ * An object that can be passed into navigator.credentials.get(...) in the browser
+ */
 export type AssertionCredentials = {
   publicKey: PublicKeyCredentialRequestOptions,
 };
@@ -111,6 +117,8 @@ export type ParsedAssertionAuthData = {
   counterBuf: Buffer,
 };
 
-// U2F Presence constant
+/**
+ * U2F Presence constant
+ */
 export const U2F_USER_PRESENTED = 0x01;
 
