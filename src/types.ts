@@ -23,6 +23,18 @@ AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
   base64AttestationObject: string;
 }
 
+/**
+ * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
+ * are base64-encoded in the browser so that they can be sent as JSON to the server.
+ */
+export interface EncodedAuthenticatorAssertionResponse extends Omit<
+AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signature'
+> {
+  base64AuthenticatorData: string;
+  base64ClientDataJSON: string;
+  base64Signature: string;
+}
+
 export enum ATTESTATION_FORMATS {
   FIDO_U2F = 'fido-u2f',
   PACKED = 'packed',
@@ -64,6 +76,9 @@ export type ClientDataJSON = {
   origin: string,
 };
 
+/**
+ * Result of attestation verification
+ */
 export type VerifiedAttestation = {
   verified: boolean,
   authenticatorInfo?: {
@@ -72,6 +87,13 @@ export type VerifiedAttestation = {
     base64PublicKey: string,
     base64CredentialID: string,
   },
+};
+
+/**
+ * Result of assertion verification
+ */
+export type VerifiedAssertion = {
+  verified: boolean;
 };
 
 export type CertificateInfo = {
@@ -122,3 +144,12 @@ export type ParsedAssertionAuthData = {
  */
 export const U2F_USER_PRESENTED = 0x01;
 
+/**
+ * A WebAuthn-compatible device and the information needed to verify assertions by it
+ */
+export type AuthenticatorDevice = {
+  base64PublicKey: string,
+  base64CredentialID: string,
+  // Number of times this device is expected to have been used
+  counter: number,
+};
