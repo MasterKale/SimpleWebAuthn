@@ -12,6 +12,7 @@ import verifySignature from '@helpers/verifySignature';
  */
 const U2F_USER_PRESENTED = 0x01;
 
+
 export default function verifyAttestationFIDOU2F(
   attestationObject: AttestationObject,
   base64ClientDataJSON: string,
