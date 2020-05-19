@@ -17,6 +17,7 @@
     "@types/cbor": "^5.0.0",
     "@types/elliptic": "^6.4.12",
     "@types/jest": "^25.2.3",
+    "@types/jsrsasign": "^8.0.3",
     "@types/node-rsa": "^1.0.0",
     "jest": "^25.1.0",
     "rimraf": "^3.0.2",
@@ -28,7 +29,6 @@
     "webauthn"
   ],
   "dependencies": {
-    "@types/jsrsasign": "^8.0.2",
     "base64url": "^3.0.1",
     "cbor": "^5.0.2",
     "elliptic": "^6.5.2",
