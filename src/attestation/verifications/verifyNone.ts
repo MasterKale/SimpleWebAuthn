@@ -1,9 +1,9 @@
 import base64url from 'base64url';
 
 import { AttestationObject, VerifiedAttestation } from "@types";
-import parseAttestationAuthData from "@helpers/parseAttestationAuthData";
 import convertCOSEECDHAtoPKCS from "@helpers/convertCOSEECDHAtoPKCS";
 
+import parseAttestationAuthData from '../parseAttestationAuthData';
 
 export default function verifyAttestationNone(
   attestationObject: AttestationObject,

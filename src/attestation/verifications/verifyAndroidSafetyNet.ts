@@ -3,9 +3,10 @@ import base64url from 'base64url';
 import { AttestationObject, VerifiedAttestation } from "@types";
 import toHash from "@helpers/toHash";
 import verifySignature from '@helpers/verifySignature';
-import parseAttestationAuthData from '@helpers/parseAttestationAuthData';
 import convertCOSEECDHAtoPKCS from '@helpers/convertCOSEECDHAtoPKCS';
 import getCertificateInfo from '@helpers/getCertificateInfo';
+
+import parseAttestationAuthData from '../parseAttestationAuthData';
 
 
 export default function verifyAttestationAndroidSafetyNet(

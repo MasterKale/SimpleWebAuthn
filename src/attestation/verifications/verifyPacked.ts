@@ -4,12 +4,13 @@ import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
 
 import { AttestationObject, VerifiedAttestation } from "@types";
-import parseAttestationAuthData from "@helpers/parseAttestationAuthData";
 import convertCOSEECDHAtoPKCS from "@helpers/convertCOSEECDHAtoPKCS";
 import toHash from "@helpers/toHash";
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import getCertificateInfo from '@helpers/getCertificateInfo';
 import verifySignature from '@helpers/verifySignature';
+
+import parseAttestationAuthData from '../parseAttestationAuthData';
 
 
 export default function verifyAttestationPacked(attestationObject: AttestationObject,
