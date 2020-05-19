@@ -5,13 +5,13 @@
     "esModuleInterop": true,
     "declaration": true,
     "sourceMap": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "paths": {
-      "@types": ["src/types.ts"],
-      "@helpers/*": ["src/helpers/*"],
+      "@types": ["types.ts"],
+      "@helpers/*": ["helpers/*"],
     }
   },
   "include": [
