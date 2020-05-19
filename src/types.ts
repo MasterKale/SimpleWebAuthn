@@ -110,3 +110,7 @@ export type ParsedAssertionAuthData = {
   counter: number,
   counterBuf: Buffer,
 };
+
+// U2F Presence constant
+export const U2F_USER_PRESENTED = 0x01;
+

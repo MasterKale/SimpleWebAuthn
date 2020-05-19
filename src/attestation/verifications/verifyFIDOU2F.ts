@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import { AttestationObject, VerifiedAttestation } from '@types';
+import { AttestationObject, VerifiedAttestation, U2F_USER_PRESENTED } from '@types';
 import toHash from '@helpers/toHash';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
@@ -8,10 +8,7 @@ import verifySignature from '@helpers/verifySignature';
 
 import parseAttestationAuthData from '../parseAttestationAuthData';
 
-/**
- * U2F Presence constant
- */
-const U2F_USER_PRESENTED = 0x01;
+
 
 
 export default function verifyAttestationFIDOU2F(
