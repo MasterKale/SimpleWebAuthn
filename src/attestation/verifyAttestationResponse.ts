@@ -64,5 +64,5 @@ export default function verifyAttestationResponse(
 
   const reason = `Unsupported Attestation Format: ${fmt}`;
   console.error(reason);
-  return { verified: false, reason };
+  throw new Error(reason);
 }
