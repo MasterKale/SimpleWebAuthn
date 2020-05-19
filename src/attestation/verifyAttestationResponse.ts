@@ -1,6 +1,6 @@
 import decodeAttestationObject from '@helpers/decodeAttestationObject';
 import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
-import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse } from '@types';
+import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse, VerifiedAttestation } from '@types';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
@@ -12,7 +12,7 @@ import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 export default function verifyAttestationResponse(
   response: EncodedAuthenticatorAttestationResponse,
   expectedOrigin: string,
-) {
+): VerifiedAttestation {
   const { base64AttestationObject, base64ClientDataJSON } = response;
   const attestationObject = decodeAttestationObject(base64AttestationObject);
   const clientDataJSON = decodeClientDataJSON(base64ClientDataJSON);
