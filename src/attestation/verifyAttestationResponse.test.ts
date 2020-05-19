@@ -40,7 +40,7 @@ test('should verify FIDO U2F attestation', () => {
   );
 });
 
-test('should verify Packed attestation', () => {
+test('should verify Packed (EC2) attestation', () => {
   const verification = verifyAttestationResponse(
     {
       base64AttestationObject: 'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
