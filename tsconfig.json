@@ -12,7 +12,7 @@
     "paths": {
       "@types": ["types.ts"],
       "@helpers/*": ["helpers/*"],
-    }
+    },
   },
   "include": [
     "src/**/*",
