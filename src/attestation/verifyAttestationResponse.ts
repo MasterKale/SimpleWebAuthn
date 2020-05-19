@@ -4,6 +4,7 @@ import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse, VerifiedA
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
+import verifyNone from './verifications/verifyNone';
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -58,10 +59,10 @@ export default function verifyAttestationResponse(
   //   return WebauthnService.verifyAttestationAndroidSafetynet(decodedAttestation, clientDataJSON);
   // }
 
-  // if (fmt === ATTESTATION_FORMATS.NONE) {
-  //   console.log('Decoding None attestation');
-  //   return WebauthnService.verifyAttestationNone(decodedAttestation, decodedClientDataJSON);
-  // }
+  if (fmt === ATTESTATION_FORMATS.NONE) {
+    console.log('Decoding None attestation');
+    return verifyNone(attestationObject);
+  }
 
   const reason = `Unsupported Attestation Format: ${fmt}`;
   console.error(reason);

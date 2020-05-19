@@ -68,3 +68,27 @@ test('should verify Packed attestation', () => {
   );
 });
 
+test('should verify None attestation', () => {
+  const verification = verifyAttestationResponse(
+    {
+      base64AttestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjFPdxHEOnAiLIp26idVjIguzn3I' +
+      'pr_RlsKZWsa-5qK-KBFAAAAAAAAAAAAAAAAAAAAAAAAAAAAQQHSlyRHIdWleVqO24-6ix7JFWODqDWo_arvEz3Se5E' +
+      'gIFHkcVjZ4F5XDSBreIHsWRilRnKmaaqlqK3V2_4XtYs2pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8x' +
+      'xQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
+      base64ClientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYUVWalkxQlhkWHBw' +
+      'VURBd1NEQndOV2Q0YURKZmRUVmZVRU0wVG1WWloyUSIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRhLn' +
+      'B3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9'
+    },
+    'https://dev.dontneeda.pw'
+  )
+
+  expect(verification.verified).toEqual(true);
+  expect(verification.authenticatorInfo?.fmt).toEqual('none');
+  expect(verification.authenticatorInfo?.counter).toEqual(0);
+  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
+    'BD5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
+  );
+  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
+    'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
+  );
+});
