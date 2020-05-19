@@ -5,6 +5,9 @@ import convertCOSEECDHAtoPKCS from "@helpers/convertCOSEECDHAtoPKCS";
 
 import parseAttestationAuthData from '../parseAttestationAuthData';
 
+/**
+ * This is the weaker of the assertions, so there are only so many checks we can perform
+ */
 export default function verifyAttestationNone(
   attestationObject: AttestationObject,
 ): VerifiedAttestation {
