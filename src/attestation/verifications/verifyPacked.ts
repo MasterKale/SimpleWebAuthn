@@ -13,6 +13,9 @@ import verifySignature from '@helpers/verifySignature';
 import parseAttestationAuthData from '../parseAttestationAuthData';
 
 
+/**
+ * Verify an attestation response with fmt 'packed'
+ */
 export default function verifyAttestationPacked(attestationObject: AttestationObject,
   base64ClientDataJSON: string,
 ): VerifiedAttestation {

@@ -9,8 +9,9 @@ import verifySignature from '@helpers/verifySignature';
 import parseAttestationAuthData from '../parseAttestationAuthData';
 
 
-
-
+/**
+ * Verify an attestation response with fmt 'fido-u2f'
+ */
 export default function verifyAttestationFIDOU2F(
   attestationObject: AttestationObject,
   base64ClientDataJSON: string,

@@ -5,7 +5,10 @@ import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
 
 import parseAttestationAuthData from '../parseAttestationAuthData';
 
+
 /**
+ * Verify an attestation response with fmt 'none'
+ *
  * This is the weaker of the assertions, so there are only so many checks we can perform
  */
 export default function verifyAttestationNone(

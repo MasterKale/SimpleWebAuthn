@@ -15,6 +15,9 @@ import getCertificateInfo from '@helpers/getCertificateInfo';
 import parseAttestationAuthData from '../parseAttestationAuthData';
 
 
+/**
+ * Verify an attestation response with fmt 'android-safetynet'
+ */
 export default function verifyAttestationAndroidSafetyNet(
   attestationObject: AttestationObject,
   base64ClientDataJSON: string,
