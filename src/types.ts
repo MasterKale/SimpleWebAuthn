@@ -65,3 +65,9 @@ export type VerifiedAttestation = {
     base64CredentialID: string,
   },
 };
+
+export type CertificateInfo = {
+  subject: { [key: string]: string },
+  version: number,
+  basicConstraintsCA: boolean,
+};
