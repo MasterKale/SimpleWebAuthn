@@ -90,7 +90,7 @@ export default function verifyAttestationAndroidSafetyNet(
   }
 
   // TODO: Re-investigate this if we decide to "use MDS or Metadata Statements"
-  // WebauthnService.validateCertificatePath(fullpathCert);
+  // validateCertificatePath(fullpathCert);
   /**
    * END Verify Header
    */
