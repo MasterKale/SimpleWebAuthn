@@ -28,13 +28,40 @@ export type AttestationObject = {
   fmt: ATTESTATION_FORMATS,
   attStmt: {
     sig?: Buffer,
-    x5c?: Buffer,
+    x5c?: Buffer[],
   },
   authData: Buffer,
 };
 
+export type ParsedAttestationAuthData = {
+  rpIdHash: Buffer,
+  flagsBuf: Buffer,
+  flags: {
+      up: boolean,
+      uv: boolean,
+      at: boolean,
+      ed: boolean,
+      flagsInt: number,
+  },
+  counter: number,
+  counterBuf: Buffer,
+  aaguid?: Buffer,
+  credentialID?: Buffer,
+  COSEPublicKey?: Buffer,
+};
+
 export type ClientDataJSON = {
-  type: string;
-  challenge: string;
-  origin: string;
+  type: string,
+  challenge: string,
+  origin: string,
+};
+
+export type VerifiedAttestation = {
+  verified: boolean,
+  authenticatorInfo?: {
+    fmt: ATTESTATION_FORMATS,
+    counter: number,
+    base64PublicKey: string,
+    base64CredentialID: string,
+  },
 };
