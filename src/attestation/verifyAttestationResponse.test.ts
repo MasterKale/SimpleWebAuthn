@@ -1,8 +1,5 @@
 import verifyAttestationResponse from './verifyAttestationResponse';
 
-jest.spyOn(console, 'log').mockImplementation();
-jest.spyOn(console, 'debug').mockImplementation();
-
 test('should verify FIDO U2F attestation', () => {
   const verification = verifyAttestationResponse(
     {

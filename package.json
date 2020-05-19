@@ -10,16 +10,17 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:coverage": "npm test -- --coverage"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",
     "@types/elliptic": "^6.4.12",
-    "@types/jest": "^25.1.2",
+    "@types/jest": "^25.2.3",
     "@types/node-rsa": "^1.0.0",
     "jest": "^25.1.0",
     "rimraf": "^3.0.2",
-    "ts-jest": "^25.2.0",
+    "ts-jest": "^25.5.1",
     "ts-node": "^8.10.1",
     "typescript": "^3.9.2"
   },
