@@ -4,11 +4,14 @@ import cbor from 'cbor';
 import { AttestationObject } from '@types';
 
 /**
+ * Convert an AttestationObject from base64 string to a proper object
  *
- * @param obj
+ * @param base64AttestationObject Base64-encoded Attestation Object
  */
-export default function decodeAttestationObject(obj: string): AttestationObject {
-  const toBuffer = base64url.toBuffer(obj);
-  const toCBOR = cbor.decodeAllSync(toBuffer)[0];
+export default function decodeAttestationObject(
+  base64AttestationObject: string,
+): AttestationObject {
+  const toBuffer = base64url.toBuffer(base64AttestationObject);
+  const toCBOR: AttestationObject = cbor.decodeAllSync(toBuffer)[0];
   return toCBOR;
 }
