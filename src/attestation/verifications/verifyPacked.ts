@@ -3,7 +3,7 @@ import cbor from 'cbor';
 import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
 
-import { AttestationObject, VerifiedAttestation } from "@types";
+import { AttestationObject, VerifiedAttestation, COSEKEYS, COSEPublicKey } from "@types";
 import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
 import toHash from "@helpers/toHash";
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
@@ -169,16 +169,6 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
   }
 
   return toReturn;
-}
-
-enum COSEKEYS {
-  kty = 1,
-  alg = 3,
-  crv = -1,
-  x = -2,
-  y = -3,
-  n = -1,
-  e = -2,
 }
 
 enum COSEKTY {

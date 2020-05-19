@@ -73,3 +73,15 @@ export type CertificateInfo = {
   version: number,
   basicConstraintsCA: boolean,
 };
+
+export enum COSEKEYS {
+  kty = 1,
+  alg = 3,
+  crv = -1,
+  x = -2,
+  y = -3,
+  n = -1,
+  e = -2,
+};
+
+export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
