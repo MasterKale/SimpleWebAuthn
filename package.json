@@ -25,7 +25,9 @@
     "webauthn"
   ],
   "dependencies": {
+    "@types/jsrsasign": "^8.0.2",
     "base64url": "^3.0.1",
-    "cbor": "^5.0.2"
+    "cbor": "^5.0.2",
+    "jsrsasign": "^8.0.15"
   }
 }
