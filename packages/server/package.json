@@ -1,5 +1,5 @@
 {
-  "name": "webauthntine",
+  "name": "@webauthntine/server",
   "version": "1.0.0",
   "description": "It's like FIDO2 and Constantine had a baby.",
   "main": "dist/index.js",
