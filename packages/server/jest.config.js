@@ -2,7 +2,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   collectCoverageFrom: [
-    'src/**/*.{js,ts}',
+    '<rootDir>/src/**/*.{js,ts}',
   ],
   coverageDirectory: 'coverage',
   setupFilesAfterEnv: [
@@ -10,6 +10,6 @@ module.exports = {
   ],
   moduleNameMapper: {
     '@helpers/(.*)': '<rootDir>/src/helpers/$1',
-    '@types': '<rootDir>/src/types',
+    '@libTypes': '<rootDir>/src/libTypes',
   },
 };
