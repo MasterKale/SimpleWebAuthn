@@ -40,7 +40,7 @@ export enum ATTESTATION_FORMATS {
   PACKED = 'packed',
   ANDROID_SAFETYNET = 'android-safetynet',
   NONE = 'none',
-};
+}
 
 export type AttestationObject = {
   fmt: ATTESTATION_FORMATS,
@@ -110,7 +110,7 @@ export enum COSEKEYS {
   y = -3,
   n = -1,
   e = -2,
-};
+}
 
 export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
 
