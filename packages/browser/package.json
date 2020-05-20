@@ -1,0 +1,22 @@
+{
+  "name": "@webauthntine/browser",
+  "version": "1.0.0",
+  "description": "WebAuthntine for the Browser",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Matthew Miller <matthew@millerti.me>",
+  "license": "MIT",
+  "homepage": "https://github.com/MasterKale/WebAuthntine/packages/browser#readme",
+  "scripts": {
+    "build": "rimraf dist && ttsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "npm test -- --coverage",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "webauthn"
+  ],
+  "dependencies": {
+  }
+}
