@@ -1,4 +1,6 @@
 src
+node_modules
+coverage
 .gitignore
 tsconfig.json
 jest.config.js
