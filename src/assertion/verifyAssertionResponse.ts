@@ -5,7 +5,7 @@ import {
   U2F_USER_PRESENTED,
   AuthenticatorDevice,
   VerifiedAssertion,
-} from "@types";
+} from "@libTypes";
 import decodeClientDataJSON from "@helpers/decodeClientDataJSON";
 
 import parseAssertionAuthData from './parseAssertionAuthData';

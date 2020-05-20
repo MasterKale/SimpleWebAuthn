@@ -1,7 +1,7 @@
 import base64url from 'base64url';
 import cbor from 'cbor';
 
-import { AttestationObject } from '@types';
+import { AttestationObject } from '@libTypes';
 
 /**
  * Convert an AttestationObject from base64 string to a proper object

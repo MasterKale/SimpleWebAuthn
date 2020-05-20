@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import { AttestationObject, VerifiedAttestation } from "@types";
+import { AttestationObject, VerifiedAttestation } from "@libTypes";
 import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
 
 import parseAttestationAuthData from '../parseAttestationAuthData';

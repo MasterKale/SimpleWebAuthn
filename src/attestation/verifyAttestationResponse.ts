@@ -1,6 +1,6 @@
 import decodeAttestationObject from '@helpers/decodeAttestationObject';
 import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
-import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse, VerifiedAttestation } from '@types';
+import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse, VerifiedAttestation } from '@libTypes';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';

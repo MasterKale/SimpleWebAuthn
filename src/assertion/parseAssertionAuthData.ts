@@ -1,4 +1,4 @@
-import { ParsedAssertionAuthData } from "@types";
+import { ParsedAssertionAuthData } from "@libTypes";
 
 /**
  * Make sense of the authData buffer contained in an Assertion

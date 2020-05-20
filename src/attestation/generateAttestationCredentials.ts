@@ -1,4 +1,4 @@
-import { AttestationCredentials } from '@types';
+import { AttestationCredentials } from '@libTypes';
 
 /**
  * Prepare credentials for user registration via navigator.credentials.create(...)

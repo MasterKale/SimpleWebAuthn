@@ -1,4 +1,4 @@
-import { ParsedAttestationAuthData } from "@types";
+import { ParsedAttestationAuthData } from "@libTypes";
 
 /**
  * Make sense of the authData buffer contained in an Attestation

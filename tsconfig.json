@@ -10,7 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "paths": {
-      "@types": ["types.ts"],
+      "@libTypes": ["libTypes"],
       "@helpers/*": ["helpers/*"],
     },
   },

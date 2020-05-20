@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import { AssertionCredentials } from '@types';
+import { AssertionCredentials } from '@libTypes';
 
 /**
  * Prepare credentials for user registration via navigator.credentials.get(...)

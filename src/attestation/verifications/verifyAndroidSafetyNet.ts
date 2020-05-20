@@ -6,7 +6,7 @@ import {
   SafetyNetJWTHeader,
   SafetyNetJWTPayload,
   SafetyNetJWTSignature,
-} from "@types";
+} from "@libTypes";
 import toHash from "@helpers/toHash";
 import verifySignature from '@helpers/verifySignature';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';

@@ -1,4 +1,4 @@
-import { ClientDataJSON } from '@types';
+import { ClientDataJSON } from '@libTypes';
 
 import asciiToBinary from './asciiToBinary';
 
