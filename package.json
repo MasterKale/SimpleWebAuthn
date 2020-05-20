@@ -2,6 +2,21 @@
   "name": "webauthntine-monorepo",
   "private": true,
   "devDependencies": {
-    "lerna": "^3.21.0"
+    "@types/cbor": "^5.0.0",
+    "@types/elliptic": "^6.4.12",
+    "@types/jest": "^25.2.3",
+    "@types/jsrsasign": "^8.0.3",
+    "@types/node-rsa": "^1.0.0",
+    "jest": "^25.1.0",
+    "lerna": "^3.21.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^25.5.1",
+    "ts-node": "^8.10.1",
+    "ttypescript": "^1.5.10",
+    "typescript": "^3.9.2",
+    "typescript-transform-paths": "^1.1.14"
+  },
+  "dependencies": {
+    "@webauthntine/server": "file:packages/server"
   }
 }
