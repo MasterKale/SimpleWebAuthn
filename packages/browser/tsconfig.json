@@ -1,15 +1,8 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2018",
-    "lib": ["ES2018", "DOM"],
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "declaration": true,
-    "sourceMap": true,
     "baseUrl": "./src",
     "outDir": "./dist",
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
     "paths": {
       "@libTypes": ["libTypes"],
       "@helpers/*": ["helpers/*"],
@@ -19,12 +12,5 @@
       { "transform": "typescript-transform-paths" },
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
-  },
-  "include": [
-    "src/**/*",
-  ],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/setupTests.ts"
-  ]
+  }
 }
