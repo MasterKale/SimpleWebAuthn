@@ -6,12 +6,13 @@
   "types": "dist/index.d.ts",
   "author": "Matthew Miller<matthew@millerti.me>",
   "license": "MIT",
-  "homepage": "https://github.com/MasterKale/webauthntine#readme",
+  "homepage": "https://github.com/MasterKale/WebAuthntine/packages/server#readme",
   "scripts": {
     "build": "rimraf dist && ttsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "npm test -- --coverage"
+    "test:coverage": "npm test -- --coverage",
+    "prepublish": "npm run build"
   },
   "keywords": [
     "webauthn"
