@@ -73,7 +73,7 @@ export interface AssertionCredential extends PublicKeyCredential {
  * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
  * are base64-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface EncodedAuthenticatorAttestationResponse extends Omit<
+export interface AuthenticatorAttestationResponseJSON extends Omit<
 AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
 > {
   base64ClientDataJSON: string,
@@ -84,7 +84,7 @@ AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
  * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
  * are base64-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface EncodedAuthenticatorAssertionResponse extends Omit<
+export interface AuthenticatorAssertionResponseJSON extends Omit<
 AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signature'
 > {
   base64AuthenticatorData: string;

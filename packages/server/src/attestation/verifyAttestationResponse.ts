@@ -1,6 +1,6 @@
 import decodeAttestationObject from '@helpers/decodeAttestationObject';
 import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
-import { ATTESTATION_FORMATS, EncodedAuthenticatorAttestationResponse, VerifiedAttestation } from '@webauthntine/typescript-types';
+import { ATTESTATION_FORMATS, AuthenticatorAttestationResponseJSON, VerifiedAttestation } from '@webauthntine/typescript-types';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
@@ -14,7 +14,7 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
  * @param expectedOrigin Expected URL of website attestation should have occurred on
  */
 export default function verifyAttestationResponse(
-  response: EncodedAuthenticatorAttestationResponse,
+  response: AuthenticatorAttestationResponseJSON,
   expectedOrigin: string,
 ): VerifiedAttestation {
   const { base64AttestationObject, base64ClientDataJSON } = response;

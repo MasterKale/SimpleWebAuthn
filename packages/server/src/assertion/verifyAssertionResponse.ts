@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import {
-  EncodedAuthenticatorAssertionResponse,
+  AuthenticatorAssertionResponseJSON,
   U2F_USER_PRESENTED,
   AuthenticatorDevice,
   VerifiedAssertion,
@@ -20,7 +20,7 @@ import verifySignature from '@helpers/verifySignature';
  * @param expectedOrigin Expected URL of website attestation should have occurred on
  */
 export default function verifyAssertionResponse(
-  response: EncodedAuthenticatorAssertionResponse,
+  response: AuthenticatorAssertionResponseJSON,
   expectedOrigin: string,
   authenticator: AuthenticatorDevice,
 ): VerifiedAssertion {

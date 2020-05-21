@@ -1,6 +1,6 @@
 import {
   PublicKeyCredentialCreationOptionsJSON,
-  EncodedAuthenticatorAttestationResponse,
+  AuthenticatorAttestationResponseJSON,
   AttestationCredential,
 } from '@webauthntine/typescript-types';
 
@@ -13,7 +13,7 @@ import supportsWebauthn from '../helpers/supportsWebauthn';
  */
 export default async function startAttestation(
   creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON
-): Promise<EncodedAuthenticatorAttestationResponse> {
+): Promise<AuthenticatorAttestationResponseJSON> {
   if (!supportsWebauthn()) {
     throw new Error('Webauthn is not supported in this browser');
   }
