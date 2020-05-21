@@ -6,10 +6,65 @@ export type AttestationCredentials = {
 };
 
 /**
+ * A variant of AttestationCredentials suitable for JSON transmission to the browser
+ *
+ * Noteworthy values:
+ * @param challenge A random string of characters. Will be converted to a Uint8Array in the browser
+ * @param user.id Your unique, internal ID for the user. Will be converted to a Uint8Array in the
+ * browser
+ */
+export type AttestationCredentialsJSON = {
+  publicKey: {
+    challenge: string,
+    // The organization registering and authenticating the user
+    rp: {
+      name: string,
+      id: string,
+    },
+    user: {
+      id: string,
+      name: string,
+      displayName: string,
+    },
+    pubKeyCredParams: [{
+      alg: -7,
+      type: 'public-key',
+    }],
+    timeout?: number,
+    attestation: 'direct' | 'indirect',
+  },
+};
+
+/**
  * An object that can be passed into navigator.credentials.get(...) in the browser
  */
 export type AssertionCredentials = {
   publicKey: PublicKeyCredentialRequestOptions,
+};
+
+/**
+ * A variant of AssertionCredentials suitable for JSON transmission to the browser
+ *
+ * Noteworthy values:
+ * @param challenge A random string of characters. Will be converted to a Uint8Array in the browser
+ * @param allowCredentials.id Base64-encoded credentialId. Will be converted to a Uint8Array in the
+ * browser
+ */
+export type AssertionCredentialsJSON = {
+  publicKey: {
+    //
+    challenge: string,
+    allowCredentials: {
+      // Will be converted to a Uint8Array in the browser
+      id: string,
+      type: 'public-key',
+      transports?: AuthenticatorTransport[],
+    }[],
+    // extensions?: AuthenticationExtensionsClientInputs,
+    rpId?: string,
+    timeout?: number,
+    userVerification?: UserVerificationRequirement,
+  },
 };
 
 /**
@@ -33,6 +88,7 @@ AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signat
   base64AuthenticatorData: string;
   base64ClientDataJSON: string;
   base64Signature: string;
+  base64UserHandle: string;
 }
 
 export enum ATTESTATION_FORMATS {
