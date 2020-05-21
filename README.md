@@ -4,12 +4,12 @@
 It's like FIDO2 and Constantine had a baby...I dunno either 🤷‍♂️
 
 This monorepo contains two complimentary libraries to help reduce the amount of work needed to
-incorporate WebAuthn into a website. The following libraries are maintained here:
+incorporate WebAuthn into a website. The following packages are maintained here:
 
 - @webauthntine/server
 - @webauthntine/browser
 
-An additional package is also included containing shared TypeScript definitions:
+An additional package is also included that contains shared TypeScript definitions:
 
 - @webauthntine/typescript-types
 
