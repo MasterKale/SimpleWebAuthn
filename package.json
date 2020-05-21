@@ -16,6 +16,5 @@
     "typescript": "^3.9.2",
     "typescript-transform-paths": "^1.1.14"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
