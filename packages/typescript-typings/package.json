@@ -1,0 +1,21 @@
+{
+  "name": "@webauthntine/typescript-typings",
+  "version": "1.0.0",
+  "description": "TypeScript types used by the @webauthntine series of libraries",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Matthew Miller <matthew@millerti.me>",
+  "license": "MIT",
+  "homepage": "",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "webauthn",
+    "typescript",
+    "types"
+  ],
+  "dependencies": {
+  }
+}
