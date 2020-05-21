@@ -4,7 +4,6 @@
     "baseUrl": "./src",
     "outDir": "./dist",
     "paths": {
-      "@libTypes": ["libTypes"],
       "@helpers/*": ["helpers/*"],
     },
     "plugins": [
