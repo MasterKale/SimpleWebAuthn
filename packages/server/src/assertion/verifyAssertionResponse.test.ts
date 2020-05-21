@@ -9,7 +9,6 @@ test('', () => {
         'aHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmdldCJ9',
       base64Signature: 'MEQCIHZYFY3LsKzI0T9XRwEACl7YsYZysZ2HUw3q9f7tlq3wAiBNbyBbQMNM56P6Z00tBEZ6v' +
         'II4f9Al-p4pZw7OBpSaog',
-      userHandle: null,
     },
     'https://dev.dontneeda.pw',
     {
