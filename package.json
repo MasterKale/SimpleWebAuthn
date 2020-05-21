@@ -17,6 +17,5 @@
     "typescript-transform-paths": "^1.1.14"
   },
   "dependencies": {
-    "@webauthntine/server": "file:packages/server"
   }
 }
