@@ -1,5 +1,4 @@
-import base64url from 'base64url';
-import { AssertionCredentials } from '@webauthntine/typescript-types';
+import { AssertionCredentialsJSON } from '@webauthntine/typescript-types';
 
 
 /**
@@ -14,12 +13,12 @@ export default function generateAssertionCredentials(
   challenge: string,
   base64CredentialIDs: string[],
   timeout: number = 60000,
-): AssertionCredentials {
+): AssertionCredentialsJSON {
   return {
     publicKey: {
-      challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+      challenge,
       allowCredentials: base64CredentialIDs.map(id => ({
-        id: base64url.toBuffer(id),
+        id,
         type: 'public-key',
         transports: ['usb', 'ble', 'nfc'],
       })),

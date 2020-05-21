@@ -1,4 +1,5 @@
-import { AttestationCredentials } from '@webauthntine/typescript-types';
+import { AttestationCredentialsJSON } from '@webauthntine/typescript-types';
+
 
 /**
  * Prepare credentials for user registration via navigator.credentials.create(...)
@@ -19,18 +20,18 @@ export default function generateAttestationCredentials(
   username: string,
   timeout: number = 60000,
   attestationType: 'direct' | 'indirect' = 'direct',
-): AttestationCredentials {
+): AttestationCredentialsJSON {
   return {
     publicKey: {
       // Cryptographically random bytes to prevent replay attacks
-      challenge: Uint8Array.from(challenge, c => c.charCodeAt(0)),
+      challenge,
       // The organization registering and authenticating the user
       rp: {
         name: serviceName,
         id: rpID,
       },
       user: {
-        id: Uint8Array.from(userID, c => c.charCodeAt(0)),
+        id: userID,
         name: username,
         displayName: username,
       },
