@@ -1,5 +1,21 @@
 import verifyAttestationResponse from './verifyAttestationResponse';
 
+import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
+import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
+
+let mockDecodeAttestation: jest.SpyInstance;
+let mockDecodeClientData: jest.SpyInstance;
+
+beforeEach(() => {
+  mockDecodeAttestation = jest.spyOn(decodeAttestationObject, 'default');
+  mockDecodeClientData = jest.spyOn(decodeClientDataJSON, 'default');
+});
+
+afterEach(() => {
+  mockDecodeAttestation.mockRestore();
+  mockDecodeClientData.mockRestore();
+});
+
 test('should verify FIDO U2F attestation', () => {
   const verification = verifyAttestationResponse(
     attestationFIDOU2F,
@@ -67,6 +83,45 @@ test('should verify Android SafetyNet attestation', () => {
   expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
     'AQy9gSmVYQXGuzd492rA2qEqwN7SYE_xOCjduU4QVagRwnX30mbfW75Lu4TwXHe-gc1O2PnJF7JVJA9dyJm83Xs',
   );
+});
+
+test('should throw when response origin is not expected value', () => {
+  expect(() => {
+    verifyAttestationResponse(
+      attestationNone,
+      'https://different.address'
+    );
+  }).toThrow('Attestation origin was an unexpected value');
+});
+
+test('should throw when attestation type is not webauthn.create', () => {
+  const origin = 'https://dev.dontneeda.pw';
+
+  // @ts-ignore 2345
+  mockDecodeClientData.mockReturnValue({ origin, type: 'webauthn.badtype' });
+
+  expect(() => {
+    verifyAttestationResponse(
+      attestationNone,
+      origin,
+    );
+  }).toThrow('Attestation type was an unexpected value');
+});
+
+test('should throw if an unexpected attestation format is specified', () => {
+  const fmt = 'fizzbuzz';
+
+  mockDecodeAttestation.mockReturnValue({
+    // @ts-ignore 2322
+    fmt,
+  });
+
+  expect(() => {
+    verifyAttestationResponse(
+      attestationNone,
+      'https://dev.dontneeda.pw',
+    );
+  }).toThrow(`Unsupported Attestation Format: ${fmt}`);
 });
 
 const attestationFIDOU2F = {
