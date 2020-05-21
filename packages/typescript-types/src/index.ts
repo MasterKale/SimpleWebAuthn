@@ -1,12 +1,6 @@
 /**
- * An object that can be passed into navigator.credentials.create(...) in the browser
- */
-export type AttestationCredentials = {
-  publicKey: PublicKeyCredentialCreationOptions,
-};
-
-/**
- * A variant of AttestationCredentials suitable for JSON transmission to the browser
+ * A variant of AttestationCredentials suitable for JSON transmission to the browser to
+ * (eventually) get passed into navigator.credentials.create(...) in the browser.
  *
  * Noteworthy values:
  * @param challenge A random string of characters. Will be converted to a Uint8Array in the browser
@@ -36,14 +30,8 @@ export type AttestationCredentialsJSON = {
 };
 
 /**
- * An object that can be passed into navigator.credentials.get(...) in the browser
- */
-export type AssertionCredentials = {
-  publicKey: PublicKeyCredentialRequestOptions,
-};
-
-/**
- * A variant of AssertionCredentials suitable for JSON transmission to the browser
+ * A variant of AssertionCredentials suitable for JSON transmission to the browser to
+ * (eventually) get passed into navigator.credentials.get(...) in the browser.
  *
  * Noteworthy values:
  * @param challenge A random string of characters. Will be converted to a Uint8Array in the browser
