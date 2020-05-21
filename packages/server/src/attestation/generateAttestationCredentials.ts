@@ -1,4 +1,4 @@
-import { AttestationCredentialsJSON } from '@webauthntine/typescript-types';
+import { PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript-types';
 
 
 /**
@@ -20,7 +20,7 @@ export default function generateAttestationCredentials(
   username: string,
   timeout: number = 60000,
   attestationType: 'direct' | 'indirect' = 'direct',
-): AttestationCredentialsJSON {
+): PublicKeyCredentialCreationOptionsJSON {
   return {
     publicKey: {
       // Cryptographically random bytes to prevent replay attacks

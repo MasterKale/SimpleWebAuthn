@@ -1,5 +1,5 @@
 /**
- * A variant of AttestationCredentials suitable for JSON transmission to the browser to
+ * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.create(...) in the browser.
  *
  * Noteworthy values:
@@ -7,7 +7,7 @@
  * @param user.id Your unique, internal ID for the user. Will be converted to a Uint8Array in the
  * browser
  */
-export type AttestationCredentialsJSON = {
+export type PublicKeyCredentialCreationOptionsJSON = {
   publicKey: {
     challenge: string,
     // The organization registering and authenticating the user
@@ -30,7 +30,7 @@ export type AttestationCredentialsJSON = {
 };
 
 /**
- * A variant of AssertionCredentials suitable for JSON transmission to the browser to
+ * A variant of PublicKeyCredentialRequestOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.get(...) in the browser.
  *
  * Noteworthy values:
@@ -38,7 +38,7 @@ export type AttestationCredentialsJSON = {
  * @param allowCredentials.id Base64-encoded credentialId. Will be converted to a Uint8Array in the
  * browser
  */
-export type AssertionCredentialsJSON = {
+export type PublicKeyCredentialRequestOptionsJSON = {
   publicKey: {
     //
     challenge: string,

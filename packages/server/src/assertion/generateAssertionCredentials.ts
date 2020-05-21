@@ -1,4 +1,4 @@
-import { AssertionCredentialsJSON } from '@webauthntine/typescript-types';
+import { PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-types';
 
 
 /**
@@ -13,7 +13,7 @@ export default function generateAssertionCredentials(
   challenge: string,
   base64CredentialIDs: string[],
   timeout: number = 60000,
-): AssertionCredentialsJSON {
+): PublicKeyCredentialRequestOptionsJSON {
   return {
     publicKey: {
       challenge,
