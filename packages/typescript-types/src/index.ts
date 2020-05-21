@@ -85,12 +85,12 @@ AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
  * are base64-encoded in the browser so that they can be sent as JSON to the server.
  */
 export interface AuthenticatorAssertionResponseJSON extends Omit<
-AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signature'
+AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signature' | 'userHandle'
 > {
   base64AuthenticatorData: string;
   base64ClientDataJSON: string;
   base64Signature: string;
-  base64UserHandle: string;
+  base64UserHandle?: string;
 }
 
 export enum ATTESTATION_FORMATS {
