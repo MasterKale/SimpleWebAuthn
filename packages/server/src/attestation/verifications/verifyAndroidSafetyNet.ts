@@ -112,6 +112,7 @@ export default function verifyAttestationAndroidSafetyNet(
 
   const toReturn: VerifiedAttestation = {
     verified: verifySignature(signatureBuffer, signatureBaseBuffer, certificate),
+    userVerified: false,
   };
   /**
    * END Verify Signature
@@ -121,7 +122,9 @@ export default function verifyAttestationAndroidSafetyNet(
   if (toReturn.verified) {
     const authDataStruct = parseAttestationAuthData(authData);
     console.debug('authDataStruct:', authDataStruct);
-    const { counter, credentialID, COSEPublicKey } = authDataStruct;
+    const { counter, credentialID, COSEPublicKey, flags } = authDataStruct;
+
+    toReturn.userVerified = flags.uv;
 
     if (!COSEPublicKey) {
       throw new Error('No public key was provided by authenticator');

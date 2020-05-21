@@ -139,6 +139,7 @@ export type ClientDataJSON = {
  */
 export type VerifiedAttestation = {
   verified: boolean,
+  userVerified: boolean;
   authenticatorInfo?: {
     fmt: ATTESTATION_FORMATS,
     counter: number,

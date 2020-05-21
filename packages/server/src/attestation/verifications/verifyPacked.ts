@@ -24,7 +24,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
 
   const authDataStruct = parseAttestationAuthData(authData);
 
-  const { COSEPublicKey, counter, credentialID } = authDataStruct;
+  const { COSEPublicKey, counter, credentialID, flags } = authDataStruct;
 
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator');
@@ -45,7 +45,10 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
     clientDataHash,
   ]);
 
-  const toReturn: VerifiedAttestation = { verified: false };
+  const toReturn: VerifiedAttestation = {
+    verified: false,
+    userVerified: flags.uv,
+  };
   const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 
   if (x5c) {

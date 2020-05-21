@@ -49,6 +49,7 @@ export default function verifyAttestationNone(
 
   const toReturn: VerifiedAttestation = {
     verified: true,
+    userVerified: flags.uv,
     authenticatorInfo: {
       fmt,
       counter,

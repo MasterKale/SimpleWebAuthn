@@ -65,6 +65,7 @@ export default function verifyAttestationFIDOU2F(
 
   const toReturn: VerifiedAttestation = {
     verified: verifySignature(sig, signatureBase, publicKeyCertPEM),
+    userVerified: flags.uv,
   };
 
   if (toReturn.verified) {
