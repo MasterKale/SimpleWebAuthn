@@ -11,7 +11,7 @@ incorporate WebAuthn into a website. The following libraries are maintained here
 
 An additional package is also included containing shared TypeScript definitions:
 
-- @webauthntine/typescript-typings
+- @webauthntine/typescript-types
 
 ## Development
 

@@ -1,5 +1,5 @@
 {
-  "name": "@webauthntine/typescript-typings",
+  "name": "@webauthntine/typescript-types",
   "version": "1.0.0",
   "description": "TypeScript types used by the @webauthntine series of libraries",
   "main": "dist/index.js",
