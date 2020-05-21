@@ -9,7 +9,7 @@ import toBase64String from '../helpers/toBase64String';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 
 /**
- * Begin authenticator registration via WebAuthn "attestation"
+ * Begin authenticator "registration" via WebAuthn attestation
  *
  * @param creationOptionsJSON Output from @webauthntine/server's generateAttestationOptions(...)
  */
