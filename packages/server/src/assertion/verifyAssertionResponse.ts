@@ -61,6 +61,15 @@ export default function verifyAssertionResponse(
     counter,
   } = authData;
 
+  if (counter <= authenticator.counter) {
+    // Error out when the counter in the DB is greater than or equal to the counter in the
+    // dataStruct. It's related to how the authenticator maintains the number of times its been
+    // used for this client. If this happens, then someone's somehow increased the counter
+    // on the device without going through this site
+    console.debug(`Response counter ${counter} was not greater than ${authenticator.counter}`);
+    throw new Error(`Counter in response did not increment from ${authenticator.counter}`);
+  }
+
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
   const signatureBase = Buffer.concat([
     rpIdHash,
@@ -75,16 +84,6 @@ export default function verifyAssertionResponse(
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
   };
-
-  if (toReturn.verified) {
-    if (counter <= authenticator.counter) {
-      // Error out when the counter in the DB is greater than or equal to the counter in the
-      // dataStruct. It's related to how the authenticator maintains the number of times its been
-      // used for this client. If this happens, then someone's somehow increased the counter
-      // on the device without going through this site
-      throw new Error(`Device's counter ${counter} isn't greater than ${authenticator.counter}!`);
-    }
-  }
 
   return toReturn;
 }
