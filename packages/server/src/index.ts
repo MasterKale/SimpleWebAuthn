@@ -1,11 +1,11 @@
-import generateAttestationCredentials from './attestation/generateAttestationCredentials';
+import generateAttestationOptions from './attestation/generateAttestationOptions';
 import verifyAttestationResponse from './attestation/verifyAttestationResponse';
-import generateAssertionCredentials from './assertion/generateAssertionCredentials';
+import generateAssertionOptions from './assertion/generateAssertionOptions';
 import verifyAssertionResponse from './assertion/verifyAssertionResponse';
 
 export {
-  generateAssertionCredentials,
+  generateAttestationOptions,
   verifyAttestationResponse,
-  generateAttestationCredentials,
+  generateAssertionOptions,
   verifyAssertionResponse,
 };

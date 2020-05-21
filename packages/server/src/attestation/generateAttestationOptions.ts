@@ -2,7 +2,7 @@ import { PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript
 
 
 /**
- * Prepare credentials for user registration via navigator.credentials.create(...)
+ * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
  *
  * @param serviceName Friendly user-visible website name
  * @param rpID Valid domain name (after `https://`)
@@ -12,7 +12,7 @@ import { PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript
  * @param timeout How long (in ms) the user can take to complete attestation
  * @param attestationType Request a full ("direct") or anonymized ("indirect") attestation statement
  */
-export default function generateAttestationCredentials(
+export default function generateAttestationOptions(
   serviceName: string,
   rpID: string,
   challenge: string,
