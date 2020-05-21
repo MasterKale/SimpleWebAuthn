@@ -1,4 +1,5 @@
 const path = require('path');
+const WebpackAutoInject = require('webpack-auto-inject-version');
 
 const outputPath = path.resolve(__dirname, 'dist');
 
@@ -24,4 +25,18 @@ module.exports = {
     library: 'WebAuthntineBrowser',
     libraryTarget: 'umd',
   },
+  plugins: [
+    new WebpackAutoInject({
+      SHORT: '@webauthentine/browser',
+      PACKAGE_JSON_INDENT: 2,
+      components: {
+        AutoIncreaseVersion: false,
+      },
+      componentsOptions: {
+        InjectAsComment: {
+          tag: 'Version: {version} - {date}',
+        },
+      },
+    })
+  ],
 };
