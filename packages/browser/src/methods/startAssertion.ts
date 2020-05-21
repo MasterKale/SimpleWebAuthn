@@ -17,7 +17,7 @@ export default async function startAssertion(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON
 ): Promise<AuthenticatorAssertionResponseJSON> {
   if (!supportsWebauthn()) {
-    throw new Error('Webauthn is not supported in this browser');
+    throw new Error('WebAuthn is not supported in this browser');
   }
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
