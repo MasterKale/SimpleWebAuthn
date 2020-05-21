@@ -3,13 +3,5 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist",
-    "paths": {
-      "@helpers/*": ["helpers/*"],
-    },
-    "plugins": [
-      // These replace the path helpers above with relative paths at build time
-      { "transform": "typescript-transform-paths" },
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ]
   }
 }
