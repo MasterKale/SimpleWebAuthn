@@ -1,4 +1,4 @@
-import { ParsedAssertionAuthData } from "@libTypes";
+import { ParsedAssertionAuthData } from "@webauthntine/typescript-types";
 
 /**
  * Make sense of the authData buffer contained in an Assertion

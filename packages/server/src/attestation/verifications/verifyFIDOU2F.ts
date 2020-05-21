@@ -1,6 +1,6 @@
 import base64url from 'base64url';
+import { AttestationObject, VerifiedAttestation, U2F_USER_PRESENTED } from '@webauthntine/typescript-types';
 
-import { AttestationObject, VerifiedAttestation, U2F_USER_PRESENTED } from '@libTypes';
 import toHash from '@helpers/toHash';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';

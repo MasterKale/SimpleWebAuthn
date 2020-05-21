@@ -1,12 +1,12 @@
 import base64url from 'base64url';
-
 import {
   AttestationObject,
   VerifiedAttestation,
   SafetyNetJWTHeader,
   SafetyNetJWTPayload,
   SafetyNetJWTSignature,
-} from "@libTypes";
+} from "@webauthntine/typescript-types";
+
 import toHash from "@helpers/toHash";
 import verifySignature from '@helpers/verifySignature';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';

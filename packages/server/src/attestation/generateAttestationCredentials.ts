@@ -1,4 +1,4 @@
-import { AttestationCredentials } from '@libTypes';
+import { AttestationCredentials } from '@webauthntine/typescript-types';
 
 /**
  * Prepare credentials for user registration via navigator.credentials.create(...)

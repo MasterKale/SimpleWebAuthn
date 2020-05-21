@@ -1,11 +1,11 @@
 import base64url from 'base64url';
-
 import {
   EncodedAuthenticatorAssertionResponse,
   U2F_USER_PRESENTED,
   AuthenticatorDevice,
   VerifiedAssertion,
-} from "@libTypes";
+} from "@webauthntine/typescript-types";
+
 import decodeClientDataJSON from "@helpers/decodeClientDataJSON";
 
 import parseAssertionAuthData from './parseAssertionAuthData';

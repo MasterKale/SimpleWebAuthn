@@ -9,11 +9,3 @@ export {
   generateAttestationCredentials,
   verifyAssertionResponse,
 };
-
-export {
-  EncodedAuthenticatorAssertionResponse,
-  EncodedAuthenticatorAttestationResponse,
-  VerifiedAttestation,
-  VerifiedAssertion,
-  AuthenticatorDevice,
-} from './libTypes';

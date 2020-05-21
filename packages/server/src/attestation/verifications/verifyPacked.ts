@@ -2,8 +2,8 @@ import base64url from 'base64url';
 import cbor from 'cbor';
 import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
+import { AttestationObject, VerifiedAttestation, COSEKEYS, COSEPublicKey } from "@webauthntine/typescript-types";
 
-import { AttestationObject, VerifiedAttestation, COSEKEYS, COSEPublicKey } from "@libTypes";
 import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
 import toHash from "@helpers/toHash";
 import convertASN1toPEM from '@helpers/convertASN1toPEM';

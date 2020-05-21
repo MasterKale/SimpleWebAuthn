@@ -1,6 +1,6 @@
 import jsrsasign from 'jsrsasign';
+import { CertificateInfo } from '@webauthntine/typescript-types';
 
-import { CertificateInfo } from '@libTypes';
 
 /**
  * Extract PEM certificate info
