@@ -43,7 +43,7 @@ export default function verifyAssertionResponse(
   if (type !== 'webauthn.get') {
     console.error('type did not equal "webauthn.get"');
     console.debug('attestation\'s type:', type);
-    throw new Error('Attestation type was an unexpected value');
+    throw new Error('Assertion type was an unexpected value');
   }
 
   const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
@@ -51,7 +51,7 @@ export default function verifyAssertionResponse(
   console.log('parsed authData:', authData);
 
   if (!(authData.flags & U2F_USER_PRESENTED)) {
-    throw new Error('User was NOT present during authentication!');
+    throw new Error('User was NOT present during assertion!');
   }
 
   const {
