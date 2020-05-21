@@ -56,6 +56,20 @@ export type AssertionCredentialsJSON = {
 };
 
 /**
+ * The value returned from navigator.credentials.create()
+ */
+export interface AttestationCredential extends PublicKeyCredential {
+  response: AuthenticatorAttestationResponse;
+}
+
+/**
+ * The value returned from navigator.credentials.get()
+ */
+export interface AssertionCredential extends PublicKeyCredential {
+  response: AuthenticatorAssertionResponse;
+}
+
+/**
  * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
  * are base64-encoded in the browser so that they can be sent as JSON to the server.
  */
