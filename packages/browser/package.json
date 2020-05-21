@@ -18,5 +18,8 @@
     "webauthn"
   ],
   "dependencies": {
+  },
+  "devDependencies": {
+    "@webauthntine/typescript-types": "^1.0.0"
   }
 }
