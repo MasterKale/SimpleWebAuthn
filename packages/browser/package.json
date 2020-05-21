@@ -24,6 +24,7 @@
     "@types/base64-js": "^1.2.5",
     "@webauthntine/typescript-types": "^1.0.0",
     "ts-loader": "^7.0.4",
-    "webpack": "^4.43.0"
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
   }
 }
