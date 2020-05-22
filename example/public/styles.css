@@ -1,0 +1,38 @@
+* {
+  font-size: 16px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #F7F7F7;
+}
+
+.container {
+  max-width: 70rem;
+  margin: auto;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2.25rem;
+}
+
+button {
+  padding: 0.5rem;
+  background: white;
+  border-radius: 0.25rem;
+}
+
+button:active {
+  background: #EEEEEE;
+}
+
+button:hover {
+  background: #EFEFEF;
+}
