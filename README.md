@@ -1,17 +1,17 @@
 # WebAuthntine Project
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)
 
 It's like FIDO2 and Constantine had a baby...I dunno either 🤷‍♂️
 
 This monorepo contains two complimentary libraries to help reduce the amount of work needed to
 incorporate WebAuthn into a website. The following packages are maintained here:
 
-- @webauthntine/server
-- @webauthntine/browser
+- [@webauthntine/server](./packages/server/)
+- [@webauthntine/browser](./packages/browser)
 
 An additional package is also included that contains shared TypeScript definitions:
 
-- @webauthntine/typescript-types
+- [@webauthntine/typescript-types](./packages/typescript-types/)
 
 ## Development
 
