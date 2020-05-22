@@ -1,6 +1,7 @@
 // Silence some console output
-jest.spyOn(console, 'log').mockImplementation();
-jest.spyOn(console, 'debug').mockImplementation();
+// jest.spyOn(console, 'log').mockImplementation();
+// jest.spyOn(console, 'debug').mockImplementation();
+// jest.spyOn(console, 'error').mockImplementation();
 
 /**
  * JSDom doesn't seem to support `credentials`, so let's define them here so we can mock their
