@@ -172,7 +172,7 @@ export type VerifiedAttestation = {
  */
 export type VerifiedAssertion = {
   verified: boolean;
-  authenticatorInfo?: {
+  authenticatorInfo: {
     counter: number,
     base64CredentialID: string,
   },

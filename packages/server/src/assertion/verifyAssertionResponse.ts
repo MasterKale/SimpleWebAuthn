@@ -75,6 +75,10 @@ export default function verifyAssertionResponse(
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
+    authenticatorInfo: {
+      counter,
+      base64CredentialID: response.base64CredentialID,
+    },
   };
 
   return toReturn;
