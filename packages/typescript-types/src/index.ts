@@ -136,6 +136,17 @@ export type ClientDataJSON = {
 
 /**
  * Result of attestation verification
+ *
+ * @param verified If the assertion response could be verified
+ * @param userVerified Whether the user was uniquely identified during attestation
+ * @param authenticatorInfo.fmt Type of attestation
+ * @param authenticatorInfo.counter The number of times the authenticator reported it has been used.
+ * Should be kept in a DB for later reference to help prevent replay attacks
+ * @param authenticatorInfo.base64PublicKey Base64-encoded ArrayBuffer containing the
+ * authenticator's public key. **Should be kept in a DB for later reference!**
+ * @param authenticatorInfo.base64CredentialID Base64-encoded ArrayBuffer containing the
+ * authenticator's credential ID for the public key above. **Should be kept in a DB for later
+ * reference!**
  */
 export type VerifiedAttestation = {
   verified: boolean,
@@ -150,6 +161,10 @@ export type VerifiedAttestation = {
 
 /**
  * Result of assertion verification
+ *
+ * @param verified If the assertion response could be verified
+ * @param counter The number of times the authenticator reported it has been used. **Should be
+ * kept in a DB for later reference to help prevent replay attacks!**
  */
 export type VerifiedAssertion = {
   verified: boolean;
