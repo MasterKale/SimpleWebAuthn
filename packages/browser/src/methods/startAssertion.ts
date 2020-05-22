@@ -3,6 +3,7 @@ import {
   AuthenticatorAssertionResponseJSON,
   AssertionCredential,
 } from '@webauthntine/typescript-types';
+import base64js from 'base64-js';
 
 import toUint8Array from '../helpers/toUint8Array';
 import toBase64String from '../helpers/toBase64String';
@@ -24,10 +25,15 @@ export default async function startAssertion(
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...requestOptionsJSON.publicKey,
     challenge: toUint8Array(requestOptionsJSON.publicKey.challenge),
-    allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map((cred) => ({
-      ...cred,
-      id: toUint8Array(cred.id),
-    }))
+    allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map((cred) => {
+      // Make sure the credential ID length is a multiple of 4
+      let id = cred.id.padEnd(cred.id.length + (cred.id.length % 4), '=');
+
+      return {
+        ...cred,
+        id: base64js.toByteArray(id),
+      };
+    })
   };
 
   // Wait for the user to complete assertion

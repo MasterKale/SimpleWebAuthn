@@ -4,6 +4,7 @@ import { AssertionCredential, PublicKeyCredentialRequestOptionsJSON } from '@web
 
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
+import toBase64String from '../helpers/toBase64String';
 
 import startAssertion from './startAssertion';
 
@@ -49,9 +50,9 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
 
   expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.publicKey.challenge));
-  expect(argsPublicKey.allowCredentials[0].id).toEqual(
-    toUint8Array(goodOpts1.publicKey.allowCredentials[0].id),
-  );
+  // Make sure the credential ID is a proper base64 with a length that's a multiple of 4
+  expect(argsPublicKey.allowCredentials[0].id.length % 4).toEqual(0);
+  expect(argsPublicKey.allowCredentials[0].id).toEqual(base64js.toByteArray('credId=='));
 
   done();
 });
