@@ -1,12 +1,15 @@
 {
   "name": "@webauthntine/server",
   "version": "1.0.0",
-  "description": "It's like FIDO2 and Constantine had a baby.",
+  "description": "WebAuthntine for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "author": "Matthew Miller<matthew@millerti.me>",
+  "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
   "homepage": "https://github.com/MasterKale/WebAuthntine/packages/server#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rimraf dist && ttsc",
     "test": "jest",
@@ -15,7 +18,8 @@
     "prepare": "npm run build"
   },
   "keywords": [
-    "webauthn"
+    "webauthn",
+    "typescript"
   ],
   "dependencies": {
     "base64url": "^3.0.1",
@@ -25,6 +29,6 @@
     "node-rsa": "^1.0.8"
   },
   "devDependencies": {
-    "@webauthntine/typescript-types": "^1.0.0"
+    "@webauthntine/typescript-types": "file:../typescript-types"
   }
 }

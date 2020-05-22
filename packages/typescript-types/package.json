@@ -6,7 +6,10 @@
   "types": "dist/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/MasterKale/WebAuthntine/packages/typescript-types#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rimraf dist && tsc",
     "prepare": "npm run build"

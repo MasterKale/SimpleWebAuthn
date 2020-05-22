@@ -1,12 +1,15 @@
 {
   "name": "@webauthntine/browser",
   "version": "1.0.0",
-  "description": "WebAuthntine for the Browser",
+  "description": "WebAuthntine for Browsers",
   "main": "dist/webauthntine-browser.min.js",
   "types": "dist/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
   "homepage": "https://github.com/MasterKale/WebAuthntine/packages/browser#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rimraf dist && webpack",
     "test": "jest",
@@ -15,14 +18,15 @@
     "prepare": "npm run build"
   },
   "keywords": [
-    "webauthn"
+    "webauthn",
+    "typescript"
   ],
   "dependencies": {
     "base64-js": "^1.3.1"
   },
   "devDependencies": {
     "@types/base64-js": "^1.2.5",
-    "@webauthntine/typescript-types": "^1.0.0",
+    "@webauthntine/typescript-types": "file:../typescript-types",
     "ts-loader": "^7.0.4",
     "webpack": "^4.43.0",
     "webpack-auto-inject-version": "^1.2.2",
