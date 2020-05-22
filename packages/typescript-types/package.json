@@ -1,6 +1,6 @@
 {
   "name": "@webauthntine/typescript-types",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "TypeScript types used by the @webauthntine series of libraries",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,5 @@
     "webauthn",
     "typescript",
     "types"
-  ],
-  "dependencies": {
-  }
+  ]
 }
