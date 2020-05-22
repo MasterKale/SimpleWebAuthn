@@ -24,17 +24,16 @@ export default function verifyAttestationNone(
     flags,
   } = authDataStruct;
 
+  if (!flags.up) {
+    throw new Error('User was not present for attestation (None)');
+  }
+
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (None)');
   }
 
   if (!credentialID) {
     throw new Error('No credential ID was provided by authenticator (None)');
-  }
-
-  // Make sure the (U)ser (P)resent for the attestation
-  if (!flags.up) {
-    throw new Error('User was not present for attestation (None)');
   }
 
   const publicKey = convertCOSEtoPKCS(COSEPublicKey);

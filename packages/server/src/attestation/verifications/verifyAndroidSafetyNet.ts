@@ -110,7 +110,9 @@ export default function verifyAttestationAndroidSafetyNet(
     const authDataStruct = parseAttestationAuthData(authData);
     const { counter, credentialID, COSEPublicKey, flags } = authDataStruct;
 
-    toReturn.userVerified = flags.uv;
+    if (!flags.up) {
+      throw new Error('User was not present for attestation (None)');
+    }
 
     if (!COSEPublicKey) {
       throw new Error('No public key was provided by authenticator (SafetyNet)');
@@ -119,6 +121,8 @@ export default function verifyAttestationAndroidSafetyNet(
     if (!credentialID) {
       throw new Error('No credential ID was provided by authenticator (SafetyNet)');
     }
+
+    toReturn.userVerified = flags.uv;
 
     const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 

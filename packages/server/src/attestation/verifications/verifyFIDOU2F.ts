@@ -1,5 +1,5 @@
 import base64url from 'base64url';
-import { AttestationObject, VerifiedAttestation, U2F_USER_PRESENTED } from '@webauthntine/typescript-types';
+import { AttestationObject, VerifiedAttestation } from '@webauthntine/typescript-types';
 
 import toHash from '@helpers/toHash';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
@@ -27,7 +27,7 @@ export default function verifyAttestationFIDOU2F(
     counter,
   } = authDataStruct;
 
-  if (!(flags.flagsInt & U2F_USER_PRESENTED)) {
+  if (!(flags.up)) {
     throw new Error('User was NOT present during authentication (FIDOU2F)');
   }
 
