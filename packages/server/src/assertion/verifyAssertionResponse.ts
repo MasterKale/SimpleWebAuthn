@@ -46,13 +46,6 @@ export default function verifyAssertionResponse(
     throw new Error('User was NOT present during assertion!');
   }
 
-  const {
-    rpIdHash,
-    flagsBuf,
-    counterBuf,
-    counter,
-  } = authData;
-
   if (counter <= authenticator.counter) {
     // Error out when the counter in the DB is greater than or equal to the counter in the
     // dataStruct. It's related to how the authenticator maintains the number of times its been
@@ -62,6 +55,12 @@ export default function verifyAssertionResponse(
       `Response counter value ${counter} was lower than expected ${authenticator.counter}`,
     );
   }
+
+  const {
+    rpIdHash,
+    flagsBuf,
+    counterBuf,
+  } = authDataStruct;
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
   const signatureBase = Buffer.concat([
