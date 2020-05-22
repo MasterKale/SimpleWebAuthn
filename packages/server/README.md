@@ -1,2 +1,2 @@
-# WebAuthntine Server
+# @webauthntine/server
 
