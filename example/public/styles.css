@@ -13,12 +13,6 @@ body {
   background: #F7F7F7;
 }
 
-.container {
-  max-width: 70rem;
-  margin: auto;
-  text-align: center;
-}
-
 h1 {
   font-size: 2.25rem;
 }
@@ -35,4 +29,15 @@ button:active {
 
 button:hover {
   background: #EFEFEF;
+}
+
+.container {
+  max-width: 70rem;
+  margin: auto;
+  text-align: center;
+}
+
+#error {
+  color: red;
+  font-weight: bold;
 }

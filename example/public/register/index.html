@@ -14,6 +14,22 @@
       <span>⬅️&nbsp;<a href="/">Go Back</a></span>
     </p>
     <button id="btnBegin">Begin Registration</button>
+    <p id="error"></p>
   </div>
+  <script>
+    const elemBegin = document.getElementById('btnBegin');
+    const elemError = document.getElementById('error');
+    const { startAttestation } = WebAuthntineBrowser;
+
+    elemBegin.addEventListener('click', (async () => {
+      console.log('getting attestation options');
+      const resp = await fetch('/generate-attestation-options');
+
+      const options = await resp.json();
+      console.log(options);
+
+      startAttestation(options);
+    }));
+  </script>
 </body>
 </html>
