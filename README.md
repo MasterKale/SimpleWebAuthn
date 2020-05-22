@@ -17,13 +17,13 @@ After pulling down the code, set up dependencies:
 
 ```sh
 $> npm install
-$> npx lerna bootstrap
+$> npm run bootstrap
 ```
 
 To run unit tests for all tracked lerna packages, run the following:
 
 ```sh
-$> npx lerna test
+$> npx lerna run test
 ```
 
 Running Jest in watch mode for a specific project requires the use of `lerna exec`:
