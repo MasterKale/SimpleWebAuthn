@@ -13,10 +13,10 @@ jest.mock('../helpers/supportsWebauthn');
 const mockNavigatorGet = (window.navigator.credentials.get as jest.Mock);
 const mockSupportsWebauthn = (supportsWebauthn as jest.Mock);
 
-const mockAttestationObject = 'mockAsse';
-const mockClientDataJSON = 'mockClie';
-const mockSignature = 'mockSign';
-const mockUserHandle = 'mockUser';
+const mockAuthenticatorData = toBase64String(toUint8Array('mockAuthenticatorData'));
+const mockClientDataJSON = toBase64String(toUint8Array('mockClientDataJSON'));
+const mockSignature = toBase64String(toUint8Array('mockSignature'));
+const mockUserHandle = toBase64String(toUint8Array('mockUserHandle'));
 
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
   publicKey: {
@@ -66,8 +66,8 @@ test('should return base64-encoded response values', async (done) => {
         id: 'foobar',
         rawId: toUint8Array('foobar'),
         response: {
+          authenticatorData: base64js.toByteArray(mockAuthenticatorData),
           clientDataJSON: base64js.toByteArray(mockClientDataJSON),
-          authenticatorData: base64js.toByteArray(mockClientDataJSON),
           signature: base64js.toByteArray(mockSignature),
           userHandle: base64js.toByteArray(mockUserHandle),
         },
@@ -80,7 +80,7 @@ test('should return base64-encoded response values', async (done) => {
   const response = await startAssertion(goodOpts1);
 
   expect(response).toEqual({
-    base64AuthenticatorData: mockClientDataJSON,
+    base64AuthenticatorData: mockAuthenticatorData,
     base64ClientDataJSON: mockClientDataJSON,
     base64Signature: mockSignature,
     base64UserHandle: mockUserHandle,
