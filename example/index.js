@@ -32,12 +32,23 @@ const username = 'user@webauthntine.foo';
 
 const inMemoryUserDeviceDB = {
   [userId]: [
-    {
-      base64PublicKey: undefined,
-      base64CredentialID: undefined,
-      counter: -1,
-    }
-],
+    /**
+     * After an attestation, the following authenticator info returned by
+     * verifyAttestationResponse() should be persisted somewhere that'll tie it back to the user
+     * specified during attestation:
+     *
+     * {
+     *   base64PublicKey: string,
+     *   base64CredentialID: string,
+     *   counter: number,
+     * }
+     *
+     * After an assertion, the `counter` value above should be updated to the value returned by
+     * verifyAssertionResponse(). This method will also return a credential ID of the device that
+     * needs to have its `counter` value updated.
+     *
+     */
+  ],
 };
 
 /**
