@@ -3,4 +3,5 @@ node_modules
 coverage
 .gitignore
 tsconfig.json
-jest.config.js
+*.config.js
+__mocks__

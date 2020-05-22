@@ -1,0 +1,7 @@
+src
+node_modules
+coverage
+.gitignore
+tsconfig.json
+*.config.js
+__mocks__
