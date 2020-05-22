@@ -81,6 +81,16 @@ app.post('/verify-attestation', (req, res) => {
   res.send({ verified });
 });
 
+app.get('/generate-assertion-options', (req, res) => {
+  // You need to know the user by this point
+  const user = inMemoryUserDeviceDB[userId];
+
+  res.send(generateAssertionOptions(
+    randomChallenge,
+    user.map(data => data.base64CredentialID),
+  ));
+});
+
 app.post('/verify-registration', (req, res) => {
   const { body } = req;
 });
