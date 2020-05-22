@@ -17,8 +17,6 @@ export default function verifyAttestationNone(
   const { fmt, authData } = attestationObject;
   const authDataStruct = parseAttestationAuthData(authData);
 
-  console.log('authDataStruct:', authDataStruct);
-
   const {
     credentialID,
     COSEPublicKey,
@@ -27,22 +25,16 @@ export default function verifyAttestationNone(
   } = authDataStruct;
 
   if (!COSEPublicKey) {
-    throw new Error('No public key was provided by authenticator');
+    throw new Error('No public key was provided by authenticator (None)');
   }
 
   if (!credentialID) {
-    throw new Error('No credential ID was provided by authenticator');
+    throw new Error('No credential ID was provided by authenticator (None)');
   }
 
   // Make sure the (U)ser (P)resent for the attestation
   if (!flags.up) {
-    console.error('User was not Present for attestation');
-    console.debug('attestation\'s flags:', flags);
-    throw new Error('User presence could not be verified');
-  }
-
-  if (!flags.uv) {
-    console.warn('The authenticator could not uniquely Verify the user');
+    throw new Error('User was not present for attestation (None)');
   }
 
   const publicKey = convertCOSEtoPKCS(COSEPublicKey);

@@ -21,24 +21,16 @@ export default function verifyAttestationResponse(
   const attestationObject = decodeAttestationObject(base64AttestationObject);
   const clientDataJSON = decodeClientDataJSON(base64ClientDataJSON);
 
-  console.debug('decoded attestationObject:', attestationObject);
-  console.debug('decoded clientDataJSON:', clientDataJSON);
-
   const { type, origin } = clientDataJSON;
 
   // Check that the origin is our site
   if (origin !== expectedOrigin) {
-    console.error('client origin did not equal our origin');
-    console.debug('Expected Origin:', expectedOrigin);
-    console.debug('attestation\'s origin:', origin);
-    throw new Error('Attestation origin was an unexpected value');
+    throw new Error(`Unexpected attestation origin: ${origin}`);
   }
 
   // Make sure we're handling an attestation
   if (type !== 'webauthn.create') {
-    console.error('type did not equal "webauthn.create"');
-    console.debug('attestation\'s type:', type);
-    throw new Error('Attestation type was an unexpected value');
+    throw new Error(`Unexpected attestation type: ${type}`);
   }
 
   const { fmt } = attestationObject;
@@ -47,26 +39,20 @@ export default function verifyAttestationResponse(
    * Verification can only be performed when attestation = 'direct'
    */
   if (fmt === ATTESTATION_FORMATS.FIDO_U2F) {
-    console.log('Decoding FIDO-U2F attestation');
     return verifyFIDOU2F(attestationObject, base64ClientDataJSON);
   }
 
   if (fmt === ATTESTATION_FORMATS.PACKED) {
-    console.log('Decoding Packed attestation');
     return verifyPacked(attestationObject, base64ClientDataJSON);
   }
 
   if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
-    console.log('Decoding Android Safetynet attestation');
     return verifyAndroidSafetynet(attestationObject, base64ClientDataJSON);
   }
 
   if (fmt === ATTESTATION_FORMATS.NONE) {
-    console.log('Decoding None attestation');
     return verifyNone(attestationObject);
   }
 
-  const reason = `Unsupported Attestation Format: ${fmt}`;
-  console.error(reason);
-  throw new Error(reason);
+  throw new Error(`Unsupported Attestation Format: ${fmt}`);
 }

@@ -28,15 +28,15 @@ export default function verifyAttestationFIDOU2F(
   } = authDataStruct;
 
   if (!(flags.flagsInt & U2F_USER_PRESENTED)) {
-    throw new Error('User was NOT present during authentication');
+    throw new Error('User was NOT present during authentication (FIDOU2F)');
   }
 
   if (!COSEPublicKey) {
-    throw new Error('No public key was provided by authenticator');
+    throw new Error('No public key was provided by authenticator (FIDOU2F)');
   }
 
   if (!credentialID) {
-    throw new Error('No credential ID was provided by authenticator');
+    throw new Error('No credential ID was provided by authenticator (FIDOU2F)');
   }
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
@@ -54,11 +54,11 @@ export default function verifyAttestationFIDOU2F(
   const { sig, x5c } = attStmt;
 
   if (!x5c) {
-    throw new Error('No attestation certificate provided in attestation statement');
+    throw new Error('No attestation certificate provided in attestation statement (FIDOU2F)');
   }
 
   if (!sig) {
-    throw new Error('No attestation signature provided in attestation statement');
+    throw new Error('No attestation signature provided in attestation statement (FIDOU2F)');
   }
 
   const publicKeyCertPEM = convertASN1toPEM(x5c[0]);

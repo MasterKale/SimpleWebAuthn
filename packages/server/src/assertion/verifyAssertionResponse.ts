@@ -27,28 +27,20 @@ export default function verifyAssertionResponse(
   const { base64AuthenticatorData, base64ClientDataJSON, base64Signature } = response;
   const clientDataJSON = decodeClientDataJSON(base64ClientDataJSON);
 
-  console.debug('decodedClientDataJSON:', clientDataJSON);
-
   const { type, origin } = clientDataJSON;
 
   // Check that the origin is our site
   if (origin !== expectedOrigin) {
-    console.error('client origin did not equal our origin');
-    console.debug('expectedOrigin:', expectedOrigin);
-    console.debug('assertion\'s origin:', origin);
-    throw new Error('Assertion origin was an unexpected value');
+    throw new Error(`Unexpected assertion origin: ${origin}`);
   }
 
   // Make sure we're handling an assertion
   if (type !== 'webauthn.get') {
-    console.error('type did not equal "webauthn.get"');
-    console.debug('attestation\'s type:', type);
-    throw new Error('Assertion type was an unexpected value');
+    throw new Error(`Unexpected assertion type: ${type}`);
   }
 
   const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
   const authData = parseAssertionAuthData(authDataBuffer);
-  console.log('parsed authData:', authData);
 
   if (!(authData.flags & U2F_USER_PRESENTED)) {
     throw new Error('User was NOT present during assertion!');
@@ -66,8 +58,9 @@ export default function verifyAssertionResponse(
     // dataStruct. It's related to how the authenticator maintains the number of times its been
     // used for this client. If this happens, then someone's somehow increased the counter
     // on the device without going through this site
-    console.debug(`Response counter ${counter} was not greater than ${authenticator.counter}`);
-    throw new Error(`Counter in response did not increment from ${authenticator.counter}`);
+    throw new Error(
+      `Response counter value ${counter} was lower than expected ${authenticator.counter}`,
+    );
   }
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));

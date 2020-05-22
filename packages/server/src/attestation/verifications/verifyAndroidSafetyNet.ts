@@ -25,7 +25,7 @@ export default function verifyAttestationAndroidSafetyNet(
   const { attStmt, authData, fmt } = attestationObject;
 
   if (!attStmt.response) {
-    throw new Error('No response was included in attStmt by authenticator');
+    throw new Error('No response was included in attStmt by authenticator (SafetyNet)');
   }
 
   // Prepare to verify a JWT
@@ -35,10 +35,6 @@ export default function verifyAttestationAndroidSafetyNet(
   const HEADER: SafetyNetJWTHeader = JSON.parse(base64url.decode(jwtParts[0]));
   const PAYLOAD: SafetyNetJWTPayload = JSON.parse(base64url.decode(jwtParts[1]));
   const SIGNATURE: SafetyNetJWTSignature = jwtParts[2];
-
-  console.debug('HEADER:', HEADER);
-  console.debug('PAYLOAD:', PAYLOAD);
-  console.debug('SIGNATURE:', SIGNATURE);
 
   /**
    * START Verify PAYLOAD
@@ -54,16 +50,11 @@ export default function verifyAttestationAndroidSafetyNet(
   const expectedNonce = nonceBuffer.toString('base64');
 
   if (nonce !== expectedNonce) {
-    console.error('Payload nonce was not the expected value!');
-    console.debug('payload nonce:', PAYLOAD.nonce);
-    console.debug('expected nonce:', expectedNonce);
-    throw new Error('Could not verify response payload nonce');
+    throw new Error('Could not verify payload nonce (SafetyNet)');
   }
 
   if (!ctsProfileMatch) {
-    console.error('ctsProfileMatch was false!');
-    console.debug('ctsProfileMatch:', ctsProfileMatch);
-    throw new Error('Could not verify response payload profile');
+    throw new Error('Could not verify device integrity (SafetyNet)');
   }
   /**
    * END Verify PAYLOAD
@@ -83,19 +74,15 @@ export default function verifyAttestationAndroidSafetyNet(
     return `-----BEGIN CERTIFICATE-----\n${pem}-----END CERTIFICATE-----`;
   });
 
-  console.debug('fullpathCert:', fullpathCert);
-
   const certificate = fullpathCert[0];
 
   const commonCertInfo = getCertificateInfo(certificate);
-  console.debug('commonCertInfo:', commonCertInfo);
 
   const { subject } = commonCertInfo;
 
   // TODO: Find out where this CN string is specified and if it might change
   if (subject.CN !== 'attest.android.com') {
-    console.error('common name was not "attest.android.com"');
-    throw new Error('Could not verify certificate common name');
+    throw new Error('Certificate common name was not "attest.android.com" (SafetyNet)');
   }
 
   // TODO: Re-investigate this if we decide to "use MDS or Metadata Statements"
@@ -121,17 +108,16 @@ export default function verifyAttestationAndroidSafetyNet(
 
   if (toReturn.verified) {
     const authDataStruct = parseAttestationAuthData(authData);
-    console.debug('authDataStruct:', authDataStruct);
     const { counter, credentialID, COSEPublicKey, flags } = authDataStruct;
 
     toReturn.userVerified = flags.uv;
 
     if (!COSEPublicKey) {
-      throw new Error('No public key was provided by authenticator');
+      throw new Error('No public key was provided by authenticator (SafetyNet)');
     }
 
     if (!credentialID) {
-      throw new Error('No credential ID was provided by authenticator');
+      throw new Error('No credential ID was provided by authenticator (SafetyNet)');
     }
 
     const publicKey = convertCOSEtoPKCS(COSEPublicKey);

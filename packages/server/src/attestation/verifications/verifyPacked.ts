@@ -27,15 +27,15 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
   const { COSEPublicKey, counter, credentialID, flags } = authDataStruct;
 
   if (!COSEPublicKey) {
-    throw new Error('No public key was provided by authenticator');
+    throw new Error('No public key was provided by authenticator (Packed)');
   }
 
   if (!credentialID) {
-    throw new Error('No credential ID was provided by authenticator');
+    throw new Error('No credential ID was provided by authenticator (Packed)');
   }
 
   if (!sig) {
-    throw new Error('No attestation signature provided in attestation statement');
+    throw new Error('No attestation signature provided in attestation statement (Packed)');
   }
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
@@ -52,8 +52,6 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
   const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 
   if (x5c) {
-    console.log('FULL Attestation');
-
     const leafCert = convertASN1toPEM(x5c[0]);
     const leafCertInfo = getCertificateInfo(leafCert);
 
@@ -66,57 +64,53 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
     } = subject;
 
     if (OU !== 'Authenticator Attestation') {
-      throw new Error('Batch certificate OU MUST be set strictly to "Authenticator Attestation"!');
+      throw new Error('Batch certificate OU MUST be set strictly to "Authenticator Attestation"! (Packed|Full');
     }
 
     if (!CN) {
-      throw new Error('Batch certificate CN MUST no be empty!');
+      throw new Error('Batch certificate CN MUST no be empty! (Packed|Full');
     }
 
     if (!O) {
-      throw new Error('Batch certificate CN MUST no be empty!');
+      throw new Error('Batch certificate CN MUST no be empty! (Packed|Full');
     }
 
     if (!C || C.length !== 2) {
-      throw new Error('Batch certificate C MUST be set to two character ISO 3166 code!');
+      throw new Error('Batch certificate C MUST be set to two character ISO 3166 code! (Packed|Full');
     }
 
     if (basicConstraintsCA) {
-      throw new Error('Batch certificate basic constraints CA MUST be false!');
+      throw new Error('Batch certificate basic constraints CA MUST be false! (Packed|Full');
     }
 
     if (version !== 3) {
-      throw new Error('Batch certificate version MUST be 3(ASN1 2)!');
+      throw new Error('Batch certificate version MUST be 3(ASN1 2)! (Packed|Full');
     }
 
     toReturn.verified = verifySignature(sig, signatureBase, leafCert);
   } else if (ecdaaKeyId) {
-    throw new Error('ECDAA not supported yet');
+    throw new Error('ECDAA not supported yet (Packed|ECDAA)');
   } else {
-    console.log('SELF Attestation');
-
     const cosePublicKey: COSEPublicKey = cbor.decodeAllSync(COSEPublicKey)[0];
 
     const kty = cosePublicKey.get(COSEKEYS.kty);
     const alg = cosePublicKey.get(COSEKEYS.alg);
 
     if (!alg) {
-      throw new Error('COSE public key was missing alg');
+      throw new Error('COSE public key was missing alg (Packed|Self)');
     }
 
     if (!kty) {
-      throw new Error('COSE public key was missing kty');
+      throw new Error('COSE public key was missing kty (Packed|Self)');
     }
 
     const hashAlg: string = COSEALGHASH[(alg as number)];
 
     if (kty === COSEKTY.EC2) {
-      console.log('EC2');
-
       const crv = cosePublicKey.get(COSEKEYS.crv);
 
       if (!crv) {
-        throw new Error('COSE public key was missing kty crv');
+        throw new Error('COSE public key was missing kty crv (Packed|EC2)');
       }
 
       const pkcsPublicKey = convertCOSEtoPKCS(cosePublicKey);
@@ -127,12 +121,10 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
 
       toReturn.verified = key.verify(signatureBaseHash, sig);
     } else if (kty === COSEKTY.RSA) {
-      console.log('RSA');
-
       const n = cosePublicKey.get(COSEKEYS.n);
 
       if (!n) {
-        throw new Error('COSE public key was missing n');
+        throw new Error('COSE public key was missing n (Packed|RSA)');
       }
 
       const signingScheme = COSERSASCHEME[alg as number];
@@ -147,12 +139,10 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
 
       toReturn.verified = key.verify(signatureBase, sig);
     } else if (kty === COSEKTY.OKP) {
-      console.log('OKP');
-
       const x = cosePublicKey.get(COSEKEYS.x);
 
       if (!x) {
-        throw new Error('COSE public key was missing x');
+        throw new Error('COSE public key was missing x (Packed|OKP)');
       }
 
       const signatureBaseHash = toHash(signatureBase, hashAlg);

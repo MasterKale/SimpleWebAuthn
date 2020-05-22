@@ -4,8 +4,6 @@ import { ParsedAttestationAuthData } from "@webauthntine/typescript-types";
  * Make sense of the authData buffer contained in an Attestation
  */
 export default function parseAttestationAuthData(authData: Buffer): ParsedAttestationAuthData {
-  console.log('parsing attestation auth data');
-
   let intBuffer = authData;
 
   const rpIdHash = intBuffer.slice(0, 32);
@@ -23,8 +21,6 @@ export default function parseAttestationAuthData(authData: Buffer): ParsedAttest
     ed: !!(flagsInt & 0x80),
     flagsInt,
   };
-
-  console.debug('flags:', flags);
 
   const counterBuf = intBuffer.slice(0, 4);
   intBuffer = intBuffer.slice(4);
