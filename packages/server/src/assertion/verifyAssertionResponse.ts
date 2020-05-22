@@ -1,7 +1,6 @@
 import base64url from 'base64url';
 import {
   AuthenticatorAssertionResponseJSON,
-  U2F_USER_PRESENTED,
   AuthenticatorDevice,
   VerifiedAssertion,
 } from "@webauthntine/typescript-types";
@@ -41,8 +40,9 @@ export default function verifyAssertionResponse(
 
   const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
   const authDataStruct = parseAuthenticatorData(authDataBuffer);
+  const { credentialID, flags, counter } = authDataStruct;
 
-  if (!(authData.flags & U2F_USER_PRESENTED)) {
+  if (!(flags.up)) {
     throw new Error('User was NOT present during assertion!');
   }
 
