@@ -30,6 +30,16 @@ const userId = 'webauthntineInternalUserId';
 // A username for the user
 const username = 'user@webauthntine.foo';
 
+const inMemoryUserDeviceDB = {
+  [userId]: [
+    {
+      base64PublicKey: undefined,
+      base64CredentialID: undefined,
+      counter: -1,
+    }
+],
+};
+
 app.get('/generate-attestation-options', (req, res) => {
   res.send(generateAttestationOptions(
     'WebAuthntine Example',
