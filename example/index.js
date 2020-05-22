@@ -97,8 +97,10 @@ app.get('/generate-assertion-options', (req, res) => {
   ));
 });
 
-app.post('/verify-registration', (req, res) => {
+app.post('/verify-assertion', (req, res) => {
   const { body } = req;
+
+  console.log('verifying assertion:', body);
 });
 
 https.createServer({
