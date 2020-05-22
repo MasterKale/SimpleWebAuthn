@@ -9,8 +9,7 @@ import toHash from "@helpers/toHash";
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import getCertificateInfo from '@helpers/getCertificateInfo';
 import verifySignature from '@helpers/verifySignature';
-
-import parseAttestationAuthData from '../parseAttestationAuthData';
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
 
 /**
@@ -22,7 +21,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
   const { fmt, authData, attStmt } = attestationObject;
   const { sig, x5c, ecdaaKeyId } = attStmt;
 
-  const authDataStruct = parseAttestationAuthData(authData);
+  const authDataStruct = parseAuthenticatorData(authData);
 
   const { COSEPublicKey, counter, credentialID, flags } = authDataStruct;
 

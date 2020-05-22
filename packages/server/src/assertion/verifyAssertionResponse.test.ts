@@ -1,14 +1,14 @@
 import verifyAssertionResponse from './verifyAssertionResponse';
 
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
-import * as parseAssertionAuthData from './parseAssertionAuthData';
+import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
 
 beforeEach(() => {
   mockDecodeClientData = jest.spyOn(decodeClientDataJSON, 'default');
-  mockParseAuthData = jest.spyOn(parseAssertionAuthData, 'default');
+  mockParseAuthData = jest.spyOn(parseAuthenticatorData, 'default');
 });
 
 afterEach(() => {

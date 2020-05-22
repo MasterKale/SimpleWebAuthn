@@ -5,8 +5,7 @@ import toHash from '@helpers/toHash';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import verifySignature from '@helpers/verifySignature';
-
-import parseAttestationAuthData from '../parseAttestationAuthData';
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
 
 /**
@@ -18,7 +17,7 @@ export default function verifyAttestationFIDOU2F(
 ): VerifiedAttestation {
   const { fmt, authData, attStmt } = attestationObject;
 
-  const authDataStruct = parseAttestationAuthData(authData);
+  const authDataStruct = parseAuthenticatorData(authData);
   const {
     flags,
     COSEPublicKey,

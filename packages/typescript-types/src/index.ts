@@ -111,7 +111,7 @@ export type AttestationObject = {
   authData: Buffer,
 };
 
-export type ParsedAttestationAuthData = {
+export type ParsedAuthenticatorData = {
   rpIdHash: Buffer,
   flagsBuf: Buffer,
   flags: {
@@ -211,19 +211,6 @@ export type SafetyNetJWTPayload = {
 };
 
 export type SafetyNetJWTSignature = string;
-
-export type ParsedAssertionAuthData = {
-  rpIdHash: Buffer,
-  flagsBuf: Buffer,
-  flags: number,
-  counter: number,
-  counterBuf: Buffer,
-};
-
-/**
- * U2F Presence constant
- */
-export const U2F_USER_PRESENTED = 0x01;
 
 /**
  * A WebAuthn-compatible device and the information needed to verify assertions by it

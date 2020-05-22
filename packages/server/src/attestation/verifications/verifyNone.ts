@@ -2,8 +2,8 @@ import base64url from 'base64url';
 import { AttestationObject, VerifiedAttestation } from "@webauthntine/typescript-types";
 
 import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
-import parseAttestationAuthData from '../parseAttestationAuthData';
 
 
 /**
@@ -15,7 +15,7 @@ export default function verifyAttestationNone(
   attestationObject: AttestationObject,
 ): VerifiedAttestation {
   const { fmt, authData } = attestationObject;
-  const authDataStruct = parseAttestationAuthData(authData);
+  const authDataStruct = parseAuthenticatorData(authData);
 
   const {
     credentialID,

@@ -8,10 +8,10 @@ import {
 
 import decodeClientDataJSON from "@helpers/decodeClientDataJSON";
 
-import parseAssertionAuthData from './parseAssertionAuthData';
 import toHash from '@helpers/toHash';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import verifySignature from '@helpers/verifySignature';
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
 /**
  * Verify that the user has legitimately completed the login process
@@ -40,7 +40,7 @@ export default function verifyAssertionResponse(
   }
 
   const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
-  const authData = parseAssertionAuthData(authDataBuffer);
+  const authDataStruct = parseAuthenticatorData(authDataBuffer);
 
   if (!(authData.flags & U2F_USER_PRESENTED)) {
     throw new Error('User was NOT present during assertion!');
