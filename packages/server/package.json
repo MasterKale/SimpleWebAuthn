@@ -32,6 +32,7 @@
     "node-rsa": "^1.0.8"
   },
   "devDependencies": {
-    "@webauthntine/typescript-types": "file:../typescript-types"
-  }
+    "@webauthntine/typescript-types": "^0.1.0"
+  },
+  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }
