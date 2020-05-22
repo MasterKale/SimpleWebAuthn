@@ -43,7 +43,9 @@ app.get('/generate-attestation-options', (req, res) => {
 app.post('/verify-attestation', (req, res) => {
   const { body } = req;
 
-  console.log('verifying:', body);
+  const verification = verifyAttestationResponse(body, `https://${origin}`);
+
+  res.send({ verified: verification.verified });
 });
 
 app.post('/verify-registration', (req, res) => {
