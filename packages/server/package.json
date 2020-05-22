@@ -1,6 +1,6 @@
 {
   "name": "@webauthntine/server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WebAuthntine for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,7 +32,7 @@
     "node-rsa": "^1.0.8"
   },
   "devDependencies": {
-    "@webauthntine/typescript-types": "^0.1.0"
+    "@webauthntine/typescript-types": "^0.1.1"
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }

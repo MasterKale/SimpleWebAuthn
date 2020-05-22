@@ -1,6 +1,6 @@
 {
   "name": "@webauthntine/browser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WebAuthntine for Browsers",
   "main": "dist/webauthntine-browser.min.js",
   "types": "dist/index.d.ts",
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@types/base64-js": "^1.2.5",
-    "@webauthntine/typescript-types": "^0.1.0",
+    "@webauthntine/typescript-types": "^0.1.1",
     "ts-loader": "^7.0.4",
     "webpack": "^4.43.0",
     "webpack-auto-inject-version": "^1.2.2",
