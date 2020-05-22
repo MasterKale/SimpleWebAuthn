@@ -1,7 +1,5 @@
 # WebAuthntine Project
-![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)
-
-It's like FIDO2 and Constantine had a baby...I dunno either 🤷‍♂️
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 This monorepo contains two complimentary libraries to help reduce the amount of work needed to
 incorporate WebAuthn into a website. The following packages are maintained here:
