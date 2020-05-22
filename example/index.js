@@ -40,6 +40,12 @@ app.get('/generate-attestation-options', (req, res) => {
   ));
 });
 
+app.post('/verify-attestation', (req, res) => {
+  const { body } = req;
+
+  console.log('verifying:', body);
+});
+
 app.post('/verify-registration', (req, res) => {
   const { body } = req;
 });
