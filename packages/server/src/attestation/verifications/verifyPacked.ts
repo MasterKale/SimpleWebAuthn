@@ -116,6 +116,15 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
       const pkcsPublicKey = convertCOSEtoPKCS(COSEPublicKey);
       const signatureBaseHash = toHash(signatureBase, hashAlg);
 
+      /**
+       * Instantiating the curve here is _very_ computationally heavy - a bit of profiling
+       * (in compiled JS, not TS) reported an average of ~125ms to execute this line. The elliptic
+       * README states, "better do it once and reuse it", so maybe there's a better way to handle
+       * this in a server context, when we can re-use an existing instance.
+       *
+       * For now, it's worth noting that this line is probably the reason why it can take
+       * 5-6 seconds to run tests.
+       */
       const ec = new elliptic.ec(COSECRV[(crv as number)]);
       const key = ec.keyFromPublic(pkcsPublicKey);
 
