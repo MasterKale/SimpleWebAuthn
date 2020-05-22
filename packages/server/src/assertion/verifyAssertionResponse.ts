@@ -76,6 +76,7 @@ export default function verifyAssertionResponse(
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
+    counter,
   };
 
   return toReturn;

@@ -153,6 +153,7 @@ export type VerifiedAttestation = {
  */
 export type VerifiedAssertion = {
   verified: boolean;
+  counter: number;
 };
 
 export type CertificateInfo = {
