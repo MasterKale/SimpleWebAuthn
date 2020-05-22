@@ -1,0 +1,23 @@
+{
+  "name": "@webauthntine/typescript-types",
+  "version": "0.1.1",
+  "description": "TypeScript types used by the @webauthntine series of libraries",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Matthew Miller <matthew@millerti.me>",
+  "license": "MIT",
+  "homepage": "https://github.com/MasterKale/WebAuthntine/packages/typescript-types#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "webauthn",
+    "typescript",
+    "types"
+  ],
+  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
+}

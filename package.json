@@ -1,17 +1,8 @@
 {
-  "name": "webauthntine",
-  "version": "1.0.0",
-  "description": "It's like FIDO2 and Constantine had a baby.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "author": "Matthew Miller<matthew@millerti.me>",
-  "license": "MIT",
-  "homepage": "https://github.com/MasterKale/webauthntine#readme",
+  "name": "webauthntine-monorepo",
+  "private": true,
   "scripts": {
-    "build": "rimraf dist && ttsc",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "npm test -- --coverage"
+    "bootstrap": "lerna bootstrap --scope=@webauthntine/typescript-types && lerna bootstrap --scope=@webauthntine/browser --scope=@webauthntine/server"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",
@@ -20,6 +11,7 @@
     "@types/jsrsasign": "^8.0.3",
     "@types/node-rsa": "^1.0.0",
     "jest": "^25.1.0",
+    "lerna": "^3.21.0",
     "rimraf": "^3.0.2",
     "ts-jest": "^25.5.1",
     "ts-node": "^8.10.1",
@@ -27,14 +19,5 @@
     "typescript": "^3.9.2",
     "typescript-transform-paths": "^1.1.14"
   },
-  "keywords": [
-    "webauthn"
-  ],
-  "dependencies": {
-    "base64url": "^3.0.1",
-    "cbor": "^5.0.2",
-    "elliptic": "^6.5.2",
-    "jsrsasign": "^8.0.15",
-    "node-rsa": "^1.0.8"
-  }
+  "dependencies": {}
 }

@@ -6,25 +6,13 @@
     "esModuleInterop": true,
     "declaration": true,
     "sourceMap": true,
-    "baseUrl": "./src",
-    "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "paths": {
-      "@libTypes": ["libTypes"],
-      "@helpers/*": ["helpers/*"],
-    },
-    "plugins": [
-      // These replace the path helpers above with relative paths at build time
-      { "transform": "typescript-transform-paths" },
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
-    ]
   },
-  "include": [
-    "src/**/*",
-  ],
   "exclude": [
-    "src/**/*.test.ts",
-    "src/setupTests.ts"
+    "node_modules",
+    "**/*.test.ts",
+    "**/setupTests.ts",
+    "**/dist/*"
   ]
 }

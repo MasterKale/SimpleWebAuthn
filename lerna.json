@@ -1,0 +1,15 @@
+{
+  "version": "0.1.1",
+  "npmClient": "npm",
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "*.md"
+      ],
+      "message": "chore(release): publish %s"
+    }
+  },
+  "packages": [
+    "packages/*"
+  ]
+}
