@@ -87,6 +87,7 @@ AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
 export interface AuthenticatorAssertionResponseJSON extends Omit<
 AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signature' | 'userHandle'
 > {
+  base64CredentialID: string;
   base64AuthenticatorData: string;
   base64ClientDataJSON: string;
   base64Signature: string;

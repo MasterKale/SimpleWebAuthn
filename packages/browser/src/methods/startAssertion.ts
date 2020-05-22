@@ -52,6 +52,7 @@ export default async function startAssertion(
 
   // Convert values to base64 to make it easier to send back to the server
   return {
+    base64CredentialID: credential.id,
     base64AuthenticatorData: toBase64String(response.authenticatorData),
     base64ClientDataJSON: toBase64String(response.clientDataJSON),
     base64Signature: toBase64String(response.signature),
