@@ -40,6 +40,9 @@ const inMemoryUserDeviceDB = {
 ],
 };
 
+/**
+ * Registration (a.k.a. "Attestation")
+ */
 app.get('/generate-attestation-options', (req, res) => {
   res.send(generateAttestationOptions(
     'WebAuthntine Example',
@@ -81,6 +84,9 @@ app.post('/verify-attestation', (req, res) => {
   res.send({ verified });
 });
 
+/**
+ * Login (a.k.a. "Assertion")
+ */
 app.get('/generate-assertion-options', (req, res) => {
   // You need to know the user by this point
   const user = inMemoryUserDeviceDB[userId];
