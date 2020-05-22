@@ -10,6 +10,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "scripts": {
     "build": "rimraf dist && ttsc",
     "test": "jest",
