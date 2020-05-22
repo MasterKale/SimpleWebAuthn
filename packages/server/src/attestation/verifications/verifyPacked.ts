@@ -113,7 +113,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
         throw new Error('COSE public key was missing kty crv (Packed|EC2)');
       }
 
-      const pkcsPublicKey = convertCOSEtoPKCS(cosePublicKey);
+      const pkcsPublicKey = convertCOSEtoPKCS(COSEPublicKey);
       const signatureBaseHash = toHash(signatureBase, hashAlg);
 
       const ec = new elliptic.ec(COSECRV[(crv as number)]);

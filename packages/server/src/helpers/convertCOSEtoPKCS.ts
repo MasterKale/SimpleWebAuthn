@@ -8,7 +8,7 @@ import { COSEKEYS, COSEPublicKey } from '@webauthntine/typescript-types';
  * @param cosePublicKey COSE-encoded public key
  * @return RAW PKCS encoded public key
  */
-export default function convertCOSEtoPKCS(cosePublicKey: Buffer | COSEPublicKey) {
+export default function convertCOSEtoPKCS(cosePublicKey: Buffer) {
   /*
     +------+-------+-------+---------+----------------------------------+
     | name | key   | label | type    | description                      |
@@ -25,17 +25,11 @@ export default function convertCOSEtoPKCS(cosePublicKey: Buffer | COSEPublicKey)
     | d    | 2     | -4    | bstr    | Private key                      |
     +------+-------+-------+---------+----------------------------------+
   */
- let struct: COSEPublicKey;
- if (cosePublicKey instanceof Buffer) {
-   struct = cbor.decodeFirstSync(cosePublicKey);
- } else {
-   struct = cosePublicKey;
- }
+  const struct: COSEPublicKey = cbor.decodeFirstSync(cosePublicKey);
 
   const tag = Buffer.from([0x04]);
   const x = struct.get(COSEKEYS.x);
   const y = struct.get(COSEKEYS.y);
-
 
   if (!x) {
     throw new Error('COSE public key was missing x');
