@@ -163,12 +163,18 @@ export type VerifiedAttestation = {
  * Result of assertion verification
  *
  * @param verified If the assertion response could be verified
- * @param counter The number of times the authenticator reported it has been used. **Should be
- * kept in a DB for later reference to help prevent replay attacks!**
+ * @param authenticatorInfo.base64CredentialID The ID of the authenticator used during assertion.
+ * Should be used to identify which DB authenticator entry needs its `counter` updated to the value
+ * below
+ * @param authenticatorInfo.counter The number of times the authenticator identified above reported
+ * it has been used. **Should be kept in a DB for later reference to help prevent replay attacks!**
  */
 export type VerifiedAssertion = {
   verified: boolean;
-  counter: number;
+  authenticatorInfo?: {
+    counter: number,
+    base64CredentialID: string,
+  },
 };
 
 export type CertificateInfo = {
