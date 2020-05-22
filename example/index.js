@@ -55,7 +55,30 @@ app.post('/verify-attestation', (req, res) => {
 
   const verification = verifyAttestationResponse(body, `https://${origin}`);
 
-  res.send({ verified: verification.verified });
+  console.log('verification:', verification);
+
+  const { verified, authenticatorInfo } = verification;
+
+  if (verified) {
+    const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
+    const user = inMemoryUserDeviceDB[userId];
+    const existingDevice = user.find((device) => device.base64CredentialID === base64CredentialID);
+
+    if (existingDevice) {
+      console.log('device already exists, skipping insertion');
+      console.debug(existingDevice);
+    } else {
+      console.log(`storing public key, credential ID, and counter for ${userId}`);
+
+      inMemoryUserDeviceDB[userId].push({
+        base64PublicKey,
+        base64CredentialID,
+        counter,
+      });
+    }
+  }
+
+  res.send({ verified });
 });
 
 app.post('/verify-registration', (req, res) => {
