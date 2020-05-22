@@ -6,10 +6,10 @@ const express = require('express');
 const {
   // Registration ("Attestation")
   generateAttestationOptions,
-  verifyAssertionResponse,
+  verifyAttestationResponse,
   // Login ("Assertion")
   generateAssertionOptions,
-  verifyAttestationResponse,
+  verifyAssertionResponse,
 } = require('@webauthntine/server');
 
 const app = express();
