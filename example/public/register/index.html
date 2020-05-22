@@ -28,7 +28,20 @@
       const options = await resp.json();
       console.log(options);
 
-      startAttestation(options);
+      let attResp;
+      try {
+        attResp = await startAttestation(options);
+      } catch (error) {
+        elemError.innerText = error;
+      }
+
+      await fetch('/verify-attestation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(attResp),
+      });
     }));
   </script>
 </body>
