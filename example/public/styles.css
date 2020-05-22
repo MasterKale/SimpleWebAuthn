@@ -39,5 +39,8 @@ button:hover {
 
 #error {
   color: red;
-  font-weight: bold;
+}
+
+#success {
+  color: #11A000;
 }
