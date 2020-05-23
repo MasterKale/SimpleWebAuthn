@@ -26,6 +26,16 @@ test('should verify an assertion response', () => {
   expect(verification.verified).toEqual(true);
 });
 
+test('should verify an assertion response if origin does not start with https', () => {
+  const verification = verifyAssertionResponse(
+    assertionResponse,
+    'dev.dontneeda.pw',
+    authenticator,
+  );
+
+  expect(verification.verified).toEqual(true);
+});
+
 test('should return authenticator info after verification', () => {
   const verification = verifyAssertionResponse(
     assertionResponse,

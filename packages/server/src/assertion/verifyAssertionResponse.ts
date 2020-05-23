@@ -28,9 +28,13 @@ export default function verifyAssertionResponse(
 
   const { type, origin } = clientDataJSON;
 
+  if (!expectedOrigin.startsWith('https://')) {
+    expectedOrigin = `https://${expectedOrigin}`;
+  }
+
   // Check that the origin is our site
   if (origin !== expectedOrigin) {
-    throw new Error(`Unexpected assertion origin: ${origin}`);
+    throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
   }
 
   // Make sure we're handling an assertion
