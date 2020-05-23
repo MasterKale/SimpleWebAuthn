@@ -20,7 +20,7 @@ export default function generateAssertionOptions(
       allowCredentials: base64CredentialIDs.map(id => ({
         id,
         type: 'public-key',
-        transports: ['usb', 'ble', 'nfc'],
+        transports: ['usb', 'ble', 'nfc', 'internal'],
       })),
       timeout,
     },
