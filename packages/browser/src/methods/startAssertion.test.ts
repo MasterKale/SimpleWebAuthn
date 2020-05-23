@@ -22,7 +22,7 @@ const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
   publicKey: {
     challenge: 'fizz',
     allowCredentials: [{
-      id: 'credId',
+      id: 'abcdefgfdnsdfunguisdfgs',
       type: 'public-key',
       transports: ['nfc'],
     }],
@@ -48,11 +48,11 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   await startAssertion(goodOpts1);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
+  const credId = base64js.fromByteArray(argsPublicKey.allowCredentials[0].id);
 
   expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.publicKey.challenge));
   // Make sure the credential ID is a proper base64 with a length that's a multiple of 4
-  expect(argsPublicKey.allowCredentials[0].id.length % 4).toEqual(0);
-  expect(argsPublicKey.allowCredentials[0].id).toEqual(base64js.toByteArray('credId=='));
+  expect(credId.length % 4).toEqual(0);
 
   done();
 });

@@ -27,7 +27,8 @@ export default async function startAssertion(
     challenge: toUint8Array(requestOptionsJSON.publicKey.challenge),
     allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map((cred) => {
       // Make sure the credential ID length is a multiple of 4
-      let id = cred.id.padEnd(cred.id.length + (cred.id.length % 4), '=');
+      const padLength = 4 - cred.id.length % 4;
+      let id = cred.id.padEnd(cred.id.length + padLength, '=');
 
       return {
         ...cred,
