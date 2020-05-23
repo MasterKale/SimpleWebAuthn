@@ -22,7 +22,8 @@
   },
   "keywords": [
     "webauthn",
-    "typescript"
+    "typescript",
+    "node"
   ],
   "dependencies": {
     "@webauthntine/typescript-types": "file:../typescript-types",
