@@ -1,11 +1,14 @@
+<!-- omit in toc -->
 # @webauthntine/browser
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/browser?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@webauthntine/browser)
 ![Browser Support](https://img.shields.io/badge/Browser-ES2018+-brightgreen?style=for-the-badge&logo=Mozilla+Firefox)
 
-## Installation
+- [Installation](#installation)
+  - [UMD](#umd)
+- [Usage - Coming Soon](#usage---coming-soon)
 
-### npm
+## Installation
 
 This package is available on **npm**:
 
@@ -28,3 +31,7 @@ This package can also be installed via **unpkg** by including the following scri
 ```
 
 The library's methods will be available on the global `WebAuthntineBrowser` object.
+
+## Usage - Coming Soon
+
+Check out [src/index.ts](./src/index.ts) for now until this section gets updated.
