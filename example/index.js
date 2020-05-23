@@ -111,7 +111,27 @@ app.get('/generate-assertion-options', (req, res) => {
 app.post('/verify-assertion', (req, res) => {
   const { body } = req;
 
-  console.log('verifying assertion:', body);
+  let dbAuthenticator;
+  // "Query the DB" here for an authenticator matching `base64CredentialID`
+  Object.values(inMemoryUserDeviceDB).forEach((userDevs) => {
+    for(let dev of userDevs) {
+      if (dev.base64CredentialID === body.base64CredentialID) {
+        dbAuthenticator = dev;
+        return;
+      }
+    }
+  });
+
+  const verification = verifyAssertionResponse(body, `https://${origin}`, dbAuthenticator);
+
+  const { verified, authenticatorInfo } = verification;
+
+  if (verified) {
+    // Update the authenticator's counter in the DB to the newest count in the assertion
+    dbAuthenticator.counter = authenticatorInfo.counter;
+  }
+
+  res.send({ verified })
 });
 
 https.createServer({
