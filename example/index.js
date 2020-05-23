@@ -74,8 +74,6 @@ app.post('/verify-attestation', (req, res) => {
 
   const verification = verifyAttestationResponse(body, `https://${origin}`);
 
-  console.log('verification:', verification);
-
   const { verified, authenticatorInfo } = verification;
 
   if (verified) {
@@ -83,12 +81,7 @@ app.post('/verify-attestation', (req, res) => {
     const user = inMemoryUserDeviceDB[userId];
     const existingDevice = user.find((device) => device.base64CredentialID === base64CredentialID);
 
-    if (existingDevice) {
-      console.log('device already exists, skipping insertion');
-      console.debug(existingDevice);
-    } else {
-      console.log(`storing public key, credential ID, and counter for ${userId}`);
-
+    if (!existingDevice) {
       inMemoryUserDeviceDB[userId].push({
         base64PublicKey,
         base64CredentialID,
