@@ -10,11 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@webauthntine/server": "^0.1.1",
+    "@webauthntine/server": "^0.1.2",
     "express": "^4.17.1"
   },
   "devDependencies": {
-    "@webauthntine/typescript-types": "^0.1.1",
     "nodemon": "^2.0.4"
   }
 }
