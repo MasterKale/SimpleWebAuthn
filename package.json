@@ -2,7 +2,7 @@
   "name": "webauthntine-monorepo",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap --scope=@webauthntine/typescript-types && lerna bootstrap --scope=@webauthntine/browser --scope=@webauthntine/server --force-local"
+    "bootstrap": "lerna bootstrap --scope=@webauthntine/typescript-types && lerna bootstrap --scope=@webauthntine/browser --scope=@webauthntine/server"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",
