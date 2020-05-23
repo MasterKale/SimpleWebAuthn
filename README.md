@@ -36,6 +36,20 @@ WebAuthntine attempts to offer a developer-friendly pair of libraries that simpl
 
 For a practical guide to implementing these to libraries, take a look at the [example project](./example). It includes a single-file Express server and a few HTML files that, combined with the packages in this repo, are close to all it takes to get up and running with WebAuthn.
 
+## Tested Devices
+
+WebAuthn support is currently spotty, but getting better. Here are things I've tested that I know support WebAuthn and work fine with the WebAuthntine example:
+
+| OS      | Browser |                  Authenticator |
+| :------ | :-----: | -----------------------------: |
+| macOS   | Firefox | Yubikey Security Key NFC (USB) |
+| macOS   | Chrome  |                       Touch ID |
+| iOS     | Safari  | Yubikey Security Key NFC (NFC) |
+| Android | Chrome  |            Fingerprint Scanner |
+| Android | Firefox |                     Screen PIN |
+
+The FIDO Alliance [maintains a list of what currently supports WebAuthn](https://fidoalliance.org/fido2/fido2-web-authentication-webauthn/). If "WebAuthn API" is green, that combination of browser and OS *should* work fine with WebAuthntine. That said, WebAuthntine isn't perfect, so pull requests are welcome!
+
 ## Development
 
 After pulling down the code, set up dependencies:
