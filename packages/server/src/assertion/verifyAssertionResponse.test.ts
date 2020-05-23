@@ -104,15 +104,6 @@ test('should throw error if previous counter value is not less than in response'
   }).toThrow();
 });
 
-/**
- * parsed authData: {
- *   rpIdHash: <Buffer>,
- *   flagsBuf: <Buffer>,
- *   flags: 1,
- *   counter: 135,
- *   counterBuf: <Buffer>
- * }
- */
 const assertionResponse = {
   base64CredentialID: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' +
     'g6jo_o0hYiew',
