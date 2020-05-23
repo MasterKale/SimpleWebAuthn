@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/@webauthntine/browser@0.1.1/dist/webauthntine-browser.min.js"></script>
+  <!-- <script src="https://unpkg.com/@webauthntine/browser@0.1.1/dist/webauthntine-browser.min.js"></script> -->
+  <script src="/webauthntine-browser.min.js"></script>
   <link rel="stylesheet" href="../styles.css" />
   <title>WebAuthntine Example Site | Login</title>
 </head>
@@ -14,9 +15,44 @@
       <span>⬅️&nbsp;<a href="/">Go Back</a></span>
     </p>
     <button id="btnBegin">Begin Login</button>
+    <p id="success"></p>
+    <p id="error"></p>
   </div>
   <script>
+    const elemBegin = document.getElementById('btnBegin');
+    const elemSuccess = document.getElementById('success');
+    const elemError = document.getElementById('error');
 
+    const { startAssertion } = WebAuthntineBrowser;
+
+    elemBegin.addEventListener('click', (async () => {
+      const resp = await fetch('/generate-assertion-options');
+
+      let asseResp;
+      try {
+        const opts = await resp.json();
+        asseResp = await startAssertion(opts);
+      } catch (error) {
+        elemError.innerText = error;
+        throw new Error(error);
+      }
+
+      const verificationResp = await fetch('/verify-assertion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(asseResp),
+      });
+
+      const verificationJSON = await verificationResp.json();
+
+      if (verificationJSON && verificationJSON.verified) {
+        elemSuccess.innerHTML = 'Success! <a href="/register">Try to register again?&nbsp;🚪</a>';
+      } else {
+        elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(verificationJSON)}</pre>`;
+      }
+    }));
   </script>
 </body>
 </html>
