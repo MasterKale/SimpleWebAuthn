@@ -2,8 +2,8 @@ import base64url from 'base64url';
 import { AttestationObject, VerifiedAttestation } from "@webauthntine/typescript-types";
 
 import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
-import parseAttestationAuthData from '../parseAttestationAuthData';
 
 
 /**
@@ -15,7 +15,7 @@ export default function verifyAttestationNone(
   attestationObject: AttestationObject,
 ): VerifiedAttestation {
   const { fmt, authData } = attestationObject;
-  const authDataStruct = parseAttestationAuthData(authData);
+  const authDataStruct = parseAuthenticatorData(authData);
 
   const {
     credentialID,
@@ -24,17 +24,16 @@ export default function verifyAttestationNone(
     flags,
   } = authDataStruct;
 
+  if (!flags.up) {
+    throw new Error('User was not present for attestation (None)');
+  }
+
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (None)');
   }
 
   if (!credentialID) {
     throw new Error('No credential ID was provided by authenticator (None)');
-  }
-
-  // Make sure the (U)ser (P)resent for the attestation
-  if (!flags.up) {
-    throw new Error('User was not present for attestation (None)');
   }
 
   const publicKey = convertCOSEtoPKCS(COSEPublicKey);

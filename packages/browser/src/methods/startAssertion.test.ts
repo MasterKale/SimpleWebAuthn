@@ -4,6 +4,7 @@ import { AssertionCredential, PublicKeyCredentialRequestOptionsJSON } from '@web
 
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
+import toBase64String from '../helpers/toBase64String';
 
 import startAssertion from './startAssertion';
 
@@ -12,10 +13,10 @@ jest.mock('../helpers/supportsWebauthn');
 const mockNavigatorGet = (window.navigator.credentials.get as jest.Mock);
 const mockSupportsWebauthn = (supportsWebauthn as jest.Mock);
 
-const mockAttestationObject = 'mockAsse';
-const mockClientDataJSON = 'mockClie';
-const mockSignature = 'mockSign';
-const mockUserHandle = 'mockUser';
+const mockAuthenticatorData = toBase64String(toUint8Array('mockAuthenticatorData'));
+const mockClientDataJSON = toBase64String(toUint8Array('mockClientDataJSON'));
+const mockSignature = toBase64String(toUint8Array('mockSignature'));
+const mockUserHandle = toBase64String(toUint8Array('mockUserHandle'));
 
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
   publicKey: {
@@ -49,9 +50,9 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
 
   expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.publicKey.challenge));
-  expect(argsPublicKey.allowCredentials[0].id).toEqual(
-    toUint8Array(goodOpts1.publicKey.allowCredentials[0].id),
-  );
+  // Make sure the credential ID is a proper base64 with a length that's a multiple of 4
+  expect(argsPublicKey.allowCredentials[0].id.length % 4).toEqual(0);
+  expect(argsPublicKey.allowCredentials[0].id).toEqual(base64js.toByteArray('credId=='));
 
   done();
 });
@@ -59,14 +60,16 @@ test('should convert options before passing to navigator.credentials.get(...)', 
 test('should return base64-encoded response values', async (done) => {
   mockSupportsWebauthn.mockReturnValue(true);
 
+  const credentialID = 'foobar';
+
   mockNavigatorGet.mockImplementation((): Promise<AssertionCredential> => {
     return new Promise((resolve) => {
       resolve({
         id: 'foobar',
         rawId: toUint8Array('foobar'),
         response: {
+          authenticatorData: base64js.toByteArray(mockAuthenticatorData),
           clientDataJSON: base64js.toByteArray(mockClientDataJSON),
-          authenticatorData: base64js.toByteArray(mockClientDataJSON),
           signature: base64js.toByteArray(mockSignature),
           userHandle: base64js.toByteArray(mockUserHandle),
         },
@@ -79,7 +82,8 @@ test('should return base64-encoded response values', async (done) => {
   const response = await startAssertion(goodOpts1);
 
   expect(response).toEqual({
-    base64AuthenticatorData: mockClientDataJSON,
+    base64CredentialID: credentialID,
+    base64AuthenticatorData: mockAuthenticatorData,
     base64ClientDataJSON: mockClientDataJSON,
     base64Signature: mockSignature,
     base64UserHandle: mockUserHandle,

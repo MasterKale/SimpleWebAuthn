@@ -13,6 +13,7 @@
     "node_modules",
     "**/*.test.ts",
     "**/setupTests.ts",
+    "**/__mocks__/*",
     "**/dist/*"
   ]
 }

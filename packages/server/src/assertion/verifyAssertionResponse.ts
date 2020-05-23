@@ -1,17 +1,16 @@
 import base64url from 'base64url';
 import {
   AuthenticatorAssertionResponseJSON,
-  U2F_USER_PRESENTED,
   AuthenticatorDevice,
   VerifiedAssertion,
 } from "@webauthntine/typescript-types";
 
 import decodeClientDataJSON from "@helpers/decodeClientDataJSON";
 
-import parseAssertionAuthData from './parseAssertionAuthData';
 import toHash from '@helpers/toHash';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import verifySignature from '@helpers/verifySignature';
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
 /**
  * Verify that the user has legitimately completed the login process
@@ -40,18 +39,12 @@ export default function verifyAssertionResponse(
   }
 
   const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
-  const authData = parseAssertionAuthData(authDataBuffer);
+  const authDataStruct = parseAuthenticatorData(authDataBuffer);
+  const { credentialID, flags, counter } = authDataStruct;
 
-  if (!(authData.flags & U2F_USER_PRESENTED)) {
+  if (!(flags.up)) {
     throw new Error('User was NOT present during assertion!');
   }
-
-  const {
-    rpIdHash,
-    flagsBuf,
-    counterBuf,
-    counter,
-  } = authData;
 
   if (counter <= authenticator.counter) {
     // Error out when the counter in the DB is greater than or equal to the counter in the
@@ -62,6 +55,12 @@ export default function verifyAssertionResponse(
       `Response counter value ${counter} was lower than expected ${authenticator.counter}`,
     );
   }
+
+  const {
+    rpIdHash,
+    flagsBuf,
+    counterBuf,
+  } = authDataStruct;
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
   const signatureBase = Buffer.concat([
@@ -76,6 +75,10 @@ export default function verifyAssertionResponse(
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
+    authenticatorInfo: {
+      counter,
+      base64CredentialID: response.base64CredentialID,
+    },
   };
 
   return toReturn;

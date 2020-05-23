@@ -87,6 +87,7 @@ AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
 export interface AuthenticatorAssertionResponseJSON extends Omit<
 AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signature' | 'userHandle'
 > {
+  base64CredentialID: string;
   base64AuthenticatorData: string;
   base64ClientDataJSON: string;
   base64Signature: string;
@@ -111,7 +112,7 @@ export type AttestationObject = {
   authData: Buffer,
 };
 
-export type ParsedAttestationAuthData = {
+export type ParsedAuthenticatorData = {
   rpIdHash: Buffer,
   flagsBuf: Buffer,
   flags: {
@@ -136,6 +137,17 @@ export type ClientDataJSON = {
 
 /**
  * Result of attestation verification
+ *
+ * @param verified If the assertion response could be verified
+ * @param userVerified Whether the user was uniquely identified during attestation
+ * @param authenticatorInfo.fmt Type of attestation
+ * @param authenticatorInfo.counter The number of times the authenticator reported it has been used.
+ * Should be kept in a DB for later reference to help prevent replay attacks
+ * @param authenticatorInfo.base64PublicKey Base64-encoded ArrayBuffer containing the
+ * authenticator's public key. **Should be kept in a DB for later reference!**
+ * @param authenticatorInfo.base64CredentialID Base64-encoded ArrayBuffer containing the
+ * authenticator's credential ID for the public key above. **Should be kept in a DB for later
+ * reference!**
  */
 export type VerifiedAttestation = {
   verified: boolean,
@@ -150,9 +162,20 @@ export type VerifiedAttestation = {
 
 /**
  * Result of assertion verification
+ *
+ * @param verified If the assertion response could be verified
+ * @param authenticatorInfo.base64CredentialID The ID of the authenticator used during assertion.
+ * Should be used to identify which DB authenticator entry needs its `counter` updated to the value
+ * below
+ * @param authenticatorInfo.counter The number of times the authenticator identified above reported
+ * it has been used. **Should be kept in a DB for later reference to help prevent replay attacks!**
  */
 export type VerifiedAssertion = {
   verified: boolean;
+  authenticatorInfo: {
+    counter: number,
+    base64CredentialID: string,
+  },
 };
 
 export type CertificateInfo = {
@@ -189,19 +212,6 @@ export type SafetyNetJWTPayload = {
 };
 
 export type SafetyNetJWTSignature = string;
-
-export type ParsedAssertionAuthData = {
-  rpIdHash: Buffer,
-  flagsBuf: Buffer,
-  flags: number,
-  counter: number,
-  counterBuf: Buffer,
-};
-
-/**
- * U2F Presence constant
- */
-export const U2F_USER_PRESENTED = 0x01;
 
 /**
  * A WebAuthn-compatible device and the information needed to verify assertions by it

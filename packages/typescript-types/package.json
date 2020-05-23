@@ -1,6 +1,6 @@
 {
   "name": "@webauthntine/typescript-types",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "TypeScript types used by the @webauthntine series of libraries",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
-    "prepare": "npm run build"
+    "prepublish": "npm run build"
   },
   "keywords": [
     "webauthn",

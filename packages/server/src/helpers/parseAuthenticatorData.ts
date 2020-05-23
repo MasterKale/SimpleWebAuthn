@@ -1,9 +1,9 @@
-import { ParsedAttestationAuthData } from "@webauthntine/typescript-types";
+import { ParsedAuthenticatorData } from "@webauthntine/typescript-types";
 
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
-export default function parseAttestationAuthData(authData: Buffer): ParsedAttestationAuthData {
+export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorData {
   let intBuffer = authData;
 
   const rpIdHash = intBuffer.slice(0, 32);

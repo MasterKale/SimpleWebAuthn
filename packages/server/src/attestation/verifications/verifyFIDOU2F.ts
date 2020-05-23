@@ -1,12 +1,11 @@
 import base64url from 'base64url';
-import { AttestationObject, VerifiedAttestation, U2F_USER_PRESENTED } from '@webauthntine/typescript-types';
+import { AttestationObject, VerifiedAttestation } from '@webauthntine/typescript-types';
 
 import toHash from '@helpers/toHash';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import verifySignature from '@helpers/verifySignature';
-
-import parseAttestationAuthData from '../parseAttestationAuthData';
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
 
 /**
@@ -18,7 +17,7 @@ export default function verifyAttestationFIDOU2F(
 ): VerifiedAttestation {
   const { fmt, authData, attStmt } = attestationObject;
 
-  const authDataStruct = parseAttestationAuthData(authData);
+  const authDataStruct = parseAuthenticatorData(authData);
   const {
     flags,
     COSEPublicKey,
@@ -27,7 +26,7 @@ export default function verifyAttestationFIDOU2F(
     counter,
   } = authDataStruct;
 
-  if (!(flags.flagsInt & U2F_USER_PRESENTED)) {
+  if (!(flags.up)) {
     throw new Error('User was NOT present during authentication (FIDOU2F)');
   }
 

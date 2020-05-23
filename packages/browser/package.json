@@ -1,6 +1,6 @@
 {
   "name": "@webauthntine/browser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "WebAuthntine for Browsers",
   "main": "dist/webauthntine-browser.min.js",
   "types": "dist/index.d.ts",
@@ -15,7 +15,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "npm test -- --coverage",
-    "prepare": "npm run build"
+    "prepublish": "npm run build"
   },
   "keywords": [
     "webauthn",
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@types/base64-js": "^1.2.5",
-    "@webauthntine/typescript-types": "^0.1.1",
+    "@webauthntine/typescript-types": "file:../typescript-types",
     "ts-loader": "^7.0.4",
     "webpack": "^4.43.0",
     "webpack-auto-inject-version": "^1.2.2",

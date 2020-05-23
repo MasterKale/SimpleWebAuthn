@@ -11,8 +11,7 @@ import toHash from "@helpers/toHash";
 import verifySignature from '@helpers/verifySignature';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import getCertificateInfo from '@helpers/getCertificateInfo';
-
-import parseAttestationAuthData from '../parseAttestationAuthData';
+import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
 
 /**
@@ -23,6 +22,20 @@ export default function verifyAttestationAndroidSafetyNet(
   base64ClientDataJSON: string,
 ): VerifiedAttestation {
   const { attStmt, authData, fmt } = attestationObject;
+  const authDataStruct = parseAuthenticatorData(authData);
+  const { counter, credentialID, COSEPublicKey, flags } = authDataStruct;
+
+  if (!flags.up) {
+    throw new Error('User was not present for attestation (None)');
+  }
+
+  if (!COSEPublicKey) {
+    throw new Error('No public key was provided by authenticator (SafetyNet)');
+  }
+
+  if (!credentialID) {
+    throw new Error('No credential ID was provided by authenticator (SafetyNet)');
+  }
 
   if (!attStmt.response) {
     throw new Error('No response was included in attStmt by authenticator (SafetyNet)');
@@ -107,18 +120,7 @@ export default function verifyAttestationAndroidSafetyNet(
 
 
   if (toReturn.verified) {
-    const authDataStruct = parseAttestationAuthData(authData);
-    const { counter, credentialID, COSEPublicKey, flags } = authDataStruct;
-
     toReturn.userVerified = flags.uv;
-
-    if (!COSEPublicKey) {
-      throw new Error('No public key was provided by authenticator (SafetyNet)');
-    }
-
-    if (!credentialID) {
-      throw new Error('No credential ID was provided by authenticator (SafetyNet)');
-    }
 
     const publicKey = convertCOSEtoPKCS(COSEPublicKey);
 
