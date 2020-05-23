@@ -9,10 +9,11 @@
 </head>
 <body>
   <div class="container">
-    <h1>Register (a.k.a. "Attestation")</h1>
     <p>
       <span>⬅️&nbsp;<a href="/">Go Back</a></span>
     </p>
+    <h1>🚪&nbsp;Register</h1>
+    <h2>(a.k.a. "Attestation")</h2>
     <button id="btnBegin">Begin Registration</button>
     <p id="success"></p>
     <p id="error"></p>
@@ -46,7 +47,7 @@
       const verificationJSON = await verificationResp.json();
 
       if (verificationJSON && verificationJSON.verified) {
-        elemSuccess.innerHTML = 'Success! <a href="/login">Now try to log in&nbsp;🔐</a>';
+        elemSuccess.innerHTML = 'Success! <a href="/login">Now try to log in</a>&nbsp;🔐';
       } else {
         elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(verificationJSON)}</pre>`;
       }
