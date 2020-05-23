@@ -26,6 +26,10 @@
     const { startAssertion } = WebAuthntineBrowser;
 
     elemBegin.addEventListener('click', (async () => {
+      // Reset success/error messages
+      elemSuccess.innerHTML = '';
+      elemError.innerHTML = '';
+
       const resp = await fetch('/generate-assertion-options');
 
       let asseResp;

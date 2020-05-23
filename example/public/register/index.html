@@ -26,7 +26,10 @@
     const { startAttestation } = WebAuthntineBrowser;
 
     elemBegin.addEventListener('click', (async () => {
-      console.log('getting attestation options');
+      // Reset success/error messages
+      elemSuccess.innerHTML = '';
+      elemError.innerHTML = '';
+
       const resp = await fetch('/generate-attestation-options');
 
       let attResp;
