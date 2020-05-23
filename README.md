@@ -1,6 +1,15 @@
+<!-- omit in toc -->
 # WebAuthntine Project
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=webauthntine)
+
+- [Overview](#overview)
+- [Philosophy](#philosophy)
+- [Tested Devices](#tested-devices)
+- [Development](#development)
+- [Pronunciation Guide](#pronunciation-guide)
+
+## Overview
 
 This monorepo contains two complimentary libraries to help reduce the amount of work needed to
 incorporate WebAuthn into a website. The following packages are maintained here:
