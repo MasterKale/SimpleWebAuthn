@@ -72,7 +72,13 @@ app.get('/generate-attestation-options', (req, res) => {
 app.post('/verify-attestation', (req, res) => {
   const { body } = req;
 
-  const verification = verifyAttestationResponse(body, `https://${origin}`);
+  let verification;
+  try {
+    verification = verifyAttestationResponse(body, `https://${origin}`);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).send({ error: error.message });
+  }
 
   const { verified, authenticatorInfo } = verification;
 
@@ -120,7 +126,13 @@ app.post('/verify-assertion', (req, res) => {
     }
   });
 
-  const verification = verifyAssertionResponse(body, `https://${origin}`, dbAuthenticator);
+  let verification;
+  try {
+    verification = verifyAssertionResponse(body, `https://${origin}`, dbAuthenticator);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).send({ error: error.message });
+  }
 
   const { verified, authenticatorInfo } = verification;
 
