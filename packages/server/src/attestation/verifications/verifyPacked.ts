@@ -19,7 +19,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
   base64ClientDataJSON: string,
 ): VerifiedAttestation {
   const { fmt, authData, attStmt } = attestationObject;
-  const { sig, x5c, ecdaaKeyId } = attStmt;
+  const { sig, x5c } = attStmt;
 
   const authDataStruct = parseAuthenticatorData(authData);
 
@@ -91,8 +91,6 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
     }
 
     toReturn.verified = verifySignature(sig, signatureBase, leafCert);
-  } else if (ecdaaKeyId) {
-    throw new Error('ECDAA not supported yet (Packed|ECDAA)');
   } else {
     const cosePublicKey: COSEPublicKey = cbor.decodeAllSync(COSEPublicKey)[0];
 
