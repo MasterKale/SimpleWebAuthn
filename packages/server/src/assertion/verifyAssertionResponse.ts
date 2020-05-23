@@ -44,7 +44,7 @@ export default function verifyAssertionResponse(
 
   const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
   const authDataStruct = parseAuthenticatorData(authDataBuffer);
-  const { credentialID, flags, counter } = authDataStruct;
+  const { flags, counter } = authDataStruct;
 
   if (!(flags.up)) {
     throw new Error('User was NOT present during assertion!');
