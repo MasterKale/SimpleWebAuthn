@@ -25,14 +25,12 @@
     "typescript"
   ],
   "dependencies": {
+    "@webauthntine/typescript-types": "^0.1.1",
     "base64url": "^3.0.1",
     "cbor": "^5.0.2",
     "elliptic": "^6.5.2",
     "jsrsasign": "^8.0.15",
     "node-rsa": "^1.0.8"
-  },
-  "devDependencies": {
-    "@webauthntine/typescript-types": "^0.1.1"
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }
