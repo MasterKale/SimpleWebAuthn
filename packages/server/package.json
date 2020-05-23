@@ -18,7 +18,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "npm test -- --coverage",
-    "prepare": "npm run build"
+    "prepublish": "npm run build"
   },
   "keywords": [
     "webauthn",

@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
-    "prepare": "npm run build"
+    "prepublish": "npm run build"
   },
   "keywords": [
     "webauthn",
