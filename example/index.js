@@ -1,3 +1,8 @@
+/**
+ * An example Express server showing off a simple integration of @webauthntine/server.
+ *
+ * The webpages served from ./public use @webauthntine/browser.
+ */
 const https = require('https');
 const fs = require('fs');
 
@@ -135,6 +140,13 @@ app.post('/verify-assertion', (req, res) => {
 });
 
 https.createServer({
+  /**
+   * You'll need to provide a SSL cert and key here because
+   * WebAuthn can only be run from HTTPS:// URLs
+   *
+   * HINT: If you create a `dev` subdomain A-record that points to 127.0.0.1,
+   * you can manually generate an HTTPS certificate for it using Let's Encrypt certbot.
+   */
   key: fs.readFileSync('./dev.yourdomain.com.key'),
   cert: fs.readFileSync('./dev.yourdomain.com.crt'),
 }, app).listen(port, host, () => {
