@@ -96,11 +96,11 @@ test('should throw error if previous counter value is not less than in response'
   };
 
   expect(() => {
-    console.log(verifyAssertionResponse(
+    verifyAssertionResponse(
       assertionResponse,
       assertionOrigin,
       badDevice,
-    ));
+    );
   }).toThrow();
 });
 
