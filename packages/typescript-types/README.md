@@ -1,4 +1,5 @@
 # @webauthntine/typescript-types
-[![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/typescript-types)](https://www.npmjs.com/package/@webauthntine/typescript-types)
+![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
+[![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/typescript-types?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@webauthntine/typescript-types)
 
 TypeScript typings for [@webauthntine/server](../server/) and [@webauthntine/browser](../browser/)
