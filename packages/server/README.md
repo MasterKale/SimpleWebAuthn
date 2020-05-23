@@ -6,6 +6,7 @@
 
 - [Installation](#installation)
 - [Usage - Coming Soon](#usage---coming-soon)
+- [Supported Attestation Formats](#supported-attestation-formats)
 
 ## Installation
 
@@ -28,3 +29,17 @@ const WebAuthntineServer = require('@webauthntine/server');
 ## Usage - Coming Soon
 
 Check out [src/index.ts](./src/index.ts) for now until this section gets updated.
+
+## Supported Attestation Formats
+
+WebAuthntine can verify the following attestation formats:
+
+- `fido-u2f`
+- `packed`
+  - Supported Certificates
+    - `X5C`
+    - `COSE - EC2`
+    - `COSE - RSA` (code is present but needs further testing)
+    - `COSE - OKP` (code is present but needs further testing)
+- `android-safetynet`
+- `none`
