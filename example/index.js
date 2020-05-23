@@ -115,8 +115,8 @@ app.post('/verify-assertion', (req, res) => {
 });
 
 https.createServer({
-  key: fs.readFileSync('./dev.dontneeda.pw.key'),
-  cert: fs.readFileSync('./dev.dontneeda.pw.crt'),
+  key: fs.readFileSync('./dev.yourdomain.com.key'),
+  cert: fs.readFileSync('./dev.yourdomain.com.crt'),
 }, app).listen(port, host, () => {
   console.log(`🚀 Server ready at https://${host}:${port}`);
 });
