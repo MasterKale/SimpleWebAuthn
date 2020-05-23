@@ -1,5 +1,6 @@
 # WebAuthntine Project
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
+[![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=webauthntine)
 
 This monorepo contains two complimentary libraries to help reduce the amount of work needed to
 incorporate WebAuthn into a website. The following packages are maintained here:
