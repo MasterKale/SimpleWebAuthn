@@ -22,9 +22,7 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
   const subjectCert = new jsrsasign.X509();
   subjectCert.readCertPEM(pemCertificate);
 
-  const { version, getSubjectString, getExtBasicConstraints } = (subjectCert as x5cCertificate);
-
-  const subjectString = getSubjectString();
+  const subjectString = subjectCert.getSubjectString();
   const subjectParts = subjectString.slice(1).split('/');
 
   const subject: { [key: string]: string } = {};
@@ -33,8 +31,8 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
     subject[key] = val;
   });
 
-
-  const basicConstraintsCA = !!getExtBasicConstraints().cA;
+  const { version } = (subjectCert as x5cCertificate);
+  const basicConstraintsCA = !!subjectCert.getExtBasicConstraints().cA;
 
   return {
     subject,
