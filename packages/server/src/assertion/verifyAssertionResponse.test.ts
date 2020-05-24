@@ -19,6 +19,7 @@ afterEach(() => {
 test('should verify an assertion response', () => {
   const verification = verifyAssertionResponse(
     assertionResponse,
+    assertionChallenge,
     assertionOrigin,
     authenticator,
   );
@@ -29,6 +30,7 @@ test('should verify an assertion response', () => {
 test('should verify an assertion response if origin does not start with https', () => {
   const verification = verifyAssertionResponse(
     assertionResponse,
+    assertionChallenge,
     'dev.dontneeda.pw',
     authenticator,
   );
@@ -39,6 +41,7 @@ test('should verify an assertion response if origin does not start with https', 
 test('should return authenticator info after verification', () => {
   const verification = verifyAssertionResponse(
     assertionResponse,
+    assertionChallenge,
     assertionOrigin,
     authenticator,
   );
@@ -47,14 +50,26 @@ test('should return authenticator info after verification', () => {
   expect(verification.authenticatorInfo.base64CredentialID).toEqual(authenticator.base64CredentialID);
 });
 
+test('should throw when response challenge is not expected value', () => {
+  expect(() => {
+    verifyAssertionResponse(
+      assertionResponse,
+      'shouldhavebeenthisvalue',
+      'https://different.address',
+      authenticator,
+    );
+  }).toThrow(/assertion challenge/i);
+});
+
 test('should throw when response origin is not expected value', () => {
   expect(() => {
     verifyAssertionResponse(
       assertionResponse,
+      assertionChallenge,
       'https://different.address',
       authenticator,
     );
-  }).toThrow();
+  }).toThrow(/assertion origin/i);
 });
 
 test('should throw when assertion type is not webauthn.create', () => {
@@ -62,15 +77,17 @@ test('should throw when assertion type is not webauthn.create', () => {
   mockDecodeClientData.mockReturnValue({
     origin: assertionOrigin,
     type: 'webauthn.badtype',
+    challenge: assertionChallenge,
   });
 
   expect(() => {
     verifyAssertionResponse(
       assertionResponse,
+      assertionChallenge,
       assertionOrigin,
       authenticator,
     );
-  }).toThrow();
+  }).toThrow(/assertion type/i);
 });
 
 test('should throw error if user was not present', () => {
@@ -81,10 +98,11 @@ test('should throw error if user was not present', () => {
   expect(() => {
     verifyAssertionResponse(
       assertionResponse,
+      assertionChallenge,
       assertionOrigin,
       authenticator,
     );
-  }).toThrow();
+  }).toThrow(/not present/i);
 });
 
 test('should throw error if previous counter value is not less than in response', () => {
@@ -98,10 +116,11 @@ test('should throw error if previous counter value is not less than in response'
   expect(() => {
     verifyAssertionResponse(
       assertionResponse,
+      assertionChallenge,
       assertionOrigin,
       badDevice,
     );
-  }).toThrow();
+  }).toThrow(/counter value/i);
 });
 
 const assertionResponse = {
@@ -114,6 +133,7 @@ const assertionResponse = {
   base64Signature: 'MEUCIQDYXBOpCWSWq2Ll4558GJKD2RoWg958lvJSB_GdeokxogIgWuEVQ7ee6AswQY0OsuQ6y8Ks6' +
     'jhd45bDx92wjXKs900='
 };
+const assertionChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlUaW1l';
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator = {

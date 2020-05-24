@@ -19,6 +19,7 @@ afterEach(() => {
 test('should verify FIDO U2F attestation', () => {
   const verification = verifyAttestationResponse(
     attestationFIDOU2F,
+    'U2d4N3Y0M09McldPb1R5ZExnTloy',
     'https://clover.millertime.dev:3000',
   );
 
@@ -36,6 +37,7 @@ test('should verify FIDO U2F attestation', () => {
 test('should verify Packed (EC2) attestation', () => {
   const verification = verifyAttestationResponse(
     attestationPacked,
+    'czZQSWJCblBQbnJHTlNCeE5kdERyVDdVclZZSks5SE0',
     'https://dev.dontneeda.pw'
   )
 
@@ -54,6 +56,7 @@ test('should verify Packed (EC2) attestation', () => {
 test ('should verify Packed (X5C) attestation', () => {
   const verification = verifyAttestationResponse(
     attestationPackedX5C,
+    'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlUaW1l',
     'https://dev.dontneeda.pw',
   );
 
@@ -71,6 +74,7 @@ test ('should verify Packed (X5C) attestation', () => {
 test('should verify None attestation', () => {
   const verification = verifyAttestationResponse(
     attestationNone,
+    'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
     'https://dev.dontneeda.pw'
   );
 
@@ -88,6 +92,7 @@ test('should verify None attestation', () => {
 test('should verify Android SafetyNet attestation', () => {
   const verification = verifyAttestationResponse(
     attestationAndroidSafetyNet,
+    'X3ZWUG9FNDJEaC13azNidkhtYWt0aVZ2RVlDLUx3Qlg',
     'https://dev.dontneeda.pw'
   );
 
@@ -102,27 +107,44 @@ test('should verify Android SafetyNet attestation', () => {
   );
 });
 
+test('should throw when response challenge is not expected value', () => {
+  expect(() => {
+    verifyAttestationResponse(
+      attestationNone,
+      'shouldhavebeenthisvalue',
+      'https://dev.dontneeda.pw',
+    );
+  }).toThrow(/attestation challenge/i);
+});
+
 test('should throw when response origin is not expected value', () => {
   expect(() => {
     verifyAttestationResponse(
       attestationNone,
+      'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
       'https://different.address'
     );
-  }).toThrow();
+  }).toThrow(/attestation origin/i);
 });
 
 test('should throw when attestation type is not webauthn.create', () => {
   const origin = 'https://dev.dontneeda.pw';
+  const challenge = 'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q';
 
   // @ts-ignore 2345
-  mockDecodeClientData.mockReturnValue({ origin, type: 'webauthn.badtype' });
+  mockDecodeClientData.mockReturnValue({
+    origin,
+    type: 'webauthn.badtype',
+    challenge: 'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
+  });
 
   expect(() => {
     verifyAttestationResponse(
       attestationNone,
+      challenge,
       origin,
     );
-  }).toThrow();
+  }).toThrow(/attestation type/i);
 });
 
 test('should throw if an unexpected attestation format is specified', () => {
@@ -136,6 +158,7 @@ test('should throw if an unexpected attestation format is specified', () => {
   expect(() => {
     verifyAttestationResponse(
       attestationNone,
+      'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
       'https://dev.dontneeda.pw',
     );
   }).toThrow();
