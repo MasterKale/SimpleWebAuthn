@@ -31,22 +31,14 @@ app.use(express.json());
 const rpID = 'dev.yourdomain.com';
 const origin = `https://${rpID}`;
 /**
- * A new, random value needs to be generated every time an attestation or an assertion is performed!
- * The server needs to temporarily remember this value for verification, so don't lose it until
- * after you verify an authenticator response.
- */
-const randomChallenge = 'totallyUniqueValueEveryTime';
-/**
  * WebAuthn expects you to be able to uniquely identify the user that performs an attestation or
  * assertion. The user ID you specify here should be your internal, _unique_ ID for that user
  * (uuid, etc...). Avoid using identifying information here, like email addresses, as it may be
  * stored within the authenticator.
+ *
+ * Here, the example server assumes the following user has completed login:
  */
-const userId = 'webauthntineInternalUserId';
-/**
- * The username can be a human-readable name, email, etc... as it is intended only for display.
- */
-const username = 'user@yourdomain.com';
+const loggedInUserId = 'webauthntineInternalUserId';
 
 /**
  * You'll need a database to store a few things:
@@ -78,35 +70,53 @@ const username = 'user@yourdomain.com';
  * expected to generate an assertion response.
  */
 const inMemoryUserDeviceDB = {
-  [userId]: [
+  [loggedInUserId]: {
+    id: loggedInUserId,
+    username: 'user@yourdomain.com',
+    devices: [
+      /**
+       * {
+       *   base64CredentialID: string,
+       *   base64PublicKey: string,
+       *   counter: number,
+       * }
+       */
+    ],
     /**
-     * After an attestation, the following authenticator info returned by
-     * verifyAttestationResponse() should be persisted somewhere that'll tie it back to the user
-     * specified during attestation:
-     *
-     * {
-     *   base64CredentialID: string,
-     *   base64PublicKey: string,
-     *   counter: number,
-     * }
-     *
-     * After an assertion, the `counter` value above should be updated to the value returned by
-     * verifyAssertionResponse(). This method will also return a credential ID of the device that
-     * needs to have its `counter` value updated.
-     *
+     * A simple way of storing a user's current challenge being signed by attestation or assertion.
+     * It should be expired after `timeout` milliseconds (optional argument for `generate` methods,
+     * defaults to 60000ms)
      */
-  ],
+    currentChallenge: undefined,
+  },
 };
 
 /**
  * Registration (a.k.a. "Attestation")
  */
 app.get('/generate-attestation-options', (req, res) => {
+  const user = inMemoryUserDeviceDB[loggedInUserId];
+
+  const {
+    /**
+     * The username can be a human-readable name, email, etc... as it is intended only for display.
+     */
+    username,
+  } = user;
+
+  /**
+   * A new, random value needs to be generated every time an attestation is performed!
+   * The server needs to temporarily remember this value for verification, so don't lose it until
+   * after you verify an authenticator response.
+   */
+  const challenge = 'totallyUniqueValueEveryAttestation';
+  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
+
   res.send(generateAttestationOptions(
     'WebAuthntine Example',
     rpID,
-    randomChallenge,
-    userId,
+    challenge,
+    loggedInUserId,
     username,
   ));
 });
@@ -114,11 +124,15 @@ app.get('/generate-attestation-options', (req, res) => {
 app.post('/verify-attestation', (req, res) => {
   const { body } = req;
 
+  const user = inMemoryUserDeviceDB[loggedInUserId];
+
+  const expectedChallenge = user.currentChallenge;
+
   let verification;
   try {
     verification = verifyAttestationResponse(
       body,
-      randomChallenge,
+      expectedChallenge,
       origin,
     );
   } catch (error) {
@@ -130,11 +144,16 @@ app.post('/verify-attestation', (req, res) => {
 
   if (verified) {
     const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
-    const user = inMemoryUserDeviceDB[userId];
-    const existingDevice = user.find((device) => device.base64CredentialID === base64CredentialID);
+
+    const existingDevice = user.devices.find(
+      (device) => device.base64CredentialID === base64CredentialID,
+    );
 
     if (!existingDevice) {
-      inMemoryUserDeviceDB[userId].push({
+      /**
+       * Add the returned device to the user's list of devices
+       */
+      user.devices.push({
         base64PublicKey,
         base64CredentialID,
         counter,
@@ -150,33 +169,43 @@ app.post('/verify-attestation', (req, res) => {
  */
 app.get('/generate-assertion-options', (req, res) => {
   // You need to know the user by this point
-  const user = inMemoryUserDeviceDB[userId];
+  const user = inMemoryUserDeviceDB[loggedInUserId];
+
+  /**
+   * A new, random value needs to be generated every time an assertion is performed!
+   * The server needs to temporarily remember this value for verification, so don't lose it until
+   * after you verify an authenticator response.
+   */
+  const challenge = 'totallyUniqueValueEveryAssertion';
+  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
 
   res.send(generateAssertionOptions(
-    randomChallenge,
-    user.map(data => data.base64CredentialID),
+    challenge,
+    user.devices.map(data => data.base64CredentialID),
   ));
 });
 
 app.post('/verify-assertion', (req, res) => {
   const { body } = req;
 
+  const user = inMemoryUserDeviceDB[loggedInUserId];
+
+  const expectedChallenge = user.currentChallenge;
+
   let dbAuthenticator;
   // "Query the DB" here for an authenticator matching `base64CredentialID`
-  Object.values(inMemoryUserDeviceDB).forEach((userDevs) => {
-    for(let dev of userDevs) {
-      if (dev.base64CredentialID === body.base64CredentialID) {
-        dbAuthenticator = dev;
-        return;
-      }
+  for(let dev of user.devices) {
+    if (dev.base64CredentialID === body.base64CredentialID) {
+      dbAuthenticator = dev;
+      break;
     }
-  });
+  }
 
   let verification;
   try {
     verification = verifyAssertionResponse(
       body,
-      randomChallenge,
+      expectedChallenge,
       origin,
       dbAuthenticator,
     );
@@ -192,7 +221,7 @@ app.post('/verify-assertion', (req, res) => {
     dbAuthenticator.counter = authenticatorInfo.counter;
   }
 
-  res.send({ verified })
+  res.send({ verified });
 });
 
 https.createServer({
