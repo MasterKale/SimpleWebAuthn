@@ -74,7 +74,11 @@ app.post('/verify-attestation', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAttestationResponse(body, `https://${origin}`);
+    verification = verifyAttestationResponse(
+      body,
+      randomChallenge,
+      `https://${origin}`,
+    );
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
@@ -128,7 +132,12 @@ app.post('/verify-assertion', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAssertionResponse(body, `https://${origin}`, dbAuthenticator);
+    verification = verifyAssertionResponse(
+      body,
+      randomChallenge,
+      `https://${origin}`,
+      dbAuthenticator,
+    );
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
