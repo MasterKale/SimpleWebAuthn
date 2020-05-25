@@ -45,17 +45,18 @@ const loggedInUserId = 'webauthntineInternalUserId';
  *
  * 1. Users
  *
- * You'll need to be able to associate attestations and assertions to a specific user
+ * You'll need to be able to associate attestation and assertions challenges, and authenticators to
+ * a specific user
  *
  * 2. Challenges
  *
  * The totally-random-unique-every-time values you pass into every execution of
  * `generateAttestationOptions()` or `generateAssertionOptions()` MUST be stored until
  * `verifyAttestationResponse()` or `verifyAssertionResponse()` (respectively) is called to verify
- * a response.
+ * that the response contains the signed challenge.
  *
  * These values only need to be persisted for `timeout` number of milliseconds (see the `generate`
- * methods.)
+ * methods and their optional `timeout` parameter)
  *
  * 3. Authenticator Devices
  *
