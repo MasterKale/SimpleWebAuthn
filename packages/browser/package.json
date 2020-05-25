@@ -1,6 +1,6 @@
 {
   "name": "@webauthntine/browser",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "WebAuthntine for Browsers",
   "main": "dist/webauthntine-browser.min.js",
   "types": "dist/index.d.ts",
