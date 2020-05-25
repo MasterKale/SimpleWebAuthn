@@ -3,9 +3,9 @@ import {
   AuthenticatorAssertionResponseJSON,
   AuthenticatorDevice,
   VerifiedAssertion,
-} from "@webauthntine/typescript-types";
+} from '@webauthntine/typescript-types';
 
-import decodeClientDataJSON from "@helpers/decodeClientDataJSON";
+import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
 
 import toHash from '@helpers/toHash';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
@@ -37,7 +37,7 @@ export default function verifyAssertionResponse(
 
   if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected assertion challenge "${challenge}", expected "${expectedChallenge}"`
+      `Unexpected assertion challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 
@@ -55,7 +55,7 @@ export default function verifyAssertionResponse(
   const authDataStruct = parseAuthenticatorData(authDataBuffer);
   const { flags, counter } = authDataStruct;
 
-  if (!(flags.up)) {
+  if (!flags.up) {
     throw new Error('User not present during assertion');
   }
 
@@ -69,19 +69,10 @@ export default function verifyAssertionResponse(
     );
   }
 
-  const {
-    rpIdHash,
-    flagsBuf,
-    counterBuf,
-  } = authDataStruct;
+  const { rpIdHash, flagsBuf, counterBuf } = authDataStruct;
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
-  const signatureBase = Buffer.concat([
-    rpIdHash,
-    flagsBuf,
-    counterBuf,
-    clientDataHash,
-  ]);
+  const signatureBase = Buffer.concat([rpIdHash, flagsBuf, counterBuf, clientDataHash]);
 
   const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.base64PublicKey));
   const signature = base64url.toBuffer(base64Signature);

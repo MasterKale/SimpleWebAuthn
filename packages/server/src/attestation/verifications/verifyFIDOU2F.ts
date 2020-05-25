@@ -7,7 +7,6 @@ import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import verifySignature from '@helpers/verifySignature';
 import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
-
 /**
  * Verify an attestation response with fmt 'fido-u2f'
  */
@@ -18,15 +17,9 @@ export default function verifyAttestationFIDOU2F(
   const { fmt, authData, attStmt } = attestationObject;
 
   const authDataStruct = parseAuthenticatorData(authData);
-  const {
-    flags,
-    COSEPublicKey,
-    rpIdHash,
-    credentialID,
-    counter,
-  } = authDataStruct;
+  const { flags, COSEPublicKey, rpIdHash, credentialID, counter } = authDataStruct;
 
-  if (!(flags.up)) {
+  if (!flags.up) {
     throw new Error('User was NOT present during authentication (FIDOU2F)');
   }
 

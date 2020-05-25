@@ -47,7 +47,9 @@ test('should return authenticator info after verification', () => {
   );
 
   expect(verification.authenticatorInfo.counter).toEqual(144);
-  expect(verification.authenticatorInfo.base64CredentialID).toEqual(authenticator.base64CredentialID);
+  expect(verification.authenticatorInfo.base64CredentialID).toEqual(
+    authenticator.base64CredentialID,
+  );
 });
 
 test('should throw when response challenge is not expected value', () => {
@@ -81,12 +83,7 @@ test('should throw when assertion type is not webauthn.create', () => {
   });
 
   expect(() => {
-    verifyAssertionResponse(
-      assertionResponse,
-      assertionChallenge,
-      assertionOrigin,
-      authenticator,
-    );
+    verifyAssertionResponse(assertionResponse, assertionChallenge, assertionOrigin, authenticator);
   }).toThrow(/assertion type/i);
 });
 
@@ -96,12 +93,7 @@ test('should throw error if user was not present', () => {
   });
 
   expect(() => {
-    verifyAssertionResponse(
-      assertionResponse,
-      assertionChallenge,
-      assertionOrigin,
-      authenticator,
-    );
+    verifyAssertionResponse(assertionResponse, assertionChallenge, assertionOrigin, authenticator);
   }).toThrow(/not present/i);
 });
 
@@ -114,32 +106,29 @@ test('should throw error if previous counter value is not less than in response'
   };
 
   expect(() => {
-    verifyAssertionResponse(
-      assertionResponse,
-      assertionChallenge,
-      assertionOrigin,
-      badDevice,
-    );
+    verifyAssertionResponse(assertionResponse, assertionChallenge, assertionOrigin, badDevice);
   }).toThrow(/counter value/i);
 });
 
 const assertionResponse = {
-  base64CredentialID: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' +
-    'g6jo_o0hYiew',
+  base64CredentialID:
+    'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' + 'g6jo_o0hYiew',
   base64AuthenticatorData: 'PdxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KABAAAAkA==',
-  base64ClientDataJSON: 'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sVWFXMWwiLCJj' +
+  base64ClientDataJSON:
+    'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sVWFXMWwiLCJj' +
     'bGllbnRFeHRlbnNpb25zIjp7fSwiaGFzaEFsZ29yaXRobSI6IlNIQS0yNTYiLCJvcmlnaW4iOiJodHRwczovL2Rldi5k' +
     'b250bmVlZGEucHciLCJ0eXBlIjoid2ViYXV0aG4uZ2V0In0=',
-  base64Signature: 'MEUCIQDYXBOpCWSWq2Ll4558GJKD2RoWg958lvJSB_GdeokxogIgWuEVQ7ee6AswQY0OsuQ6y8Ks6' +
-    'jhd45bDx92wjXKs900='
+  base64Signature:
+    'MEUCIQDYXBOpCWSWq2Ll4558GJKD2RoWg958lvJSB_GdeokxogIgWuEVQ7ee6AswQY0OsuQ6y8Ks6' +
+    'jhd45bDx92wjXKs900=',
 };
 const assertionChallenge = 'totallyUniqueValueEveryTime';
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator = {
-  base64PublicKey: 'BIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A18WGeA6hPmnab0HAViUYVRkwTNcN77QBf_' +
-    'RR0dv3lIvQ',
-  base64CredentialID: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' +
-    'g6jo_o0hYiew',
+  base64PublicKey:
+    'BIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A18WGeA6hPmnab0HAViUYVRkwTNcN77QBf_' + 'RR0dv3lIvQ',
+  base64CredentialID:
+    'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' + 'g6jo_o0hYiew',
   counter: 0,
 };

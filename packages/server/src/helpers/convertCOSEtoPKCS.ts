@@ -1,14 +1,13 @@
 import cbor from 'cbor';
 import { COSEKEYS, COSEPublicKey } from '@webauthntine/typescript-types';
 
-
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
  *
  * @param cosePublicKey COSE-encoded public key
  * @return RAW PKCS encoded public key
  */
-export default function convertCOSEtoPKCS(cosePublicKey: Buffer) {
+export default function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
   /*
     +------+-------+-------+---------+----------------------------------+
     | name | key   | label | type    | description                      |
@@ -39,5 +38,5 @@ export default function convertCOSEtoPKCS(cosePublicKey: Buffer) {
     throw new Error('COSE public key was missing y');
   }
 
-  return Buffer.concat([tag, (x as Buffer), (y as Buffer)]);
+  return Buffer.concat([tag, x as Buffer, y as Buffer]);
 }

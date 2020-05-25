@@ -2,16 +2,16 @@ import jsrsasign from 'jsrsasign';
 import { CertificateInfo } from '@webauthntine/typescript-types';
 
 type ExtInfo = {
-  critical: boolean,
-  oid: string,
-  vidx: number,
+  critical: boolean;
+  oid: string;
+  vidx: number;
 };
 
 interface x5cCertificate extends jsrsasign.X509 {
   version: number;
   foffset: number;
   aExtInfo: ExtInfo[];
-};
+}
 
 /**
  * Extract PEM certificate info
@@ -26,12 +26,12 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
   const subjectParts = subjectString.slice(1).split('/');
 
   const subject: { [key: string]: string } = {};
-  subjectParts.forEach((field) => {
+  subjectParts.forEach(field => {
     const [key, val] = field.split('=');
     subject[key] = val;
   });
 
-  const { version } = (subjectCert as x5cCertificate);
+  const { version } = subjectCert as x5cCertificate;
   const basicConstraintsCA = !!subjectCert.getExtBasicConstraints().cA;
 
   return {

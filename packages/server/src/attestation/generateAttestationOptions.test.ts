@@ -31,10 +31,12 @@ test('should generate credential request options suitable for sending via JSON',
         name: username,
         displayName: username,
       },
-      pubKeyCredParams: [{
-        alg: -7,
-        type: 'public-key',
-      }],
+      pubKeyCredParams: [
+        {
+          alg: -7,
+          type: 'public-key',
+        },
+      ],
       timeout,
       attestation: attestationType,
     },

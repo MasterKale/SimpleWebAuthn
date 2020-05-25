@@ -2,20 +2,25 @@ import base64url from 'base64url';
 import cbor from 'cbor';
 import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
-import { AttestationObject, VerifiedAttestation, COSEKEYS, COSEPublicKey } from "@webauthntine/typescript-types";
+import {
+  AttestationObject,
+  VerifiedAttestation,
+  COSEKEYS,
+  COSEPublicKey as COSEPublicKeyType,
+} from '@webauthntine/typescript-types';
 
-import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
-import toHash from "@helpers/toHash";
+import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
+import toHash from '@helpers/toHash';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';
 import getCertificateInfo from '@helpers/getCertificateInfo';
 import verifySignature from '@helpers/verifySignature';
 import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 
-
 /**
  * Verify an attestation response with fmt 'packed'
  */
-export default function verifyAttestationPacked(attestationObject: AttestationObject,
+export default function verifyAttestationPacked(
+  attestationObject: AttestationObject,
   base64ClientDataJSON: string,
 ): VerifiedAttestation {
   const { fmt, authData, attStmt } = attestationObject;
@@ -43,10 +48,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
 
-  const signatureBase = Buffer.concat([
-    authData,
-    clientDataHash,
-  ]);
+  const signatureBase = Buffer.concat([authData, clientDataHash]);
 
   const toReturn: VerifiedAttestation = {
     verified: false,
@@ -59,12 +61,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
     const leafCertInfo = getCertificateInfo(leafCert);
 
     const { subject, basicConstraintsCA, version } = leafCertInfo;
-    const {
-      OU,
-      CN,
-      O,
-      C,
-    } = subject;
+    const { OU, CN, O, C } = subject;
 
     if (OU !== 'Authenticator Attestation') {
       throw new Error('Batch certificate OU was not "Authenticator Attestation" (Packed|Full');
@@ -92,7 +89,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
 
     toReturn.verified = verifySignature(sig, signatureBase, leafCert);
   } else {
-    const cosePublicKey: COSEPublicKey = cbor.decodeAllSync(COSEPublicKey)[0];
+    const cosePublicKey: COSEPublicKeyType = cbor.decodeAllSync(COSEPublicKey)[0];
 
     const kty = cosePublicKey.get(COSEKEYS.kty);
     const alg = cosePublicKey.get(COSEKEYS.alg);
@@ -105,7 +102,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
       throw new Error('COSE public key was missing kty (Packed|Self)');
     }
 
-    const hashAlg: string = COSEALGHASH[(alg as number)];
+    const hashAlg: string = COSEALGHASH[alg as number];
 
     if (kty === COSEKTY.EC2) {
       const crv = cosePublicKey.get(COSEKEYS.crv);
@@ -126,7 +123,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
        * For now, it's worth noting that this line is probably the reason why it can take
        * 5-6 seconds to run tests.
        */
-      const ec = new elliptic.ec(COSECRV[(crv as number)]);
+      const ec = new elliptic.ec(COSECRV[crv as number]);
       const key = ec.keyFromPublic(pkcsPublicKey);
 
       toReturn.verified = key.verify(signatureBaseHash, sig);
@@ -142,10 +139,13 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
       // TODO: Verify this works
       const key = new NodeRSA();
       key.setOptions({ signingScheme });
-      key.importKey({
-        n: (n as Buffer),
-        e: 65537,
-      }, 'components-public');
+      key.importKey(
+        {
+          n: n as Buffer,
+          e: 65537,
+        },
+        'components-public',
+      );
 
       toReturn.verified = key.verify(signatureBase, sig);
     } else if (kty === COSEKTY.OKP) {
@@ -158,7 +158,7 @@ export default function verifyAttestationPacked(attestationObject: AttestationOb
       const signatureBaseHash = toHash(signatureBase, hashAlg);
 
       const key = new elliptic.eddsa('ed25519');
-      key.keyFromPublic((x as Buffer));
+      key.keyFromPublic(x as Buffer);
 
       // TODO: is `publicKey` right here?
       toReturn.verified = key.verify(signatureBaseHash, sig, publicKey);
@@ -190,8 +190,8 @@ const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
   '-65535': 'pkcs1-sha1',
   '-257': 'pkcs1-sha256',
   '-258': 'pkcs1-sha384',
-  '-259': 'pkcs1-sha512'
-}
+  '-259': 'pkcs1-sha512',
+};
 
 const COSECRV: { [key: number]: string } = {
   1: 'p256',
@@ -209,5 +209,5 @@ const COSEALGHASH: { [key: string]: string } = {
   '-37': 'sha256',
   '-7': 'sha256',
   '-8': 'sha512',
-  '-36': 'sha512'
-}
+  '-36': 'sha512',
+};

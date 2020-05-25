@@ -1,10 +1,8 @@
 import base64url from 'base64url';
-import { AttestationObject, VerifiedAttestation } from "@webauthntine/typescript-types";
+import { AttestationObject, VerifiedAttestation } from '@webauthntine/typescript-types';
 
-import convertCOSEtoPKCS from "@helpers/convertCOSEtoPKCS";
+import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
-
-
 
 /**
  * Verify an attestation response with fmt 'none'
@@ -17,12 +15,7 @@ export default function verifyAttestationNone(
   const { fmt, authData } = attestationObject;
   const authDataStruct = parseAuthenticatorData(authData);
 
-  const {
-    credentialID,
-    COSEPublicKey,
-    counter,
-    flags,
-  } = authDataStruct;
+  const { credentialID, COSEPublicKey, counter, flags } = authDataStruct;
 
   if (!flags.up) {
     throw new Error('User was not present for attestation (None)');

@@ -1,6 +1,5 @@
 import { PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-types';
 
-
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
  *
@@ -12,7 +11,7 @@ import { PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-
 export default function generateAssertionOptions(
   challenge: string,
   base64CredentialIDs: string[],
-  timeout: number = 60000,
+  timeout = 60000,
 ): PublicKeyCredentialRequestOptionsJSON {
   return {
     publicKey: {

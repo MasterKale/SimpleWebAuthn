@@ -5,7 +5,11 @@
     "publish": {
       "ignoreChanges": [
         "*.md",
-        "*.config.js"
+        "*.config.js",
+        ".eslintrc.js",
+        ".prettierignore",
+        ".gitignore",
+        ".eslintignore"
       ],
       "message": "chore(release): publish %s"
     }

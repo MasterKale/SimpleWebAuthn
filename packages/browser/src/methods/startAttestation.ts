@@ -14,7 +14,7 @@ import supportsWebauthn from '../helpers/supportsWebauthn';
  * @param creationOptionsJSON Output from @webauthntine/server's generateAttestationOptions(...)
  */
 export default async function startAttestation(
-  creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON
+  creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
 ): Promise<AuthenticatorAttestationResponseJSON> {
   if (!supportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
@@ -37,7 +37,7 @@ export default async function startAttestation(
     throw new Error('Attestation was not completed');
   }
 
-  const { response } = (credential as AttestationCredential);
+  const { response } = credential as AttestationCredential;
 
   // Convert values to base64 to make it easier to send back to the server
   return {

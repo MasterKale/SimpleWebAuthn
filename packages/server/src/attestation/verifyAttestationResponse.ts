@@ -1,6 +1,10 @@
 import decodeAttestationObject from '@helpers/decodeAttestationObject';
 import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
-import { ATTESTATION_FORMATS, AuthenticatorAttestationResponseJSON, VerifiedAttestation } from '@webauthntine/typescript-types';
+import {
+  ATTESTATION_FORMATS,
+  AuthenticatorAttestationResponseJSON,
+  VerifiedAttestation,
+} from '@webauthntine/typescript-types';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
@@ -28,7 +32,7 @@ export default function verifyAttestationResponse(
 
   if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`
+      `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 

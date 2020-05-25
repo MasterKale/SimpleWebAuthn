@@ -3,6 +3,6 @@
  *
  * @param input Base64-encoded string
  */
-export default function asciiToBinary(input: string) {
+export default function asciiToBinary(input: string): string {
   return Buffer.from(input, 'base64').toString('binary');
 }

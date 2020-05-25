@@ -10,7 +10,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #F7F7F7;
+  background: #f7f7f7;
 }
 
 h1 {
@@ -28,11 +28,11 @@ button {
 }
 
 button:active {
-  background: #EEEEEE;
+  background: #eeeeee;
 }
 
 button:hover {
-  background: #EFEFEF;
+  background: #efefef;
 }
 
 .container {
@@ -46,5 +46,5 @@ button:hover {
 }
 
 #success {
-  color: #11A000;
+  color: #11a000;
 }

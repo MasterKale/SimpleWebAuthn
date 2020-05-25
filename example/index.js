@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /**
  * An example Express server showing off a simple integration of @webauthntine/server.
  *
@@ -113,13 +114,9 @@ app.get('/generate-attestation-options', (req, res) => {
   const challenge = 'totallyUniqueValueEveryAttestation';
   inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
 
-  res.send(generateAttestationOptions(
-    'WebAuthntine Example',
-    rpID,
-    challenge,
-    loggedInUserId,
-    username,
-  ));
+  res.send(
+    generateAttestationOptions('WebAuthntine Example', rpID, challenge, loggedInUserId, username),
+  );
 });
 
 app.post('/verify-attestation', (req, res) => {
@@ -131,11 +128,7 @@ app.post('/verify-attestation', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAttestationResponse(
-      body,
-      expectedChallenge,
-      origin,
-    );
+    verification = verifyAttestationResponse(body, expectedChallenge, origin);
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
@@ -147,7 +140,7 @@ app.post('/verify-attestation', (req, res) => {
     const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
 
     const existingDevice = user.devices.find(
-      (device) => device.base64CredentialID === base64CredentialID,
+      device => device.base64CredentialID === base64CredentialID,
     );
 
     if (!existingDevice) {
@@ -180,10 +173,12 @@ app.get('/generate-assertion-options', (req, res) => {
   const challenge = 'totallyUniqueValueEveryAssertion';
   inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
 
-  res.send(generateAssertionOptions(
-    challenge,
-    user.devices.map(data => data.base64CredentialID),
-  ));
+  res.send(
+    generateAssertionOptions(
+      challenge,
+      user.devices.map(data => data.base64CredentialID),
+    ),
+  );
 });
 
 app.post('/verify-assertion', (req, res) => {
@@ -195,7 +190,7 @@ app.post('/verify-assertion', (req, res) => {
 
   let dbAuthenticator;
   // "Query the DB" here for an authenticator matching `base64CredentialID`
-  for(let dev of user.devices) {
+  for (let dev of user.devices) {
     if (dev.base64CredentialID === body.base64CredentialID) {
       dbAuthenticator = dev;
       break;
@@ -204,12 +199,7 @@ app.post('/verify-assertion', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAssertionResponse(
-      body,
-      expectedChallenge,
-      origin,
-      dbAuthenticator,
-    );
+    verification = verifyAssertionResponse(body, expectedChallenge, origin, dbAuthenticator);
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
@@ -225,16 +215,21 @@ app.post('/verify-assertion', (req, res) => {
   res.send({ verified });
 });
 
-https.createServer({
-  /**
-   * You'll need to provide a SSL cert and key here because
-   * WebAuthn can only be run from HTTPS:// URLs
-   *
-   * HINT: If you create a `dev` subdomain A-record that points to 127.0.0.1,
-   * you can manually generate an HTTPS certificate for it using Let's Encrypt certbot.
-   */
-  key: fs.readFileSync('./dev.yourdomain.com.key'),
-  cert: fs.readFileSync('./dev.yourdomain.com.crt'),
-}, app).listen(port, host, () => {
-  console.log(`🚀 Server ready at https://${host}:${port}`);
-});
+https
+  .createServer(
+    {
+      /**
+       * You'll need to provide a SSL cert and key here because
+       * WebAuthn can only be run from HTTPS:// URLs
+       *
+       * HINT: If you create a `dev` subdomain A-record that points to 127.0.0.1,
+       * you can manually generate an HTTPS certificate for it using Let's Encrypt certbot.
+       */
+      key: fs.readFileSync('./dev.yourdomain.com.key'),
+      cert: fs.readFileSync('./dev.yourdomain.com.crt'),
+    },
+    app,
+  )
+  .listen(port, host, () => {
+    console.log(`🚀 Server ready at https://${host}:${port}`);
+  });
