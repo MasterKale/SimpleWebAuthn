@@ -9,7 +9,7 @@ import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 /**
  * Verify an attestation response with fmt 'none'
  *
- * This is the weaker of the assertions, so there are only so many checks we can perform
+ * This is the weaker of the attestations, so there are only so many checks we can perform
  */
 export default function verifyAttestationNone(
   attestationObject: AttestationObject,

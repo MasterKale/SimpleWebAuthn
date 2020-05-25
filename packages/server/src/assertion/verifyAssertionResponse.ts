@@ -15,21 +15,30 @@ import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
 /**
  * Verify that the user has legitimately completed the login process
  *
- * @param response Authenticator attestation response with base64-encoded values
- * @param expectedOrigin Expected URL of website attestation should have occurred on
+ * @param response Authenticator assertion response with base64-encoded values
+ * @param expectedChallenge The random value provided to generateAssertionOptions for the
+ * authenticator to sign
+ * @param expectedOrigin Expected URL of website assertion should have occurred on
  */
 export default function verifyAssertionResponse(
   response: AuthenticatorAssertionResponseJSON,
+  expectedChallenge: string,
   expectedOrigin: string,
   authenticator: AuthenticatorDevice,
 ): VerifiedAssertion {
   const { base64AuthenticatorData, base64ClientDataJSON, base64Signature } = response;
   const clientDataJSON = decodeClientDataJSON(base64ClientDataJSON);
 
-  const { type, origin } = clientDataJSON;
+  const { type, origin, challenge } = clientDataJSON;
 
   if (!expectedOrigin.startsWith('https://')) {
     expectedOrigin = `https://${expectedOrigin}`;
+  }
+
+  if (challenge !== expectedChallenge) {
+    throw new Error(
+      `Unexpected assertion challenge "${challenge}", expected "${expectedChallenge}"`
+    );
   }
 
   // Check that the origin is our site
@@ -47,7 +56,7 @@ export default function verifyAssertionResponse(
   const { flags, counter } = authDataStruct;
 
   if (!(flags.up)) {
-    throw new Error('User was NOT present during assertion!');
+    throw new Error('User not present during assertion');
   }
 
   if (counter <= authenticator.counter) {
