@@ -7,7 +7,7 @@ import { PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-
  * @param challenge Random string the authenticator needs to sign and pass back
  * @param base64CredentialIDs Array of base64-encoded authenticator IDs registered by the user for
  * assertion
- * @param timeout How long (in ms) the user can take to complete attestation
+ * @param timeout How long (in ms) the user can take to complete assertion
  */
 export default function generateAssertionOptions(
   challenge: string,
