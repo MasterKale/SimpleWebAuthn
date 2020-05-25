@@ -133,7 +133,7 @@ const assertionResponse = {
   base64Signature: 'MEUCIQDYXBOpCWSWq2Ll4558GJKD2RoWg958lvJSB_GdeokxogIgWuEVQ7ee6AswQY0OsuQ6y8Ks6' +
     'jhd45bDx92wjXKs900='
 };
-const assertionChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlUaW1l';
+const assertionChallenge = 'totallyUniqueValueEveryTime';
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator = {

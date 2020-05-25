@@ -19,7 +19,7 @@ afterEach(() => {
 test('should verify FIDO U2F attestation', () => {
   const verification = verifyAttestationResponse(
     attestationFIDOU2F,
-    'U2d4N3Y0M09McldPb1R5ZExnTloy',
+    attestationFIDOU2FChallenge,
     'https://clover.millertime.dev:3000',
   );
 
@@ -37,7 +37,7 @@ test('should verify FIDO U2F attestation', () => {
 test('should verify Packed (EC2) attestation', () => {
   const verification = verifyAttestationResponse(
     attestationPacked,
-    'czZQSWJCblBQbnJHTlNCeE5kdERyVDdVclZZSks5SE0',
+    attestationPackedChallenge,
     'https://dev.dontneeda.pw'
   )
 
@@ -56,7 +56,7 @@ test('should verify Packed (EC2) attestation', () => {
 test ('should verify Packed (X5C) attestation', () => {
   const verification = verifyAttestationResponse(
     attestationPackedX5C,
-    'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlUaW1l',
+    attestationPackedX5CChallenge,
     'https://dev.dontneeda.pw',
   );
 
@@ -74,7 +74,7 @@ test ('should verify Packed (X5C) attestation', () => {
 test('should verify None attestation', () => {
   const verification = verifyAttestationResponse(
     attestationNone,
-    'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
+    attestationNoneChallenge,
     'https://dev.dontneeda.pw'
   );
 
@@ -92,7 +92,7 @@ test('should verify None attestation', () => {
 test('should verify Android SafetyNet attestation', () => {
   const verification = verifyAttestationResponse(
     attestationAndroidSafetyNet,
-    'X3ZWUG9FNDJEaC13azNidkhtYWt0aVZ2RVlDLUx3Qlg',
+    attestationAndroidSafetyNetChallenge,
     'https://dev.dontneeda.pw'
   );
 
@@ -121,7 +121,7 @@ test('should throw when response origin is not expected value', () => {
   expect(() => {
     verifyAttestationResponse(
       attestationNone,
-      'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
+      attestationNoneChallenge,
       'https://different.address'
     );
   }).toThrow(/attestation origin/i);
@@ -129,13 +129,13 @@ test('should throw when response origin is not expected value', () => {
 
 test('should throw when attestation type is not webauthn.create', () => {
   const origin = 'https://dev.dontneeda.pw';
-  const challenge = 'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q';
+  const challenge = attestationNoneChallenge;
 
   // @ts-ignore 2345
   mockDecodeClientData.mockReturnValue({
     origin,
     type: 'webauthn.badtype',
-    challenge: 'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
+    challenge: attestationNoneChallenge,
   });
 
   expect(() => {
@@ -158,7 +158,7 @@ test('should throw if an unexpected attestation format is specified', () => {
   expect(() => {
     verifyAttestationResponse(
       attestationNone,
-      'aEVjY1BXdXppUDAwSDBwNWd4aDJfdTVfUEM0TmVZZ2Q',
+      attestationNoneChallenge,
       'https://dev.dontneeda.pw',
     );
   }).toThrow();
@@ -185,6 +185,7 @@ const attestationFIDOU2F = {
     'RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9jbG92ZXIu' +
     'bWlsbGVydGltZS5kZXY6MzAwMCIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ==',
 };
+const attestationFIDOU2FChallenge = 'Sgx7v43OLrWOoTydLgNZ2';
 
 const attestationPacked = {
   base64AttestationObject: 'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
@@ -197,6 +198,7 @@ const attestationPacked = {
     'a3M1U0UwIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0' +
     'ZSJ9',
 };
+const attestationPackedChallenge = 's6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM';
 
 const attestationPackedX5C = {
   base64AttestationObject: 'o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAIMt_hGMtdgpIVIwMOeKK' +
@@ -218,6 +220,7 @@ const attestationPackedX5C = {
   base64ClientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhG' +
     'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0='
 };
+const attestationPackedX5CChallenge = 'totallyUniqueValueEveryTime';
 
 const attestationNone = {
   base64AttestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjFPdxHEOnAiLIp26idVjIguzn3I' +
@@ -228,6 +231,7 @@ const attestationNone = {
     'VURBd1NEQndOV2Q0YURKZmRUVmZVRU0wVG1WWloyUSIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
     'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9'
 };
+const attestationNoneChallenge = 'hEccPWuziP00H0p5gxh2_u5_PC4NeYgd';
 
 const attestationAndroidSafetyNet = {
   base64AttestationObject: 'o2NmbXRxYW5kcm9pZC1zYWZldHluZXRnYXR0U3RtdKJjdmVyaDE3MTIyMDM3aHJlc' +
@@ -319,3 +323,4 @@ const attestationAndroidSafetyNet = {
     'YUMxM2F6Tmlka2h0WVd0MGFWWjJSVmxETFV4M1FsZyIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
     'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0'
 };
+const attestationAndroidSafetyNetChallenge = '_vVPoE42Dh-wk3bvHmaktiVvEYC-LwBX';
