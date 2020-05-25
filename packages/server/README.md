@@ -28,7 +28,7 @@ const WebAuthntineServer = require('@webauthntine/server');
 
 ## Usage - Coming Soon
 
-Check out [src/index.ts](./src/index.ts) for now until this section gets updated.
+Check out [the example](../../example/index.js) for now until this section gets updated.
 
 ## Supported Attestation Formats
 

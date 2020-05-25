@@ -34,4 +34,4 @@ The library's methods will be available on the global `WebAuthntineBrowser` obje
 
 ## Usage - Coming Soon
 
-Check out [src/index.ts](./src/index.ts) for now until this section gets updated.
+Check out [the example](../../example/public/) for now until this section gets updated.
