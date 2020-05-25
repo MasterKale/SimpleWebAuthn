@@ -24,17 +24,59 @@ const port = 443;
 app.use(express.static('./public/'));
 app.use(express.json());
 
-// Domain where the WebAuthn interactions are expected to occur
-const origin = 'dev.dontneeda.pw';
-// GENERATE A NEW VALUE FOR THIS EVERY TIME! The server needs to temporarily remember this value,
-// so don't lose it until after you verify
+/**
+ * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
+ * represents the expected URL from which an attestation or assertion occurs.
+ */
+const rpID = 'yourdomain.com';
+const origin = `https://dev.${rpID}`;
+/**
+ * A new, random value needs to be generated every time an attestation or an assertion is performed!
+ * The server needs to temporarily remember this value for verification, so don't lose it until
+ * after you verify an authenticator response.
+ */
 const randomChallenge = 'totallyUniqueValueEveryTime';
-// Your internal, _unique_ ID for the user (uuid, etc...). Avoid using identifying information here,
-// like an email address
+/**
+ * WebAuthn expects you to be able to uniquely identify the user that performs an attestation or
+ * assertion. The user ID you specify here should be your internal, _unique_ ID for that user
+ * (uuid, etc...). Avoid using identifying information here, like email addresses, as it may be
+ * stored within the authenticator.
+ */
 const userId = 'webauthntineInternalUserId';
-// A username for the user
-const username = 'user@webauthntine.foo';
+/**
+ * The username can be a human-readable name, email, etc... as it is intended only for display.
+ */
+const username = 'user@yourdomain.com';
 
+/**
+ * You'll need a database to store a few things:
+ *
+ * 1. Users
+ *
+ * You'll need to be able to associate attestations and assertions to a specific user
+ *
+ * 2. Challenges
+ *
+ * The totally-random-unique-every-time values you pass into every execution of
+ * `generateAttestationOptions()` or `generateAssertionOptions()` MUST be stored until
+ * `verifyAttestationResponse()` or `verifyAssertionResponse()` (respectively) is called to verify
+ * a response.
+ *
+ * These values only need to be persisted for `timeout` number of milliseconds (see the `generate`
+ * methods.)
+ *
+ * 3. Authenticator Devices
+ *
+ * After an attestation, you'll need to store three things about the authenticator:
+ *
+ * - Base64-encoded "Credential ID" (varchar)
+ * - Base64-encoded "Public Key" (varchar)
+ * - Counter (int)
+ *
+ * Each authenticator must also be associated to a user so that you can generate a list of
+ * authenticator credential IDs to pass into `generateAssertionOptions()`, from which one is
+ * expected to generate an assertion response.
+ */
 const inMemoryUserDeviceDB = {
   [userId]: [
     /**
@@ -43,8 +85,8 @@ const inMemoryUserDeviceDB = {
      * specified during attestation:
      *
      * {
-     *   base64PublicKey: string,
      *   base64CredentialID: string,
+     *   base64PublicKey: string,
      *   counter: number,
      * }
      *
@@ -62,7 +104,7 @@ const inMemoryUserDeviceDB = {
 app.get('/generate-attestation-options', (req, res) => {
   res.send(generateAttestationOptions(
     'WebAuthntine Example',
-    origin,
+    rpID,
     randomChallenge,
     userId,
     username,
@@ -77,7 +119,7 @@ app.post('/verify-attestation', (req, res) => {
     verification = verifyAttestationResponse(
       body,
       randomChallenge,
-      `https://${origin}`,
+      origin,
     );
   } catch (error) {
     console.error(error);
@@ -135,7 +177,7 @@ app.post('/verify-assertion', (req, res) => {
     verification = verifyAssertionResponse(
       body,
       randomChallenge,
-      `https://${origin}`,
+      origin,
       dbAuthenticator,
     );
   } catch (error) {
