@@ -7,7 +7,7 @@
     "declaration": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": true
   },
   "exclude": [
     "node_modules",

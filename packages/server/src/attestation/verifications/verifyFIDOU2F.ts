@@ -1,6 +1,5 @@
+import type { AttestationObject, VerifiedAttestation } from '@webauthntine/typescript-types';
 import base64url from 'base64url';
-import { AttestationObject, VerifiedAttestation } from '@webauthntine/typescript-types';
-
 import toHash from '@helpers/toHash';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import convertASN1toPEM from '@helpers/convertASN1toPEM';

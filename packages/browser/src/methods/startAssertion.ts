@@ -1,13 +1,12 @@
-import {
+import type {
   PublicKeyCredentialRequestOptionsJSON,
   AuthenticatorAssertionResponseJSON,
   AssertionCredential,
 } from '@webauthntine/typescript-types';
-import base64js from 'base64-js';
-
 import toUint8Array from '../helpers/toUint8Array';
 import toBase64String from '../helpers/toBase64String';
 import supportsWebauthn from '../helpers/supportsWebauthn';
+import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
@@ -25,16 +24,9 @@ export default async function startAssertion(
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...requestOptionsJSON.publicKey,
     challenge: toUint8Array(requestOptionsJSON.publicKey.challenge),
-    allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map((cred) => {
-      // Make sure the credential ID length is a multiple of 4
-      const padLength = 4 - cred.id.length % 4;
-      let id = cred.id.padEnd(cred.id.length + padLength, '=');
-
-      return {
-        ...cred,
-        id: base64js.toByteArray(id),
-      };
-    })
+    allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map(
+      ({ id, transports }) => toPublicKeyCredentialDescriptor(id, transports)
+    ),
   };
 
   // Wait for the user to complete assertion

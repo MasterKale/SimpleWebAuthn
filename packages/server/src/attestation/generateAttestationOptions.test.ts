@@ -8,6 +8,7 @@ test('should generate credential request options suitable for sending via JSON',
   const username = 'usernameHere';
   const timeout = 1;
   const attestationType = 'indirect';
+  const excludeCredentials = ['123abc'];
 
   const options = generateAttestationOptions(
     serviceName,
@@ -17,6 +18,7 @@ test('should generate credential request options suitable for sending via JSON',
     username,
     timeout,
     attestationType,
+    excludeCredentials,
   );
 
   expect(options).toEqual({
@@ -37,6 +39,10 @@ test('should generate credential request options suitable for sending via JSON',
       }],
       timeout,
       attestation: attestationType,
+      excludeCredentials: [{
+        type: 'public-key',
+        id: '123abc'
+      }],
     },
   });
 });

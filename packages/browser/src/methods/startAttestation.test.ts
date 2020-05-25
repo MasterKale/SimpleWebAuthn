@@ -1,10 +1,7 @@
+import type { AttestationCredential, PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript-types';
 import base64js from 'base64-js';
-
-import { AttestationCredential, PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript-types';
-
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
-
 import startAttestation from './startAttestation';
 
 jest.mock('../helpers/supportsWebauthn');

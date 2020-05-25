@@ -1,12 +1,11 @@
-import {
+import type {
   PublicKeyCredentialCreationOptionsJSON,
   AuthenticatorAttestationResponseJSON,
-  AttestationCredential,
 } from '@webauthntine/typescript-types';
-
 import toUint8Array from '../helpers/toUint8Array';
 import toBase64String from '../helpers/toBase64String';
 import supportsWebauthn from '../helpers/supportsWebauthn';
+import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
@@ -28,16 +27,19 @@ export default async function startAttestation(
       ...creationOptionsJSON.publicKey.user,
       id: toUint8Array(creationOptionsJSON.publicKey.user.id),
     },
+    excludeCredentials: creationOptionsJSON.publicKey.excludeCredentials?.map(
+      ({ id, transports }) => toPublicKeyCredentialDescriptor(id, transports)
+    ),
   };
 
   // Wait for the user to complete attestation
-  const credential = await navigator.credentials.create({ publicKey });
+  const credential = await navigator.credentials.create({ publicKey }) as PublicKeyCredential | null;
 
   if (!credential) {
     throw new Error('Attestation was not completed');
   }
 
-  const { response } = (credential as AttestationCredential);
+  const response = credential.response as AuthenticatorAttestationResponse
 
   // Convert values to base64 to make it easier to send back to the server
   return {

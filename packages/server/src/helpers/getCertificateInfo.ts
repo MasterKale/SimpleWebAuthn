@@ -1,5 +1,5 @@
 import jsrsasign from 'jsrsasign';
-import { CertificateInfo } from '@webauthntine/typescript-types';
+import type { CertificateInfo } from '@webauthntine/typescript-types';
 
 type ExtInfo = {
   critical: boolean,

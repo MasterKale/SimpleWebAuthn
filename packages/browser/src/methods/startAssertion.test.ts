@@ -1,11 +1,8 @@
+import type { AssertionCredential, PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-types';
 import base64js from 'base64-js';
-
-import { AssertionCredential, PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-types';
-
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import toBase64String from '../helpers/toBase64String';
-
 import startAssertion from './startAssertion';
 
 jest.mock('../helpers/supportsWebauthn');

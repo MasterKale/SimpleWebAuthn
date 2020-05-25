@@ -26,6 +26,12 @@ export type PublicKeyCredentialCreationOptionsJSON = {
     }],
     timeout?: number,
     attestation: 'direct' | 'indirect',
+    excludeCredentials?: { 
+      // Will be converted to a Uint8Array in the browser
+      id: string,
+      type: 'public-key',
+      transports?: AuthenticatorTransport[],
+     }[];
   },
 };
 
@@ -76,7 +82,7 @@ export interface AssertionCredential extends PublicKeyCredential {
 export interface AuthenticatorAttestationResponseJSON extends Omit<
 AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
 > {
-  base64ClientDataJSON: string,
+  base64ClientDataJSON: string;
   base64AttestationObject: string;
 }
 
