@@ -6,7 +6,7 @@ import {
   AttestationObject,
   VerifiedAttestation,
   COSEKEYS,
-  COSEPublicKey,
+  COSEPublicKey as COSEPublicKeyType,
 } from '@webauthntine/typescript-types';
 
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
@@ -89,7 +89,7 @@ export default function verifyAttestationPacked(
 
     toReturn.verified = verifySignature(sig, signatureBase, leafCert);
   } else {
-    const cosePublicKey: COSEPublicKey = cbor.decodeAllSync(COSEPublicKey)[0];
+    const cosePublicKey: COSEPublicKeyType = cbor.decodeAllSync(COSEPublicKey)[0];
 
     const kty = cosePublicKey.get(COSEKEYS.kty);
     const alg = cosePublicKey.get(COSEKEYS.alg);

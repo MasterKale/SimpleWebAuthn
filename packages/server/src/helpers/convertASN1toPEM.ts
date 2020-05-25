@@ -4,7 +4,7 @@
  * @param buffer - Cert or PubKey buffer
  * @return PEM
  */
-export default function convertASN1toPEM(pkBuffer: Buffer) {
+export default function convertASN1toPEM(pkBuffer: Buffer): string {
   let buffer = pkBuffer;
 
   let type;

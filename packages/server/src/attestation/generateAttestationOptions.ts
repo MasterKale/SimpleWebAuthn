@@ -17,7 +17,7 @@ export default function generateAttestationOptions(
   challenge: string,
   userID: string,
   username: string,
-  timeout: number = 60000,
+  timeout = 60000,
   attestationType: 'direct' | 'indirect' = 'direct',
 ): PublicKeyCredentialCreationOptionsJSON {
   return {

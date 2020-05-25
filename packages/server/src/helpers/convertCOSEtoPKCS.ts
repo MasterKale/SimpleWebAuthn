@@ -7,7 +7,7 @@ import { COSEKEYS, COSEPublicKey } from '@webauthntine/typescript-types';
  * @param cosePublicKey COSE-encoded public key
  * @return RAW PKCS encoded public key
  */
-export default function convertCOSEtoPKCS(cosePublicKey: Buffer) {
+export default function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
   /*
     +------+-------+-------+---------+----------------------------------+
     | name | key   | label | type    | description                      |
