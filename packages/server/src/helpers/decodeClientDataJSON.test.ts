@@ -7,7 +7,7 @@ test('should convert base64-encoded attestation clientDataJSON to JSON', () => {
       'sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9jbG92ZXIubWlsbGVydGltZS5kZX' +
       'Y6MzAwMCIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ=='
     )).toEqual({
-      challenge: 'U2d4N3Y0M09McldPb1R5ZExnTloy',
+      challenge: 'Sgx7v43OLrWOoTydLgNZ2',
       clientExtensions: {},
       hashAlgorithm: 'SHA-256',
       origin: 'https://clover.millertime.dev:3000',
