@@ -24,6 +24,7 @@ module.exports = {
     filename: 'webauthntine-browser.min.js',
     library: 'WebAuthntineBrowser',
     libraryTarget: 'umd',
+    globalObject: 'this',
   },
   plugins: [
     new WebpackAutoInject({
