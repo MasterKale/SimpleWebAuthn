@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap --scope=@webauthntine/typescript-types && lerna bootstrap --scope=@webauthntine/browser --scope=@webauthntine/server",
-    "lint": "prettier --write packages/ example/"
+    "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",
