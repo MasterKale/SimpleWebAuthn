@@ -2,7 +2,8 @@
   "name": "webauthntine-monorepo",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap --scope=@webauthntine/typescript-types && lerna bootstrap --scope=@webauthntine/browser --scope=@webauthntine/server"
+    "bootstrap": "lerna bootstrap --scope=@webauthntine/typescript-types && lerna bootstrap --scope=@webauthntine/browser --scope=@webauthntine/server",
+    "lint": "prettier --write packages/"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",
@@ -22,5 +23,16 @@
     "typescript": "^3.9.2",
     "typescript-transform-paths": "^1.1.14"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,js,md,json}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
 }
