@@ -38,8 +38,8 @@ test('should verify Packed (EC2) attestation', () => {
   const verification = verifyAttestationResponse(
     attestationPacked,
     attestationPackedChallenge,
-    'https://dev.dontneeda.pw'
-  )
+    'https://dev.dontneeda.pw',
+  );
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('packed');
@@ -49,11 +49,11 @@ test('should verify Packed (EC2) attestation', () => {
   );
   expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
     'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
-    'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
+      'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
   );
 });
 
-test ('should verify Packed (X5C) attestation', () => {
+test('should verify Packed (X5C) attestation', () => {
   const verification = verifyAttestationResponse(
     attestationPackedX5C,
     attestationPackedX5CChallenge,
@@ -75,7 +75,7 @@ test('should verify None attestation', () => {
   const verification = verifyAttestationResponse(
     attestationNone,
     attestationNoneChallenge,
-    'https://dev.dontneeda.pw'
+    'https://dev.dontneeda.pw',
   );
 
   expect(verification.verified).toEqual(true);
@@ -93,7 +93,7 @@ test('should verify Android SafetyNet attestation', () => {
   const verification = verifyAttestationResponse(
     attestationAndroidSafetyNet,
     attestationAndroidSafetyNetChallenge,
-    'https://dev.dontneeda.pw'
+    'https://dev.dontneeda.pw',
   );
 
   expect(verification.verified).toEqual(true);
@@ -122,7 +122,7 @@ test('should throw when response origin is not expected value', () => {
     verifyAttestationResponse(
       attestationNone,
       attestationNoneChallenge,
-      'https://different.address'
+      'https://different.address',
     );
   }).toThrow(/attestation origin/i);
 });
@@ -139,11 +139,7 @@ test('should throw when attestation type is not webauthn.create', () => {
   });
 
   expect(() => {
-    verifyAttestationResponse(
-      attestationNone,
-      challenge,
-      origin,
-    );
+    verifyAttestationResponse(attestationNone, challenge, origin);
   }).toThrow(/attestation type/i);
 });
 
@@ -165,7 +161,8 @@ test('should throw if an unexpected attestation format is specified', () => {
 });
 
 const attestationFIDOU2F = {
-  base64AttestationObject: 'o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAK40WxA0t7py7AjEXvwGw' +
+  base64AttestationObject:
+    'o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAK40WxA0t7py7AjEXvwGw' +
     'TlmqlvrOks5g9lf+9zXzRiVAiEA3bv60xyXveKDOusYzniD7CDSostCet9PYK7FLdnTdZNjeDVjgVkCwTCCAr0wg' +
     'gGloAMCAQICBCrnYmMwDQYJKoZIhvcNAQELBQAwLjEsMCoGA1UEAxMjWXViaWNvIFUyRiBSb290IENBIFNlcmlhb' +
     'CA0NTcyMDA2MzEwIBcNMTQwODAxMDAwMDAwWhgPMjA1MDA5MDQwMDAwMDBaMG4xCzAJBgNVBAYTAlNFMRIwEAYDV' +
@@ -181,27 +178,31 @@ const attestationFIDOU2F = {
     'NjDq86cN9vm6+APoAM20wtBAAAAAAAAAAAAAAAAAAAAAAAAAAAAQGFYevaR71ptU5YtXOSnVzPQTsGgK+gLiBKnq' +
     'PWBmZXNRvjISqlLxiwApzlrfkTc3lEMYMatjeACCnsijOkNEGOlAQIDJiABIVggdWLG6UvGyHFw/k/bv6/k6z/LL' +
     'gSO5KXzXw2EcUxkEX8iWCBeaVLz/cbyoKvRIg/q+q7tan0VN+i3WR0BOBCcuNP7yw==',
-  base64ClientDataJSON: 'eyJjaGFsbGVuZ2UiOiJVMmQ0TjNZME0wOU1jbGRQYjFSNVpFeG5UbG95IiwiY2xpZW50' +
+  base64ClientDataJSON:
+    'eyJjaGFsbGVuZ2UiOiJVMmQ0TjNZME0wOU1jbGRQYjFSNVpFeG5UbG95IiwiY2xpZW50' +
     'RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9jbG92ZXIu' +
     'bWlsbGVydGltZS5kZXY6MzAwMCIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ==',
 };
 const attestationFIDOU2FChallenge = 'Sgx7v43OLrWOoTydLgNZ2';
 
 const attestationPacked = {
-  base64AttestationObject: 'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
+  base64AttestationObject:
+    'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
     'qz6lCPlF6B4y885FYUCCrhrzAYXAiAb4dQKXbP3IimsTTadkwXQlrRVdxzlbmPXt847-Oh6r2hhdXRoRGF0YVjhP' +
     'dxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KBFXsOO-a3OAAI1vMYKZIsLJfHwVQMAXQGE4WNXLCDWOCa2x' +
     '8hpqk5dZy_xdc4wBd4UgCJ4M_JAHI7oJgDDVb8WUcKqRB_mzRxwCL9vdTl-ZKPXg3_-Zrt1Adgb7EnK9ivqaTOKM' +
     'DqRrKsIObWYJaqpsSJtUKUBAgMmIAEhWCBKMVVaivqCBpqqAxMjuCo5jMeUdh3jDOC0EF4fLBNNTyJYILc7rqDDe' +
     'X1pwCLrl3ZX7IThrtZNwKQVLQyfHiorqP-n',
-  base64ClientDataJSON: 'eyJjaGFsbGVuZ2UiOiJjelpRU1dKQ2JsQlFibkpIVGxOQ2VFNWtkRVJ5VkRkVmNsWlpT' +
+  base64ClientDataJSON:
+    'eyJjaGFsbGVuZ2UiOiJjelpRU1dKQ2JsQlFibkpIVGxOQ2VFNWtkRVJ5VkRkVmNsWlpT' +
     'a3M1U0UwIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0' +
     'ZSJ9',
 };
 const attestationPackedChallenge = 's6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM';
 
 const attestationPackedX5C = {
-  base64AttestationObject: 'o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAIMt_hGMtdgpIVIwMOeKK' +
+  base64AttestationObject:
+    'o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAIMt_hGMtdgpIVIwMOeKK' +
     'w0IkUUFkXSY8arKh3Q0c5QQAiB9Sv9JavAEmppeH_XkZjB7TFM3jfxsgl97iIkvuJOUImN4NWOBWQLBMIICvTCCAaWgA' +
     'wIBAgIEKudiYzANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwM' +
     'DYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowbjELMAkGA1UEBhMCU0UxEjAQBgNVBAoMCVl1Ymljb' +
@@ -217,24 +218,28 @@ const attestationPackedX5C = {
     'wBA4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56TlqUBA' +
     'gMmIAEhWCBsJbGAjckW-AA_XMk8OnB-VUvrs35ZpjtVJXRhnvXiGiJYIL2ncyg_KesCi44GH8UcZXYwjBkVdGMjNd6LF' +
     'myiD6xf',
-  base64ClientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhG' +
-    'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0='
+  base64ClientDataJSON:
+    'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhG' +
+    'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0=',
 };
 const attestationPackedX5CChallenge = 'totallyUniqueValueEveryTime';
 
 const attestationNone = {
-  base64AttestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjFPdxHEOnAiLIp26idVjIguzn3I' +
+  base64AttestationObject:
+    'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjFPdxHEOnAiLIp26idVjIguzn3I' +
     'pr_RlsKZWsa-5qK-KBFAAAAAAAAAAAAAAAAAAAAAAAAAAAAQQHSlyRHIdWleVqO24-6ix7JFWODqDWo_arvEz3Se' +
     '5EgIFHkcVjZ4F5XDSBreIHsWRilRnKmaaqlqK3V2_4XtYs2pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENs' +
     'MH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
-  base64ClientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYUVWalkxQlhkWHBw' +
+  base64ClientDataJSON:
+    'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYUVWalkxQlhkWHBw' +
     'VURBd1NEQndOV2Q0YURKZmRUVmZVRU0wVG1WWloyUSIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
-    'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9'
+    'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9',
 };
 const attestationNoneChallenge = 'hEccPWuziP00H0p5gxh2_u5_PC4NeYgd';
 
 const attestationAndroidSafetyNet = {
-  base64AttestationObject: 'o2NmbXRxYW5kcm9pZC1zYWZldHluZXRnYXR0U3RtdKJjdmVyaDE3MTIyMDM3aHJlc' +
+  base64AttestationObject:
+    'o2NmbXRxYW5kcm9pZC1zYWZldHluZXRnYXR0U3RtdKJjdmVyaDE3MTIyMDM3aHJlc' +
     '3BvbnNlWRS9ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbmcxWXlJNld5Sk5TVWxHYTJwRFEwSkljV2RCZDBsQ1FXZEpVV' +
     'kpZY205T01GcFBaRkpyUWtGQlFVRkJRVkIxYm5wQlRrSm5hM0ZvYTJsSE9YY3dRa0ZSYzBaQlJFSkRUVkZ6ZDBOU' +
     'ldVUldVVkZIUlhkS1ZsVjZSV1ZOUW5kSFFURlZSVU5vVFZaU01qbDJXako0YkVsR1VubGtXRTR3U1VaT2JHTnVXb' +
@@ -319,8 +324,9 @@ const attestationAndroidSafetyNet = {
     'yKa_0ZbCmVrGvuaivigRQAAAAC5P9lh8uZGL7EiggAiR954AEEBDL2BKZVhBca7N3j3asDaoSrA3tJgT_E4KN25T' +
     'hBVqBHCdffSZt9bvku7hPBcd76BzU7Y-ckXslUkD13Imbzde6UBAgMmIAEhWCCT4hId3ByJ_agRyznv1xIazx2nl' +
     'VEGyvN7intoZr7C2CJYIKo3XB-cca9aUOLC-xhp3GfhyfTS0hjws5zL_bT_N1AL',
-  base64ClientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWDNaV1VHOUZOREpF' +
+  base64ClientDataJSON:
+    'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWDNaV1VHOUZOREpF' +
     'YUMxM2F6Tmlka2h0WVd0MGFWWjJSVmxETFV4M1FsZyIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
-    'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0'
+    'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0',
 };
 const attestationAndroidSafetyNetChallenge = '_vVPoE42Dh-wk3bvHmaktiVvEYC-LwBX';

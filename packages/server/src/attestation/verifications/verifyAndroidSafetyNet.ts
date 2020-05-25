@@ -5,14 +5,13 @@ import {
   SafetyNetJWTHeader,
   SafetyNetJWTPayload,
   SafetyNetJWTSignature,
-} from "@webauthntine/typescript-types";
+} from '@webauthntine/typescript-types';
 
-import toHash from "@helpers/toHash";
+import toHash from '@helpers/toHash';
 import verifySignature from '@helpers/verifySignature';
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import getCertificateInfo from '@helpers/getCertificateInfo';
 import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
-
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
@@ -55,10 +54,7 @@ export default function verifyAttestationAndroidSafetyNet(
   const { nonce, ctsProfileMatch } = PAYLOAD;
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
 
-  const nonceBase = Buffer.concat([
-    authData,
-    clientDataHash,
-  ]);
+  const nonceBase = Buffer.concat([authData, clientDataHash]);
   const nonceBuffer = toHash(nonceBase);
   const expectedNonce = nonceBuffer.toString('base64');
 
@@ -77,7 +73,7 @@ export default function verifyAttestationAndroidSafetyNet(
    * START Verify Header
    */
   // Generate an array of certs constituting a full certificate chain
-  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map((cert) => {
+  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map(cert => {
     let pem = '';
     // Take a string of characters and chop them up into 64-char lines (just like a PEM cert)
     for (let i = 0; i < cert.length; i += 64) {
@@ -118,7 +114,6 @@ export default function verifyAttestationAndroidSafetyNet(
    * END Verify Signature
    */
 
-
   if (toReturn.verified) {
     toReturn.userVerified = flags.uv;
 
@@ -141,7 +136,8 @@ export default function verifyAttestationAndroidSafetyNet(
  *
  * The certificate is valid until Dec 15, 2021
  */
-const GlobalSignRootCAR2 = 'MIIDujCCAqKgAwIBAgILBAAAAAABD4Ym5g0wDQYJKoZIhvcNAQEFBQAwTDEgMB4GA1UEC' +
+const GlobalSignRootCAR2 =
+  'MIIDujCCAqKgAwIBAgILBAAAAAABD4Ym5g0wDQYJKoZIhvcNAQEFBQAwTDEgMB4GA1UEC' +
   'xMXR2xvYmFsU2lnbiBSb290IENBIC0gUjIxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wHhc' +
   'NMDYxMjE1MDgwMDAwWhcNMjExMjE1MDgwMDAwWjBMMSAwHgYDVQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMjETMBEGA' +
   '1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMKR2xvYmFsU2lnbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKb' +

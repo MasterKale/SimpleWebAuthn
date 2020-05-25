@@ -15,7 +15,7 @@ import supportsWebauthn from '../helpers/supportsWebauthn';
  * @param requestOptionsJSON Output from @webauthntine/server's generateAssertionOptions(...)
  */
 export default async function startAssertion(
-  requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON
+  requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
 ): Promise<AuthenticatorAssertionResponseJSON> {
   if (!supportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
@@ -25,16 +25,16 @@ export default async function startAssertion(
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...requestOptionsJSON.publicKey,
     challenge: toUint8Array(requestOptionsJSON.publicKey.challenge),
-    allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map((cred) => {
+    allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map(cred => {
       // Make sure the credential ID length is a multiple of 4
-      const padLength = 4 - cred.id.length % 4;
+      const padLength = 4 - (cred.id.length % 4);
       let id = cred.id.padEnd(cred.id.length + padLength, '=');
 
       return {
         ...cred,
         id: base64js.toByteArray(id),
       };
-    })
+    }),
   };
 
   // Wait for the user to complete assertion
@@ -44,7 +44,7 @@ export default async function startAssertion(
     throw new Error('Assertion was not completed');
   }
 
-  const { response } = (credential as AssertionCredential);
+  const { response } = credential as AssertionCredential;
 
   let base64UserHandle = undefined;
   if (response.userHandle) {

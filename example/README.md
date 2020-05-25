@@ -8,7 +8,7 @@ A fully-functional reference implementation of [@webauthntine/server](../package
 
 ### SSL Certificate
 
-Websites that wish to leverage WebAuthn *must* be served over HTTPS, **including during development!**
+Websites that wish to leverage WebAuthn _must_ be served over HTTPS, **including during development!**
 
 Here's one technique for setting up SSL for a local dev instance:
 

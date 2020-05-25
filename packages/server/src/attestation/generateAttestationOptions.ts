@@ -1,6 +1,5 @@
 import { PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript-types';
 
-
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
  *
@@ -35,10 +34,12 @@ export default function generateAttestationOptions(
         name: username,
         displayName: username,
       },
-      pubKeyCredParams: [{
-        alg: -7,
-        type: 'public-key',
-      }],
+      pubKeyCredParams: [
+        {
+          alg: -7,
+          type: 'public-key',
+        },
+      ],
       timeout,
       attestation: attestationType,
     },

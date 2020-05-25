@@ -1,6 +1,5 @@
 import { PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-types';
 
-
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
  *

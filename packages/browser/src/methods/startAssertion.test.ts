@@ -1,6 +1,9 @@
 import base64js from 'base64-js';
 
-import { AssertionCredential, PublicKeyCredentialRequestOptionsJSON } from '@webauthntine/typescript-types';
+import {
+  AssertionCredential,
+  PublicKeyCredentialRequestOptionsJSON,
+} from '@webauthntine/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
@@ -10,8 +13,8 @@ import startAssertion from './startAssertion';
 
 jest.mock('../helpers/supportsWebauthn');
 
-const mockNavigatorGet = (window.navigator.credentials.get as jest.Mock);
-const mockSupportsWebauthn = (supportsWebauthn as jest.Mock);
+const mockNavigatorGet = window.navigator.credentials.get as jest.Mock;
+const mockSupportsWebauthn = supportsWebauthn as jest.Mock;
 
 const mockAuthenticatorData = toBase64String(toUint8Array('mockAuthenticatorData'));
 const mockClientDataJSON = toBase64String(toUint8Array('mockClientDataJSON'));
@@ -21,11 +24,13 @@ const mockUserHandle = toBase64String(toUint8Array('mockUserHandle'));
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
   publicKey: {
     challenge: 'fizz',
-    allowCredentials: [{
-      id: 'abcdefgfdnsdfunguisdfgs',
-      type: 'public-key',
-      transports: ['nfc'],
-    }],
+    allowCredentials: [
+      {
+        id: 'abcdefgfdnsdfunguisdfgs',
+        type: 'public-key',
+        transports: ['nfc'],
+      },
+    ],
     timeout: 1,
   },
 };
@@ -35,15 +40,17 @@ beforeEach(() => {
   mockSupportsWebauthn.mockReset();
 });
 
-test('should convert options before passing to navigator.credentials.get(...)', async (done) => {
+test('should convert options before passing to navigator.credentials.get(...)', async done => {
   mockSupportsWebauthn.mockReturnValue(true);
 
   // Stub out a response so the method won't throw
-  mockNavigatorGet.mockImplementation((): Promise<any> => {
-    return new Promise((resolve) => {
-      resolve({ response: {} });
-    });
-  });
+  mockNavigatorGet.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({ response: {} });
+      });
+    },
+  );
 
   await startAssertion(goodOpts1);
 
@@ -57,27 +64,29 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   done();
 });
 
-test('should return base64-encoded response values', async (done) => {
+test('should return base64-encoded response values', async done => {
   mockSupportsWebauthn.mockReturnValue(true);
 
   const credentialID = 'foobar';
 
-  mockNavigatorGet.mockImplementation((): Promise<AssertionCredential> => {
-    return new Promise((resolve) => {
-      resolve({
-        id: 'foobar',
-        rawId: toUint8Array('foobar'),
-        response: {
-          authenticatorData: base64js.toByteArray(mockAuthenticatorData),
-          clientDataJSON: base64js.toByteArray(mockClientDataJSON),
-          signature: base64js.toByteArray(mockSignature),
-          userHandle: base64js.toByteArray(mockUserHandle),
-        },
-        getClientExtensionResults: () => ({}),
-        type: 'webauthn.get',
+  mockNavigatorGet.mockImplementation(
+    (): Promise<AssertionCredential> => {
+      return new Promise(resolve => {
+        resolve({
+          id: 'foobar',
+          rawId: toUint8Array('foobar'),
+          response: {
+            authenticatorData: base64js.toByteArray(mockAuthenticatorData),
+            clientDataJSON: base64js.toByteArray(mockClientDataJSON),
+            signature: base64js.toByteArray(mockSignature),
+            userHandle: base64js.toByteArray(mockUserHandle),
+          },
+          getClientExtensionResults: () => ({}),
+          type: 'webauthn.get',
+        });
       });
-    });
-  });
+    },
+  );
 
   const response = await startAssertion(goodOpts1);
 
@@ -90,24 +99,28 @@ test('should return base64-encoded response values', async (done) => {
   });
 
   done();
-})
+});
 
-test('should throw error if WebAuthn isn\'t supported', async (done) => {
+test("should throw error if WebAuthn isn't supported", async done => {
   mockSupportsWebauthn.mockReturnValue(false);
 
-  await expect(startAssertion(goodOpts1)).rejects.toThrow('WebAuthn is not supported in this browser');
+  await expect(startAssertion(goodOpts1)).rejects.toThrow(
+    'WebAuthn is not supported in this browser',
+  );
 
   done();
 });
 
-test('should throw error if assertion is cancelled for some reason', async (done) => {
+test('should throw error if assertion is cancelled for some reason', async done => {
   mockSupportsWebauthn.mockReturnValue(true);
 
-  mockNavigatorGet.mockImplementation((): Promise<null> => {
-    return new Promise((resolve) => {
-      resolve(null);
-    });
-  });
+  mockNavigatorGet.mockImplementation(
+    (): Promise<null> => {
+      return new Promise(resolve => {
+        resolve(null);
+      });
+    },
+  );
 
   await expect(startAssertion(goodOpts1)).rejects.toThrow('Assertion was not completed');
 

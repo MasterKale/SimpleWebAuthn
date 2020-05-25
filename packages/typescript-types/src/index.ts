@@ -9,24 +9,26 @@
  */
 export type PublicKeyCredentialCreationOptionsJSON = {
   publicKey: {
-    challenge: string,
+    challenge: string;
     // The organization registering and authenticating the user
     rp: {
-      name: string,
-      id: string,
-    },
+      name: string;
+      id: string;
+    };
     user: {
-      id: string,
-      name: string,
-      displayName: string,
-    },
-    pubKeyCredParams: [{
-      alg: -7,
-      type: 'public-key',
-    }],
-    timeout?: number,
-    attestation: 'direct' | 'indirect',
-  },
+      id: string;
+      name: string;
+      displayName: string;
+    };
+    pubKeyCredParams: [
+      {
+        alg: -7;
+        type: 'public-key';
+      },
+    ];
+    timeout?: number;
+    attestation: 'direct' | 'indirect';
+  };
 };
 
 /**
@@ -41,18 +43,18 @@ export type PublicKeyCredentialCreationOptionsJSON = {
 export type PublicKeyCredentialRequestOptionsJSON = {
   publicKey: {
     //
-    challenge: string,
+    challenge: string;
     allowCredentials: {
       // Will be converted to a Uint8Array in the browser
-      id: string,
-      type: 'public-key',
-      transports?: AuthenticatorTransport[],
-    }[],
+      id: string;
+      type: 'public-key';
+      transports?: AuthenticatorTransport[];
+    }[];
     // extensions?: AuthenticationExtensionsClientInputs,
-    rpId?: string,
-    timeout?: number,
-    userVerification?: UserVerificationRequirement,
-  },
+    rpId?: string;
+    timeout?: number;
+    userVerification?: UserVerificationRequirement;
+  };
 };
 
 /**
@@ -73,10 +75,9 @@ export interface AssertionCredential extends PublicKeyCredential {
  * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
  * are base64-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface AuthenticatorAttestationResponseJSON extends Omit<
-AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
-> {
-  base64ClientDataJSON: string,
+export interface AuthenticatorAttestationResponseJSON
+  extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
+  base64ClientDataJSON: string;
   base64AttestationObject: string;
 }
 
@@ -84,9 +85,11 @@ AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'
  * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
  * are base64-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface AuthenticatorAssertionResponseJSON extends Omit<
-AuthenticatorAssertionResponse, 'clientDataJSON' | 'authenticatorData' | 'signature' | 'userHandle'
-> {
+export interface AuthenticatorAssertionResponseJSON
+  extends Omit<
+    AuthenticatorAssertionResponse,
+    'clientDataJSON' | 'authenticatorData' | 'signature' | 'userHandle'
+  > {
   base64CredentialID: string;
   base64AuthenticatorData: string;
   base64ClientDataJSON: string;
@@ -102,36 +105,36 @@ export enum ATTESTATION_FORMATS {
 }
 
 export type AttestationObject = {
-  fmt: ATTESTATION_FORMATS,
+  fmt: ATTESTATION_FORMATS;
   attStmt: {
-    sig?: Buffer,
-    x5c?: Buffer[],
-    response?: Buffer,
-  },
-  authData: Buffer,
+    sig?: Buffer;
+    x5c?: Buffer[];
+    response?: Buffer;
+  };
+  authData: Buffer;
 };
 
 export type ParsedAuthenticatorData = {
-  rpIdHash: Buffer,
-  flagsBuf: Buffer,
+  rpIdHash: Buffer;
+  flagsBuf: Buffer;
   flags: {
-      up: boolean,
-      uv: boolean,
-      at: boolean,
-      ed: boolean,
-      flagsInt: number,
-  },
-  counter: number,
-  counterBuf: Buffer,
-  aaguid?: Buffer,
-  credentialID?: Buffer,
-  COSEPublicKey?: Buffer,
+    up: boolean;
+    uv: boolean;
+    at: boolean;
+    ed: boolean;
+    flagsInt: number;
+  };
+  counter: number;
+  counterBuf: Buffer;
+  aaguid?: Buffer;
+  credentialID?: Buffer;
+  COSEPublicKey?: Buffer;
 };
 
 export type ClientDataJSON = {
-  type: string,
-  challenge: string,
-  origin: string,
+  type: string;
+  challenge: string;
+  origin: string;
 };
 
 /**
@@ -149,14 +152,14 @@ export type ClientDataJSON = {
  * reference!**
  */
 export type VerifiedAttestation = {
-  verified: boolean,
+  verified: boolean;
   userVerified: boolean;
   authenticatorInfo?: {
-    fmt: ATTESTATION_FORMATS,
-    counter: number,
-    base64PublicKey: string,
-    base64CredentialID: string,
-  },
+    fmt: ATTESTATION_FORMATS;
+    counter: number;
+    base64PublicKey: string;
+    base64CredentialID: string;
+  };
 };
 
 /**
@@ -172,15 +175,15 @@ export type VerifiedAttestation = {
 export type VerifiedAssertion = {
   verified: boolean;
   authenticatorInfo: {
-    counter: number,
-    base64CredentialID: string,
-  },
+    counter: number;
+    base64CredentialID: string;
+  };
 };
 
 export type CertificateInfo = {
-  subject: { [key: string]: string },
-  version: number,
-  basicConstraintsCA: boolean,
+  subject: { [key: string]: string };
+  version: number;
+  basicConstraintsCA: boolean;
 };
 
 export enum COSEKEYS {
@@ -196,18 +199,18 @@ export enum COSEKEYS {
 export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
 
 export type SafetyNetJWTHeader = {
-  alg: 'string',
-  x5c: string[],
+  alg: 'string';
+  x5c: string[];
 };
 
 export type SafetyNetJWTPayload = {
-  nonce: string,
-  timestampMs: number,
-  apkPackageName: string,
-  apkDigestSha256: string,
-  ctsProfileMatch: boolean,
-  apkCertificateDigestSha256: string[],
-  basicIntegrity: boolean,
+  nonce: string;
+  timestampMs: number;
+  apkPackageName: string;
+  apkDigestSha256: string;
+  ctsProfileMatch: boolean;
+  apkCertificateDigestSha256: string[];
+  basicIntegrity: boolean;
 };
 
 export type SafetyNetJWTSignature = string;
@@ -216,8 +219,8 @@ export type SafetyNetJWTSignature = string;
  * A WebAuthn-compatible device and the information needed to verify assertions by it
  */
 export type AuthenticatorDevice = {
-  base64PublicKey: string,
-  base64CredentialID: string,
+  base64PublicKey: string;
+  base64CredentialID: string;
   // Number of times this device is expected to have been used
-  counter: number,
+  counter: number;
 };

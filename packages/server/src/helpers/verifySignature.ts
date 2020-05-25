@@ -12,7 +12,5 @@ export default function verifySignature(
   signatureBase: Buffer,
   publicKey: string,
 ): boolean {
-  return crypto.createVerify('SHA256')
-    .update(signatureBase)
-    .verify(publicKey, signature);
+  return crypto.createVerify('SHA256').update(signatureBase).verify(publicKey, signature);
 }

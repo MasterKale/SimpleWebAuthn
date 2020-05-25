@@ -1,4 +1,4 @@
-import supportsWebauthn from './supportsWebauthn'
+import supportsWebauthn from './supportsWebauthn';
 
 beforeEach(() => {
   // @ts-ignore 2741
@@ -17,12 +17,12 @@ test('should return false when browser does not support WebAuthn', () => {
 test('should return false when window is undefined', () => {
   // Make window undefined as it is in node environments.
   // @ts-expect-error
-  const windowSpy = jest.spyOn(global, "window", "get");
+  const windowSpy = jest.spyOn(global, 'window', 'get');
   windowSpy.mockImplementation(() => undefined);
 
-  expect(window).toBe(undefined)
+  expect(window).toBe(undefined);
   expect(supportsWebauthn()).toBe(false);
 
   // Restore original window value.
-  windowSpy.mockRestore()
-})
+  windowSpy.mockRestore();
+});
