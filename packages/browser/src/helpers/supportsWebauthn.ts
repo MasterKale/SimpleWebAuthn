@@ -3,7 +3,7 @@
  */
 export default function supportsWebauthn(): boolean {
   return (
-    window.PublicKeyCredential !== undefined
+    window?.PublicKeyCredential !== undefined
     && typeof window.PublicKeyCredential === 'function'
   );
 }
