@@ -192,6 +192,7 @@ app.get('/generate-assertion-options', (req, res) => {
   res.send(
     generateAssertionOptions(
       challenge,
+      60000,
       user.devices.map(data => data.base64CredentialID),
     ),
   );
