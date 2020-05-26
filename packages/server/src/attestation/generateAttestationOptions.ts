@@ -10,6 +10,9 @@ import { PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript
  * @param username User's website-specific username
  * @param timeout How long (in ms) the user can take to complete attestation
  * @param attestationType Request a full ("direct") or anonymized ("indirect") attestation statement
+ * @param excludedBase64CredentialIDs Array of base64-encoded authenticator IDs registered by the
+ * user so the user can't register the same credential multiple times
+ * @param suggestedTransports Suggested types of authenticators for attestation
  */
 export default function generateAttestationOptions(
   serviceName: string,
@@ -19,6 +22,8 @@ export default function generateAttestationOptions(
   username: string,
   timeout = 60000,
   attestationType: 'direct' | 'indirect' = 'direct',
+  excludedBase64CredentialIDs: string[] = [],
+  suggestedTransports: AuthenticatorTransport[] = ['usb', 'ble', 'nfc', 'internal'],
 ): PublicKeyCredentialCreationOptionsJSON {
   return {
     publicKey: {
@@ -42,6 +47,11 @@ export default function generateAttestationOptions(
       ],
       timeout,
       attestation: attestationType,
+      excludeCredentials: excludedBase64CredentialIDs.map((id) => ({
+        id,
+        type: 'public-key',
+        transports: suggestedTransports,
+      })),
     },
   };
 }
