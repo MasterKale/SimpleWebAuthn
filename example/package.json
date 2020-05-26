@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@webauthntine/server": "^0.2.3",
+    "@simplewebauthn/server": "^0.2.3",
     "express": "^4.17.1"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { PublicKeyCredentialCreationOptionsJSON } from '@webauthntine/typescript-types';
+import { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/typescript-types';
 
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"

@@ -1,12 +1,12 @@
 {
-  "name": "@webauthntine/server",
+  "name": "@simplewebauthn/server",
   "version": "0.2.3",
-  "description": "WebAuthntine for Servers",
+  "description": "SimpleWebAuthn for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
-  "homepage": "https://github.com/MasterKale/WebAuthntine/packages/server#readme",
+  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/packages/server#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -26,7 +26,7 @@
     "node"
   ],
   "dependencies": {
-    "@webauthntine/typescript-types": "file:../typescript-types",
+    "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "^3.0.1",
     "cbor": "^5.0.2",
     "elliptic": "^6.5.2",

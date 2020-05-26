@@ -1,5 +1,5 @@
 import cbor from 'cbor';
-import { COSEKEYS, COSEPublicKey } from '@webauthntine/typescript-types';
+import { COSEKEYS, COSEPublicKey } from '@simplewebauthn/typescript-types';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key

@@ -1,5 +1,5 @@
 import base64js from 'base64-js';
-import type { PublicKeyCredentialDescriptorJSON } from '@webauthntine/typescript-types';
+import type { PublicKeyCredentialDescriptorJSON } from '@simplewebauthn/typescript-types';
 
 export default function toPublicKeyCredentialDescriptor(
   descriptor: PublicKeyCredentialDescriptorJSON,

@@ -1,4 +1,4 @@
-import { ParsedAuthenticatorData } from '@webauthntine/typescript-types';
+import { ParsedAuthenticatorData } from '@simplewebauthn/typescript-types';
 
 /**
  * Make sense of the authData buffer contained in an Attestation

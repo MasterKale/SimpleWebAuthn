@@ -2,7 +2,7 @@ import {
   PublicKeyCredentialRequestOptionsJSON,
   AuthenticatorAssertionResponseJSON,
   AssertionCredential,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
 import toBase64String from '../helpers/toBase64String';
@@ -12,7 +12,7 @@ import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDes
 /**
  * Begin authenticator "login" via WebAuthn assertion
  *
- * @param requestOptionsJSON Output from @webauthntine/server's generateAssertionOptions(...)
+ * @param requestOptionsJSON Output from @simplewebauthn/server's generateAssertionOptions(...)
  */
 export default async function startAssertion(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,

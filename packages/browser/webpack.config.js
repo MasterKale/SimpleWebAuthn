@@ -21,8 +21,8 @@ module.exports = {
   },
   output: {
     path: outputPath,
-    filename: 'webauthntine-browser.min.js',
-    library: 'WebAuthntineBrowser',
+    filename: 'simplewebauthn-browser.min.js',
+    library: 'SimpleWebAuthnBrowser',
     libraryTarget: 'umd',
     globalObject: 'this',
   },

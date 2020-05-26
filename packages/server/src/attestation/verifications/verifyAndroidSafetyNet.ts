@@ -5,7 +5,7 @@ import {
   SafetyNetJWTHeader,
   SafetyNetJWTPayload,
   SafetyNetJWTSignature,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 import toHash from '@helpers/toHash';
 import verifySignature from '@helpers/verifySignature';

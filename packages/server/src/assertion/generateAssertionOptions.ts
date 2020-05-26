@@ -1,6 +1,6 @@
 import type {
   PublicKeyCredentialRequestOptionsJSON,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
@@ -13,8 +13,8 @@ import type {
  */
 export default function generateAssertionOptions(
   challenge: string,
-  allowedBase64CredentialIDs: string[],
   timeout = 60000,
+  allowedBase64CredentialIDs: string[],
   suggestedTransports: AuthenticatorTransport[] = ['usb', 'ble', 'nfc', 'internal'],
 ): PublicKeyCredentialRequestOptionsJSON {
   return {

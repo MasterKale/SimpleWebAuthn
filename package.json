@@ -1,8 +1,8 @@
 {
-  "name": "webauthntine-monorepo",
+  "name": "simplewebauthn-monorepo",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap --scope=@webauthntine/typescript-types && lerna bootstrap --scope=@webauthntine/browser --scope=@webauthntine/server",
+    "bootstrap": "lerna bootstrap --scope=@simplewebauthn/typescript-types && lerna bootstrap --scope=@simplewebauthn/browser --scope=@simplewebauthn/server",
     "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/"
   },
   "devDependencies": {

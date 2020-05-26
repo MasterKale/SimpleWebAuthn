@@ -1,4 +1,4 @@
-import { ClientDataJSON } from '@webauthntine/typescript-types';
+import { ClientDataJSON } from '@simplewebauthn/typescript-types';
 
 import asciiToBinary from './asciiToBinary';
 

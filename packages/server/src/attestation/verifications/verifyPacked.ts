@@ -7,7 +7,7 @@ import {
   VerifiedAttestation,
   COSEKEYS,
   COSEPublicKey as COSEPublicKeyType,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
 import toHash from '@helpers/toHash';

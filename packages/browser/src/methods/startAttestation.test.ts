@@ -3,7 +3,7 @@ import base64js from 'base64-js';
 import {
   AttestationCredential,
   PublicKeyCredentialCreationOptionsJSON,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
@@ -30,7 +30,7 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
     ],
     rp: {
       id: '1234',
-      name: 'webauthntine',
+      name: 'simplewebauthn',
     },
     user: {
       id: '5678',

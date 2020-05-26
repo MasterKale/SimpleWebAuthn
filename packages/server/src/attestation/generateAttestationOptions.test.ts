@@ -1,7 +1,7 @@
 import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
-  const serviceName = 'WebAuthntine';
+  const serviceName = 'SimpleWebAuthn';
   const rpID = 'not.real';
   const challenge = 'totallyrandomvalue';
   const userID = '1234';
@@ -46,7 +46,7 @@ test('should generate credential request options suitable for sending via JSON',
 
 test('should map excluded credential IDs if specified', () => {
   const options = generateAttestationOptions(
-    'WebAuthntine',
+    'SimpleWebAuthn',
     'not.real',
     'totallyrandomvalue',
     '1234',
@@ -65,7 +65,7 @@ test('should map excluded credential IDs if specified', () => {
 
 test('defaults to 60 seconds if no timeout is specified', () => {
   const options = generateAttestationOptions(
-    'WebAuthntine',
+    'SimpleWebAuthn',
     'not.real',
     'totallyrandomvalue',
     '1234',
@@ -77,7 +77,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
 
 test('defaults to direct attestation if no attestation type is specified', () => {
   const options = generateAttestationOptions(
-    'WebAuthntine',
+    'SimpleWebAuthn',
     'not.real',
     'totallyrandomvalue',
     '1234',

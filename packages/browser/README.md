@@ -1,9 +1,9 @@
 <!-- omit in toc -->
 
-# @webauthntine/browser
+# @simplewebauthn/browser
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
-[![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/browser?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@webauthntine/browser)
+[![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/browser?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/browser)
 ![Browser Support](https://img.shields.io/badge/Browser-ES2018+-brightgreen?style=for-the-badge&logo=Mozilla+Firefox)
 
 - [Installation](#installation)
@@ -15,13 +15,13 @@
 This package is available on **npm**:
 
 ```sh
-npm install @webauthntine/browser
+npm install @simplewebauthn/browser
 ```
 
 It can then be imported into a project as usual:
 
 ```js
-import WebAuthntineBrowser from '@webauthntine/browser';
+import SimpleWebAuthnBrowser from '@simplewebauthn/browser';
 ```
 
 ### UMD
@@ -29,10 +29,10 @@ import WebAuthntineBrowser from '@webauthntine/browser';
 This package can also be installed via **unpkg** by including the following script in your page's `<head>` element:
 
 ```html
-<script src="https://unpkg.com/@webauthntine/browser/dist/webauthntine-browser.min.js"></script>
+<script src="https://unpkg.com/@simplewebauthn/browser/dist/simplewebauthn-browser.min.js"></script>
 ```
 
-The library's methods will be available on the global `WebAuthntineBrowser` object.
+The library's methods will be available on the global `SimpleWebAuthnBrowser` object.
 
 ## Usage - Coming Soon
 
