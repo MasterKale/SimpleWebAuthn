@@ -3,7 +3,7 @@ import base64js from 'base64-js';
 import {
   AssertionCredential,
   PublicKeyCredentialRequestOptionsJSON,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';

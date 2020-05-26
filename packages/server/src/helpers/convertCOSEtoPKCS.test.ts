@@ -1,5 +1,5 @@
 import cbor from 'cbor';
-import { COSEKEYS } from '@webauthntine/typescript-types';
+import { COSEKEYS } from '@simplewebauthn/typescript-types';
 
 import convertCOSEtoPKCS from './convertCOSEtoPKCS';
 
