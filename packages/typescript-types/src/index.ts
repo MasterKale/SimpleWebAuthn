@@ -28,6 +28,7 @@ export type PublicKeyCredentialCreationOptionsJSON = {
     ];
     timeout?: number;
     attestation: 'direct' | 'indirect';
+    excludeCredentials: PublicKeyCredentialDescriptorJSON[];
   };
 };
 
