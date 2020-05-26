@@ -104,6 +104,7 @@ app.get('/generate-attestation-options', (req, res) => {
      * The username can be a human-readable name, email, etc... as it is intended only for display.
      */
     username,
+    devices,
   } = user;
 
   /**
@@ -115,7 +116,22 @@ app.get('/generate-attestation-options', (req, res) => {
   inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
 
   res.send(
-    generateAttestationOptions('WebAuthntine Example', rpID, challenge, loggedInUserId, username),
+    generateAttestationOptions(
+      'WebAuthntine Example',
+      rpID,
+      challenge,
+      loggedInUserId,
+      username,
+      60000,
+      'direct',
+      /**
+       * Passing in a user's list of already-registered authenticator IDs here prevents users from
+       * registering the same device multiple times. The authenticator will simply throw an error in
+       * the browser if it's asked to perform an attestation when one of these ID's already resides
+       * on it.
+       */
+      devices.map(dev => dev.base64CredentialID),
+    ),
   );
 });
 

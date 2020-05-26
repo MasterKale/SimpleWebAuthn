@@ -37,6 +37,7 @@
           attResp = await startAttestation(await resp.json());
         } catch (error) {
           elemError.innerText = error;
+          throw new Error(error);
         }
 
         const verificationResp = await fetch('/verify-attestation', {

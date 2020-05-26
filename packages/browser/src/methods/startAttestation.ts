@@ -7,6 +7,7 @@ import {
 import toUint8Array from '../helpers/toUint8Array';
 import toBase64String from '../helpers/toBase64String';
 import supportsWebauthn from '../helpers/supportsWebauthn';
+import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
@@ -28,6 +29,9 @@ export default async function startAttestation(
       ...creationOptionsJSON.publicKey.user,
       id: toUint8Array(creationOptionsJSON.publicKey.user.id),
     },
+    excludeCredentials: creationOptionsJSON.publicKey.excludeCredentials.map(
+      toPublicKeyCredentialDescriptor,
+    ),
   };
 
   // Wait for the user to complete attestation

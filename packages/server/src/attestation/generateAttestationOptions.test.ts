@@ -39,8 +39,28 @@ test('should generate credential request options suitable for sending via JSON',
       ],
       timeout,
       attestation: attestationType,
+      excludeCredentials: [],
     },
   });
+});
+
+test('should map excluded credential IDs if specified', () => {
+  const options = generateAttestationOptions(
+    'WebAuthntine',
+    'not.real',
+    'totallyrandomvalue',
+    '1234',
+    'usernameHere',
+    undefined,
+    undefined,
+    ['someIDhere'],
+  );
+
+  expect(options.publicKey.excludeCredentials).toEqual([{
+    id: 'someIDhere',
+    type: 'public-key',
+    transports: ['usb', 'ble', 'nfc', 'internal'],
+  }]);
 });
 
 test('defaults to 60 seconds if no timeout is specified', () => {
