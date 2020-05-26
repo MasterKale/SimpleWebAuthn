@@ -38,6 +38,11 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
       name: 'username',
     },
     timeout: 1,
+    excludeCredentials: [{
+      id: 'authIdentifier',
+      type: 'public-key',
+      transports: ['internal'],
+    }],
   },
 };
 
@@ -64,6 +69,11 @@ test('should convert options before passing to navigator.credentials.create(...)
 
   expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.publicKey.challenge));
   expect(argsPublicKey.user.id).toEqual(toUint8Array(goodOpts1.publicKey.user.id));
+  expect(argsPublicKey.excludeCredentials).toEqual([{
+    id: base64js.toByteArray('authIdentifier=='),
+    type: 'public-key',
+    transports: ['internal'],
+  }])
 
   done();
 });
