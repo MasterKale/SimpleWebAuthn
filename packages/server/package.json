@@ -1,6 +1,6 @@
 {
   "name": "@webauthntine/server",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "WebAuthntine for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
