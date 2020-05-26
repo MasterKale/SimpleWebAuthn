@@ -42,20 +42,21 @@ export type PublicKeyCredentialCreationOptionsJSON = {
  */
 export type PublicKeyCredentialRequestOptionsJSON = {
   publicKey: {
-    //
     challenge: string;
-    allowCredentials: {
-      // Will be converted to a Uint8Array in the browser
-      id: string;
-      type: 'public-key';
-      transports?: AuthenticatorTransport[];
-    }[];
+    allowCredentials: PublicKeyCredentialDescriptorJSON[];
     // extensions?: AuthenticationExtensionsClientInputs,
     rpId?: string;
     timeout?: number;
     userVerification?: UserVerificationRequirement;
   };
 };
+
+export interface PublicKeyCredentialDescriptorJSON extends Omit<
+PublicKeyCredentialDescriptor, 'id'
+> {
+  // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
+  id: string;
+}
 
 /**
  * The value returned from navigator.credentials.create()
