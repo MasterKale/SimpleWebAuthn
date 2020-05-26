@@ -7,7 +7,6 @@
 - [Philosophy](#philosophy)
 - [Tested Devices](#tested-devices)
 - [Development](#development)
-- [Pronunciation Guide](#pronunciation-guide)
 
 ## Overview
 
@@ -79,7 +78,3 @@ Running Jest in watch mode for a specific project requires the use of `lerna exe
 ```sh
 $> npx lerna exec npm run test:watch --scope=@simplewebauthn/server
 ```
-
-## Pronunciation Guide
-
-It's pronounced **"web-authn-teen"**...because I couldn't stop thinking about rewatching the movie Constantine (with Keanu Reeves) when I was brainstorming project names.
