@@ -1,6 +1,6 @@
-# WebAuthntine Example
+# SimpleWebAuthn Example
 
-A fully-functional reference implementation of [@webauthntine/server](../packages/server) and [@webauthntine/browser](../packages/browser).
+A fully-functional reference implementation of [@simplewebauthn/server](../packages/server) and [@simplewebauthn/browser](../packages/browser).
 
 ## Requirements
 

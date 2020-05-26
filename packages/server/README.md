@@ -1,10 +1,10 @@
 <!-- omit in toc -->
 
-# @webauthntine/server
+# @simplewebauthn/server
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
-[![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@webauthntine/server)
-![node-lts (scoped)](https://img.shields.io/node/v/@webauthntine/server?style=for-the-badge&logo=Node.js)
+[![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/server)
+![node-lts (scoped)](https://img.shields.io/node/v/@simplewebauthn/server?style=for-the-badge&logo=Node.js)
 
 - [Installation](#installation)
 - [Usage - Coming Soon](#usage---coming-soon)
@@ -15,16 +15,16 @@
 This package is available on **npm**:
 
 ```sh
-npm install @webauthntine/server
+npm install @simplewebauthn/server
 ```
 
 It can then be imported into a Node project as usual:
 
 ```js
 // ESModule
-import WebAuthntineServer from '@webauthntine/server';
+import SimpleWebAuthnServer from '@simplewebauthn/server';
 // CommonJS
-const WebAuthntineServer = require('@webauthntine/server');
+const SimpleWebAuthnServer = require('@simplewebauthn/server');
 ```
 
 ## Usage - Coming Soon
@@ -33,7 +33,7 @@ Check out [the example](../../example/index.js) for now until this section gets 
 
 ## Supported Attestation Formats
 
-WebAuthntine can verify the following attestation formats:
+SimpleWebAuthn can verify the following attestation formats:
 
 - `fido-u2f`
 - `packed`

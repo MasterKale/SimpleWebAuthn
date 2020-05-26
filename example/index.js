@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /**
- * An example Express server showing off a simple integration of @webauthntine/server.
+ * An example Express server showing off a simple integration of @simplewebauthn/server.
  *
- * The webpages served from ./public use @webauthntine/browser.
+ * The webpages served from ./public use @simplewebauthn/browser.
  */
 const https = require('https');
 const fs = require('fs');
@@ -16,7 +16,7 @@ const {
   // Login ("Assertion")
   generateAssertionOptions,
   verifyAssertionResponse,
-} = require('@webauthntine/server');
+} = require('@simplewebauthn/server');
 
 const app = express();
 const host = '0.0.0.0';
@@ -39,7 +39,7 @@ const origin = `https://${rpID}`;
  *
  * Here, the example server assumes the following user has completed login:
  */
-const loggedInUserId = 'webauthntineInternalUserId';
+const loggedInUserId = 'internalUserId';
 
 /**
  * You'll need a database to store a few things:
@@ -117,7 +117,7 @@ app.get('/generate-attestation-options', (req, res) => {
 
   res.send(
     generateAttestationOptions(
-      'WebAuthntine Example',
+      'SimpleWebAuthn Example',
       rpID,
       challenge,
       loggedInUserId,

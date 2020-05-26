@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://unpkg.com/@webauthntine/browser@0.2.3/dist/webauthntine-browser.min.js"></script>
+    <script src="https://unpkg.com/@simplewebauthn/browser@0.2.3/dist/simplewebauthn-browser.min.js"></script>
     <link rel="stylesheet" href="../styles.css" />
-    <title>WebAuthntine Example Site | Register</title>
+    <title>SimpleWebAuthn Example Site | Register</title>
   </head>
   <body>
     <div class="container">
@@ -23,7 +23,7 @@
       const elemSuccess = document.getElementById('success');
       const elemError = document.getElementById('error');
 
-      const { startAttestation } = WebAuthntineBrowser;
+      const { startAttestation } = SimpleWebAuthnBrowser;
 
       elemBegin.addEventListener('click', async () => {
         // Reset success/error messages

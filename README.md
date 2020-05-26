@@ -1,7 +1,7 @@
 <!-- omit in toc -->
-# WebAuthntine Project
+# SimpleWebAuthn Project
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
-[![npm (scoped)](https://img.shields.io/npm/v/@webauthntine/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=webauthntine)
+[![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=simplewebauthn)
 
 - [Overview](#overview)
 - [Philosophy](#philosophy)
@@ -14,12 +14,12 @@
 This monorepo contains two complimentary libraries to help reduce the amount of work needed to
 incorporate WebAuthn into a website. The following packages are maintained here:
 
-- [@webauthntine/server](./packages/server/)
-- [@webauthntine/browser](./packages/browser)
+- [@simplewebauthn/server](./packages/server/)
+- [@simplewebauthn/browser](./packages/browser)
 
 An additional package is also included that contains shared TypeScript definitions:
 
-- [@webauthntine/typescript-types](./packages/typescript-types/)
+- [@simplewebauthn/typescript-types](./packages/typescript-types/)
 
 See these packages' READMEs for more specific implementation information.
 
@@ -39,15 +39,15 @@ Website front ends have their own part to play in the process:
 
 On the surface, this is a relatively straightforward dance. Unfortunately the values passed into the `navigator.credentials` methods and the responses received from them make heavy use of `ArrayBuffer`'s which are difficult to transmit as JSON between front end and back end. Not only that, there are many complex ways in which authenticator responses must be parsed, and though finalized, [the W3C spec](https://w3c.github.io/webauthn/) is quite complex and is being expanded all the time.
 
-**Enter WebAuthntine.**
+**Enter SimpleWebAuthn.**
 
-WebAuthntine attempts to offer a developer-friendly pair of libraries that simplify the above dance. [@webauthntine/server](./packages/server/) exports a small number of methods requiring a handful of simple inputs that pair with the two primary methods exported by [@webauthntine/browser](./packages/browser). No converting back and forth between `Uint8Array` (or was this supposed to be an `ArrayBuffer`...?) and `String`, no worrying about JSON compatibility - **WebAuthntine takes care of it all!**
+SimpleWebAuthn attempts to offer a developer-friendly pair of libraries that simplify the above dance. [@simplewebauthn/server](./packages/server/) exports a small number of methods requiring a handful of simple inputs that pair with the two primary methods exported by [@simplewebauthn/browser](./packages/browser). No converting back and forth between `Uint8Array` (or was this supposed to be an `ArrayBuffer`...?) and `String`, no worrying about JSON compatibility - **SimpleWebAuthn takes care of it all!**
 
 For a practical guide to implementing these to libraries, take a look at the [example project](./example). It includes a single-file Express server and a few HTML files that, combined with the packages in this repo, are close to all it takes to get up and running with WebAuthn.
 
 ## Tested Devices
 
-WebAuthn support is currently spotty, but getting better. Here are things I've tested that I know support WebAuthn and work fine with the WebAuthntine example:
+WebAuthn support is currently spotty, but getting better. Here are things I've tested that I know support WebAuthn and work fine with the SimpleWebAuthn example:
 
 | OS      | Browser |                  Authenticator |
 | :------ | :-----: | -----------------------------: |
@@ -57,7 +57,7 @@ WebAuthn support is currently spotty, but getting better. Here are things I've t
 | Android | Chrome  |            Fingerprint Scanner |
 | Android | Firefox |                     Screen PIN |
 
-The FIDO Alliance [maintains a list of what currently supports WebAuthn](https://fidoalliance.org/fido2/fido2-web-authentication-webauthn/). If "WebAuthn API" is green, that combination of browser and OS *should* work fine with WebAuthntine. That said, WebAuthntine isn't perfect, so pull requests are welcome!
+The FIDO Alliance [maintains a list of what currently supports WebAuthn](https://fidoalliance.org/fido2/fido2-web-authentication-webauthn/). If "WebAuthn API" is green, that combination of browser and OS *should* work fine with SimpleWebAuthn. That said, SimpleWebAuthn isn't perfect, so pull requests are welcome!
 
 ## Development
 
@@ -77,7 +77,7 @@ $> npx lerna run test
 Running Jest in watch mode for a specific project requires the use of `lerna exec`:
 
 ```sh
-$> npx lerna exec npm run test:watch --scope=@webauthntine/server
+$> npx lerna exec npm run test:watch --scope=@simplewebauthn/server
 ```
 
 ## Pronunciation Guide

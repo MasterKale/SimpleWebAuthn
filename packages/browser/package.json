@@ -1,12 +1,12 @@
 {
-  "name": "@webauthntine/browser",
+  "name": "@simplewebauthn/browser",
   "version": "0.2.3",
-  "description": "WebAuthntine for Browsers",
-  "main": "dist/webauthntine-browser.min.js",
+  "description": "SimpleWebAuthn for Browsers",
+  "main": "dist/simplewebauthn-browser.min.js",
   "types": "dist/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
-  "homepage": "https://github.com/MasterKale/WebAuthntine/packages/browser#readme",
+  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/packages/browser#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@types/base64-js": "^1.2.5",
-    "@webauthntine/typescript-types": "file:../typescript-types",
+    "@simplewebauthn/typescript-types": "file:../typescript-types",
     "ts-loader": "^7.0.4",
     "webpack": "^4.43.0",
     "webpack-auto-inject-version": "^1.2.2",

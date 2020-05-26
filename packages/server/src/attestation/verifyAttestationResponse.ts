@@ -4,7 +4,7 @@ import {
   ATTESTATION_FORMATS,
   AuthenticatorAttestationResponseJSON,
   VerifiedAttestation,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';

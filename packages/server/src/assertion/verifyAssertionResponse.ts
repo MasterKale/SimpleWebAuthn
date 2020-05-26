@@ -3,7 +3,7 @@ import {
   AuthenticatorAssertionResponseJSON,
   AuthenticatorDevice,
   VerifiedAssertion,
-} from '@webauthntine/typescript-types';
+} from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
 

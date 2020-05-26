@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import cbor from 'cbor';
-import { AttestationObject } from '@webauthntine/typescript-types';
+import { AttestationObject } from '@simplewebauthn/typescript-types';
 
 /**
  * Convert an AttestationObject from base64 string to a proper object
