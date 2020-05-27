@@ -2,6 +2,13 @@ import type {
   PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
+type Options = {
+  challenge: string,
+  allowedBase64CredentialIDs: string[],
+  suggestedTransports?: AuthenticatorTransport[],
+  timeout?: number,
+};
+
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
  *
@@ -12,20 +19,22 @@ import type {
  * @param suggestedTransports Suggested types of authenticators for assertion
  */
 export default function generateAssertionOptions(
-  challenge: string,
-  timeout = 60000,
-  allowedBase64CredentialIDs: string[],
-  suggestedTransports: AuthenticatorTransport[] = ['usb', 'ble', 'nfc', 'internal'],
+  opts: Options,
 ): PublicKeyCredentialRequestOptionsJSON {
+  const {
+    challenge,
+    allowedBase64CredentialIDs,
+    suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
+    timeout = 60000,
+  } = opts;
+
   return {
-    publicKey: {
-      challenge,
-      allowCredentials: allowedBase64CredentialIDs.map(id => ({
-        id,
-        type: 'public-key',
-        transports: suggestedTransports,
-      })),
-      timeout,
-    },
+    challenge,
+    allowCredentials: allowedBase64CredentialIDs.map(id => ({
+      id,
+      type: 'public-key',
+      transports: suggestedTransports,
+    })),
+    timeout,
   };
 }
