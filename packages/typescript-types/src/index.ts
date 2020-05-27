@@ -1,59 +1,37 @@
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.create(...) in the browser.
- *
- * Noteworthy values:
- * @param challenge A random string of characters. Will be converted to a Uint8Array in the browser
- * @param user.id Your unique, internal ID for the user. Will be converted to a Uint8Array in the
- * browser
  */
-export type PublicKeyCredentialCreationOptionsJSON = {
-  publicKey: {
-    challenge: string;
-    // The organization registering and authenticating the user
-    rp: {
-      name: string;
-      id: string;
-    };
-    user: {
-      id: string;
-      name: string;
-      displayName: string;
-    };
-    pubKeyCredParams: [
-      {
-        alg: -7;
-        type: 'public-key';
-      },
-    ];
-    timeout?: number;
-    attestation: 'direct' | 'indirect';
-    excludeCredentials: PublicKeyCredentialDescriptorJSON[];
-  };
-};
+export interface PublicKeyCredentialCreationOptionsJSON extends Omit<
+PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
+> {
+  // Will be converted to a Uint8Array in the browser
+  user: PublicKeyCredentialUserEntityJSON;
+  challenge: string;
+  excludeCredentials: PublicKeyCredentialDescriptorJSON[];
+}
 
 /**
  * A variant of PublicKeyCredentialRequestOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.get(...) in the browser.
- *
- * Noteworthy values:
- * @param challenge A random string of characters. Will be converted to a Uint8Array in the browser
- * @param allowCredentials.id Base64-encoded credentialId. Will be converted to a Uint8Array in the
- * browser
  */
-export type PublicKeyCredentialRequestOptionsJSON = {
-  publicKey: {
-    challenge: string;
-    allowCredentials: PublicKeyCredentialDescriptorJSON[];
-    // extensions?: AuthenticationExtensionsClientInputs,
-    rpId?: string;
-    timeout?: number;
-    userVerification?: UserVerificationRequirement;
-  };
-};
+export interface PublicKeyCredentialRequestOptionsJSON extends Omit<
+PublicKeyCredentialRequestOptions, 'challenge' |'allowCredentials'
+> {
+  // Will be converted to a Uint8Array in the browser
+  challenge: string;
+  allowCredentials: PublicKeyCredentialDescriptorJSON[];
+}
 
 export interface PublicKeyCredentialDescriptorJSON extends Omit<
 PublicKeyCredentialDescriptor, 'id'
+> {
+  // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
+  id: string;
+}
+
+export interface PublicKeyCredentialUserEntityJSON extends Omit <
+PublicKeyCredentialUserEntity, 'id'
 > {
   // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
   id: string;
