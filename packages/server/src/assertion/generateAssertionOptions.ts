@@ -7,6 +7,7 @@ type Options = {
   allowedBase64CredentialIDs: string[],
   suggestedTransports?: AuthenticatorTransport[],
   timeout?: number,
+  userVerification?: UserVerificationRequirement,
 };
 
 /**
@@ -17,6 +18,8 @@ type Options = {
  * user for assertion
  * @param timeout How long (in ms) the user can take to complete assertion
  * @param suggestedTransports Suggested types of authenticators for assertion
+ * @param userVerification Set to `'discouraged'` when asserting as part of a 2FA flow, otherwise
+ * set to `'preferred'` or `'required'` as desired.
  */
 export default function generateAssertionOptions(
   options: Options,
@@ -26,6 +29,7 @@ export default function generateAssertionOptions(
     allowedBase64CredentialIDs,
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     timeout = 60000,
+    userVerification,
   } = options;
 
   return {
@@ -36,5 +40,6 @@ export default function generateAssertionOptions(
       transports: suggestedTransports,
     })),
     timeout,
+    userVerification,
   };
 }
