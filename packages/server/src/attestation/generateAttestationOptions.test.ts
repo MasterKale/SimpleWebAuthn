@@ -5,58 +5,54 @@ test('should generate credential request options suitable for sending via JSON',
   const rpID = 'not.real';
   const challenge = 'totallyrandomvalue';
   const userID = '1234';
-  const username = 'usernameHere';
+  const userName = 'usernameHere';
   const timeout = 1;
   const attestationType = 'indirect';
 
-  const options = generateAttestationOptions(
+  const options = generateAttestationOptions({
     serviceName,
     rpID,
     challenge,
     userID,
-    username,
+    userName,
     timeout,
     attestationType,
-  );
+  });
 
   expect(options).toEqual({
-    publicKey: {
-      challenge,
-      rp: {
-        name: serviceName,
-        id: rpID,
-      },
-      user: {
-        id: userID,
-        name: username,
-        displayName: username,
-      },
-      pubKeyCredParams: [
-        {
-          alg: -7,
-          type: 'public-key',
-        },
-      ],
-      timeout,
-      attestation: attestationType,
-      excludeCredentials: [],
+    challenge,
+    rp: {
+      name: serviceName,
+      id: rpID,
     },
+    user: {
+      id: userID,
+      name: userName,
+      displayName: userName,
+    },
+    pubKeyCredParams: [
+      {
+        alg: -7,
+        type: 'public-key',
+      },
+    ],
+    timeout,
+    attestation: attestationType,
+    excludeCredentials: [],
   });
 });
 
 test('should map excluded credential IDs if specified', () => {
-  const options = generateAttestationOptions(
-    'SimpleWebAuthn',
-    'not.real',
-    'totallyrandomvalue',
-    '1234',
-    'usernameHere',
-    undefined,
-    undefined,
-    ['someIDhere'],
-  );
+  const options = generateAttestationOptions({
+    serviceName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userID: '1234',
+    userName: 'usernameHere',
+    excludedBase64CredentialIDs: ['someIDhere'],
+  });
 
-  expect(options.publicKey.excludeCredentials).toEqual([{
+  expect(options.excludeCredentials).toEqual([{
     id: 'someIDhere',
     type: 'public-key',
     transports: ['usb', 'ble', 'nfc', 'internal'],
@@ -64,25 +60,25 @@ test('should map excluded credential IDs if specified', () => {
 });
 
 test('defaults to 60 seconds if no timeout is specified', () => {
-  const options = generateAttestationOptions(
-    'SimpleWebAuthn',
-    'not.real',
-    'totallyrandomvalue',
-    '1234',
-    'usernameHere',
-  );
+  const options = generateAttestationOptions({
+    serviceName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
 
-  expect(options.publicKey.timeout).toEqual(60000);
+  expect(options.timeout).toEqual(60000);
 });
 
 test('defaults to direct attestation if no attestation type is specified', () => {
-  const options = generateAttestationOptions(
-    'SimpleWebAuthn',
-    'not.real',
-    'totallyrandomvalue',
-    '1234',
-    'usernameHere',
-  );
+  const options = generateAttestationOptions({
+    serviceName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
 
-  expect(options.publicKey.attestation).toEqual('direct');
+  expect(options.attestation).toEqual('none');
 });
