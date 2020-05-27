@@ -13,7 +13,7 @@ type Options = {
   attestationType?: AttestationConveyancePreference,
   excludedBase64CredentialIDs?: string[],
   suggestedTransports?: AuthenticatorTransport[],
-  authenticatorAttributes?: AuthenticatorSelectionCriteria,
+  authenticatorSelection?: AuthenticatorSelectionCriteria,
 };
 
 /**
@@ -32,7 +32,8 @@ type Options = {
  * @param excludedBase64CredentialIDs Array of base64-encoded authenticator IDs registered by the
  * user so the user can't register the same credential multiple times
  * @param suggestedTransports Suggested types of authenticators for attestation
- * @param authenticatorAttributes Advanced criteria for the types of authenticators that may be used
+ * @param authenticatorSelection Advanced criteria for restricting the types of authenticators that
+ * may be used
  */
 export default function generateAttestationOptions(
   options: Options,
@@ -48,7 +49,7 @@ export default function generateAttestationOptions(
     attestationType = 'none',
     excludedBase64CredentialIDs = [],
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
-    authenticatorAttributes,
+    authenticatorSelection,
   } = options;
 
   return {
@@ -75,6 +76,6 @@ export default function generateAttestationOptions(
       type: 'public-key',
       transports: suggestedTransports,
     })),
-    authenticatorSelection: authenticatorAttributes,
+    authenticatorSelection,
   };
 }

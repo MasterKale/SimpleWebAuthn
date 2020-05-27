@@ -83,14 +83,14 @@ test('defaults to direct attestation if no attestation type is specified', () =>
   expect(options.attestation).toEqual('none');
 });
 
-test('should set authenticatorAttributes to authenticatorSelection if set', () => {
+test('should set authenticatorSelection if specified', () => {
   const options = generateAttestationOptions({
     serviceName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
     userID: '1234',
     userName: 'usernameHere',
-    authenticatorAttributes: {
+    authenticatorSelection: {
       authenticatorAttachment: 'cross-platform',
       requireResidentKey: false,
       userVerification: 'preferred',
