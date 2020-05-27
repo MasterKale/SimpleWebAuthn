@@ -116,22 +116,22 @@ app.get('/generate-attestation-options', (req, res) => {
   inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
 
   res.send(
-    generateAttestationOptions(
-      'SimpleWebAuthn Example',
+    generateAttestationOptions({
+      serviceName: 'SimpleWebAuthn Example',
       rpID,
       challenge,
-      loggedInUserId,
-      username,
-      60000,
-      'direct',
+      userID: loggedInUserId,
+      userName: username,
+      timeout: 60000,
+      attestationType: 'direct',
       /**
        * Passing in a user's list of already-registered authenticator IDs here prevents users from
        * registering the same device multiple times. The authenticator will simply throw an error in
        * the browser if it's asked to perform an attestation when one of these ID's already resides
        * on it.
        */
-      devices.map(dev => dev.base64CredentialID),
-    ),
+      excludedBase64CredentialIDs: devices.map(dev => dev.base64CredentialID),
+    }),
   );
 });
 
@@ -190,11 +190,11 @@ app.get('/generate-assertion-options', (req, res) => {
   inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
 
   res.send(
-    generateAssertionOptions(
+    generateAssertionOptions({
       challenge,
-      60000,
-      user.devices.map(data => data.base64CredentialID),
-    ),
+      timeout: 60000,
+      allowedBase64CredentialIDs: user.devices.map(data => data.base64CredentialID),
+    }),
   );
 });
 
