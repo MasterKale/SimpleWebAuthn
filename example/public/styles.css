@@ -48,3 +48,10 @@ button:hover {
 #success {
   color: #11a000;
 }
+
+/* Desktop Styles */
+@media(min-width: 75rem) {
+  * {
+    font-size: 24px;
+  }
+}
