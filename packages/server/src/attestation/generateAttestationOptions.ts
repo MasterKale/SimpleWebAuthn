@@ -32,7 +32,9 @@ type Options = {
  * user so the user can't register the same credential multiple times
  * @param suggestedTransports Suggested types of authenticators for attestation
  */
-export default function generateAttestationOptions(opts: Options): PublicKeyCredentialCreationOptionsJSON {
+export default function generateAttestationOptions(
+  options: Options,
+): PublicKeyCredentialCreationOptionsJSON {
   const {
     serviceName,
     rpID,
@@ -44,7 +46,7 @@ export default function generateAttestationOptions(opts: Options): PublicKeyCred
     attestationType = 'none',
     excludedBase64CredentialIDs = [],
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
-  } = opts;
+  } = options;
 
   return {
     challenge,

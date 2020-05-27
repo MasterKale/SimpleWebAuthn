@@ -19,14 +19,14 @@ type Options = {
  * @param suggestedTransports Suggested types of authenticators for assertion
  */
 export default function generateAssertionOptions(
-  opts: Options,
+  options: Options,
 ): PublicKeyCredentialRequestOptionsJSON {
   const {
     challenge,
     allowedBase64CredentialIDs,
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     timeout = 60000,
-  } = opts;
+  } = options;
 
   return {
     challenge,
