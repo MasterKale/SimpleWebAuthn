@@ -23,13 +23,13 @@ export default async function startAttestation(
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
   const publicKey: PublicKeyCredentialCreationOptions = {
-    ...creationOptionsJSON.publicKey,
-    challenge: toUint8Array(creationOptionsJSON.publicKey.challenge),
+    ...creationOptionsJSON,
+    challenge: toUint8Array(creationOptionsJSON.challenge),
     user: {
-      ...creationOptionsJSON.publicKey.user,
-      id: toUint8Array(creationOptionsJSON.publicKey.user.id),
+      ...creationOptionsJSON.user,
+      id: toUint8Array(creationOptionsJSON.user.id),
     },
-    excludeCredentials: creationOptionsJSON.publicKey.excludeCredentials.map(
+    excludeCredentials: creationOptionsJSON.excludeCredentials.map(
       toPublicKeyCredentialDescriptor,
     ),
   };

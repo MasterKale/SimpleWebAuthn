@@ -19,31 +19,29 @@ const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';
 
 const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
-  publicKey: {
-    challenge: 'fizz',
-    attestation: 'direct',
-    pubKeyCredParams: [
-      {
-        alg: -7,
-        type: 'public-key',
-      },
-    ],
-    rp: {
-      id: '1234',
-      name: 'simplewebauthn',
-    },
-    user: {
-      id: '5678',
-      displayName: 'username',
-      name: 'username',
-    },
-    timeout: 1,
-    excludeCredentials: [{
-      id: 'authIdentifier',
+  challenge: 'fizz',
+  attestation: 'direct',
+  pubKeyCredParams: [
+    {
+      alg: -7,
       type: 'public-key',
-      transports: ['internal'],
-    }],
+    },
+  ],
+  rp: {
+    id: '1234',
+    name: 'simplewebauthn',
   },
+  user: {
+    id: '5678',
+    displayName: 'username',
+    name: 'username',
+  },
+  timeout: 1,
+  excludeCredentials: [{
+    id: 'authIdentifier',
+    type: 'public-key',
+    transports: ['internal'],
+  }],
 };
 
 beforeEach(() => {
@@ -67,8 +65,8 @@ test('should convert options before passing to navigator.credentials.create(...)
 
   const argsPublicKey = mockNavigatorCreate.mock.calls[0][0].publicKey;
 
-  expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.publicKey.challenge));
-  expect(argsPublicKey.user.id).toEqual(toUint8Array(goodOpts1.publicKey.user.id));
+  expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.challenge));
+  expect(argsPublicKey.user.id).toEqual(toUint8Array(goodOpts1.user.id));
   expect(argsPublicKey.excludeCredentials).toEqual([{
     id: base64js.toByteArray('authIdentifier=='),
     type: 'public-key',

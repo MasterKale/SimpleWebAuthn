@@ -22,17 +22,15 @@ const mockSignature = toBase64String(toUint8Array('mockSignature'));
 const mockUserHandle = toBase64String(toUint8Array('mockUserHandle'));
 
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
-  publicKey: {
-    challenge: 'fizz',
-    allowCredentials: [
-      {
-        id: 'abcdefgfdnsdfunguisdfgs',
-        type: 'public-key',
-        transports: ['nfc'],
-      },
-    ],
-    timeout: 1,
-  },
+  challenge: 'fizz',
+  allowCredentials: [
+    {
+      id: 'abcdefgfdnsdfunguisdfgs',
+      type: 'public-key',
+      transports: ['nfc'],
+    },
+  ],
+  timeout: 1,
 };
 
 beforeEach(() => {
@@ -57,7 +55,7 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
   const credId = base64js.fromByteArray(argsPublicKey.allowCredentials[0].id);
 
-  expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.publicKey.challenge));
+  expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.challenge));
   // Make sure the credential ID is a proper base64 with a length that's a multiple of 4
   expect(credId.length % 4).toEqual(0);
 

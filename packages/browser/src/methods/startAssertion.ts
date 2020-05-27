@@ -23,9 +23,9 @@ export default async function startAssertion(
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
   const publicKey: PublicKeyCredentialRequestOptions = {
-    ...requestOptionsJSON.publicKey,
-    challenge: toUint8Array(requestOptionsJSON.publicKey.challenge),
-    allowCredentials: requestOptionsJSON.publicKey.allowCredentials.map(
+    ...requestOptionsJSON,
+    challenge: toUint8Array(requestOptionsJSON.challenge),
+    allowCredentials: requestOptionsJSON.allowCredentials.map(
       toPublicKeyCredentialDescriptor,
     ),
   };
