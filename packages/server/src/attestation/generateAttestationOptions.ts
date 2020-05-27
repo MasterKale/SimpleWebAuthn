@@ -14,6 +14,7 @@ type Options = {
   excludedBase64CredentialIDs?: string[],
   suggestedTransports?: AuthenticatorTransport[],
   authenticatorSelection?: AuthenticatorSelectionCriteria,
+  extensions?: AuthenticationExtensionsClientInputs,
 };
 
 /**
@@ -34,6 +35,7 @@ type Options = {
  * @param suggestedTransports Suggested types of authenticators for attestation
  * @param authenticatorSelection Advanced criteria for restricting the types of authenticators that
  * may be used
+ * @param extensions Additional plugins the authenticator or browser should use during attestation
  */
 export default function generateAttestationOptions(
   options: Options,
@@ -50,6 +52,7 @@ export default function generateAttestationOptions(
     excludedBase64CredentialIDs = [],
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     authenticatorSelection,
+    extensions,
   } = options;
 
   return {
@@ -77,5 +80,6 @@ export default function generateAttestationOptions(
       transports: suggestedTransports,
     })),
     authenticatorSelection,
+    extensions,
   };
 }
