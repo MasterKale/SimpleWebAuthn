@@ -71,7 +71,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
   expect(options.timeout).toEqual(60000);
 });
 
-test('defaults to direct attestation if no attestation type is specified', () => {
+test('defaults to none attestation if no attestation type is specified', () => {
   const options = generateAttestationOptions({
     serviceName: 'SimpleWebAuthn',
     rpID: 'not.real',
@@ -101,5 +101,20 @@ test('should set authenticatorSelection if specified', () => {
     authenticatorAttachment: 'cross-platform',
     requireResidentKey: false,
     userVerification: 'preferred',
+  });
+});
+
+test('should set extensions if specified', () => {
+  const options = generateAttestationOptions({
+    serviceName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userID: '1234',
+    userName: 'usernameHere',
+    extensions: { appid: 'simplewebauthn' },
+  });
+
+  expect(options.extensions).toEqual({
+    appid: 'simplewebauthn',
   });
 });

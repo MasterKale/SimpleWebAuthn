@@ -8,6 +8,7 @@ type Options = {
   suggestedTransports?: AuthenticatorTransport[],
   timeout?: number,
   userVerification?: UserVerificationRequirement,
+  extensions?: AuthenticationExtensionsClientInputs,
 };
 
 /**
@@ -20,6 +21,7 @@ type Options = {
  * @param suggestedTransports Suggested types of authenticators for assertion
  * @param userVerification Set to `'discouraged'` when asserting as part of a 2FA flow, otherwise
  * set to `'preferred'` or `'required'` as desired.
+ * @param extensions Additional plugins the authenticator or browser should use during assertion
  */
 export default function generateAssertionOptions(
   options: Options,
@@ -30,6 +32,7 @@ export default function generateAssertionOptions(
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     timeout = 60000,
     userVerification,
+    extensions,
   } = options;
 
   return {
@@ -41,5 +44,6 @@ export default function generateAssertionOptions(
     })),
     timeout,
     userVerification,
+    extensions,
   };
 }

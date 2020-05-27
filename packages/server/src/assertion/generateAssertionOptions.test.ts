@@ -34,9 +34,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
 });
 
 test('should not set userVerification if not specified', () => {
-  const options = generateAssertionOptions({
-    ...goodOpts1,
-  });
+  const options = generateAssertionOptions(goodOpts1);
 
   expect(options.userVerification).toEqual(undefined);
 });
@@ -48,6 +46,17 @@ test('should set userVerification if specified', () => {
   });
 
   expect(options.userVerification).toEqual('required');
+});
+
+test('should set extensions if specified', () => {
+  const options = generateAssertionOptions({
+    ...goodOpts1,
+    extensions: { appid: 'simplewebauthn' },
+  });
+
+  expect(options.extensions).toEqual({
+    appid: 'simplewebauthn',
+  });
 });
 
 const goodOpts1 = {
