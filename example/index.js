@@ -131,6 +131,15 @@ app.get('/generate-attestation-options', (req, res) => {
        * on it.
        */
       excludedBase64CredentialIDs: devices.map(dev => dev.base64CredentialID),
+      /**
+       * The optional authenticatorSelection property allows for specifying more constraints around
+       * the types of authenticators that users to can use for attestation
+       */
+      authenticatorSelection: {
+        authenticatorAttachment: 'cross-platform',
+        userVerification: 'preferred',
+        requireResidentKey: false,
+      },
     }),
   );
 });
@@ -194,6 +203,11 @@ app.get('/generate-assertion-options', (req, res) => {
       challenge,
       timeout: 60000,
       allowedBase64CredentialIDs: user.devices.map(data => data.base64CredentialID),
+      /**
+       * This optional value controls whether or not the authenticator needs be able to uniquely
+       * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
+       */
+      userVerification: 'preferred',
     }),
   );
 });
