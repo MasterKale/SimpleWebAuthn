@@ -9,6 +9,8 @@ const fs = require('fs');
 
 const express = require('express');
 
+const FIDOConformanceRoutes = require('./fido-conformance');
+
 const {
   // Registration ("Attestation")
   generateAttestationOptions,
@@ -258,6 +260,8 @@ app.post('/verify-assertion', (req, res) => {
 
   res.send({ verified });
 });
+
+app.use('/fido', FIDOConformanceRoutes);
 
 https
   .createServer(
