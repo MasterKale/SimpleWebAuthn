@@ -18,8 +18,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "npm test -- --coverage",
-    "prepublish": "npm run build",
-    "docs": "typedoc --tsconfig tsconfig.json"
+    "prepublish": "npm run build"
   },
   "keywords": [
     "webauthn",
