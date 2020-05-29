@@ -9,12 +9,12 @@ import {
   COSEPublicKey as COSEPublicKeyType,
 } from '@simplewebauthn/typescript-types';
 
-import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
-import toHash from '@helpers/toHash';
-import convertASN1toPEM from '@helpers/convertASN1toPEM';
-import getCertificateInfo from '@helpers/getCertificateInfo';
-import verifySignature from '@helpers/verifySignature';
-import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
+import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
+import toHash from '../../helpers/toHash';
+import convertASN1toPEM from '../../helpers/convertASN1toPEM';
+import getCertificateInfo from '../../helpers/getCertificateInfo';
+import verifySignature from '../../helpers/verifySignature';
+import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'packed'

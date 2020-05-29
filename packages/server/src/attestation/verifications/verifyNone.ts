@@ -1,8 +1,8 @@
 import base64url from 'base64url';
 import { AttestationObject, VerifiedAttestation } from '@simplewebauthn/typescript-types';
 
-import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
-import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
+import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
+import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'none'

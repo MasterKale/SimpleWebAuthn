@@ -5,12 +5,11 @@ import {
   VerifiedAssertion,
 } from '@simplewebauthn/typescript-types';
 
-import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
-
-import toHash from '@helpers/toHash';
-import convertASN1toPEM from '@helpers/convertASN1toPEM';
-import verifySignature from '@helpers/verifySignature';
-import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
+import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import toHash from '../helpers/toHash';
+import convertASN1toPEM from '../helpers/convertASN1toPEM';
+import verifySignature from '../helpers/verifySignature';
+import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 
 /**
  * Verify that the user has legitimately completed the login process

@@ -7,11 +7,11 @@ import {
   SafetyNetJWTSignature,
 } from '@simplewebauthn/typescript-types';
 
-import toHash from '@helpers/toHash';
-import verifySignature from '@helpers/verifySignature';
-import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
-import getCertificateInfo from '@helpers/getCertificateInfo';
-import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
+import toHash from '../../helpers/toHash';
+import verifySignature from '../../helpers/verifySignature';
+import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
+import getCertificateInfo from '../../helpers/getCertificateInfo';
+import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
