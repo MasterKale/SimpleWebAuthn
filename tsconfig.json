@@ -23,7 +23,7 @@
       "./packages/browser/src/index.ts",
       "./packages/typescript-types/src/index.ts"
     ],
-    "readme": "./README.md",
+    "readme": "./DOCS.md",
     "mode": "library",
     "name": "@SimpleWebAuthn",
     "excludeExternals": true,
