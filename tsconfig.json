@@ -28,6 +28,10 @@
     "name": "@SimpleWebAuthn",
     "excludeExternals": true,
     "excludeNotExported": true,
-    "excludePrivate": true
+    "excludePrivate": true,
+    "plugin": [
+      // Relative to somewhere deep in `node_modules/typedocs`
+      "../../../../../typedoc-plugin-external-module-name"
+    ]
   }
 }
