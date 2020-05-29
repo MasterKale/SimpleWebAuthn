@@ -11,5 +11,20 @@
       { "transform": "typescript-transform-paths" },
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
+  },
+  "typedocOptions": {
+    "out": "../../docs/server",
+    "inputFiles": [
+      "./src/index.ts"
+    ],
+    "exclude": [
+      "**/__mocks__/**/*",
+      "**/*+(test).ts"
+    ],
+    "theme": "minimal",
+    "mode": "library",
+    "excludeExternals": true,
+    "excludeNotExported": true,
+    "excludePrivate": true
   }
 }

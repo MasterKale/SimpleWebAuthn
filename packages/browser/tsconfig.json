@@ -3,5 +3,20 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist"
+  },
+  "typedocOptions": {
+    "out": "../../docs/browser",
+    "inputFiles": [
+      "./src/index.ts"
+    ],
+    "exclude": [
+      "**/__mocks__/**/*",
+      "**/*+(test).ts"
+    ],
+    "theme": "minimal",
+    "mode": "library",
+    "excludeExternals": true,
+    "excludeNotExported": true,
+    "excludePrivate": true
   }
 }
