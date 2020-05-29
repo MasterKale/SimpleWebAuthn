@@ -17,7 +17,7 @@
     "**/dist/*"
   ],
   "typedocOptions": {
-    "out": "docs2",
+    "out": "docs",
     "inputFiles": [
       "./packages/server/src/index.ts",
       "./packages/browser/src/index.ts",
