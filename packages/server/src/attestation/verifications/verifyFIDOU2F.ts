@@ -1,11 +1,11 @@
 import base64url from 'base64url';
 import { AttestationObject, VerifiedAttestation } from '@simplewebauthn/typescript-types';
 
-import toHash from '@helpers/toHash';
-import convertCOSEtoPKCS from '@helpers/convertCOSEtoPKCS';
-import convertASN1toPEM from '@helpers/convertASN1toPEM';
-import verifySignature from '@helpers/verifySignature';
-import parseAuthenticatorData from '@helpers/parseAuthenticatorData';
+import toHash from '../../helpers/toHash';
+import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
+import convertASN1toPEM from '../../helpers/convertASN1toPEM';
+import verifySignature from '../../helpers/verifySignature';
+import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'

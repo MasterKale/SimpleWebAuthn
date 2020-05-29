@@ -1,5 +1,5 @@
-import decodeAttestationObject from '@helpers/decodeAttestationObject';
-import decodeClientDataJSON from '@helpers/decodeClientDataJSON';
+import decodeAttestationObject from '../helpers/decodeAttestationObject';
+import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import {
   ATTESTATION_FORMATS,
   AuthenticatorAttestationResponseJSON,

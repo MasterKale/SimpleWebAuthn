@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap --scope=@simplewebauthn/typescript-types && lerna bootstrap --scope=@simplewebauthn/browser --scope=@simplewebauthn/server",
-    "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/"
+    "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/",
+    "docs": "npm run bootstrap && typedoc --tsconfig tsconfig.json"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",
@@ -20,9 +21,11 @@
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
+    "semver": "^7.3.2",
     "ts-jest": "^25.5.1",
     "ts-node": "^8.10.1",
     "ttypescript": "^1.5.10",
+    "typedoc": "^0.17.0-3",
     "typescript": "^3.9.2",
     "typescript-transform-paths": "^1.1.14"
   },

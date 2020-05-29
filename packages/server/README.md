@@ -1,5 +1,4 @@
 <!-- omit in toc -->
-
 # @simplewebauthn/server
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
@@ -7,7 +6,7 @@
 ![node-lts (scoped)](https://img.shields.io/node/v/@simplewebauthn/server?style=for-the-badge&logo=Node.js)
 
 - [Installation](#installation)
-- [Usage - Coming Soon](#usage---coming-soon)
+- [Usage](#usage)
 - [Supported Attestation Formats](#supported-attestation-formats)
 
 ## Installation
@@ -27,9 +26,12 @@ import SimpleWebAuthnServer from '@simplewebauthn/server';
 const SimpleWebAuthnServer = require('@simplewebauthn/server');
 ```
 
-## Usage - Coming Soon
+## Usage
 
-Check out [the example](../../example/index.js) for now until this section gets updated.
+Check out [the example's index.js](../../example/index.js) for a practical implementation of this library.
+
+Lower-level API documentation for the methods in this library is available [here](https://simplewebauthn.netlify.app/modules/_simplewebauthn_server.html).
+
 
 ## Supported Attestation Formats
 

@@ -1,5 +1,4 @@
 <!-- omit in toc -->
-
 # @simplewebauthn/browser
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
@@ -8,7 +7,7 @@
 
 - [Installation](#installation)
   - [UMD](#umd)
-- [Usage - Coming Soon](#usage---coming-soon)
+- [Usage](#usage)
 
 ## Installation
 
@@ -34,6 +33,8 @@ This package can also be installed via **unpkg** by including the following scri
 
 The library's methods will be available on the global `SimpleWebAuthnBrowser` object.
 
-## Usage - Coming Soon
+## Usage
 
-Check out [the example](../../example/public/) for now until this section gets updated.
+Check out [the example's public/ folder](../../example/public/) for a practical implementation of this library.
+
+Lower-level API documentation for the methods in this library is available [here](https://simplewebauthn.netlify.app/modules/_simplewebauthn_browser.html).
