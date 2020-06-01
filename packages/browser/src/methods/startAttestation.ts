@@ -1,7 +1,7 @@
 import {
   PublicKeyCredentialCreationOptionsJSON,
-  AuthenticatorAttestationResponseJSON,
   AttestationCredential,
+  AttestationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
@@ -16,7 +16,7 @@ import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDes
  */
 export default async function startAttestation(
   creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
-): Promise<AuthenticatorAttestationResponseJSON> {
+): Promise<AttestationCredentialJSON> {
   if (!supportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
@@ -35,17 +35,22 @@ export default async function startAttestation(
   };
 
   // Wait for the user to complete attestation
-  const credential = await navigator.credentials.create({ publicKey });
+  const credential = await navigator.credentials.create({ publicKey }) as AttestationCredential;
 
   if (!credential) {
     throw new Error('Attestation was not completed');
   }
 
-  const { response } = credential as AttestationCredential;
+  const { rawId, response } = credential;
 
   // Convert values to base64 to make it easier to send back to the server
   return {
-    base64AttestationObject: toBase64String(response.attestationObject),
-    base64ClientDataJSON: toBase64String(response.clientDataJSON),
+    ...credential,
+    rawId: toBase64String(rawId),
+    response: {
+      ...response,
+      attestationObject: toBase64String(response.attestationObject),
+      clientDataJSON: toBase64String(response.clientDataJSON),
+    }
   };
 }

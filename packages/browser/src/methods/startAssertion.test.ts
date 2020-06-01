@@ -65,8 +65,6 @@ test('should convert options before passing to navigator.credentials.get(...)', 
 test('should return base64-encoded response values', async done => {
   mockSupportsWebauthn.mockReturnValue(true);
 
-  const credentialID = 'foobar';
-
   mockNavigatorGet.mockImplementation(
     (): Promise<AssertionCredential> => {
       return new Promise(resolve => {
@@ -88,13 +86,11 @@ test('should return base64-encoded response values', async done => {
 
   const response = await startAssertion(goodOpts1);
 
-  expect(response).toEqual({
-    base64CredentialID: credentialID,
-    base64AuthenticatorData: mockAuthenticatorData,
-    base64ClientDataJSON: mockClientDataJSON,
-    base64Signature: mockSignature,
-    base64UserHandle: mockUserHandle,
-  });
+  expect(response.rawId).toEqual('Zm9vYmFy');
+  expect(response.response.authenticatorData).toEqual(mockAuthenticatorData);
+  expect(response.response.clientDataJSON).toEqual(mockClientDataJSON);
+  expect(response.response.signature).toEqual(mockSignature);
+  expect(response.response.userHandle).toEqual(mockUserHandle);
 
   done();
 });

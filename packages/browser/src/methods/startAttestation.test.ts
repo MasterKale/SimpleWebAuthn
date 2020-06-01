@@ -98,10 +98,9 @@ test('should return base64-encoded response values', async done => {
 
   const response = await startAttestation(goodOpts1);
 
-  expect(response).toEqual({
-    base64AttestationObject: mockAttestationObject,
-    base64ClientDataJSON: mockClientDataJSON,
-  });
+  expect(response.rawId).toEqual('Zm9vYmFy');
+  expect(response.response.attestationObject).toEqual(mockAttestationObject);
+  expect(response.response.clientDataJSON).toEqual(mockClientDataJSON);
 
   done();
 });
