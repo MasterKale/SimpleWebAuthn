@@ -49,11 +49,22 @@ export interface AttestationCredential extends PublicKeyCredential {
   response: AuthenticatorAttestationResponse;
 }
 
+export interface AttestationCredentialJSON
+  extends Omit<AttestationCredential, 'response' | 'rawId'> {
+  rawId: string;
+  response: AuthenticatorAttestationResponseJSON;
+}
+
 /**
  * The value returned from navigator.credentials.get()
  */
 export interface AssertionCredential extends PublicKeyCredential {
   response: AuthenticatorAssertionResponse;
+}
+
+export interface AssertionCredentialJSON extends Omit<AssertionCredential, 'response' | 'rawId'> {
+  rawId: string;
+  response: AuthenticatorAssertionResponseJSON;
 }
 
 /**
@@ -62,8 +73,8 @@ export interface AssertionCredential extends PublicKeyCredential {
  */
 export interface AuthenticatorAttestationResponseJSON
   extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
-  base64ClientDataJSON: string;
-  base64AttestationObject: string;
+  clientDataJSON: string;
+  attestationObject: string;
 }
 
 /**
@@ -73,13 +84,12 @@ export interface AuthenticatorAttestationResponseJSON
 export interface AuthenticatorAssertionResponseJSON
   extends Omit<
     AuthenticatorAssertionResponse,
-    'clientDataJSON' | 'authenticatorData' | 'signature' | 'userHandle'
+    'authenticatorData' | 'clientDataJSON' | 'signature' | 'userHandle'
   > {
-  base64CredentialID: string;
-  base64AuthenticatorData: string;
-  base64ClientDataJSON: string;
-  base64Signature: string;
-  base64UserHandle?: string;
+  authenticatorData: string;
+  clientDataJSON: string;
+  signature: string;
+  userHandle?: string;
 }
 
 export enum ATTESTATION_FORMATS {
