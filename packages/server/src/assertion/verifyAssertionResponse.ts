@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import {
-  AuthenticatorAssertionResponseJSON,
+  AssertionCredentialJSON,
   AuthenticatorDevice,
   VerifiedAssertion,
 } from '@simplewebauthn/typescript-types';
@@ -20,13 +20,13 @@ import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
  * @param expectedOrigin Expected URL of website assertion should have occurred on
  */
 export default function verifyAssertionResponse(
-  response: AuthenticatorAssertionResponseJSON,
+  credential: AssertionCredentialJSON,
   expectedChallenge: string,
   expectedOrigin: string,
   authenticator: AuthenticatorDevice,
 ): VerifiedAssertion {
-  const { base64AuthenticatorData, base64ClientDataJSON, base64Signature } = response;
-  const clientDataJSON = decodeClientDataJSON(base64ClientDataJSON);
+  const { response } = credential;
+  const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
   const { type, origin, challenge } = clientDataJSON;
 
@@ -50,7 +50,7 @@ export default function verifyAssertionResponse(
     throw new Error(`Unexpected assertion type: ${type}`);
   }
 
-  const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
+  const authDataBuffer = base64url.toBuffer(response.authenticatorData);
   const authDataStruct = parseAuthenticatorData(authDataBuffer);
   const { flags, counter } = authDataStruct;
 
@@ -70,17 +70,17 @@ export default function verifyAssertionResponse(
 
   const { rpIdHash, flagsBuf, counterBuf } = authDataStruct;
 
-  const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
+  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = Buffer.concat([rpIdHash, flagsBuf, counterBuf, clientDataHash]);
 
   const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.base64PublicKey));
-  const signature = base64url.toBuffer(base64Signature);
+  const signature = base64url.toBuffer(response.signature);
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
     authenticatorInfo: {
       counter,
-      base64CredentialID: response.base64CredentialID,
+      base64CredentialID: credential.id,
     },
   };
 

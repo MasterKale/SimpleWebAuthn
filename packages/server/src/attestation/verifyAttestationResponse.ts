@@ -2,7 +2,7 @@ import decodeAttestationObject from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import {
   ATTESTATION_FORMATS,
-  AuthenticatorAttestationResponseJSON,
+  AttestationCredentialJSON,
   VerifiedAttestation,
 } from '@simplewebauthn/typescript-types';
 
@@ -20,13 +20,13 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
  * @param expectedOrigin Expected URL of website attestation should have occurred on
  */
 export default function verifyAttestationResponse(
-  response: AuthenticatorAttestationResponseJSON,
+  credential: AttestationCredentialJSON,
   expectedChallenge: string,
   expectedOrigin: string,
 ): VerifiedAttestation {
-  const { base64AttestationObject, base64ClientDataJSON } = response;
-  const attestationObject = decodeAttestationObject(base64AttestationObject);
-  const clientDataJSON = decodeClientDataJSON(base64ClientDataJSON);
+  const { response } = credential;
+  const attestationObject = decodeAttestationObject(response.attestationObject);
+  const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
   const { type, origin, challenge } = clientDataJSON;
 
@@ -52,15 +52,15 @@ export default function verifyAttestationResponse(
    * Verification can only be performed when attestation = 'direct'
    */
   if (fmt === ATTESTATION_FORMATS.FIDO_U2F) {
-    return verifyFIDOU2F(attestationObject, base64ClientDataJSON);
+    return verifyFIDOU2F(attestationObject, response.clientDataJSON);
   }
 
   if (fmt === ATTESTATION_FORMATS.PACKED) {
-    return verifyPacked(attestationObject, base64ClientDataJSON);
+    return verifyPacked(attestationObject, response.clientDataJSON);
   }
 
   if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
-    return verifyAndroidSafetynet(attestationObject, base64ClientDataJSON);
+    return verifyAndroidSafetynet(attestationObject, response.clientDataJSON);
   }
 
   if (fmt === ATTESTATION_FORMATS.NONE) {
