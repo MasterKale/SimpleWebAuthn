@@ -12,7 +12,7 @@ PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
 > {
   // Will be converted to a Uint8Array in the browser
   user: PublicKeyCredentialUserEntityJSON;
-  challenge: string;
+  challenge: Base64String;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
 }
 
@@ -24,7 +24,7 @@ export interface PublicKeyCredentialRequestOptionsJSON extends Omit<
 PublicKeyCredentialRequestOptions, 'challenge' |'allowCredentials'
 > {
   // Will be converted to a Uint8Array in the browser
-  challenge: string;
+  challenge: Base64String;
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
 }
 
@@ -32,14 +32,14 @@ export interface PublicKeyCredentialDescriptorJSON extends Omit<
 PublicKeyCredentialDescriptor, 'id'
 > {
   // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
-  id: string;
+  id: Base64String;
 }
 
 export interface PublicKeyCredentialUserEntityJSON extends Omit <
 PublicKeyCredentialUserEntity, 'id'
 > {
   // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
-  id: string;
+  id: Base64String;
 }
 
 /**
@@ -51,7 +51,7 @@ export interface AttestationCredential extends PublicKeyCredential {
 
 export interface AttestationCredentialJSON
   extends Omit<AttestationCredential, 'response' | 'rawId'> {
-  rawId: string;
+  rawId: Base64String;
   response: AuthenticatorAttestationResponseJSON;
 }
 
@@ -63,7 +63,7 @@ export interface AssertionCredential extends PublicKeyCredential {
 }
 
 export interface AssertionCredentialJSON extends Omit<AssertionCredential, 'response' | 'rawId'> {
-  rawId: string;
+  rawId: Base64String;
   response: AuthenticatorAssertionResponseJSON;
 }
 
@@ -73,8 +73,8 @@ export interface AssertionCredentialJSON extends Omit<AssertionCredential, 'resp
  */
 export interface AuthenticatorAttestationResponseJSON
   extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
-  clientDataJSON: string;
-  attestationObject: string;
+  clientDataJSON: Base64String;
+  attestationObject: Base64String;
 }
 
 /**
@@ -86,10 +86,10 @@ export interface AuthenticatorAssertionResponseJSON
     AuthenticatorAssertionResponse,
     'authenticatorData' | 'clientDataJSON' | 'signature' | 'userHandle'
   > {
-  authenticatorData: string;
-  clientDataJSON: string;
-  signature: string;
-  userHandle?: string;
+  authenticatorData: Base64String;
+  clientDataJSON: Base64String;
+  signature: Base64String;
+  userHandle?: Base64String;
 }
 
 export enum ATTESTATION_FORMATS {
@@ -219,3 +219,8 @@ export type AuthenticatorDevice = {
   // Number of times this device is expected to have been used
   counter: number;
 };
+
+/**
+ * An attempt to communicate that this isn't just any string, but a base64-encoded string
+ */
+export type Base64String = string;
