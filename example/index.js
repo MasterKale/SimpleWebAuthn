@@ -78,8 +78,8 @@ const inMemoryUserDeviceDB = {
     devices: [
       /**
        * {
-       *   base64CredentialID: string,
-       *   base64PublicKey: string,
+       *   credentialID: string,
+       *   publicKey: string,
        *   counter: number,
        * }
        */
@@ -130,7 +130,7 @@ app.get('/generate-attestation-options', (req, res) => {
        * the browser if it's asked to perform an attestation when one of these ID's already resides
        * on it.
        */
-      excludedBase64CredentialIDs: devices.map(dev => dev.base64CredentialID),
+      excludedCredentialIDs: devices.map(dev => dev.credentialID),
       /**
        * The optional authenticatorSelection property allows for specifying more constraints around
        * the types of authenticators that users to can use for attestation
@@ -165,7 +165,7 @@ app.post('/verify-attestation', (req, res) => {
     const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
 
     const existingDevice = user.devices.find(
-      device => device.base64CredentialID === base64CredentialID,
+      device => device.credentialID === base64CredentialID,
     );
 
     if (!existingDevice) {
@@ -173,8 +173,8 @@ app.post('/verify-attestation', (req, res) => {
        * Add the returned device to the user's list of devices
        */
       user.devices.push({
-        base64PublicKey,
-        base64CredentialID,
+        publicKey: base64PublicKey,
+        credentialID: base64CredentialID,
         counter,
       });
     }
@@ -202,7 +202,7 @@ app.get('/generate-assertion-options', (req, res) => {
     generateAssertionOptions({
       challenge,
       timeout: 60000,
-      allowedBase64CredentialIDs: user.devices.map(data => data.base64CredentialID),
+      allowedCredentialIDs: user.devices.map(data => data.credentialID),
       /**
        * This optional value controls whether or not the authenticator needs be able to uniquely
        * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
@@ -220,12 +220,16 @@ app.post('/verify-assertion', (req, res) => {
   const expectedChallenge = user.currentChallenge;
 
   let dbAuthenticator;
-  // "Query the DB" here for an authenticator matching `base64CredentialID`
+  // "Query the DB" here for an authenticator matching `credentialID`
   for (let dev of user.devices) {
-    if (dev.base64CredentialID === body.base64CredentialID) {
+    if (dev.credentialID === body.id) {
       dbAuthenticator = dev;
       break;
     }
+  }
+
+  if (!dbAuthenticator) {
+    throw new Error('could not find authenticator matching', body.id);
   }
 
   let verification;
