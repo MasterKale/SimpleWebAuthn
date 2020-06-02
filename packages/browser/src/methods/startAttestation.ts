@@ -41,16 +41,16 @@ export default async function startAttestation(
     throw new Error('Attestation was not completed');
   }
 
-  const { rawId, response } = credential;
+  const { id, rawId, response, type } = credential;
 
   // Convert values to base64 to make it easier to send back to the server
   return {
-    ...credential,
+    id,
     rawId: bufferToBase64URLString(rawId),
     response: {
-      ...response,
       attestationObject: bufferToBase64URLString(response.attestationObject),
       clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
     },
+    type,
   };
 }

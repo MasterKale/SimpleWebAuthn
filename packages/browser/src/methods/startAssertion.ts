@@ -37,7 +37,7 @@ export default async function startAssertion(
     throw new Error('Assertion was not completed');
   }
 
-  const { rawId, response } = credential;
+  const { id, rawId, response, type } = credential;
 
   let userHandle = undefined;
   if (response.userHandle) {
@@ -46,14 +46,14 @@ export default async function startAssertion(
 
   // Convert values to base64 to make it easier to send back to the server
   return {
-    ...credential,
+    id,
     rawId: bufferToBase64URLString(rawId),
     response: {
-      ...response,
       authenticatorData: bufferToBase64URLString(response.authenticatorData),
       clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
       signature: bufferToBase64URLString(response.signature),
       userHandle,
     },
+    type,
   };
 }
