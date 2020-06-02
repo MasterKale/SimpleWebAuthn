@@ -48,7 +48,7 @@ test('should return authenticator info after verification', () => {
 
   expect(verification.authenticatorInfo.counter).toEqual(144);
   expect(verification.authenticatorInfo.base64CredentialID).toEqual(
-    authenticator.base64CredentialID,
+    authenticator.credentialID,
   );
 });
 
@@ -130,9 +130,9 @@ const assertionChallenge = 'totallyUniqueValueEveryTime';
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator = {
-  base64PublicKey:
+  publicKey:
     'BIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A18WGeA6hPmnab0HAViUYVRkwTNcN77QBf_' + 'RR0dv3lIvQ',
-  base64CredentialID:
+  credentialID:
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' + 'g6jo_o0hYiew',
   counter: 0,
 };
