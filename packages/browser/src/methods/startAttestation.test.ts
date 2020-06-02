@@ -1,5 +1,3 @@
-import base64js from 'base64-js';
-
 import {
   AttestationCredential,
   PublicKeyCredentialCreationOptionsJSON,
@@ -38,7 +36,7 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
   },
   timeout: 1,
   excludeCredentials: [{
-    id: 'authIdentifier',
+    id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
     type: 'public-key',
     transports: ['internal'],
   }],
@@ -64,14 +62,17 @@ test('should convert options before passing to navigator.credentials.create(...)
   await startAttestation(goodOpts1);
 
   const argsPublicKey = mockNavigatorCreate.mock.calls[0][0].publicKey;
+  const credId = argsPublicKey.excludeCredentials[0].id;
 
-  expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.challenge));
-  expect(argsPublicKey.user.id).toEqual(toUint8Array(goodOpts1.user.id));
-  expect(argsPublicKey.excludeCredentials).toEqual([{
-    id: base64js.toByteArray('authIdentifier=='),
-    type: 'public-key',
-    transports: ['internal'],
-  }])
+  // Make sure challenge and user.id are converted to Buffers
+  expect(JSON.stringify(argsPublicKey.challenge)).toEqual('{"0":102,"1":105,"2":122,"3":122}');
+  expect(JSON.stringify(argsPublicKey.user.id)).toEqual('{"0":53,"1":54,"2":55,"3":56}');
+
+  // Confirm construction of excludeCredentials array
+  expect(credId instanceof ArrayBuffer).toEqual(true);
+  expect(credId.byteLength).toEqual(64);
+  expect(argsPublicKey.excludeCredentials[0].type).toEqual('public-key');
+  expect(argsPublicKey.excludeCredentials[0].transports).toEqual(['internal']);
 
   done();
 });
@@ -86,8 +87,8 @@ test('should return base64-encoded response values', async done => {
           id: 'foobar',
           rawId: toUint8Array('foobar'),
           response: {
-            attestationObject: base64js.toByteArray(mockAttestationObject),
-            clientDataJSON: base64js.toByteArray(mockClientDataJSON),
+            attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
+            clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
           },
           getClientExtensionResults: () => ({}),
           type: 'webauthn.create',
@@ -99,8 +100,8 @@ test('should return base64-encoded response values', async done => {
   const response = await startAttestation(goodOpts1);
 
   expect(response.rawId).toEqual('Zm9vYmFy');
-  expect(response.response.attestationObject).toEqual(mockAttestationObject);
-  expect(response.response.clientDataJSON).toEqual(mockClientDataJSON);
+  expect(response.response.attestationObject).toEqual('bW9ja0F0dGU');
+  expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWU');
 
   done();
 });
