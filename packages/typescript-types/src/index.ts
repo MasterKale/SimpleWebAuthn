@@ -10,7 +10,6 @@
 export interface PublicKeyCredentialCreationOptionsJSON extends Omit<
 PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
 > {
-  // Will be converted to a Uint8Array in the browser
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64String;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
@@ -23,7 +22,6 @@ PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
 export interface PublicKeyCredentialRequestOptionsJSON extends Omit<
 PublicKeyCredentialRequestOptions, 'challenge' |'allowCredentials'
 > {
-  // Will be converted to a Uint8Array in the browser
   challenge: Base64String;
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
 }
