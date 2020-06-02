@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/browser",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "SimpleWebAuthn for Browsers",
   "main": "dist/simplewebauthn-browser.min.js",
   "types": "dist/index.d.ts",
@@ -22,7 +22,6 @@
     "typescript",
     "umd"
   ],
-  "dependencies": {},
   "devDependencies": {
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "ts-loader": "^7.0.4",
