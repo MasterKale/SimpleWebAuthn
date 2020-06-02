@@ -36,8 +36,13 @@
         try {
           attResp = await startAttestation(await resp.json());
         } catch (error) {
-          elemError.innerText = error;
-          throw new Error(error);
+          if (error.name === 'InvalidStateError') {
+            elemError.innerText = 'Error: Authenticator was probably already registered by user';
+          } else {
+            elemError.innerText = error;
+          }
+
+          throw error;
         }
 
         const verificationResp = await fetch('/verify-attestation', {
