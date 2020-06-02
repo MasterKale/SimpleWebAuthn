@@ -72,7 +72,7 @@ export default function verifyAssertionResponse(
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = Buffer.concat([rpIdHash, flagsBuf, counterBuf, clientDataHash]);
 
-  const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.base64PublicKey));
+  const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.publicKey));
   const signature = base64url.toBuffer(response.signature);
 
   const toReturn = {

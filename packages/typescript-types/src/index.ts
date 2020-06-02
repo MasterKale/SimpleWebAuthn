@@ -96,8 +96,8 @@ interface AuthenticatorAssertionResponseJSON
  * A WebAuthn-compatible device and the information needed to verify assertions by it
  */
 export type AuthenticatorDevice = {
-  base64PublicKey: string;
-  base64CredentialID: string;
+  publicKey: Base64String;
+  credentialID: Base64String;
   // Number of times this device is expected to have been used
   counter: number;
 };
