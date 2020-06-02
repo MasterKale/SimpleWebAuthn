@@ -1,10 +1,11 @@
 import type {
   PublicKeyCredentialRequestOptionsJSON,
+  Base64URLString,
 } from '@simplewebauthn/typescript-types';
 
 type Options = {
   challenge: string,
-  allowedBase64CredentialIDs: string[],
+  allowedCredentialIDs: Base64URLString[],
   suggestedTransports?: AuthenticatorTransport[],
   timeout?: number,
   userVerification?: UserVerificationRequirement,
@@ -15,7 +16,7 @@ type Options = {
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
  *
  * @param challenge Random string the authenticator needs to sign and pass back
- * @param allowedBase64CredentialIDs Array of base64url-encoded authenticator IDs registered by the
+ * @param allowedCredentialIDs Array of base64url-encoded authenticator IDs registered by the
  * user for assertion
  * @param timeout How long (in ms) the user can take to complete assertion
  * @param suggestedTransports Suggested types of authenticators for assertion
@@ -28,7 +29,7 @@ export default function generateAssertionOptions(
 ): PublicKeyCredentialRequestOptionsJSON {
   const {
     challenge,
-    allowedBase64CredentialIDs,
+    allowedCredentialIDs,
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     timeout = 60000,
     userVerification,
@@ -37,7 +38,7 @@ export default function generateAssertionOptions(
 
   return {
     challenge,
-    allowCredentials: allowedBase64CredentialIDs.map(id => ({
+    allowCredentials: allowedCredentialIDs.map(id => ({
       id,
       type: 'public-key',
       transports: suggestedTransports,
