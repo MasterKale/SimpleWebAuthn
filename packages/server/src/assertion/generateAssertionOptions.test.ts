@@ -61,7 +61,7 @@ test('should set extensions if specified', () => {
 
 const goodOpts1 = {
   challenge: 'totallyrandomvalue',
-  allowedBase64CredentialIDs: [
+  allowedCredentialIDs: [
     Buffer.from('1234', 'ascii').toString('base64'),
     Buffer.from('5678', 'ascii').toString('base64'),
   ],

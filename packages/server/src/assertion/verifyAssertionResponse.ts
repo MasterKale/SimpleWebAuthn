@@ -1,8 +1,7 @@
 import base64url from 'base64url';
 import {
-  AuthenticatorAssertionResponseJSON,
+  AssertionCredentialJSON,
   AuthenticatorDevice,
-  VerifiedAssertion,
 } from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -14,19 +13,19 @@ import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 /**
  * Verify that the user has legitimately completed the login process
  *
- * @param response Authenticator assertion response with base64-encoded values
+ * @param response Authenticator assertion response with base64url-encoded values
  * @param expectedChallenge The random value provided to generateAssertionOptions for the
  * authenticator to sign
  * @param expectedOrigin Expected URL of website assertion should have occurred on
  */
 export default function verifyAssertionResponse(
-  response: AuthenticatorAssertionResponseJSON,
+  credential: AssertionCredentialJSON,
   expectedChallenge: string,
   expectedOrigin: string,
   authenticator: AuthenticatorDevice,
 ): VerifiedAssertion {
-  const { base64AuthenticatorData, base64ClientDataJSON, base64Signature } = response;
-  const clientDataJSON = decodeClientDataJSON(base64ClientDataJSON);
+  const { response } = credential;
+  const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
   const { type, origin, challenge } = clientDataJSON;
 
@@ -50,7 +49,7 @@ export default function verifyAssertionResponse(
     throw new Error(`Unexpected assertion type: ${type}`);
   }
 
-  const authDataBuffer = base64url.toBuffer(base64AuthenticatorData);
+  const authDataBuffer = base64url.toBuffer(response.authenticatorData);
   const authDataStruct = parseAuthenticatorData(authDataBuffer);
   const { flags, counter } = authDataStruct;
 
@@ -70,19 +69,37 @@ export default function verifyAssertionResponse(
 
   const { rpIdHash, flagsBuf, counterBuf } = authDataStruct;
 
-  const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
+  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = Buffer.concat([rpIdHash, flagsBuf, counterBuf, clientDataHash]);
 
-  const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.base64PublicKey));
-  const signature = base64url.toBuffer(base64Signature);
+  const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.publicKey));
+  const signature = base64url.toBuffer(response.signature);
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
     authenticatorInfo: {
       counter,
-      base64CredentialID: response.base64CredentialID,
+      base64CredentialID: credential.id,
     },
   };
 
   return toReturn;
 }
+
+/**
+ * Result of assertion verification
+ *
+ * @param verified If the assertion response could be verified
+ * @param authenticatorInfo.base64CredentialID The ID of the authenticator used during assertion.
+ * Should be used to identify which DB authenticator entry needs its `counter` updated to the value
+ * below
+ * @param authenticatorInfo.counter The number of times the authenticator identified above reported
+ * it has been used. **Should be kept in a DB for later reference to help prevent replay attacks!**
+ */
+export type VerifiedAssertion = {
+  verified: boolean;
+  authenticatorInfo: {
+    counter: number;
+    base64CredentialID: string;
+  };
+};

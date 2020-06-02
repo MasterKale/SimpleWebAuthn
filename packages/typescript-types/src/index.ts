@@ -10,9 +10,8 @@
 export interface PublicKeyCredentialCreationOptionsJSON extends Omit<
 PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
 > {
-  // Will be converted to a Uint8Array in the browser
   user: PublicKeyCredentialUserEntityJSON;
-  challenge: string;
+  challenge: Base64URLString;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
 }
 
@@ -23,23 +22,20 @@ PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
 export interface PublicKeyCredentialRequestOptionsJSON extends Omit<
 PublicKeyCredentialRequestOptions, 'challenge' |'allowCredentials'
 > {
-  // Will be converted to a Uint8Array in the browser
-  challenge: string;
+  challenge: Base64URLString;
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
 }
 
 export interface PublicKeyCredentialDescriptorJSON extends Omit<
 PublicKeyCredentialDescriptor, 'id'
 > {
-  // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
-  id: string;
+  id: Base64URLString;
 }
 
 export interface PublicKeyCredentialUserEntityJSON extends Omit <
 PublicKeyCredentialUserEntity, 'id'
 > {
-  // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
-  id: string;
+  id: Base64URLString;
 }
 
 /**
@@ -50,6 +46,16 @@ export interface AttestationCredential extends PublicKeyCredential {
 }
 
 /**
+ * A slightly-modified AttestationCredential to simplify working with ArrayBuffers that
+ * are base64url-encoded in the browser so that they can be sent as JSON to the server.
+ */
+export interface AttestationCredentialJSON
+  extends Omit<AttestationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+  rawId: Base64URLString;
+  response: AuthenticatorAttestationResponseJSON;
+}
+
+/**
  * The value returned from navigator.credentials.get()
  */
 export interface AssertionCredential extends PublicKeyCredential {
@@ -57,155 +63,43 @@ export interface AssertionCredential extends PublicKeyCredential {
 }
 
 /**
- * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
- * are base64-encoded in the browser so that they can be sent as JSON to the server.
+ * A slightly-modified AssertionCredential to simplify working with ArrayBuffers that
+ * are base64url-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface AuthenticatorAttestationResponseJSON
-  extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
-  base64ClientDataJSON: string;
-  base64AttestationObject: string;
+export interface AssertionCredentialJSON
+  extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+  rawId: Base64URLString;
+  response: AuthenticatorAssertionResponseJSON;
 }
 
-/**
- * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
- * are base64-encoded in the browser so that they can be sent as JSON to the server.
- */
-export interface AuthenticatorAssertionResponseJSON
+interface AuthenticatorAttestationResponseJSON
+  extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
+  clientDataJSON: Base64URLString;
+  attestationObject: Base64URLString;
+}
+
+interface AuthenticatorAssertionResponseJSON
   extends Omit<
     AuthenticatorAssertionResponse,
-    'clientDataJSON' | 'authenticatorData' | 'signature' | 'userHandle'
+    'authenticatorData' | 'clientDataJSON' | 'signature' | 'userHandle'
   > {
-  base64CredentialID: string;
-  base64AuthenticatorData: string;
-  base64ClientDataJSON: string;
-  base64Signature: string;
-  base64UserHandle?: string;
+  authenticatorData: Base64URLString;
+  clientDataJSON: Base64URLString;
+  signature: Base64URLString;
+  userHandle?: Base64URLString;
 }
-
-export enum ATTESTATION_FORMATS {
-  FIDO_U2F = 'fido-u2f',
-  PACKED = 'packed',
-  ANDROID_SAFETYNET = 'android-safetynet',
-  NONE = 'none',
-}
-
-export type AttestationObject = {
-  fmt: ATTESTATION_FORMATS;
-  attStmt: {
-    sig?: Buffer;
-    x5c?: Buffer[];
-    response?: Buffer;
-  };
-  authData: Buffer;
-};
-
-export type ParsedAuthenticatorData = {
-  rpIdHash: Buffer;
-  flagsBuf: Buffer;
-  flags: {
-    up: boolean;
-    uv: boolean;
-    at: boolean;
-    ed: boolean;
-    flagsInt: number;
-  };
-  counter: number;
-  counterBuf: Buffer;
-  aaguid?: Buffer;
-  credentialID?: Buffer;
-  COSEPublicKey?: Buffer;
-};
-
-export type ClientDataJSON = {
-  type: string;
-  challenge: string;
-  origin: string;
-};
-
-/**
- * Result of attestation verification
- *
- * @param verified If the assertion response could be verified
- * @param userVerified Whether the user was uniquely identified during attestation
- * @param authenticatorInfo.fmt Type of attestation
- * @param authenticatorInfo.counter The number of times the authenticator reported it has been used.
- * Should be kept in a DB for later reference to help prevent replay attacks
- * @param authenticatorInfo.base64PublicKey Base64-encoded ArrayBuffer containing the
- * authenticator's public key. **Should be kept in a DB for later reference!**
- * @param authenticatorInfo.base64CredentialID Base64-encoded ArrayBuffer containing the
- * authenticator's credential ID for the public key above. **Should be kept in a DB for later
- * reference!**
- */
-export type VerifiedAttestation = {
-  verified: boolean;
-  userVerified: boolean;
-  authenticatorInfo?: {
-    fmt: ATTESTATION_FORMATS;
-    counter: number;
-    base64PublicKey: string;
-    base64CredentialID: string;
-  };
-};
-
-/**
- * Result of assertion verification
- *
- * @param verified If the assertion response could be verified
- * @param authenticatorInfo.base64CredentialID The ID of the authenticator used during assertion.
- * Should be used to identify which DB authenticator entry needs its `counter` updated to the value
- * below
- * @param authenticatorInfo.counter The number of times the authenticator identified above reported
- * it has been used. **Should be kept in a DB for later reference to help prevent replay attacks!**
- */
-export type VerifiedAssertion = {
-  verified: boolean;
-  authenticatorInfo: {
-    counter: number;
-    base64CredentialID: string;
-  };
-};
-
-export type CertificateInfo = {
-  subject: { [key: string]: string };
-  version: number;
-  basicConstraintsCA: boolean;
-};
-
-export enum COSEKEYS {
-  kty = 1,
-  alg = 3,
-  crv = -1,
-  x = -2,
-  y = -3,
-  n = -1,
-  e = -2,
-}
-
-export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
-
-export type SafetyNetJWTHeader = {
-  alg: 'string';
-  x5c: string[];
-};
-
-export type SafetyNetJWTPayload = {
-  nonce: string;
-  timestampMs: number;
-  apkPackageName: string;
-  apkDigestSha256: string;
-  ctsProfileMatch: boolean;
-  apkCertificateDigestSha256: string[];
-  basicIntegrity: boolean;
-};
-
-export type SafetyNetJWTSignature = string;
 
 /**
  * A WebAuthn-compatible device and the information needed to verify assertions by it
  */
 export type AuthenticatorDevice = {
-  base64PublicKey: string;
-  base64CredentialID: string;
+  publicKey: Base64URLString;
+  credentialID: Base64URLString;
   // Number of times this device is expected to have been used
   counter: number;
 };
+
+/**
+ * An attempt to communicate that this isn't just any string, but a base64url-encoded string
+ */
+export type Base64URLString = string;

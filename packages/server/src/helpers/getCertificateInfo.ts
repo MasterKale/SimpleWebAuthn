@@ -1,5 +1,10 @@
 import jsrsasign from 'jsrsasign';
-import { CertificateInfo } from '@simplewebauthn/typescript-types';
+
+export type CertificateInfo = {
+  subject: { [key: string]: string };
+  version: number;
+  basicConstraintsCA: boolean;
+};
 
 type ExtInfo = {
   critical: boolean;

@@ -1,13 +1,9 @@
-import base64js from 'base64-js';
-
 import {
   AssertionCredential,
   PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
-import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
-import toBase64String from '../helpers/toBase64String';
 
 import startAssertion from './startAssertion';
 
@@ -16,16 +12,16 @@ jest.mock('../helpers/supportsWebauthn');
 const mockNavigatorGet = window.navigator.credentials.get as jest.Mock;
 const mockSupportsWebauthn = supportsWebauthn as jest.Mock;
 
-const mockAuthenticatorData = toBase64String(toUint8Array('mockAuthenticatorData'));
-const mockClientDataJSON = toBase64String(toUint8Array('mockClientDataJSON'));
-const mockSignature = toBase64String(toUint8Array('mockSignature'));
-const mockUserHandle = toBase64String(toUint8Array('mockUserHandle'));
+const mockAuthenticatorData = 'mockAuthenticatorData';
+const mockClientDataJSON = 'mockClientDataJSON';
+const mockSignature = 'mockSignature';
+const mockUserHandle = 'mockUserHandle';
 
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
   challenge: 'fizz',
   allowCredentials: [
     {
-      id: 'abcdefgfdnsdfunguisdfgs',
+      id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
       type: 'public-key',
       transports: ['nfc'],
     },
@@ -45,7 +41,10 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   mockNavigatorGet.mockImplementation(
     (): Promise<any> => {
       return new Promise(resolve => {
-        resolve({ response: {} });
+        resolve({
+          response: {},
+          getClientExtensionResults: () => ({}),
+        });
       });
     },
   );
@@ -53,31 +52,30 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   await startAssertion(goodOpts1);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
-  const credId = base64js.fromByteArray(argsPublicKey.allowCredentials[0].id);
+  const credId = argsPublicKey.allowCredentials[0].id;
 
-  expect(argsPublicKey.challenge).toEqual(toUint8Array(goodOpts1.challenge));
-  // Make sure the credential ID is a proper base64 with a length that's a multiple of 4
-  expect(credId.length % 4).toEqual(0);
+  expect(JSON.stringify(argsPublicKey.challenge)).toEqual('{"0":102,"1":105,"2":122,"3":122}');
+  // Make sure the credential ID is an ArrayBuffer with a length of 64
+  expect(credId instanceof ArrayBuffer).toEqual(true);
+  expect(credId.byteLength).toEqual(64);
 
   done();
 });
 
-test('should return base64-encoded response values', async done => {
+test('should return base64url-encoded response values', async done => {
   mockSupportsWebauthn.mockReturnValue(true);
-
-  const credentialID = 'foobar';
 
   mockNavigatorGet.mockImplementation(
     (): Promise<AssertionCredential> => {
       return new Promise(resolve => {
         resolve({
           id: 'foobar',
-          rawId: toUint8Array('foobar'),
+          rawId: Buffer.from('foobar', 'ascii'),
           response: {
-            authenticatorData: base64js.toByteArray(mockAuthenticatorData),
-            clientDataJSON: base64js.toByteArray(mockClientDataJSON),
-            signature: base64js.toByteArray(mockSignature),
-            userHandle: base64js.toByteArray(mockUserHandle),
+            authenticatorData: Buffer.from(mockAuthenticatorData, 'ascii'),
+            clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
+            signature: Buffer.from(mockSignature, 'ascii'),
+            userHandle: Buffer.from(mockUserHandle, 'ascii'),
           },
           getClientExtensionResults: () => ({}),
           type: 'webauthn.get',
@@ -88,13 +86,11 @@ test('should return base64-encoded response values', async done => {
 
   const response = await startAssertion(goodOpts1);
 
-  expect(response).toEqual({
-    base64CredentialID: credentialID,
-    base64AuthenticatorData: mockAuthenticatorData,
-    base64ClientDataJSON: mockClientDataJSON,
-    base64Signature: mockSignature,
-    base64UserHandle: mockUserHandle,
-  });
+  expect(response.rawId).toEqual('Zm9vYmFy');
+  expect(response.response.authenticatorData).toEqual('bW9ja0F1dGhlbnRpY2F0b3JEYXRh');
+  expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWVudERhdGFKU09O');
+  expect(response.response.signature).toEqual('bW9ja1NpZ25hdHVyZQ');
+  expect(response.response.userHandle).toEqual('bW9ja1VzZXJIYW5kbGU');
 
   done();
 });

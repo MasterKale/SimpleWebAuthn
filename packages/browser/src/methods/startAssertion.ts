@@ -1,11 +1,11 @@
 import {
   PublicKeyCredentialRequestOptionsJSON,
-  AuthenticatorAssertionResponseJSON,
   AssertionCredential,
+  AssertionCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
-import toBase64String from '../helpers/toBase64String';
+import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
@@ -16,7 +16,7 @@ import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDes
  */
 export default async function startAssertion(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
-): Promise<AuthenticatorAssertionResponseJSON> {
+): Promise<AssertionCredentialJSON> {
   if (!supportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
@@ -31,25 +31,29 @@ export default async function startAssertion(
   };
 
   // Wait for the user to complete assertion
-  const credential = await navigator.credentials.get({ publicKey });
+  const credential = await navigator.credentials.get({ publicKey }) as AssertionCredential;
 
   if (!credential) {
     throw new Error('Assertion was not completed');
   }
 
-  const { response } = credential as AssertionCredential;
+  const { id, rawId, response, type } = credential;
 
-  let base64UserHandle = undefined;
+  let userHandle = undefined;
   if (response.userHandle) {
-    base64UserHandle = toBase64String(response.userHandle);
+    userHandle = bufferToBase64URLString(response.userHandle);
   }
 
   // Convert values to base64 to make it easier to send back to the server
   return {
-    base64CredentialID: credential.id,
-    base64AuthenticatorData: toBase64String(response.authenticatorData),
-    base64ClientDataJSON: toBase64String(response.clientDataJSON),
-    base64Signature: toBase64String(response.signature),
-    base64UserHandle,
+    id,
+    rawId: bufferToBase64URLString(rawId),
+    response: {
+      authenticatorData: bufferToBase64URLString(response.authenticatorData),
+      clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
+      signature: bufferToBase64URLString(response.signature),
+      userHandle,
+    },
+    type,
   };
 }

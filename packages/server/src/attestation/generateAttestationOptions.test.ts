@@ -49,7 +49,7 @@ test('should map excluded credential IDs if specified', () => {
     challenge: 'totallyrandomvalue',
     userID: '1234',
     userName: 'usernameHere',
-    excludedBase64CredentialIDs: ['someIDhere'],
+    excludedCredentialIDs: ['someIDhere'],
   });
 
   expect(options.excludeCredentials).toEqual([{
