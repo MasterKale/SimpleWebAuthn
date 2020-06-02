@@ -13,7 +13,7 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 /**
  * Verify that the user has legitimately completed the registration process
  *
- * @param response Authenticator attestation response with base64-encoded values
+ * @param response Authenticator attestation response with base64url-encoded values
  * @param expectedChallenge The random value provided to generateAttestationOptions for the
  * authenticator to sign
  * @param expectedOrigin Expected URL of website attestation should have occurred on
@@ -77,9 +77,9 @@ export default function verifyAttestationResponse(
  * @param authenticatorInfo.fmt Type of attestation
  * @param authenticatorInfo.counter The number of times the authenticator reported it has been used.
  * Should be kept in a DB for later reference to help prevent replay attacks
- * @param authenticatorInfo.base64PublicKey Base64-encoded ArrayBuffer containing the
+ * @param authenticatorInfo.base64PublicKey Base64URL-encoded ArrayBuffer containing the
  * authenticator's public key. **Should be kept in a DB for later reference!**
- * @param authenticatorInfo.base64CredentialID Base64-encoded ArrayBuffer containing the
+ * @param authenticatorInfo.base64CredentialID Base64URL-encoded ArrayBuffer containing the
  * authenticator's credential ID for the public key above. **Should be kept in a DB for later
  * reference!**
  */

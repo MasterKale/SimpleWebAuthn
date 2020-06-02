@@ -2,9 +2,9 @@ import base64url from 'base64url';
 import cbor from 'cbor';
 
 /**
- * Convert an AttestationObject from base64 string to a proper object
+ * Convert an AttestationObject from base64url string to a proper object
  *
- * @param base64AttestationObject Base64-encoded Attestation Object
+ * @param base64AttestationObject Base64URL-encoded Attestation Object
  */
 export default function decodeAttestationObject(
   base64AttestationObject: string,

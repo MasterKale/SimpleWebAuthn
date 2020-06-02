@@ -77,7 +77,7 @@ test('should convert options before passing to navigator.credentials.create(...)
   done();
 });
 
-test('should return base64-encoded response values', async done => {
+test('should return base64url-encoded response values', async done => {
   mockSupportsWebauthn.mockReturnValue(true);
 
   mockNavigatorCreate.mockImplementation(

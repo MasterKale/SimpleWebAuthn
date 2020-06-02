@@ -29,14 +29,12 @@ PublicKeyCredentialRequestOptions, 'challenge' |'allowCredentials'
 export interface PublicKeyCredentialDescriptorJSON extends Omit<
 PublicKeyCredentialDescriptor, 'id'
 > {
-  // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
   id: Base64URLString;
 }
 
 export interface PublicKeyCredentialUserEntityJSON extends Omit <
 PublicKeyCredentialUserEntity, 'id'
 > {
-  // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
   id: Base64URLString;
 }
 
@@ -49,7 +47,7 @@ export interface AttestationCredential extends PublicKeyCredential {
 
 /**
  * A slightly-modified AttestationCredential to simplify working with ArrayBuffers that
- * are base64-encoded in the browser so that they can be sent as JSON to the server.
+ * are base64url-encoded in the browser so that they can be sent as JSON to the server.
  */
 export interface AttestationCredentialJSON
   extends Omit<AttestationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
@@ -66,7 +64,7 @@ export interface AssertionCredential extends PublicKeyCredential {
 
 /**
  * A slightly-modified AssertionCredential to simplify working with ArrayBuffers that
- * are base64-encoded in the browser so that they can be sent as JSON to the server.
+ * are base64url-encoded in the browser so that they can be sent as JSON to the server.
  */
 export interface AssertionCredentialJSON
   extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {

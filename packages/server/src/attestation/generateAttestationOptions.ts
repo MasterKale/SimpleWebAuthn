@@ -30,7 +30,7 @@ type Options = {
  * @param userDisplayName User's actual name
  * @param timeout How long (in ms) the user can take to complete attestation
  * @param attestationType Specific attestation statement
- * @param excludedBase64CredentialIDs Array of base64-encoded authenticator IDs registered by the
+ * @param excludedBase64CredentialIDs Array of base64url-encoded authenticator IDs registered by the
  * user so the user can't register the same credential multiple times
  * @param suggestedTransports Suggested types of authenticators for attestation
  * @param authenticatorSelection Advanced criteria for restricting the types of authenticators that

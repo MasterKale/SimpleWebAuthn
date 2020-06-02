@@ -13,7 +13,7 @@ import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 /**
  * Verify that the user has legitimately completed the login process
  *
- * @param response Authenticator assertion response with base64-encoded values
+ * @param response Authenticator assertion response with base64url-encoded values
  * @param expectedChallenge The random value provided to generateAssertionOptions for the
  * authenticator to sign
  * @param expectedOrigin Expected URL of website assertion should have occurred on
