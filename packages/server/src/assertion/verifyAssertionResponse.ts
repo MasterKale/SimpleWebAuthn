@@ -2,7 +2,6 @@ import base64url from 'base64url';
 import {
   AssertionCredentialJSON,
   AuthenticatorDevice,
-  VerifiedAssertion,
 } from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -86,3 +85,21 @@ export default function verifyAssertionResponse(
 
   return toReturn;
 }
+
+/**
+ * Result of assertion verification
+ *
+ * @param verified If the assertion response could be verified
+ * @param authenticatorInfo.base64CredentialID The ID of the authenticator used during assertion.
+ * Should be used to identify which DB authenticator entry needs its `counter` updated to the value
+ * below
+ * @param authenticatorInfo.counter The number of times the authenticator identified above reported
+ * it has been used. **Should be kept in a DB for later reference to help prevent replay attacks!**
+ */
+export type VerifiedAssertion = {
+  verified: boolean;
+  authenticatorInfo: {
+    counter: number;
+    base64CredentialID: string;
+  };
+};

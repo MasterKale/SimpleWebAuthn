@@ -1,5 +1,4 @@
 import cbor from 'cbor';
-import { COSEKEYS, COSEPublicKey } from '@simplewebauthn/typescript-types';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
@@ -39,4 +38,16 @@ export default function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
   }
 
   return Buffer.concat([tag, x as Buffer, y as Buffer]);
+}
+
+export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
+
+export enum COSEKEYS {
+  kty = 1,
+  alg = 3,
+  crv = -1,
+  x = -2,
+  y = -3,
+  n = -1,
+  e = -2,
 }

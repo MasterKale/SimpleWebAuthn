@@ -1,5 +1,3 @@
-import { ClientDataJSON } from '@simplewebauthn/typescript-types';
-
 import asciiToBinary from './asciiToBinary';
 
 /**
@@ -15,3 +13,9 @@ export default function decodeClientDataJSON(data: string): ClientDataJSON {
 
   return clientData;
 }
+
+type ClientDataJSON = {
+  type: string;
+  challenge: string;
+  origin: string;
+};

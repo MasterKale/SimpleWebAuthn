@@ -1,11 +1,7 @@
 import base64url from 'base64url';
-import {
-  AttestationObject,
-  VerifiedAttestation,
-  SafetyNetJWTHeader,
-  SafetyNetJWTPayload,
-  SafetyNetJWTSignature,
-} from '@simplewebauthn/typescript-types';
+
+import type { AttestationObject } from '../../helpers/decodeAttestationObject';
+import type { VerifiedAttestation } from '../verifyAttestationResponse';
 
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
@@ -151,3 +147,20 @@ const GlobalSignRootCAR2 =
   '7mpM0sYmsL4h4hO291xNBrBVNpGP-DTKqttVCL1OmLNIG-6KYnX3ZHu01yiPqFbQfXf5WRDLenVOavSot-3i9DAgBkcRcA' +
   'tjOj4LaR0VknFBbVPFd5uRHg5h6h-u_N5GJG79G-dwfCMNYxdAfvDbbnvRG15RjF-Cv6pgsH_76tuIMRQyV-dTZsXjAzlA' +
   'cmgQWpzU_qlULRuJQ_7TBj0_VLZjmmx6BEP3ojY-x1J96relc8geMJgEtslQIxq_H5COEBkEveegeGTLg';
+
+type SafetyNetJWTHeader = {
+  alg: 'string';
+  x5c: string[];
+};
+
+type SafetyNetJWTPayload = {
+  nonce: string;
+  timestampMs: number;
+  apkPackageName: string;
+  apkDigestSha256: string;
+  ctsProfileMatch: boolean;
+  apkCertificateDigestSha256: string[];
+  basicIntegrity: boolean;
+};
+
+type SafetyNetJWTSignature = string;

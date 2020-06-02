@@ -1,5 +1,7 @@
 import base64url from 'base64url';
-import { AttestationObject, VerifiedAttestation } from '@simplewebauthn/typescript-types';
+
+import type { AttestationObject } from '../../helpers/decodeAttestationObject';
+import type { VerifiedAttestation } from '../verifyAttestationResponse';
 
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';

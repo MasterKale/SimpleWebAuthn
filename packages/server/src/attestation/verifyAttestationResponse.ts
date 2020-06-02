@@ -1,10 +1,9 @@
-import decodeAttestationObject from '../helpers/decodeAttestationObject';
-import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import {
-  ATTESTATION_FORMATS,
   AttestationCredentialJSON,
-  VerifiedAttestation,
 } from '@simplewebauthn/typescript-types';
+
+import decodeAttestationObject, { ATTESTATION_FORMATS } from '../helpers/decodeAttestationObject';
+import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
@@ -69,3 +68,28 @@ export default function verifyAttestationResponse(
 
   throw new Error(`Unsupported Attestation Format: ${fmt}`);
 }
+
+/**
+ * Result of attestation verification
+ *
+ * @param verified If the assertion response could be verified
+ * @param userVerified Whether the user was uniquely identified during attestation
+ * @param authenticatorInfo.fmt Type of attestation
+ * @param authenticatorInfo.counter The number of times the authenticator reported it has been used.
+ * Should be kept in a DB for later reference to help prevent replay attacks
+ * @param authenticatorInfo.base64PublicKey Base64-encoded ArrayBuffer containing the
+ * authenticator's public key. **Should be kept in a DB for later reference!**
+ * @param authenticatorInfo.base64CredentialID Base64-encoded ArrayBuffer containing the
+ * authenticator's credential ID for the public key above. **Should be kept in a DB for later
+ * reference!**
+ */
+export type VerifiedAttestation = {
+  verified: boolean;
+  userVerified: boolean;
+  authenticatorInfo?: {
+    fmt: ATTESTATION_FORMATS;
+    counter: number;
+    base64PublicKey: string;
+    base64CredentialID: string;
+  };
+};

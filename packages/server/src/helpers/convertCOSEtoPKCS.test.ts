@@ -1,7 +1,6 @@
 import cbor from 'cbor';
-import { COSEKEYS } from '@simplewebauthn/typescript-types';
 
-import convertCOSEtoPKCS from './convertCOSEtoPKCS';
+import convertCOSEtoPKCS, { COSEKEYS } from './convertCOSEtoPKCS';
 
 test('should throw an error curve if, somehow, curve coordinate x is missing', () => {
   const mockCOSEKey = new Map<number, number | Buffer>();

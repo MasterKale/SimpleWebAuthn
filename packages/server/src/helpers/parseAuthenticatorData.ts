@@ -1,5 +1,3 @@
-import { ParsedAuthenticatorData } from '@simplewebauthn/typescript-types';
-
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
@@ -57,3 +55,20 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     COSEPublicKey,
   };
 }
+
+type ParsedAuthenticatorData = {
+  rpIdHash: Buffer;
+  flagsBuf: Buffer;
+  flags: {
+    up: boolean;
+    uv: boolean;
+    at: boolean;
+    ed: boolean;
+    flagsInt: number;
+  };
+  counter: number;
+  counterBuf: Buffer;
+  aaguid?: Buffer;
+  credentialID?: Buffer;
+  COSEPublicKey?: Buffer;
+};
