@@ -5,7 +5,7 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
-import toBase64String from '../helpers/toBase64String';
+import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
@@ -46,11 +46,11 @@ export default async function startAttestation(
   // Convert values to base64 to make it easier to send back to the server
   return {
     ...credential,
-    rawId: toBase64String(rawId),
+    rawId: bufferToBase64URLString(rawId),
     response: {
       ...response,
-      attestationObject: toBase64String(response.attestationObject),
-      clientDataJSON: toBase64String(response.clientDataJSON),
-    }
+      attestationObject: bufferToBase64URLString(response.attestationObject),
+      clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
+    },
   };
 }

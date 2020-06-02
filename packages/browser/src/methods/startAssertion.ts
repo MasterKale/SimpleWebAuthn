@@ -5,7 +5,7 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import toUint8Array from '../helpers/toUint8Array';
-import toBase64String from '../helpers/toBase64String';
+import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
@@ -41,18 +41,18 @@ export default async function startAssertion(
 
   let userHandle = undefined;
   if (response.userHandle) {
-    userHandle = toBase64String(response.userHandle);
+    userHandle = bufferToBase64URLString(response.userHandle);
   }
 
   // Convert values to base64 to make it easier to send back to the server
   return {
     ...credential,
-    rawId: toBase64String(rawId),
+    rawId: bufferToBase64URLString(rawId),
     response: {
       ...response,
-      authenticatorData: toBase64String(response.authenticatorData),
-      clientDataJSON: toBase64String(response.clientDataJSON),
-      signature: toBase64String(response.signature),
+      authenticatorData: bufferToBase64URLString(response.authenticatorData),
+      clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
+      signature: bufferToBase64URLString(response.signature),
       userHandle,
     },
   };
