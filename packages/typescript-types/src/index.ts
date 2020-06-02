@@ -11,7 +11,7 @@ export interface PublicKeyCredentialCreationOptionsJSON extends Omit<
 PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
 > {
   user: PublicKeyCredentialUserEntityJSON;
-  challenge: Base64String;
+  challenge: Base64URLString;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
 }
 
@@ -22,7 +22,7 @@ PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
 export interface PublicKeyCredentialRequestOptionsJSON extends Omit<
 PublicKeyCredentialRequestOptions, 'challenge' |'allowCredentials'
 > {
-  challenge: Base64String;
+  challenge: Base64URLString;
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
 }
 
@@ -30,14 +30,14 @@ export interface PublicKeyCredentialDescriptorJSON extends Omit<
 PublicKeyCredentialDescriptor, 'id'
 > {
   // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
-  id: Base64String;
+  id: Base64URLString;
 }
 
 export interface PublicKeyCredentialUserEntityJSON extends Omit <
 PublicKeyCredentialUserEntity, 'id'
 > {
   // Should be a Base64-encoded credential ID. Will be converted to a Uint8Array in the browser
-  id: Base64String;
+  id: Base64URLString;
 }
 
 /**
@@ -53,7 +53,7 @@ export interface AttestationCredential extends PublicKeyCredential {
  */
 export interface AttestationCredentialJSON
   extends Omit<AttestationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
-  rawId: Base64String;
+  rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
 }
 
@@ -70,14 +70,14 @@ export interface AssertionCredential extends PublicKeyCredential {
  */
 export interface AssertionCredentialJSON
   extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
-  rawId: Base64String;
+  rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
 }
 
 interface AuthenticatorAttestationResponseJSON
   extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
-  clientDataJSON: Base64String;
-  attestationObject: Base64String;
+  clientDataJSON: Base64URLString;
+  attestationObject: Base64URLString;
 }
 
 interface AuthenticatorAssertionResponseJSON
@@ -85,23 +85,23 @@ interface AuthenticatorAssertionResponseJSON
     AuthenticatorAssertionResponse,
     'authenticatorData' | 'clientDataJSON' | 'signature' | 'userHandle'
   > {
-  authenticatorData: Base64String;
-  clientDataJSON: Base64String;
-  signature: Base64String;
-  userHandle?: Base64String;
+  authenticatorData: Base64URLString;
+  clientDataJSON: Base64URLString;
+  signature: Base64URLString;
+  userHandle?: Base64URLString;
 }
 
 /**
  * A WebAuthn-compatible device and the information needed to verify assertions by it
  */
 export type AuthenticatorDevice = {
-  publicKey: Base64String;
-  credentialID: Base64String;
+  publicKey: Base64URLString;
+  credentialID: Base64URLString;
   // Number of times this device is expected to have been used
   counter: number;
 };
 
 /**
- * An attempt to communicate that this isn't just any string, but a base64-encoded string
+ * An attempt to communicate that this isn't just any string, but a base64url-encoded string
  */
-export type Base64String = string;
+export type Base64URLString = string;
