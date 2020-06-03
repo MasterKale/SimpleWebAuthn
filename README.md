@@ -22,6 +22,10 @@ An additional package is also included that contains shared TypeScript definitio
 
 See these packages' READMEs for more specific implementation information.
 
+**API Documentation**
+
+In-depth API documentation for all of the packages in this project is available here: https://docs.simplewebauthn.dev/
+
 ## Philosophy
 
 WebAuthn is a browser API that enables the use of physical, cryptographically-secure hardware "authenticators" to provide stronger replacements to passwords or 2FA.

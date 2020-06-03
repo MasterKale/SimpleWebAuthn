@@ -30,7 +30,7 @@ const SimpleWebAuthnServer = require('@simplewebauthn/server');
 
 Check out [the example's index.js](../../example/index.js) for a practical implementation of this library.
 
-Lower-level API documentation for the methods in this library is available [here](https://simplewebauthn.netlify.app/modules/_simplewebauthn_server.html).
+Lower-level API documentation for the methods in this library is available [here](https://docs.simplewebauthn.dev/modules/_simplewebauthn_server.html).
 
 
 ## Supported Attestation Formats

@@ -37,4 +37,4 @@ The library's methods will be available on the global `SimpleWebAuthnBrowser` ob
 
 Check out [the example's public/ folder](../../example/public/) for a practical implementation of this library.
 
-Lower-level API documentation for the methods in this library is available [here](https://simplewebauthn.netlify.app/modules/_simplewebauthn_browser.html).
+Lower-level API documentation for the methods in this library is available [here](https://docs.simplewebauthn.dev/modules/_simplewebauthn_browser.html).
