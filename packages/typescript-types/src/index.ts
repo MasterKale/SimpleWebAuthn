@@ -72,12 +72,20 @@ export interface AssertionCredentialJSON
   response: AuthenticatorAssertionResponseJSON;
 }
 
+/**
+ * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
+ * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ */
 export interface AuthenticatorAttestationResponseJSON
   extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
 }
 
+/**
+ * A slightly-modified AuthenticatorAssertionResponse to simplify working with ArrayBuffers that
+ * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ */
 export interface AuthenticatorAssertionResponseJSON
   extends Omit<
     AuthenticatorAssertionResponse,
