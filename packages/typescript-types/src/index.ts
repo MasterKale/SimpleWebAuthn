@@ -72,13 +72,13 @@ export interface AssertionCredentialJSON
   response: AuthenticatorAssertionResponseJSON;
 }
 
-interface AuthenticatorAttestationResponseJSON
+export interface AuthenticatorAttestationResponseJSON
   extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
 }
 
-interface AuthenticatorAssertionResponseJSON
+export interface AuthenticatorAssertionResponseJSON
   extends Omit<
     AuthenticatorAssertionResponse,
     'authenticatorData' | 'clientDataJSON' | 'signature' | 'userHandle'
