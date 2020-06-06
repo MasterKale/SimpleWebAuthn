@@ -47,9 +47,7 @@ test('should return authenticator info after verification', () => {
   );
 
   expect(verification.authenticatorInfo.counter).toEqual(144);
-  expect(verification.authenticatorInfo.base64CredentialID).toEqual(
-    authenticator.credentialID,
-  );
+  expect(verification.authenticatorInfo.base64CredentialID).toEqual(authenticator.credentialID);
 });
 
 test('should throw when response challenge is not expected value', () => {

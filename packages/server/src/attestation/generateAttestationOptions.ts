@@ -4,28 +4,23 @@ import type {
 } from '@simplewebauthn/typescript-types';
 
 type Options = {
-  serviceName: string,
-  rpID: string,
-  challenge: string,
-  userID: string,
-  userName: string,
-  userDisplayName?: string,
-  timeout?: number,
-  attestationType?: AttestationConveyancePreference,
-  excludedCredentialIDs?: Base64URLString[],
-  suggestedTransports?: AuthenticatorTransport[],
-  authenticatorSelection?: AuthenticatorSelectionCriteria,
-  extensions?: AuthenticationExtensionsClientInputs,
+  serviceName: string;
+  rpID: string;
+  challenge: string;
+  userID: string;
+  userName: string;
+  userDisplayName?: string;
+  timeout?: number;
+  attestationType?: AttestationConveyancePreference;
+  excludedCredentialIDs?: Base64URLString[];
+  suggestedTransports?: AuthenticatorTransport[];
+  authenticatorSelection?: AuthenticatorSelectionCriteria;
+  extensions?: AuthenticationExtensionsClientInputs;
 };
 
 // Supported crypto algo identifiers
 // See https://w3c.github.io/webauthn/#sctn-alg-identifier
-export const supportedCOSEAlgorithIdentifiers: COSEAlgorithmIdentifier[] = [
-  -7,
-  -35,
-  -36,
-  -8
-];
+export const supportedCOSEAlgorithIdentifiers: COSEAlgorithmIdentifier[] = [-7, -35, -36, -8];
 
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
@@ -82,7 +77,7 @@ export default function generateAttestationOptions(
     })),
     timeout,
     attestation: attestationType,
-    excludeCredentials: excludedCredentialIDs.map((id) => ({
+    excludeCredentials: excludedCredentialIDs.map(id => ({
       id,
       type: 'public-key',
       transports: suggestedTransports,
