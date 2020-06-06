@@ -13,8 +13,17 @@ import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 
+type Options = {
+  credential: AttestationCredentialJSON;
+  expectedChallenge: string;
+  expectedOrigin: string;
+  expectedRPID: string;
+};
+
 /**
  * Verify that the user has legitimately completed the registration process
+ *
+ * **Options:**
  *
  * @param response Authenticator attestation response with base64url-encoded values
  * @param expectedChallenge The random value provided to generateAttestationOptions for the
@@ -22,12 +31,8 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
  * @param expectedOrigin Expected URL of website attestation should have occurred on
  * @param expectedRPID Expect RP ID as it was specified in the attestation options
  */
-export default function verifyAttestationResponse(
-  credential: AttestationCredentialJSON,
-  expectedChallenge: string,
-  expectedOrigin: string,
-  expectedRPID: string,
-): VerifiedAttestation {
+export default function verifyAttestationResponse(options: Options): VerifiedAttestation {
+  const { credential, expectedChallenge, expectedOrigin, expectedRPID } = options;
   const { response } = credential;
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 

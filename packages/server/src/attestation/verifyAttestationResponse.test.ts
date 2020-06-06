@@ -17,12 +17,12 @@ afterEach(() => {
 });
 
 test('should verify FIDO U2F attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationFIDOU2F,
-    attestationFIDOU2FChallenge,
-    'https://dev.dontneeda.pw',
-    'dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationFIDOU2F,
+    expectedChallenge: attestationFIDOU2FChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('fido-u2f');
@@ -36,12 +36,12 @@ test('should verify FIDO U2F attestation', () => {
 });
 
 test('should verify Packed (EC2) attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationPacked,
-    attestationPackedChallenge,
-    'https://dev.dontneeda.pw',
-    'dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationPacked,
+    expectedChallenge: attestationPackedChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('packed');
@@ -56,12 +56,12 @@ test('should verify Packed (EC2) attestation', () => {
 });
 
 test('should verify Packed (X5C) attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationPackedX5C,
-    attestationPackedX5CChallenge,
-    'https://dev.dontneeda.pw',
-    'dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationPackedX5C,
+    expectedChallenge: attestationPackedX5CChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('packed');
@@ -75,12 +75,12 @@ test('should verify Packed (X5C) attestation', () => {
 });
 
 test('should verify None attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationNone,
-    attestationNoneChallenge,
-    'https://dev.dontneeda.pw',
-    'dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('none');
@@ -94,12 +94,12 @@ test('should verify None attestation', () => {
 });
 
 test('should verify Android SafetyNet attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationAndroidSafetyNet,
-    attestationAndroidSafetyNetChallenge,
-    'https://dev.dontneeda.pw',
-    'dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationAndroidSafetyNet,
+    expectedChallenge: attestationAndroidSafetyNetChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('android-safetynet');
@@ -114,23 +114,23 @@ test('should verify Android SafetyNet attestation', () => {
 
 test('should throw when response challenge is not expected value', () => {
   expect(() => {
-    verifyAttestationResponse(
-      attestationNone,
-      'shouldhavebeenthisvalue',
-      'https://dev.dontneeda.pw',
-      'dev.dontneeda.pw',
-    );
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: 'shouldhavebeenthisvalue',
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
   }).toThrow(/attestation challenge/i);
 });
 
 test('should throw when response origin is not expected value', () => {
   expect(() => {
-    verifyAttestationResponse(
-      attestationNone,
-      attestationNoneChallenge,
-      'https://different.address',
-      'dev.dontneeda.pw',
-    );
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://different.address',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
   }).toThrow(/attestation origin/i);
 });
 
@@ -146,7 +146,12 @@ test('should throw when attestation type is not webauthn.create', () => {
   });
 
   expect(() => {
-    verifyAttestationResponse(attestationNone, challenge, origin, 'dev.dontneeda.pw');
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: challenge,
+      expectedOrigin: origin,
+      expectedRPID: 'dev.dontneeda.pw',
+    });
   }).toThrow(/attestation type/i);
 });
 
@@ -159,12 +164,12 @@ test('should throw if an unexpected attestation format is specified', () => {
   });
 
   expect(() => {
-    verifyAttestationResponse(
-      attestationNone,
-      attestationNoneChallenge,
-      'https://dev.dontneeda.pw',
-      '',
-    );
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: '',
+    });
   }).toThrow();
 });
 
