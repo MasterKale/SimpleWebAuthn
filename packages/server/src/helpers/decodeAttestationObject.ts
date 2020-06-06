@@ -23,10 +23,12 @@ export enum ATTESTATION_FORMATS {
 
 export type AttestationObject = {
   fmt: ATTESTATION_FORMATS;
-  attStmt: {
-    sig?: Buffer;
-    x5c?: Buffer[];
-    response?: Buffer;
-  };
+  attStmt: AttestationStatement;
   authData: Buffer;
+};
+
+export type AttestationStatement = {
+  sig?: Buffer;
+  x5c?: Buffer[];
+  response?: Buffer;
 };
