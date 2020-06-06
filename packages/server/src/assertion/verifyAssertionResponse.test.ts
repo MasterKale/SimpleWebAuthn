@@ -2,6 +2,7 @@ import verifyAssertionResponse from './verifyAssertionResponse';
 
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import toHash from '../helpers/toHash';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -17,34 +18,25 @@ afterEach(() => {
 });
 
 test('should verify an assertion response', () => {
-  const verification = verifyAssertionResponse(
-    assertionResponse,
-    assertionChallenge,
-    assertionOrigin,
-    authenticator,
-  );
-
-  expect(verification.verified).toEqual(true);
-});
-
-test('should verify an assertion response if origin does not start with https', () => {
-  const verification = verifyAssertionResponse(
-    assertionResponse,
-    assertionChallenge,
-    'dev.dontneeda.pw',
-    authenticator,
-  );
+  const verification = verifyAssertionResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+  });
 
   expect(verification.verified).toEqual(true);
 });
 
 test('should return authenticator info after verification', () => {
-  const verification = verifyAssertionResponse(
-    assertionResponse,
-    assertionChallenge,
-    assertionOrigin,
-    authenticator,
-  );
+  const verification = verifyAssertionResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+  });
 
   expect(verification.authenticatorInfo.counter).toEqual(144);
   expect(verification.authenticatorInfo.base64CredentialID).toEqual(authenticator.credentialID);
@@ -52,23 +44,25 @@ test('should return authenticator info after verification', () => {
 
 test('should throw when response challenge is not expected value', () => {
   expect(() => {
-    verifyAssertionResponse(
-      assertionResponse,
-      'shouldhavebeenthisvalue',
-      'https://different.address',
-      authenticator,
-    );
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: 'shouldhavebeenthisvalue',
+      expectedOrigin: 'https://different.address',
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: authenticator,
+    });
   }).toThrow(/assertion challenge/i);
 });
 
 test('should throw when response origin is not expected value', () => {
   expect(() => {
-    verifyAssertionResponse(
-      assertionResponse,
-      assertionChallenge,
-      'https://different.address',
-      authenticator,
-    );
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: 'https://different.address',
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: authenticator,
+    });
   }).toThrow(/assertion origin/i);
 });
 
@@ -81,17 +75,30 @@ test('should throw when assertion type is not webauthn.create', () => {
   });
 
   expect(() => {
-    verifyAssertionResponse(assertionResponse, assertionChallenge, assertionOrigin, authenticator);
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: assertionOrigin,
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: authenticator,
+    });
   }).toThrow(/assertion type/i);
 });
 
 test('should throw error if user was not present', () => {
   mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: 0,
   });
 
   expect(() => {
-    verifyAssertionResponse(assertionResponse, assertionChallenge, assertionOrigin, authenticator);
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: assertionOrigin,
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: authenticator,
+    });
   }).toThrow(/not present/i);
 });
 
@@ -104,7 +111,13 @@ test('should throw error if previous counter value is not less than in response'
   };
 
   expect(() => {
-    verifyAssertionResponse(assertionResponse, assertionChallenge, assertionOrigin, badDevice);
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: assertionOrigin,
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: badDevice,
+    });
   }).toThrow(/counter value/i);
 });
 
