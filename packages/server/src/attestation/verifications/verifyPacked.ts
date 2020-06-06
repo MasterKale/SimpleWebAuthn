@@ -189,6 +189,7 @@ const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
   '-259': 'pkcs1-sha512',
 };
 
+// See https://w3c.github.io/webauthn/#sctn-alg-identifier
 const COSECRV: { [key: number]: string } = {
   // alg: -7
   1: 'p256',
