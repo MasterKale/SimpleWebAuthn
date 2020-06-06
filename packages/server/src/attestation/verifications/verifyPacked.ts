@@ -190,9 +190,14 @@ const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
 };
 
 const COSECRV: { [key: number]: string } = {
+  // alg: -7
   1: 'p256',
+  // alg: -35
   2: 'p384',
+  // alg: -36
   3: 'p521',
+  // alg: -8
+  6: 'ed25519',
 };
 
 const COSEALGHASH: { [key: string]: string } = {
