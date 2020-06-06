@@ -55,7 +55,7 @@ export default function verifyAttestationResponse(
   const { fmt, authData } = attestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { rpIdHash, flags, COSEPublicKey } = parsedAuthData;
+  const { rpIdHash, flags, credentialPublicKey } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
@@ -68,11 +68,11 @@ export default function verifyAttestationResponse(
     throw new Error('User not present during assertion');
   }
 
-  if (!COSEPublicKey) {
+  if (!credentialPublicKey) {
     throw new Error('No public key was provided by authenticator');
   }
 
-  const decodedPublicKey = decodeCredentialPublicKey(COSEPublicKey);
+  const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
   if (!alg) {
@@ -109,7 +109,7 @@ export default function verifyAttestationResponse(
       attestationObject,
       response.clientDataJSON,
       parsedAuthData,
-      COSEPublicKey,
+      credentialPublicKey,
     );
   }
 

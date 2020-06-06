@@ -16,16 +16,13 @@ export default function verifyAttestationAndroidSafetyNet(
   attestationObject: AttestationObject,
   base64ClientDataJSON: string,
   parsedAuthData: ParsedAuthenticatorData,
-  COSEPublicKey: Buffer,
+  credentialPublicKey: Buffer,
 ): VerifiedAttestation {
   const { attStmt, authData, fmt } = attestationObject;
   const { counter, credentialID, flags } = parsedAuthData;
 
   if (!credentialID) {
     throw new Error('No credential ID was provided by authenticator (SafetyNet)');
-  }
-  if (!COSEPublicKey) {
-    throw new Error('No public key was provided by authenticator (SafetyNet)');
   }
 
   if (!attStmt.response) {
@@ -109,7 +106,7 @@ export default function verifyAttestationAndroidSafetyNet(
   if (toReturn.verified) {
     toReturn.userVerified = flags.uv;
 
-    const publicKey = convertCOSEtoPKCS(COSEPublicKey);
+    const publicKey = convertCOSEtoPKCS(credentialPublicKey);
 
     toReturn.authenticatorInfo = {
       fmt,

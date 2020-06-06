@@ -1,5 +1,4 @@
 import base64url from 'base64url';
-import cbor from 'cbor';
 import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
 
@@ -9,12 +8,12 @@ import type { VerifiedAttestation } from '../verifyAttestationResponse';
 
 import convertCOSEtoPKCS, {
   COSEKEYS,
-  COSEPublicKey as COSEPublicKeyType
 } from '../../helpers/convertCOSEtoPKCS';
 import toHash from '../../helpers/toHash';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
+import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
 
 /**
  * Verify an attestation response with fmt 'packed'
@@ -26,9 +25,9 @@ export default function verifyAttestationPacked(
 ): VerifiedAttestation {
   const { fmt, authData, attStmt } = attestationObject;
   const { sig, x5c } = attStmt;
-  const { COSEPublicKey, counter, credentialID, flags } = parsedAuthData;
+  const { credentialPublicKey, counter, credentialID, flags } = parsedAuthData;
 
-  if (!COSEPublicKey) {
+  if (!credentialPublicKey) {
     throw new Error('No public key was provided by authenticator (Packed)');
   }
 
@@ -48,7 +47,7 @@ export default function verifyAttestationPacked(
     verified: false,
     userVerified: flags.uv,
   };
-  const publicKey = convertCOSEtoPKCS(COSEPublicKey);
+  const publicKey = convertCOSEtoPKCS(credentialPublicKey);
 
   if (x5c) {
     const leafCert = convertASN1toPEM(x5c[0]);
@@ -83,7 +82,7 @@ export default function verifyAttestationPacked(
 
     toReturn.verified = verifySignature(sig, signatureBase, leafCert);
   } else {
-    const cosePublicKey: COSEPublicKeyType = cbor.decodeAllSync(COSEPublicKey)[0];
+    const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
     const kty = cosePublicKey.get(COSEKEYS.kty);
     const alg = cosePublicKey.get(COSEKEYS.alg);
@@ -105,7 +104,7 @@ export default function verifyAttestationPacked(
         throw new Error('COSE public key was missing kty crv (Packed|EC2)');
       }
 
-      const pkcsPublicKey = convertCOSEtoPKCS(COSEPublicKey);
+      const pkcsPublicKey = convertCOSEtoPKCS(credentialPublicKey);
       const signatureBaseHash = toHash(signatureBase, hashAlg);
 
       /**

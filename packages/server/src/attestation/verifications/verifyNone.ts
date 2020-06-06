@@ -15,10 +15,10 @@ export default function verifyAttestationNone(
   attestationObject: AttestationObject,
   parsedAuthData: ParsedAuthenticatorData,
 ): VerifiedAttestation {
-  const { fmt, authData } = attestationObject;
-  const { credentialID, COSEPublicKey, counter, flags } = parsedAuthData;
+  const { fmt } = attestationObject;
+  const { credentialID, credentialPublicKey, counter, flags } = parsedAuthData;
 
-  if (!COSEPublicKey) {
+  if (!credentialPublicKey) {
     throw new Error('No public key was provided by authenticator (None)');
   }
 
@@ -26,7 +26,7 @@ export default function verifyAttestationNone(
     throw new Error('No credential ID was provided by authenticator (None)');
   }
 
-  const publicKey = convertCOSEtoPKCS(COSEPublicKey);
+  const publicKey = convertCOSEtoPKCS(credentialPublicKey);
 
   const toReturn: VerifiedAttestation = {
     verified: true,

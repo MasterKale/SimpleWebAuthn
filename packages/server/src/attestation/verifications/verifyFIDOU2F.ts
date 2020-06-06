@@ -18,9 +18,9 @@ export default function verifyAttestationFIDOU2F(
   parsedAuthData: ParsedAuthenticatorData,
 ): VerifiedAttestation {
   const { fmt, attStmt } = attestationObject;
-  const { flags, COSEPublicKey, rpIdHash, credentialID, counter } = parsedAuthData;
+  const { flags, credentialPublicKey, rpIdHash, credentialID, counter } = parsedAuthData;
 
-  if (!COSEPublicKey) {
+  if (!credentialPublicKey) {
     throw new Error('No public key was provided by authenticator (FIDOU2F)');
   }
 
@@ -30,7 +30,7 @@ export default function verifyAttestationFIDOU2F(
 
   const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
   const reservedByte = Buffer.from([0x00]);
-  const publicKey = convertCOSEtoPKCS(COSEPublicKey);
+  const publicKey = convertCOSEtoPKCS(credentialPublicKey);
 
   const signatureBase = Buffer.concat([
     reservedByte,
