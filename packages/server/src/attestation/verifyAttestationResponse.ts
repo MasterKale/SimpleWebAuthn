@@ -20,6 +20,7 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
  * @param expectedChallenge The random value provided to generateAttestationOptions for the
  * authenticator to sign
  * @param expectedOrigin Expected URL of website attestation should have occurred on
+ * @param expectedRPID Expect RP ID as it was specified in the attestation options
  */
 export default function verifyAttestationResponse(
   credential: AttestationCredentialJSON,
