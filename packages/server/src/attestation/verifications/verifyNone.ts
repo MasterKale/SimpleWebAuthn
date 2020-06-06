@@ -19,10 +19,6 @@ export default function verifyAttestationNone(
 
   const { credentialID, COSEPublicKey, counter, flags } = authDataStruct;
 
-  if (!flags.up) {
-    throw new Error('User was not present for attestation (None)');
-  }
-
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (None)');
   }

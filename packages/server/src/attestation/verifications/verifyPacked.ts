@@ -30,10 +30,6 @@ export default function verifyAttestationPacked(
 
   const { COSEPublicKey, counter, credentialID, flags } = authDataStruct;
 
-  if (!flags.up) {
-    throw new Error('User was not present for attestation (Packed)');
-  }
-
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (Packed)');
   }

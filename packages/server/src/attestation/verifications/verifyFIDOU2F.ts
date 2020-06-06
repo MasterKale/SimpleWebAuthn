@@ -21,10 +21,6 @@ export default function verifyAttestationFIDOU2F(
   const authDataStruct = parseAuthenticatorData(authData);
   const { flags, COSEPublicKey, rpIdHash, credentialID, counter } = authDataStruct;
 
-  if (!flags.up) {
-    throw new Error('User was NOT present during authentication (FIDOU2F)');
-  }
-
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (FIDOU2F)');
   }

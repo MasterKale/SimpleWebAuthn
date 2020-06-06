@@ -60,6 +60,11 @@ export default function verifyAttestationResponse(
     throw new Error(`Unexpected RP ID hash`);
   }
 
+  // Make sure someone was physically present
+  if (!flags.up) {
+    throw new Error('User not present during assertion');
+  }
+
 
   /**
    * Verification can only be performed when attestation = 'direct'

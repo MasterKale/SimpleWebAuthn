@@ -18,18 +18,13 @@ export default function verifyAttestationAndroidSafetyNet(
 ): VerifiedAttestation {
   const { attStmt, authData, fmt } = attestationObject;
   const authDataStruct = parseAuthenticatorData(authData);
-  const { counter, credentialID, COSEPublicKey, flags } = authDataStruct;
-
-  if (!flags.up) {
-    throw new Error('User was not present for attestation (None)');
-  }
-
-  if (!COSEPublicKey) {
-    throw new Error('No public key was provided by authenticator (SafetyNet)');
-  }
+  const { counter, credentialID, flags } = authDataStruct;
 
   if (!credentialID) {
     throw new Error('No credential ID was provided by authenticator (SafetyNet)');
+  }
+  if (!COSEPublicKey) {
+    throw new Error('No public key was provided by authenticator (SafetyNet)');
   }
 
   if (!attStmt.response) {
