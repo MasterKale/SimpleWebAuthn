@@ -4,6 +4,8 @@ import {
 
 import decodeAttestationObject, { ATTESTATION_FORMATS } from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import toHash from '../helpers/toHash';
 
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
@@ -22,9 +24,9 @@ export default function verifyAttestationResponse(
   credential: AttestationCredentialJSON,
   expectedChallenge: string,
   expectedOrigin: string,
+  expectedRPID: string,
 ): VerifiedAttestation {
   const { response } = credential;
-  const attestationObject = decodeAttestationObject(response.attestationObject);
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
   const { type, origin, challenge } = clientDataJSON;
@@ -34,6 +36,7 @@ export default function verifyAttestationResponse(
     throw new Error(`Unexpected attestation type: ${type}`);
   }
 
+  // Ensure the device provided the challenge we gave it
   if (challenge !== expectedChallenge) {
     throw new Error(
       `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
@@ -45,7 +48,18 @@ export default function verifyAttestationResponse(
     throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
   }
 
-  const { fmt } = attestationObject;
+  const attestationObject = decodeAttestationObject(response.attestationObject);
+  const { fmt, authData, attStmt } = attestationObject;
+
+  const parsedAuthData = parseAuthenticatorData(authData);
+  const { rpIdHash, flags, COSEPublicKey } = parsedAuthData;
+
+  // Make sure the response's RP ID is ours
+  const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+  if (!rpIdHash.equals(expectedRPIDHash)) {
+    throw new Error(`Unexpected RP ID hash`);
+  }
+
 
   /**
    * Verification can only be performed when attestation = 'direct'
