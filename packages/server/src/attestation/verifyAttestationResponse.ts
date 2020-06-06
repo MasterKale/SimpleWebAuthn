@@ -6,7 +6,10 @@ import decodeAttestationObject, { ATTESTATION_FORMATS } from '../helpers/decodeA
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
+import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 
+import { supportedCOSEAlgorithIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyNone from './verifications/verifyNone';
@@ -65,6 +68,22 @@ export default function verifyAttestationResponse(
     throw new Error('User not present during assertion');
   }
 
+  if (!COSEPublicKey) {
+    throw new Error('No public key was provided by authenticator');
+  }
+
+  const decodedPublicKey = decodeCredentialPublicKey(COSEPublicKey);
+  const alg = decodedPublicKey.get(COSEKEYS.alg);
+
+  if (!alg) {
+    throw new Error('Credential public key was missing alg');
+  }
+
+  // Make sure the key algorithm is one we specified within the attestation options
+  if (!supportedCOSEAlgorithIdentifiers.includes(alg as number)) {
+    const supported = supportedCOSEAlgorithIdentifiers.join(', ');
+    throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
+  }
 
   /**
    * Verification can only be performed when attestation = 'direct'
