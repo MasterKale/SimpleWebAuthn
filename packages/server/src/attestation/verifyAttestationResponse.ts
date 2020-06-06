@@ -29,6 +29,11 @@ export default function verifyAttestationResponse(
 
   const { type, origin, challenge } = clientDataJSON;
 
+  // Make sure we're handling an attestation
+  if (type !== 'webauthn.create') {
+    throw new Error(`Unexpected attestation type: ${type}`);
+  }
+
   if (challenge !== expectedChallenge) {
     throw new Error(
       `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
@@ -38,11 +43,6 @@ export default function verifyAttestationResponse(
   // Check that the origin is our site
   if (origin !== expectedOrigin) {
     throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
-  }
-
-  // Make sure we're handling an attestation
-  if (type !== 'webauthn.create') {
-    throw new Error(`Unexpected attestation type: ${type}`);
   }
 
   const { fmt } = attestationObject;
