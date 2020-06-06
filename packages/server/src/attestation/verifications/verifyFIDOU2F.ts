@@ -1,13 +1,13 @@
 import base64url from 'base64url';
 
 import type { AttestationObject } from '../../helpers/decodeAttestationObject';
+import type { ParsedAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import type { VerifiedAttestation } from '../verifyAttestationResponse';
 
 import toHash from '../../helpers/toHash';
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import verifySignature from '../../helpers/verifySignature';
-import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
@@ -15,11 +15,10 @@ import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 export default function verifyAttestationFIDOU2F(
   attestationObject: AttestationObject,
   base64ClientDataJSON: string,
+  parsedAuthData: ParsedAuthenticatorData,
 ): VerifiedAttestation {
-  const { fmt, authData, attStmt } = attestationObject;
-
-  const authDataStruct = parseAuthenticatorData(authData);
-  const { flags, COSEPublicKey, rpIdHash, credentialID, counter } = authDataStruct;
+  const { fmt, attStmt } = attestationObject;
+  const { flags, COSEPublicKey, rpIdHash, credentialID, counter } = parsedAuthData;
 
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (FIDOU2F)');

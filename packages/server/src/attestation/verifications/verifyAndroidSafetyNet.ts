@@ -1,13 +1,13 @@
 import base64url from 'base64url';
 
 import type { AttestationObject } from '../../helpers/decodeAttestationObject';
+import type { ParsedAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import type { VerifiedAttestation } from '../verifyAttestationResponse';
 
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
-import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
@@ -15,10 +15,11 @@ import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 export default function verifyAttestationAndroidSafetyNet(
   attestationObject: AttestationObject,
   base64ClientDataJSON: string,
+  parsedAuthData: ParsedAuthenticatorData,
+  COSEPublicKey: Buffer,
 ): VerifiedAttestation {
   const { attStmt, authData, fmt } = attestationObject;
-  const authDataStruct = parseAuthenticatorData(authData);
-  const { counter, credentialID, flags } = authDataStruct;
+  const { counter, credentialID, flags } = parsedAuthData;
 
   if (!credentialID) {
     throw new Error('No credential ID was provided by authenticator (SafetyNet)');

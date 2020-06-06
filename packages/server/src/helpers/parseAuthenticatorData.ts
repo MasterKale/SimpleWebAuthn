@@ -56,7 +56,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
   };
 }
 
-type ParsedAuthenticatorData = {
+export type ParsedAuthenticatorData = {
   rpIdHash: Buffer;
   flagsBuf: Buffer;
   flags: {

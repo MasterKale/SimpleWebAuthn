@@ -52,7 +52,7 @@ export default function verifyAttestationResponse(
   }
 
   const attestationObject = decodeAttestationObject(response.attestationObject);
-  const { fmt, authData, attStmt } = attestationObject;
+  const { fmt, authData } = attestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
   const { rpIdHash, flags, COSEPublicKey } = parsedAuthData;
@@ -89,19 +89,35 @@ export default function verifyAttestationResponse(
    * Verification can only be performed when attestation = 'direct'
    */
   if (fmt === ATTESTATION_FORMATS.FIDO_U2F) {
-    return verifyFIDOU2F(attestationObject, response.clientDataJSON);
+    return verifyFIDOU2F(
+      attestationObject,
+      response.clientDataJSON,
+      parsedAuthData,
+    );
   }
 
   if (fmt === ATTESTATION_FORMATS.PACKED) {
-    return verifyPacked(attestationObject, response.clientDataJSON);
+    return verifyPacked(
+      attestationObject,
+      response.clientDataJSON,
+      parsedAuthData,
+    );
   }
 
   if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
-    return verifyAndroidSafetynet(attestationObject, response.clientDataJSON);
+    return verifyAndroidSafetynet(
+      attestationObject,
+      response.clientDataJSON,
+      parsedAuthData,
+      COSEPublicKey,
+    );
   }
 
   if (fmt === ATTESTATION_FORMATS.NONE) {
-    return verifyNone(attestationObject);
+    return verifyNone(
+      attestationObject,
+      parsedAuthData,
+    );
   }
 
   throw new Error(`Unsupported Attestation Format: ${fmt}`);

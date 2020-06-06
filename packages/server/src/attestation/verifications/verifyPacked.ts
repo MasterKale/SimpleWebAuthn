@@ -4,6 +4,7 @@ import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
 
 import type { AttestationObject } from '../../helpers/decodeAttestationObject';
+import type { ParsedAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import type { VerifiedAttestation } from '../verifyAttestationResponse';
 
 import convertCOSEtoPKCS, {
@@ -14,7 +15,6 @@ import toHash from '../../helpers/toHash';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
-import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'packed'
@@ -22,13 +22,11 @@ import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 export default function verifyAttestationPacked(
   attestationObject: AttestationObject,
   base64ClientDataJSON: string,
+  parsedAuthData: ParsedAuthenticatorData,
 ): VerifiedAttestation {
   const { fmt, authData, attStmt } = attestationObject;
   const { sig, x5c } = attStmt;
-
-  const authDataStruct = parseAuthenticatorData(authData);
-
-  const { COSEPublicKey, counter, credentialID, flags } = authDataStruct;
+  const { COSEPublicKey, counter, credentialID, flags } = parsedAuthData;
 
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (Packed)');

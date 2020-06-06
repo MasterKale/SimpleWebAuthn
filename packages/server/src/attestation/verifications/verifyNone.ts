@@ -1,10 +1,10 @@
 import base64url from 'base64url';
 
 import type { AttestationObject } from '../../helpers/decodeAttestationObject';
+import type { ParsedAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import type { VerifiedAttestation } from '../verifyAttestationResponse';
 
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
-import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 
 /**
  * Verify an attestation response with fmt 'none'
@@ -13,11 +13,10 @@ import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
  */
 export default function verifyAttestationNone(
   attestationObject: AttestationObject,
+  parsedAuthData: ParsedAuthenticatorData,
 ): VerifiedAttestation {
   const { fmt, authData } = attestationObject;
-  const authDataStruct = parseAuthenticatorData(authData);
-
-  const { credentialID, COSEPublicKey, counter, flags } = authDataStruct;
+  const { credentialID, COSEPublicKey, counter, flags } = parsedAuthData;
 
   if (!COSEPublicKey) {
     throw new Error('No public key was provided by authenticator (None)');
