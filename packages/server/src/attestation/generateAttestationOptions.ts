@@ -20,7 +20,7 @@ type Options = {
 
 // Supported crypto algo identifiers
 // See https://w3c.github.io/webauthn/#sctn-alg-identifier
-const supportedCOSEAlgorithIdentifiers = [
+export const supportedCOSEAlgorithIdentifiers: COSEAlgorithmIdentifier[] = [
   -7,
   -35,
   -36,
