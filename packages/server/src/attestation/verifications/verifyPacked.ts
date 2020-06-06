@@ -1,53 +1,38 @@
-import base64url from 'base64url';
 import elliptic from 'elliptic';
 import NodeRSA, { SigningSchemeHash } from 'node-rsa';
 
-import type { AttestationObject } from '../../helpers/decodeAttestationObject';
-import type { ParsedAuthenticatorData } from '../../helpers/parseAuthenticatorData';
-import type { VerifiedAttestation } from '../verifyAttestationResponse';
+import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 
-import convertCOSEtoPKCS, {
-  COSEKEYS,
-} from '../../helpers/convertCOSEtoPKCS';
+import convertCOSEtoPKCS, { COSEKEYS } from '../../helpers/convertCOSEtoPKCS';
 import toHash from '../../helpers/toHash';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
 import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
 
+type Options = {
+  attStmt: AttestationStatement;
+  clientDataHash: Buffer;
+  authData: Buffer;
+  credentialPublicKey: Buffer;
+};
+
 /**
  * Verify an attestation response with fmt 'packed'
  */
-export default function verifyAttestationPacked(
-  attestationObject: AttestationObject,
-  base64ClientDataJSON: string,
-  parsedAuthData: ParsedAuthenticatorData,
-): VerifiedAttestation {
-  const { fmt, authData, attStmt } = attestationObject;
+export default function verifyAttestationPacked(options: Options): boolean {
+  const { attStmt, clientDataHash, authData, credentialPublicKey } = options;
+
   const { sig, x5c } = attStmt;
-  const { credentialPublicKey, counter, credentialID, flags } = parsedAuthData;
-
-  if (!credentialPublicKey) {
-    throw new Error('No public key was provided by authenticator (Packed)');
-  }
-
-  if (!credentialID) {
-    throw new Error('No credential ID was provided by authenticator (Packed)');
-  }
 
   if (!sig) {
     throw new Error('No attestation signature provided in attestation statement (Packed)');
   }
 
-  const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
-
   const signatureBase = Buffer.concat([authData, clientDataHash]);
 
-  const toReturn: VerifiedAttestation = {
-    verified: false,
-    userVerified: flags.uv,
-  };
-  const publicKey = convertCOSEtoPKCS(credentialPublicKey);
+  let verified = false;
+  const pkcsPublicKey = convertCOSEtoPKCS(credentialPublicKey);
 
   if (x5c) {
     const leafCert = convertASN1toPEM(x5c[0]);
@@ -80,7 +65,7 @@ export default function verifyAttestationPacked(
       throw new Error('Batch certificate version was not `3` (ASN.1 value of 2) (Packed|Full');
     }
 
-    toReturn.verified = verifySignature(sig, signatureBase, leafCert);
+    verified = verifySignature(sig, signatureBase, leafCert);
   } else {
     const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
@@ -104,7 +89,6 @@ export default function verifyAttestationPacked(
         throw new Error('COSE public key was missing kty crv (Packed|EC2)');
       }
 
-      const pkcsPublicKey = convertCOSEtoPKCS(credentialPublicKey);
       const signatureBaseHash = toHash(signatureBase, hashAlg);
 
       /**
@@ -119,7 +103,7 @@ export default function verifyAttestationPacked(
       const ec = new elliptic.ec(COSECRV[crv as number]);
       const key = ec.keyFromPublic(pkcsPublicKey);
 
-      toReturn.verified = key.verify(signatureBaseHash, sig);
+      verified = key.verify(signatureBaseHash, sig);
     } else if (kty === COSEKTY.RSA) {
       const n = cosePublicKey.get(COSEKEYS.n);
 
@@ -140,7 +124,7 @@ export default function verifyAttestationPacked(
         'components-public',
       );
 
-      toReturn.verified = key.verify(signatureBase, sig);
+      verified = key.verify(signatureBase, sig);
     } else if (kty === COSEKTY.OKP) {
       const x = cosePublicKey.get(COSEKEYS.x);
 
@@ -154,20 +138,11 @@ export default function verifyAttestationPacked(
       key.keyFromPublic(x as Buffer);
 
       // TODO: is `publicKey` right here?
-      toReturn.verified = key.verify(signatureBaseHash, sig, publicKey);
+      verified = key.verify(signatureBaseHash, sig, pkcsPublicKey);
     }
   }
 
-  if (toReturn.verified) {
-    toReturn.authenticatorInfo = {
-      fmt,
-      counter,
-      base64PublicKey: base64url.encode(publicKey),
-      base64CredentialID: base64url.encode(credentialID),
-    };
-  }
-
-  return toReturn;
+  return verified;
 }
 
 enum COSEKTY {

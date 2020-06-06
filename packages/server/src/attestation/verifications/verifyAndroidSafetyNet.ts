@@ -1,29 +1,22 @@
 import base64url from 'base64url';
 
-import type { AttestationObject } from '../../helpers/decodeAttestationObject';
-import type { ParsedAuthenticatorData } from '../../helpers/parseAuthenticatorData';
-import type { VerifiedAttestation } from '../verifyAttestationResponse';
+import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
-import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
+
+type Options = {
+  attStmt: AttestationStatement;
+  clientDataHash: Buffer;
+  authData: Buffer;
+};
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
-export default function verifyAttestationAndroidSafetyNet(
-  attestationObject: AttestationObject,
-  base64ClientDataJSON: string,
-  parsedAuthData: ParsedAuthenticatorData,
-  credentialPublicKey: Buffer,
-): VerifiedAttestation {
-  const { attStmt, authData, fmt } = attestationObject;
-  const { counter, credentialID, flags } = parsedAuthData;
-
-  if (!credentialID) {
-    throw new Error('No credential ID was provided by authenticator (SafetyNet)');
-  }
+export default function verifyAttestationAndroidSafetyNet(options: Options): boolean {
+  const { attStmt, clientDataHash, authData } = options;
 
   if (!attStmt.response) {
     throw new Error('No response was included in attStmt by authenticator (SafetyNet)');
@@ -41,7 +34,6 @@ export default function verifyAttestationAndroidSafetyNet(
    * START Verify PAYLOAD
    */
   const { nonce, ctsProfileMatch } = PAYLOAD;
-  const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
 
   const nonceBase = Buffer.concat([authData, clientDataHash]);
   const nonceBuffer = toHash(nonceBase);
@@ -95,28 +87,12 @@ export default function verifyAttestationAndroidSafetyNet(
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const toReturn: VerifiedAttestation = {
-    verified: verifySignature(signatureBuffer, signatureBaseBuffer, certificate),
-    userVerified: false,
-  };
+  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, certificate);
   /**
    * END Verify Signature
    */
 
-  if (toReturn.verified) {
-    toReturn.userVerified = flags.uv;
-
-    const publicKey = convertCOSEtoPKCS(credentialPublicKey);
-
-    toReturn.authenticatorInfo = {
-      fmt,
-      counter,
-      base64PublicKey: base64url.encode(publicKey),
-      base64CredentialID: base64url.encode(credentialID),
-    };
-  }
-
-  return toReturn;
+  return verified;
 }
 
 /**
