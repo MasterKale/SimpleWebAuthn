@@ -1,10 +1,10 @@
-import asciiToBinary from './asciiToBinary';
+import base64url from 'base64url';
 
 /**
  * Decode an authenticator's base64-encoded clientDataJSON to JSON
  */
 export default function decodeClientDataJSON(data: string): ClientDataJSON {
-  const toString = asciiToBinary(data);
+  const toString = base64url.decode(data);
   const clientData: ClientDataJSON = JSON.parse(toString);
 
   // `challenge` will be Base64-encoded here. Decode it for easier comparisons with what is provided
