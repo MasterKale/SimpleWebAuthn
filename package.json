@@ -4,7 +4,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap --scope=@simplewebauthn/typescript-types && lerna bootstrap --scope=@simplewebauthn/browser --scope=@simplewebauthn/server",
     "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/",
-    "docs": "npm run bootstrap && typedoc --tsconfig tsconfig.json"
+    "docs": "npm run bootstrap && typedoc --tsconfig tsconfig.json",
+    "test": "lerna run test"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",
