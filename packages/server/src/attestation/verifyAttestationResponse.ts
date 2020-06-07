@@ -26,7 +26,7 @@ type Options = {
  *
  * **Options:**
  *
- * @param response Authenticator attestation response with base64url-encoded values
+ * @param credential Authenticator credential returned by browser's `startAttestation()`
  * @param expectedChallenge The random value provided to generateAttestationOptions for the
  * authenticator to sign
  * @param expectedOrigin Website URL that the attestation should have occurred on
