@@ -121,6 +121,18 @@ test('should throw error if previous counter value is not less than in response'
   }).toThrow(/counter value/i);
 });
 
+test('should not compare counters if both are 0', () => {
+  const verification = verifyAssertionResponse({
+    credential: assertionFirstTimeUsedResponse,
+    expectedChallenge: assertionFirstTimeUsedChallenge,
+    expectedOrigin: assertionFirstTimeUsedOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticatorFirstTimeUsed,
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
 const assertionResponse = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   rawId: '',
@@ -145,5 +157,30 @@ const authenticator = {
     'BIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A18WGeA6hPmnab0HAViUYVRkwTNcN77QBf_' + 'RR0dv3lIvQ',
   credentialID:
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' + 'g6jo_o0hYiew',
+  counter: 0,
+};
+
+/**
+ * Represented a device that's being used on the website for the first time
+ */
+const assertionFirstTimeUsedResponse = {
+  id: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
+  rawId: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
+  response: {
+    authenticatorData: 'PdxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KABAAAAAA',
+    clientDataJSON:
+      'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sQmMzTmxjblJwYjI0IiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmdldCJ9',
+    signature:
+      'MEQCIBu6M-DGzu1O8iocGHEj0UaAZm0HmxTeRIE6-nS3_CPjAiBDsmIzy5sacYwwzgpXqfwRt_2vl5yiQZ_OAqWJQBGVsQ',
+  },
+  type: 'public-key',
+};
+const assertionFirstTimeUsedChallenge = 'totallyUniqueValueEveryAssertion';
+const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
+const authenticatorFirstTimeUsed = {
+  publicKey:
+    'BGmaxR4mBbukc2QhtW2ldhAAd555r-ljlGQN8MbcTnPP9CyUlE-0AB2fbzZbNgBvJuRa7r6o2jPphOmtyNPR_kY',
+  credentialID:
+    'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   counter: 0,
 };
