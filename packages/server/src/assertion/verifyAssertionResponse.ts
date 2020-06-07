@@ -60,8 +60,9 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
   }
 
-  const parsedAuthData = parseAuthenticatorData(base64url.toBuffer(response.authenticatorData));
-  const { rpIdHash, flags, counter, flagsBuf, counterBuf } = parsedAuthData;
+  const authDataBuffer = base64url.toBuffer(response.authenticatorData);
+  const parsedAuthData = parseAuthenticatorData(authDataBuffer);
+  const { rpIdHash, flags, counter } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
@@ -80,7 +81,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const signatureBase = Buffer.concat([rpIdHash, flagsBuf, counterBuf, clientDataHash]);
+  const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
 
   const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.publicKey));
   const signature = base64url.toBuffer(response.signature);
