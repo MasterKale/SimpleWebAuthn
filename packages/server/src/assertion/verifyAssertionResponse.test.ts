@@ -174,7 +174,7 @@ const authenticator = {
     'BIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A18WGeA6hPmnab0HAViUYVRkwTNcN77QBf_' + 'RR0dv3lIvQ',
   credentialID:
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Px' + 'g6jo_o0hYiew',
-  counter: 0,
+  counter: 143,
 };
 
 /**
