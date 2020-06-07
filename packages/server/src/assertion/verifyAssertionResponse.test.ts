@@ -121,6 +121,23 @@ test('should throw error if previous counter value is not less than in response'
   }).toThrow(/counter value/i);
 });
 
+test('should throw error if assertion RP ID is unexpected value', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
+    flags: 0,
+  });
+
+  expect(() => {
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: assertionOrigin,
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: authenticator,
+    });
+  }).toThrow(/rp id/i);
+});
+
 test('should not compare counters if both are 0', () => {
   const verification = verifyAssertionResponse({
     credential: assertionFirstTimeUsedResponse,
