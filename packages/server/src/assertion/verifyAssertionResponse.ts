@@ -1,8 +1,5 @@
 import base64url from 'base64url';
-import {
-  AssertionCredentialJSON,
-  AuthenticatorDevice,
-} from '@simplewebauthn/typescript-types';
+import { AssertionCredentialJSON, AuthenticatorDevice } from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import toHash from '../helpers/toHash';
@@ -10,27 +7,46 @@ import convertASN1toPEM from '../helpers/convertASN1toPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 
+type Options = {
+  credential: AssertionCredentialJSON;
+  expectedChallenge: string;
+  expectedOrigin: string;
+  expectedRPID: string;
+  authenticator: AuthenticatorDevice;
+  requireUserVerification?: boolean;
+};
+
 /**
  * Verify that the user has legitimately completed the login process
  *
- * @param response Authenticator assertion response with base64url-encoded values
+ * **Options:**
+ *
+ * @param credential Authenticator credential returned by browser's `startAssertion()`
  * @param expectedChallenge The random value provided to generateAssertionOptions for the
  * authenticator to sign
- * @param expectedOrigin Expected URL of website assertion should have occurred on
+ * @param expectedOrigin Website URL that the attestation should have occurred on
+ * @param expectedRPID RP ID that was specified in the attestation options
+ * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
+ * @param requireUserVerification (Optional) Enforce user verification by the authenticator
+ * (via PIN, fingerprint, etc...)
  */
-export default function verifyAssertionResponse(
-  credential: AssertionCredentialJSON,
-  expectedChallenge: string,
-  expectedOrigin: string,
-  authenticator: AuthenticatorDevice,
-): VerifiedAssertion {
+export default function verifyAssertionResponse(options: Options): VerifiedAssertion {
+  const {
+    credential,
+    expectedChallenge,
+    expectedOrigin,
+    expectedRPID,
+    authenticator,
+    requireUserVerification = false,
+  } = options;
   const { response } = credential;
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
   const { type, origin, challenge } = clientDataJSON;
 
-  if (!expectedOrigin.startsWith('https://')) {
-    expectedOrigin = `https://${expectedOrigin}`;
+  // Make sure we're handling an assertion
+  if (type !== 'webauthn.get') {
+    throw new Error(`Unexpected assertion type: ${type}`);
   }
 
   if (challenge !== expectedChallenge) {
@@ -44,20 +60,33 @@ export default function verifyAssertionResponse(
     throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
   }
 
-  // Make sure we're handling an assertion
-  if (type !== 'webauthn.get') {
-    throw new Error(`Unexpected assertion type: ${type}`);
+  const authDataBuffer = base64url.toBuffer(response.authenticatorData);
+  const parsedAuthData = parseAuthenticatorData(authDataBuffer);
+  const { rpIdHash, flags, counter } = parsedAuthData;
+
+  // Make sure the response's RP ID is ours
+  const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+  if (!rpIdHash.equals(expectedRPIDHash)) {
+    throw new Error(`Unexpected RP ID hash`);
   }
 
-  const authDataBuffer = base64url.toBuffer(response.authenticatorData);
-  const authDataStruct = parseAuthenticatorData(authDataBuffer);
-  const { flags, counter } = authDataStruct;
-
+  // Make sure someone was physically present
   if (!flags.up) {
     throw new Error('User not present during assertion');
   }
 
-  if (counter <= authenticator.counter) {
+  // Enforce user verification if specified
+  if (requireUserVerification && !flags.uv) {
+    throw new Error('User verification required, but user could not be verified');
+  }
+
+  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
+  const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
+
+  const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.publicKey));
+  const signature = base64url.toBuffer(response.signature);
+
+  if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
     // Error out when the counter in the DB is greater than or equal to the counter in the
     // dataStruct. It's related to how the authenticator maintains the number of times its been
     // used for this client. If this happens, then someone's somehow increased the counter
@@ -66,14 +95,6 @@ export default function verifyAssertionResponse(
       `Response counter value ${counter} was lower than expected ${authenticator.counter}`,
     );
   }
-
-  const { rpIdHash, flagsBuf, counterBuf } = authDataStruct;
-
-  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const signatureBase = Buffer.concat([rpIdHash, flagsBuf, counterBuf, clientDataHash]);
-
-  const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.publicKey));
-  const signature = base64url.toBuffer(response.signature);
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),

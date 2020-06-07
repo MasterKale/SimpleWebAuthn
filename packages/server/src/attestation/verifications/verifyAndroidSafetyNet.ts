@@ -1,36 +1,22 @@
 import base64url from 'base64url';
 
-import type { AttestationObject } from '../../helpers/decodeAttestationObject';
-import type { VerifiedAttestation } from '../verifyAttestationResponse';
+import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
-import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
-import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
+
+type Options = {
+  attStmt: AttestationStatement;
+  clientDataHash: Buffer;
+  authData: Buffer;
+};
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
-export default function verifyAttestationAndroidSafetyNet(
-  attestationObject: AttestationObject,
-  base64ClientDataJSON: string,
-): VerifiedAttestation {
-  const { attStmt, authData, fmt } = attestationObject;
-  const authDataStruct = parseAuthenticatorData(authData);
-  const { counter, credentialID, COSEPublicKey, flags } = authDataStruct;
-
-  if (!flags.up) {
-    throw new Error('User was not present for attestation (None)');
-  }
-
-  if (!COSEPublicKey) {
-    throw new Error('No public key was provided by authenticator (SafetyNet)');
-  }
-
-  if (!credentialID) {
-    throw new Error('No credential ID was provided by authenticator (SafetyNet)');
-  }
+export default function verifyAttestationAndroidSafetyNet(options: Options): boolean {
+  const { attStmt, clientDataHash, authData } = options;
 
   if (!attStmt.response) {
     throw new Error('No response was included in attStmt by authenticator (SafetyNet)');
@@ -48,7 +34,6 @@ export default function verifyAttestationAndroidSafetyNet(
    * START Verify PAYLOAD
    */
   const { nonce, ctsProfileMatch } = PAYLOAD;
-  const clientDataHash = toHash(base64url.toBuffer(base64ClientDataJSON));
 
   const nonceBase = Buffer.concat([authData, clientDataHash]);
   const nonceBuffer = toHash(nonceBase);
@@ -102,28 +87,12 @@ export default function verifyAttestationAndroidSafetyNet(
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const toReturn: VerifiedAttestation = {
-    verified: verifySignature(signatureBuffer, signatureBaseBuffer, certificate),
-    userVerified: false,
-  };
+  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, certificate);
   /**
    * END Verify Signature
    */
 
-  if (toReturn.verified) {
-    toReturn.userVerified = flags.uv;
-
-    const publicKey = convertCOSEtoPKCS(COSEPublicKey);
-
-    toReturn.authenticatorInfo = {
-      fmt,
-      counter,
-      base64PublicKey: base64url.encode(publicKey),
-      base64CredentialID: base64url.encode(credentialID),
-    };
-  }
-
-  return toReturn;
+  return verified;
 }
 
 /**

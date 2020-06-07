@@ -35,6 +35,18 @@ test('should generate credential request options suitable for sending via JSON',
         alg: -7,
         type: 'public-key',
       },
+      {
+        alg: -35,
+        type: 'public-key',
+      },
+      {
+        alg: -36,
+        type: 'public-key',
+      },
+      {
+        alg: -8,
+        type: 'public-key',
+      },
     ],
     timeout,
     attestation: attestationType,
@@ -52,11 +64,13 @@ test('should map excluded credential IDs if specified', () => {
     excludedCredentialIDs: ['someIDhere'],
   });
 
-  expect(options.excludeCredentials).toEqual([{
-    id: 'someIDhere',
-    type: 'public-key',
-    transports: ['usb', 'ble', 'nfc', 'internal'],
-  }]);
+  expect(options.excludeCredentials).toEqual([
+    {
+      id: 'someIDhere',
+      type: 'public-key',
+      transports: ['usb', 'ble', 'nfc', 'internal'],
+    },
+  ]);
 });
 
 test('defaults to 60 seconds if no timeout is specified', () => {

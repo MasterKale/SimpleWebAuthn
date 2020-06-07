@@ -1,6 +1,6 @@
 import decodeClientDataJSON from './decodeClientDataJSON';
 
-test('should convert base64-encoded attestation clientDataJSON to JSON', () => {
+test('should convert base64url-encoded attestation clientDataJSON to JSON', () => {
   expect(
     decodeClientDataJSON(
       'eyJjaGFsbGVuZ2UiOiJVMmQ0TjNZME0wOU1jbGRQYjFSNVpFeG5UbG95IiwiY2xpZW50RXh0ZW5zaW9ucyI6e30' +

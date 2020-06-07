@@ -1,34 +1,58 @@
-import {
-  AttestationCredentialJSON,
-} from '@simplewebauthn/typescript-types';
+import base64url from 'base64url';
+import { AttestationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 import decodeAttestationObject, { ATTESTATION_FORMATS } from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import toHash from '../helpers/toHash';
+import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import convertCOSEtoPKCS, { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 
+import { supportedCOSEAlgorithIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
-import verifyNone from './verifications/verifyNone';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
+
+type Options = {
+  credential: AttestationCredentialJSON;
+  expectedChallenge: string;
+  expectedOrigin: string;
+  expectedRPID: string;
+  requireUserVerification?: boolean;
+};
 
 /**
  * Verify that the user has legitimately completed the registration process
  *
+ * **Options:**
+ *
  * @param response Authenticator attestation response with base64url-encoded values
  * @param expectedChallenge The random value provided to generateAttestationOptions for the
  * authenticator to sign
- * @param expectedOrigin Expected URL of website attestation should have occurred on
+ * @param expectedOrigin Website URL that the attestation should have occurred on
+ * @param expectedRPID RP ID that was specified in the attestation options
+ * @param requireUserVerification (Optional) Enforce user verification by the authenticator
+ * (via PIN, fingerprint, etc...)
  */
-export default function verifyAttestationResponse(
-  credential: AttestationCredentialJSON,
-  expectedChallenge: string,
-  expectedOrigin: string,
-): VerifiedAttestation {
+export default function verifyAttestationResponse(options: Options): VerifiedAttestation {
+  const {
+    credential,
+    expectedChallenge,
+    expectedOrigin,
+    expectedRPID,
+    requireUserVerification = false,
+  } = options;
   const { response } = credential;
-  const attestationObject = decodeAttestationObject(response.attestationObject);
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
   const { type, origin, challenge } = clientDataJSON;
 
+  // Make sure we're handling an attestation
+  if (type !== 'webauthn.create') {
+    throw new Error(`Unexpected attestation type: ${type}`);
+  }
+
+  // Ensure the device provided the challenge we gave it
   if (challenge !== expectedChallenge) {
     throw new Error(
       `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
@@ -40,33 +64,102 @@ export default function verifyAttestationResponse(
     throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
   }
 
-  // Make sure we're handling an attestation
-  if (type !== 'webauthn.create') {
-    throw new Error(`Unexpected attestation type: ${type}`);
+  const attestationObject = decodeAttestationObject(response.attestationObject);
+  const { fmt, authData, attStmt } = attestationObject;
+
+  const parsedAuthData = parseAuthenticatorData(authData);
+  const { rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
+
+  // Make sure the response's RP ID is ours
+  const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+  if (!rpIdHash.equals(expectedRPIDHash)) {
+    throw new Error(`Unexpected RP ID hash`);
   }
 
-  const { fmt } = attestationObject;
+  // Make sure someone was physically present
+  if (!flags.up) {
+    throw new Error('User not present during assertion');
+  }
+
+  // Enforce user verification if specified
+  if (requireUserVerification && !flags.uv) {
+    throw new Error('User verification required, but user could not be verified');
+  }
+
+  if (!credentialID) {
+    throw new Error('No credential ID was provided by authenticator');
+  }
+
+  if (!credentialPublicKey) {
+    throw new Error('No public key was provided by authenticator');
+  }
+
+  const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
+  const alg = decodedPublicKey.get(COSEKEYS.alg);
+
+  if (!alg) {
+    throw new Error('Credential public key was missing alg');
+  }
+
+  // Make sure the key algorithm is one we specified within the attestation options
+  if (!supportedCOSEAlgorithIdentifiers.includes(alg as number)) {
+    const supported = supportedCOSEAlgorithIdentifiers.join(', ');
+    throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
+  }
+
+  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
 
   /**
    * Verification can only be performed when attestation = 'direct'
    */
+  let verified = false;
   if (fmt === ATTESTATION_FORMATS.FIDO_U2F) {
-    return verifyFIDOU2F(attestationObject, response.clientDataJSON);
+    verified = verifyFIDOU2F({
+      attStmt,
+      clientDataHash,
+      credentialID,
+      credentialPublicKey,
+      rpIdHash,
+    });
+  } else if (fmt === ATTESTATION_FORMATS.PACKED) {
+    verified = verifyPacked({
+      attStmt,
+      authData,
+      clientDataHash,
+      credentialPublicKey,
+    });
+  } else if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
+    verified = verifyAndroidSafetynet({
+      attStmt,
+      authData,
+      clientDataHash,
+    });
+  } else if (fmt === ATTESTATION_FORMATS.NONE) {
+    // This is the weaker of the attestations, so there's nothing else to really check
+    verified = true;
+  } else {
+    throw new Error(`Unsupported Attestation Format: ${fmt}`);
   }
 
-  if (fmt === ATTESTATION_FORMATS.PACKED) {
-    return verifyPacked(attestationObject, response.clientDataJSON);
+  const toReturn: VerifiedAttestation = {
+    verified,
+    userVerified: flags.uv,
+  };
+
+  if (toReturn.verified) {
+    toReturn.userVerified = flags.uv;
+
+    const publicKey = convertCOSEtoPKCS(credentialPublicKey);
+
+    toReturn.authenticatorInfo = {
+      fmt,
+      counter,
+      base64PublicKey: base64url.encode(publicKey),
+      base64CredentialID: base64url.encode(credentialID),
+    };
   }
 
-  if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
-    return verifyAndroidSafetynet(attestationObject, response.clientDataJSON);
-  }
-
-  if (fmt === ATTESTATION_FORMATS.NONE) {
-    return verifyNone(attestationObject);
-  }
-
-  throw new Error(`Unsupported Attestation Format: ${fmt}`);
+  return toReturn;
 }
 
 /**

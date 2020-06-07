@@ -1,45 +1,64 @@
+import base64url from 'base64url';
+
 import verifyAttestationResponse from './verifyAttestationResponse';
 
 import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+
+import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
+
+import toHash from '../helpers/toHash';
 
 let mockDecodeAttestation: jest.SpyInstance;
 let mockDecodeClientData: jest.SpyInstance;
+let mockParseAuthData: jest.SpyInstance;
+let mockDecodePubKey: jest.SpyInstance;
+let mockVerifyFIDOU2F: jest.SpyInstance;
 
 beforeEach(() => {
   mockDecodeAttestation = jest.spyOn(decodeAttestationObject, 'default');
   mockDecodeClientData = jest.spyOn(decodeClientDataJSON, 'default');
+  mockParseAuthData = jest.spyOn(parseAuthenticatorData, 'default');
+  mockDecodePubKey = jest.spyOn(decodeCredentialPublicKey, 'default');
+  mockVerifyFIDOU2F = jest.spyOn(verifyFIDOU2F, 'default');
 });
 
 afterEach(() => {
   mockDecodeAttestation.mockRestore();
   mockDecodeClientData.mockRestore();
+  mockParseAuthData.mockRestore();
+  mockDecodePubKey.mockRestore();
+  mockVerifyFIDOU2F.mockRestore();
 });
 
 test('should verify FIDO U2F attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationFIDOU2F,
-    attestationFIDOU2FChallenge,
-    'https://clover.millertime.dev:3000',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationFIDOU2F,
+    expectedChallenge: attestationFIDOU2FChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('fido-u2f');
   expect(verification.authenticatorInfo?.counter).toEqual(0);
   expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'BHVixulLxshxcP5P27-v5Os_yy4EjuSl818NhHFMZBF_XmlS8_3G8qCr0SIP6vqu7Wp9FTfot1kdATgQnLjT-8s',
+    'BMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
   );
   expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'YVh69pHvWm1Tli1c5KdXM9BOwaAr6AuIEqeo9YGZlc1G-MhKqUvGLACnOWt-RNzeUQxgxq2N4AIKeyKM6Q0QYw',
+    'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   );
 });
 
 test('should verify Packed (EC2) attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationPacked,
-    attestationPackedChallenge,
-    'https://dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationPacked,
+    expectedChallenge: attestationPackedChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('packed');
@@ -54,11 +73,12 @@ test('should verify Packed (EC2) attestation', () => {
 });
 
 test('should verify Packed (X5C) attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationPackedX5C,
-    attestationPackedX5CChallenge,
-    'https://dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationPackedX5C,
+    expectedChallenge: attestationPackedX5CChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('packed');
@@ -72,11 +92,12 @@ test('should verify Packed (X5C) attestation', () => {
 });
 
 test('should verify None attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationNone,
-    attestationNoneChallenge,
-    'https://dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('none');
@@ -90,11 +111,12 @@ test('should verify None attestation', () => {
 });
 
 test('should verify Android SafetyNet attestation', () => {
-  const verification = verifyAttestationResponse(
-    attestationAndroidSafetyNet,
-    attestationAndroidSafetyNetChallenge,
-    'https://dev.dontneeda.pw',
-  );
+  const verification = verifyAttestationResponse({
+    credential: attestationAndroidSafetyNet,
+    expectedChallenge: attestationAndroidSafetyNetChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticatorInfo?.fmt).toEqual('android-safetynet');
@@ -109,21 +131,23 @@ test('should verify Android SafetyNet attestation', () => {
 
 test('should throw when response challenge is not expected value', () => {
   expect(() => {
-    verifyAttestationResponse(
-      attestationNone,
-      'shouldhavebeenthisvalue',
-      'https://dev.dontneeda.pw',
-    );
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: 'shouldhavebeenthisvalue',
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
   }).toThrow(/attestation challenge/i);
 });
 
 test('should throw when response origin is not expected value', () => {
   expect(() => {
-    verifyAttestationResponse(
-      attestationNone,
-      attestationNoneChallenge,
-      'https://different.address',
-    );
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://different.address',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
   }).toThrow(/attestation origin/i);
 });
 
@@ -139,57 +163,194 @@ test('should throw when attestation type is not webauthn.create', () => {
   });
 
   expect(() => {
-    verifyAttestationResponse(attestationNone, challenge, origin);
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: challenge,
+      expectedOrigin: origin,
+      expectedRPID: 'dev.dontneeda.pw',
+    });
   }).toThrow(/attestation type/i);
 });
 
 test('should throw if an unexpected attestation format is specified', () => {
   const fmt = 'fizzbuzz';
 
+  const realAtteObj = decodeAttestationObject.default(attestationNone.response.attestationObject);
+
   mockDecodeAttestation.mockReturnValue({
+    ...realAtteObj,
     // @ts-ignore 2322
     fmt,
   });
 
   expect(() => {
-    verifyAttestationResponse(
-      attestationNone,
-      attestationNoneChallenge,
-      'https://dev.dontneeda.pw',
-    );
-  }).toThrow();
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/unsupported attestation format/i);
 });
 
+test('should throw error if assertion RP ID is unexpected value', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
+    flags: 0,
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: '',
+    });
+  }).toThrow(/rp id/i);
+});
+
+test('should throw error if user was not present', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: false,
+    },
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/not present/i);
+});
+
+test('should throw if the authenticator does not give back credential ID', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: true,
+    },
+    credentialID: undefined,
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/credential id/i);
+});
+
+test('should throw if the authenticator does not give back credential public key', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: true,
+    },
+    credentialID: 'aaa',
+    credentialPublicKey: undefined,
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/public key/i);
+});
+
+test('should throw error if no alg is specified in public key', () => {
+  mockDecodePubKey.mockReturnValue({
+    get: () => undefined,
+    credentialID: '',
+    credentialPublicKey: '',
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/missing alg/i);
+});
+
+test('should throw error if unsupported alg is used', () => {
+  mockDecodePubKey.mockReturnValue({
+    get: () => -999,
+    credentialID: '',
+    credentialPublicKey: '',
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/unexpected public key/i);
+});
+
+test('should not include authenticator info if not verified', () => {
+  mockVerifyFIDOU2F.mockReturnValue(false);
+
+  const verification = verifyAttestationResponse({
+    credential: attestationFIDOU2F,
+    expectedChallenge: attestationFIDOU2FChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toBe(false);
+  expect(verification.authenticatorInfo).toBeUndefined();
+});
+
+test('should throw an error if user verification is required but user was not verified', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: true,
+      uv: false,
+    },
+  });
+
+  expect(() => {
+    const verification = verifyAttestationResponse({
+      credential: attestationFIDOU2F,
+      expectedChallenge: attestationFIDOU2FChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+      requireUserVerification: true,
+    });
+  }).toThrow(/user could not be verified/i);
+});
+
+/**
+ * Various Attestations Below
+ */
+
 const attestationFIDOU2F = {
-  id: 'YVh69pHvWm1Tli1c5KdXM9BOwaAr6AuIEqeo9YGZlc1G-MhKqUvGLACnOWt-RNzeUQxgxq2N4AIKeyKM6Q0QYw',
-  rawId: 'YVh69pHvWm1Tli1c5KdXM9BOwaAr6AuIEqeo9YGZlc1G+MhKqUvGLACnOWt+RNzeUQxgxq2N4AIKeyKM6Q0QYw==',
+  id: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
+  rawId: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   response: {
     attestationObject:
-      'o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAK40WxA0t7py7AjEXvwGw' +
-      'TlmqlvrOks5g9lf+9zXzRiVAiEA3bv60xyXveKDOusYzniD7CDSostCet9PYK7FLdnTdZNjeDVjgVkCwTCCAr0wg' +
-      'gGloAMCAQICBCrnYmMwDQYJKoZIhvcNAQELBQAwLjEsMCoGA1UEAxMjWXViaWNvIFUyRiBSb290IENBIFNlcmlhb' +
-      'CA0NTcyMDA2MzEwIBcNMTQwODAxMDAwMDAwWhgPMjA1MDA5MDQwMDAwMDBaMG4xCzAJBgNVBAYTAlNFMRIwEAYDV' +
-      'QQKDAlZdWJpY28gQUIxIjAgBgNVBAsMGUF1dGhlbnRpY2F0b3IgQXR0ZXN0YXRpb24xJzAlBgNVBAMMHll1Ymljb' +
-      'yBVMkYgRUUgU2VyaWFsIDcxOTgwNzA3NTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABCoDhl5gQ9meEf8QqiVUV' +
-      '4S/Ca+Oax47MhcpIW9VEhqM2RDTmd3HaL3+SnvH49q8YubSRp/1Z1uP+okMynSGnj+jbDBqMCIGCSsGAQQBgsQKA' +
-      'gQVMS4zLjYuMS40LjEuNDE0ODIuMS4xMBMGCysGAQQBguUcAgEBBAQDAgQwMCEGCysGAQQBguUcAQEEBBIEEG1Eu' +
-      'pv27C5JuTAMj+kgy3MwDAYDVR0TAQH/BAIwADANBgkqhkiG9w0BAQsFAAOCAQEAclfQPNzD4RVphJDW+A75W1MHI' +
-      '3PZ5kcyYysR3Nx3iuxr1ZJtB+F7nFQweI3jL05HtFh2/4xVIgKb6Th4eVcjMecncBaCinEbOcdP1sEli9Hk2eVm1' +
-      'XB5A0faUjXAPw/+QLFCjgXG6ReZ5HVUcWkB7riLsFeJNYitiKrTDXFPLy+sNtVNutcQnFsCerDKuM81TvEAigkIb' +
-      'KCGlq8M/NvBg5j83wIxbCYiyV7mIr3RwApHieShzLdJo1S6XydgQjC+/64G5r8C+8AVvNFR3zXXCpio5C3KRIj88' +
-      'HEEIYjf6h1fdLfqeIsq+cUUqbq5T+c4nNoZUZCysTB9v5EY4akp+GhhdXRoRGF0YVjEAbElFazplpnc037DORGDZ' +
-      'NjDq86cN9vm6+APoAM20wtBAAAAAAAAAAAAAAAAAAAAAAAAAAAAQGFYevaR71ptU5YtXOSnVzPQTsGgK+gLiBKnq' +
-      'PWBmZXNRvjISqlLxiwApzlrfkTc3lEMYMatjeACCnsijOkNEGOlAQIDJiABIVggdWLG6UvGyHFw/k/bv6/k6z/LL' +
-      'gSO5KXzXw2EcUxkEX8iWCBeaVLz/cbyoKvRIg/q+q7tan0VN+i3WR0BOBCcuNP7yw==',
+      'o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEcwRQIgRYUftNUmhT0VWTZmIgDmrOoP26Pcre-kL3DLnCrXbegCIQCOu_x5gqp-Rej76zeBuXlk8e7J-9WM_i-wZmCIbIgCGmN4NWOBWQLBMIICvTCCAaWgAwIBAgIEKudiYzANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowbjELMAkGA1UEBhMCU0UxEjAQBgNVBAoMCVl1YmljbyBBQjEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjEnMCUGA1UEAwweWXViaWNvIFUyRiBFRSBTZXJpYWwgNzE5ODA3MDc1MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKgOGXmBD2Z4R_xCqJVRXhL8Jr45rHjsyFykhb1USGozZENOZ3cdovf5Ke8fj2rxi5tJGn_VnW4_6iQzKdIaeP6NsMGowIgYJKwYBBAGCxAoCBBUxLjMuNi4xLjQuMS40MTQ4Mi4xLjEwEwYLKwYBBAGC5RwCAQEEBAMCBDAwIQYLKwYBBAGC5RwBAQQEEgQQbUS6m_bsLkm5MAyP6SDLczAMBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQByV9A83MPhFWmEkNb4DvlbUwcjc9nmRzJjKxHc3HeK7GvVkm0H4XucVDB4jeMvTke0WHb_jFUiApvpOHh5VyMx5ydwFoKKcRs5x0_WwSWL0eTZ5WbVcHkDR9pSNcA_D_5AsUKOBcbpF5nkdVRxaQHuuIuwV4k1iK2IqtMNcU8vL6w21U261xCcWwJ6sMq4zzVO8QCKCQhsoIaWrwz828GDmPzfAjFsJiLJXuYivdHACkeJ5KHMt0mjVLpfJ2BCML7_rgbmvwL7wBW80VHfNdcKmKjkLcpEiPzwcQQhiN_qHV90t-p4iyr5xRSpurlP5zic2hlRkLKxMH2_kRjhqSn4aGF1dGhEYXRhWMQ93EcQ6cCIsinbqJ1WMiC7Ofcimv9GWwplaxr7mor4oEEAAAAAAAAAAAAAAAAAAAAAAAAAAABAVHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUaUBAgMmIAEhWCDIkcsOaVKDIQYwq3EDQ-pST2kRwNH_l1nCgW-WcFpNXiJYIBSbummp-KO3qZeqmvZ_U_uirCDL2RNj3E5y4_KzefIr',
     clientDataJSON:
-      'eyJjaGFsbGVuZ2UiOiJVMmQ0TjNZME0wOU1jbGRQYjFSNVpFeG5UbG95IiwiY2xpZW50' +
-      'RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9jbG92ZXIu' +
-      'bWlsbGVydGltZS5kZXY6MzAwMCIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ==',
+      'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sQmRIUmxjM1JoZEdsdmJnIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
-const attestationFIDOU2FChallenge = 'Sgx7v43OLrWOoTydLgNZ2';
+const attestationFIDOU2FChallenge = 'totallyUniqueValueEveryAttestation';
 
 const attestationPacked = {
   id: '',

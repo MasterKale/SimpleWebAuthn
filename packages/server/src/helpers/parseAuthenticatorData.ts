@@ -27,7 +27,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
 
   let aaguid: Buffer | undefined = undefined;
   let credentialID: Buffer | undefined = undefined;
-  let COSEPublicKey: Buffer | undefined = undefined;
+  let credentialPublicKey: Buffer | undefined = undefined;
 
   if (flags.at) {
     aaguid = intBuffer.slice(0, 16);
@@ -41,7 +41,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     credentialID = intBuffer.slice(0, credIDLen);
     intBuffer = intBuffer.slice(credIDLen);
 
-    COSEPublicKey = intBuffer;
+    credentialPublicKey = intBuffer;
   }
 
   return {
@@ -52,11 +52,11 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     counterBuf,
     aaguid,
     credentialID,
-    COSEPublicKey,
+    credentialPublicKey,
   };
 }
 
-type ParsedAuthenticatorData = {
+export type ParsedAuthenticatorData = {
   rpIdHash: Buffer;
   flagsBuf: Buffer;
   flags: {
@@ -70,5 +70,5 @@ type ParsedAuthenticatorData = {
   counterBuf: Buffer;
   aaguid?: Buffer;
   credentialID?: Buffer;
-  COSEPublicKey?: Buffer;
+  credentialPublicKey?: Buffer;
 };

@@ -4,12 +4,12 @@ import type {
 } from '@simplewebauthn/typescript-types';
 
 type Options = {
-  challenge: string,
-  allowedCredentialIDs: Base64URLString[],
-  suggestedTransports?: AuthenticatorTransport[],
-  timeout?: number,
-  userVerification?: UserVerificationRequirement,
-  extensions?: AuthenticationExtensionsClientInputs,
+  challenge: string;
+  allowedCredentialIDs: Base64URLString[];
+  suggestedTransports?: AuthenticatorTransport[];
+  timeout?: number;
+  userVerification?: UserVerificationRequirement;
+  extensions?: AuthenticationExtensionsClientInputs;
 };
 
 /**

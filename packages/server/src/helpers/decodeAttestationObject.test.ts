@@ -1,6 +1,6 @@
 import decodeAttestationObject from './decodeAttestationObject';
 
-test('should decode base64-encoded indirect attestationObject', () => {
+test('should decode base64url-encoded indirect attestationObject', () => {
   const decoded = decodeAttestationObject(
     'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjEAbElFazplpnc037DORGDZNjDq86cN9vm6' +
       '+APoAM20wtBAAAAAAAAAAAAAAAAAAAAAAAAAAAAQKmPuEwByQJ3e89TccUSrCGDkNWquhevjLLn/' +
@@ -13,7 +13,7 @@ test('should decode base64-encoded indirect attestationObject', () => {
   expect(decoded.authData).toBeDefined();
 });
 
-test('should decode base64-encoded direct attestationObject', () => {
+test('should decode base64url-encoded direct attestationObject', () => {
   const decoded = decodeAttestationObject(
     'o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAK40WxA0t7py7AjEXvwGwTlmqlvrOk' +
       's5g9lf+9zXzRiVAiEA3bv60xyXveKDOusYzniD7CDSostCet9PYK7FLdnTdZNjeDVjgVkCwTCCAr0wggGloAMCAQICBCrn' +
