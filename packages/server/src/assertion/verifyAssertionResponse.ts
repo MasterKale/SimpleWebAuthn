@@ -13,6 +13,7 @@ type Options = {
   expectedOrigin: string;
   expectedRPID: string;
   authenticator: AuthenticatorDevice;
+  requireUserVerification?: boolean;
 };
 
 /**
@@ -20,13 +21,24 @@ type Options = {
  *
  * **Options:**
  *
- * @param response Authenticator assertion response with base64url-encoded values
+ * @param credential Authenticator credential returned by browser's `startAssertion()`
  * @param expectedChallenge The random value provided to generateAssertionOptions for the
  * authenticator to sign
- * @param expectedOrigin Expected URL of website assertion should have occurred on
+ * @param expectedOrigin Website URL that the attestation should have occurred on
+ * @param expectedRPID RP ID that was specified in the attestation options
+ * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
+ * @param requireUserVerification (Optional) Enforce user verification by the authenticator
+ * (via PIN, fingerprint, etc...)
  */
 export default function verifyAssertionResponse(options: Options): VerifiedAssertion {
-  const { credential, expectedChallenge, expectedOrigin, expectedRPID, authenticator } = options;
+  const {
+    credential,
+    expectedChallenge,
+    expectedOrigin,
+    expectedRPID,
+    authenticator,
+    requireUserVerification = false,
+  } = options;
   const { response } = credential;
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
@@ -60,6 +72,11 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   // Make sure someone was physically present
   if (!flags.up) {
     throw new Error('User not present during assertion');
+  }
+
+  // Enforce user verification if specified
+  if (requireUserVerification && !flags.uv) {
+    throw new Error('User verification required, but user could not be verified');
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));

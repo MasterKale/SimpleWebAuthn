@@ -18,6 +18,7 @@ type Options = {
   expectedChallenge: string;
   expectedOrigin: string;
   expectedRPID: string;
+  requireUserVerification?: boolean;
 };
 
 /**
@@ -28,11 +29,19 @@ type Options = {
  * @param response Authenticator attestation response with base64url-encoded values
  * @param expectedChallenge The random value provided to generateAttestationOptions for the
  * authenticator to sign
- * @param expectedOrigin Expected URL of website attestation should have occurred on
- * @param expectedRPID Expect RP ID as it was specified in the attestation options
+ * @param expectedOrigin Website URL that the attestation should have occurred on
+ * @param expectedRPID RP ID that was specified in the attestation options
+ * @param requireUserVerification (Optional) Enforce user verification by the authenticator
+ * (via PIN, fingerprint, etc...)
  */
 export default function verifyAttestationResponse(options: Options): VerifiedAttestation {
-  const { credential, expectedChallenge, expectedOrigin, expectedRPID } = options;
+  const {
+    credential,
+    expectedChallenge,
+    expectedOrigin,
+    expectedRPID,
+    requireUserVerification = false,
+  } = options;
   const { response } = credential;
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
@@ -70,6 +79,11 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   // Make sure someone was physically present
   if (!flags.up) {
     throw new Error('User not present during assertion');
+  }
+
+  // Enforce user verification if specified
+  if (requireUserVerification && !flags.uv) {
+    throw new Error('User verification required, but user could not be verified');
   }
 
   if (!credentialID) {

@@ -1,3 +1,5 @@
+import base64url from 'base64url';
+
 import verifyAttestationResponse from './verifyAttestationResponse';
 
 import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
@@ -310,6 +312,26 @@ test('should not include authenticator info if not verified', () => {
 
   expect(verification.verified).toBe(false);
   expect(verification.authenticatorInfo).toBeUndefined();
+});
+
+test('should throw an error if user verification is required but user was not verified', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: true,
+      uv: false,
+    },
+  });
+
+  expect(() => {
+    const verification = verifyAttestationResponse({
+      credential: attestationFIDOU2F,
+      expectedChallenge: attestationFIDOU2FChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+      requireUserVerification: true,
+    });
+  }).toThrow(/user could not be verified/i);
 });
 
 /**

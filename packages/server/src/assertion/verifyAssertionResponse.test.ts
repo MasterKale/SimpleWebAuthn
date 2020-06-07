@@ -1,3 +1,4 @@
+import base64url from 'base64url';
 import verifyAssertionResponse from './verifyAssertionResponse';
 
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -149,6 +150,35 @@ test('should not compare counters if both are 0', () => {
 
   expect(verification.verified).toEqual(true);
 });
+
+test('should throw an error if user verification is required but user was not verified', () => {
+  const actualData = parseAuthenticatorData.default(
+    base64url.toBuffer(assertionResponse.response.authenticatorData),
+  );
+
+  mockParseAuthData.mockReturnValue({
+    ...actualData,
+    flags: {
+      up: true,
+      uv: false,
+    },
+  });
+
+  expect(() => {
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: assertionOrigin,
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: authenticator,
+      requireUserVerification: true,
+    });
+  }).toThrow(/user could not be verified/i);
+});
+
+/**
+ * Assertion examples below
+ */
 
 const assertionResponse = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
