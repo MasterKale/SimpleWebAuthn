@@ -153,7 +153,12 @@ app.post('/verify-attestation', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAttestationResponse(body, expectedChallenge, origin);
+    verification = verifyAttestationResponse({
+      credential: body,
+      expectedChallenge,
+      expectedOrigin: origin,
+      expectedRPID: rpID,
+    });
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
@@ -164,9 +169,7 @@ app.post('/verify-attestation', (req, res) => {
   if (verified) {
     const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
 
-    const existingDevice = user.devices.find(
-      device => device.credentialID === base64CredentialID,
-    );
+    const existingDevice = user.devices.find(device => device.credentialID === base64CredentialID);
 
     if (!existingDevice) {
       /**
@@ -234,7 +237,13 @@ app.post('/verify-assertion', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAssertionResponse(body, expectedChallenge, origin, dbAuthenticator);
+    verification = verifyAssertionResponse({
+      credential: body,
+      expectedChallenge,
+      expectedOrigin: origin,
+      expectedRPID: rpID,
+      authenticator: dbAuthenticator,
+    });
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
