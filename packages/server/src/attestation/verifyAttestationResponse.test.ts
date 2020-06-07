@@ -2,18 +2,33 @@ import verifyAttestationResponse from './verifyAttestationResponse';
 
 import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+
+import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
+
+import toHash from '../helpers/toHash';
 
 let mockDecodeAttestation: jest.SpyInstance;
 let mockDecodeClientData: jest.SpyInstance;
+let mockParseAuthData: jest.SpyInstance;
+let mockDecodePubKey: jest.SpyInstance;
+let mockVerifyFIDOU2F: jest.SpyInstance;
 
 beforeEach(() => {
   mockDecodeAttestation = jest.spyOn(decodeAttestationObject, 'default');
   mockDecodeClientData = jest.spyOn(decodeClientDataJSON, 'default');
+  mockParseAuthData = jest.spyOn(parseAuthenticatorData, 'default');
+  mockDecodePubKey = jest.spyOn(decodeCredentialPublicKey, 'default');
+  mockVerifyFIDOU2F = jest.spyOn(verifyFIDOU2F, 'default');
 });
 
 afterEach(() => {
   mockDecodeAttestation.mockRestore();
   mockDecodeClientData.mockRestore();
+  mockParseAuthData.mockRestore();
+  mockDecodePubKey.mockRestore();
+  mockVerifyFIDOU2F.mockRestore();
 });
 
 test('should verify FIDO U2F attestation', () => {
@@ -158,7 +173,10 @@ test('should throw when attestation type is not webauthn.create', () => {
 test('should throw if an unexpected attestation format is specified', () => {
   const fmt = 'fizzbuzz';
 
+  const realAtteObj = decodeAttestationObject.default(attestationNone.response.attestationObject);
+
   mockDecodeAttestation.mockReturnValue({
+    ...realAtteObj,
     // @ts-ignore 2322
     fmt,
   });
@@ -168,10 +186,135 @@ test('should throw if an unexpected attestation format is specified', () => {
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/unsupported attestation format/i);
+});
+
+test('should throw error if assertion RP ID is unexpected value', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
+    flags: 0,
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: '',
     });
-  }).toThrow();
+  }).toThrow(/rp id/i);
 });
+
+test('should throw error if user was not present', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: false,
+    },
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/not present/i);
+});
+
+test('should throw if the authenticator does not give back credential ID', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: true,
+    },
+    credentialID: undefined,
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/credential id/i);
+});
+
+test('should throw if the authenticator does not give back credential public key', () => {
+  mockParseAuthData.mockReturnValue({
+    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    flags: {
+      up: true,
+    },
+    credentialID: 'aaa',
+    credentialPublicKey: undefined,
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/public key/i);
+});
+
+test('should throw error if no alg is specified in public key', () => {
+  mockDecodePubKey.mockReturnValue({
+    get: () => undefined,
+    credentialID: '',
+    credentialPublicKey: '',
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/missing alg/i);
+});
+
+test('should throw error if unsupported alg is used', () => {
+  mockDecodePubKey.mockReturnValue({
+    get: () => -999,
+    credentialID: '',
+    credentialPublicKey: '',
+  });
+
+  expect(() => {
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+    });
+  }).toThrow(/unexpected public key/i);
+});
+
+test('should not include authenticator info if not verified', () => {
+  mockVerifyFIDOU2F.mockReturnValue(false);
+
+  const verification = verifyAttestationResponse({
+    credential: attestationFIDOU2F,
+    expectedChallenge: attestationFIDOU2FChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toBe(false);
+  expect(verification.authenticatorInfo).toBeUndefined();
+});
+
+/**
+ * Various Attestations Below
+ */
 
 const attestationFIDOU2F = {
   id: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
