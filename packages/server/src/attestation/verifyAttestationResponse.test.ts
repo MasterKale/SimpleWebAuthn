@@ -194,9 +194,12 @@ test('should throw if an unexpected attestation format is specified', () => {
 });
 
 test('should throw error if assertion RP ID is unexpected value', () => {
+  const { authData } = decodeAttestationObject.default(attestationNone.response.attestationObject);
+  const actualAuthData = parseAuthenticatorData.default(authData);
+
   mockParseAuthData.mockReturnValue({
+    ...actualAuthData,
     rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
-    flags: 0,
   });
 
   expect(() => {
@@ -204,7 +207,7 @@ test('should throw error if assertion RP ID is unexpected value', () => {
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: '',
+      expectedRPID: 'dev.dontneeda.pw',
     });
   }).toThrow(/rp id/i);
 });
@@ -324,7 +327,7 @@ test('should throw an error if user verification is required but user was not ve
   });
 
   expect(() => {
-    const verification = verifyAttestationResponse({
+    verifyAttestationResponse({
       credential: attestationFIDOU2F,
       expectedChallenge: attestationFIDOU2FChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -353,8 +356,8 @@ const attestationFIDOU2F = {
 const attestationFIDOU2FChallenge = 'totallyUniqueValueEveryAttestation';
 
 const attestationPacked = {
-  id: '',
-  rawId: '',
+  id: 'bbb',
+  rawId: 'bbb',
   response: {
     attestationObject:
       'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
@@ -369,14 +372,14 @@ const attestationPacked = {
       'ZSJ9',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
 const attestationPackedChallenge = 's6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM';
 
 const attestationPackedX5C = {
   // TODO: Grab these from another iPhone attestation
-  id: '',
-  rawId: '',
+  id: 'aaa',
+  rawId: 'aaa',
   response: {
     attestationObject:
       'o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAIMt_hGMtdgpIVIwMOeKK' +
@@ -400,7 +403,7 @@ const attestationPackedX5C = {
       'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0=',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
 const attestationPackedX5CChallenge = 'totallyUniqueValueEveryTime';
 
@@ -419,7 +422,7 @@ const attestationNone = {
       'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
 const attestationNoneChallenge = 'hEccPWuziP00H0p5gxh2_u5_PC4NeYgd';
 
@@ -519,6 +522,6 @@ const attestationAndroidSafetyNet = {
       'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
 const attestationAndroidSafetyNetChallenge = '_vVPoE42Dh-wk3bvHmaktiVvEYC-LwBX';
