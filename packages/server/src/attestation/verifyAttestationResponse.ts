@@ -42,7 +42,23 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
     expectedRPID,
     requireUserVerification = false,
   } = options;
-  const { response } = credential;
+  const { id, rawId, type: credentialType, response } = credential;
+
+  // Ensure credential specified an ID
+  if (!id) {
+    throw new Error('Missing credential ID');
+  }
+
+  // Ensure ID is base64url-encoded
+  if (id !== rawId) {
+    throw new Error('Credential ID was not base64url-encoded');
+  }
+
+  // Make sure credential type is public-key
+  if (credentialType !== 'public-key') {
+    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
+  }
+
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
   const { type, origin, challenge } = clientDataJSON;
