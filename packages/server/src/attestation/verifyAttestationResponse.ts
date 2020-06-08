@@ -17,7 +17,7 @@ type Options = {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string;
-  expectedRPID: string;
+  expectedRPID?: string;
   requireUserVerification?: boolean;
 };
 
@@ -72,9 +72,11 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   const { rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
-  const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-  if (!rpIdHash.equals(expectedRPIDHash)) {
-    throw new Error(`Unexpected RP ID hash`);
+  if (expectedRPID) {
+    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+    if (!rpIdHash.equals(expectedRPIDHash)) {
+      throw new Error(`Unexpected RP ID hash`);
+    }
   }
 
   // Make sure someone was physically present
