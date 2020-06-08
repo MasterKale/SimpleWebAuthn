@@ -61,7 +61,7 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
 
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
-  const { type, origin, challenge } = clientDataJSON;
+  const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an attestation
   if (type !== 'webauthn.create') {
@@ -79,6 +79,16 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   // Check that the origin is our site
   if (origin !== expectedOrigin) {
     throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
+  }
+
+  if (tokenBinding) {
+    if (!(tokenBinding instanceof Object)) {
+      throw new Error(`Unexpected value for TokenBinding "${tokenBinding}"`);
+    }
+
+    if (['present', 'supported', 'not-supported'].indexOf(tokenBinding.status) < 0) {
+      throw new Error(`Unexpected tokenBinding.status value of "${tokenBinding.status}"`);
+    }
   }
 
   const attestationObject = decodeAttestationObject(response.attestationObject);
