@@ -8,7 +8,7 @@ import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import convertCOSEtoPKCS, { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 
-import { supportedCOSEAlgorithIdentifiers } from './generateAttestationOptions';
+import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
@@ -131,8 +131,8 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   }
 
   // Make sure the key algorithm is one we specified within the attestation options
-  if (!supportedCOSEAlgorithIdentifiers.includes(alg as number)) {
-    const supported = supportedCOSEAlgorithIdentifiers.join(', ');
+  if (!supportedCOSEAlgorithmIdentifiers.includes(alg as number)) {
+    const supported = supportedCOSEAlgorithmIdentifiers.join(', ');
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
