@@ -14,4 +14,9 @@ type ClientDataJSON = {
   type: string;
   challenge: string;
   origin: string;
+  crossOrigin?: boolean;
+  tokenBinding?: {
+    id?: string;
+    status: 'present' | 'supported' | 'not-supported';
+  };
 };
