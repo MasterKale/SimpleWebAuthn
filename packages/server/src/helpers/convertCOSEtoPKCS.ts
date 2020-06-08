@@ -33,11 +33,11 @@ export default function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
     throw new Error('COSE public key was missing x');
   }
 
-  if (!y) {
-    throw new Error('COSE public key was missing y');
+  if (y) {
+    return Buffer.concat([tag, x as Buffer, y as Buffer]);
   }
 
-  return Buffer.concat([tag, x as Buffer, y as Buffer]);
+  return Buffer.concat([tag, x as Buffer]);
 }
 
 export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
