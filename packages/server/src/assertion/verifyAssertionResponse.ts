@@ -49,9 +49,11 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     throw new Error(`Unexpected assertion type: ${type}`);
   }
 
-  if (challenge !== expectedChallenge) {
+  // Ensure the device provided the challenge we gave it
+  const encodedExpectedChallenge = base64url.encode(expectedChallenge);
+  if (challenge !== encodedExpectedChallenge) {
     throw new Error(
-      `Unexpected assertion challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected assertion challenge "${challenge}", expected "${encodedExpectedChallenge}"`,
     );
   }
 

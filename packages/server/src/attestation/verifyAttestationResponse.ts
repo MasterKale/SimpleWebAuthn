@@ -53,9 +53,10 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   }
 
   // Ensure the device provided the challenge we gave it
-  if (challenge !== expectedChallenge) {
+  const encodedExpectedChallenge = base64url.encode(expectedChallenge);
+  if (challenge !== encodedExpectedChallenge) {
     throw new Error(
-      `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected attestation challenge "${challenge}", expected "${encodedExpectedChallenge}"`,
     );
   }
 
