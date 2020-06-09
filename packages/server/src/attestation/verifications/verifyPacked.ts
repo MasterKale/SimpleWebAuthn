@@ -23,10 +23,14 @@ type Options = {
 export default function verifyAttestationPacked(options: Options): boolean {
   const { attStmt, clientDataHash, authData, credentialPublicKey } = options;
 
-  const { sig, x5c } = attStmt;
+  const { sig, x5c, alg } = attStmt;
 
   if (!sig) {
     throw new Error('No attestation signature provided in attestation statement (Packed)');
+  }
+
+  if (Number.isNaN(Number(alg))) {
+    throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
   }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
@@ -70,11 +74,6 @@ export default function verifyAttestationPacked(options: Options): boolean {
     const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
     const kty = cosePublicKey.get(COSEKEYS.kty);
-    const alg = cosePublicKey.get(COSEKEYS.alg);
-
-    if (!alg) {
-      throw new Error('COSE public key was missing alg (Packed|Self)');
-    }
 
     if (!kty) {
       throw new Error('COSE public key was missing kty (Packed|Self)');
