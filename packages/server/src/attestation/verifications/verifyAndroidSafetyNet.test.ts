@@ -7,44 +7,16 @@ import decodeAttestationObject, {
 } from '../../helpers/decodeAttestationObject';
 import toHash from '../../helpers/toHash';
 
-/**
- * Android SafetyNet attestations should only be valid for a minute past their `timestampMs`.
- *
- * This method will take an expired-but-otherwise-valid attestation statement and update its
- * timestampMs to "now" so that logic after the time check can be tested.
- */
-function timestampToNow(attStmt: AttestationStatement): AttestationStatement {
-  // Make a copy of attStmt
-  const newStatement = {
-    ...attStmt,
-  };
-
-  const { response } = newStatement;
-
-  // @ts-ignore TS2532
-  const respStr = response.toString('utf8');
-  const parts = respStr.split('.');
-  const payload = JSON.parse(base64url.decode(parts[1]));
-  payload.timestampMs = Date.now();
-  const encodedPayload = base64url.encode(JSON.stringify(payload));
-  const revisedRespStr = [parts[0], encodedPayload, parts[2]].join('.');
-
-  newStatement.response = Buffer.from(revisedRespStr, 'utf-8');
-
-  return newStatement;
-}
-
 test('should verify Android SafetyNet attestation', () => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
   const { authData, attStmt } = decodedAttestationObject;
 
-  const nowAttStmt = timestampToNow(attStmt);
-
   const verified = verifyAndroidSafetyNet({
-    attStmt: nowAttStmt,
+    attStmt,
     authData,
     clientDataHash: toHash(base64url.toBuffer(clientDataJSON)),
+    verifyTimestampMS: false,
   });
 
   expect(verified).toEqual(true);
