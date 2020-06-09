@@ -38,7 +38,20 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
   /**
    * START Verify PAYLOAD
    */
-  const { nonce, ctsProfileMatch } = PAYLOAD;
+  const { nonce, ctsProfileMatch, timestampMs } = PAYLOAD;
+
+  // Make sure timestamp is in the past
+  let now = Date.now();
+  if (timestampMs > Date.now()) {
+    throw new Error(`Payload timestamp "${timestampMs}" was later than "${now}" (SafetyNet)`);
+  }
+
+  // Consider a SafetyNet attestation valid within a minute of it being performed
+  const timestampPlusDelay = timestampMs + 60 * 1000;
+  now = Date.now();
+  if (timestampPlusDelay < now) {
+    throw new Error(`Payload timestamp "${timestampPlusDelay}" has expired`);
+  }
 
   const nonceBase = Buffer.concat([authData, clientDataHash]);
   const nonceBuffer = toHash(nonceBase);
