@@ -2,15 +2,34 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 
-const {
-  generateAttestationOptions,
-  verifyAttestationResponse,
-} = require('@simplewebauthn/server');
+const { generateAttestationOptions, verifyAttestationResponse } = require('@simplewebauthn/server');
+
+const inMemoryUserDeviceDB = {
+  // [username]: string: {
+  //   id: loggedInUserId,
+  //   username: 'user@yourdomain.com',
+  //   devices: [
+  //     /**
+  //      * {
+  //      *   credentialID: string,
+  //      *   publicKey: string,
+  //      *   counter: number,
+  //      * }
+  //      */
+  //   ],
+  //   currentChallenge: undefined,
+  // },
+};
 
 /**
  * Create paths specifically for testing with the FIDO Conformance Tools
  */
 const fidoComplianceRouter = express.Router();
+
+let loggedInUsername = undefined;
+const serviceName = 'FIDO Conformance Test';
+const rpID = 'fido-compliance-test';
+const origin = 'https://dev.dontneeda.pw';
 
 /**
  * [FIDO2] Server Tests > MakeCredential Request
@@ -19,19 +38,36 @@ fidoComplianceRouter.post('/attestation/options', (req, res) => {
   const { body } = req;
   const { username, displayName, authenticatorSelection, attestation, extensions } = body;
 
-  console.log('hello1');
-  console.log(body);
+  loggedInUsername = username;
+
+  let user = inMemoryUserDeviceDB[username];
+  if (!user) {
+    const newUser = {
+      id: username,
+      username,
+      devices: [],
+    };
+
+    inMemoryUserDeviceDB[username] = newUser;
+    user = newUser;
+  }
+
+  const { devices } = user;
+
+  const challenge = uuidv4();
+  user.currentChallenge = challenge;
 
   const opts = generateAttestationOptions({
-    serviceName: 'FIDO Conformance Test',
-    rpID: 'fido-compliance-test',
-    challenge: Buffer.from(uuidv4(), 'ascii').toString('base64'),
+    serviceName,
+    rpID,
+    challenge,
     userID: username,
     userName: username,
     userDisplayName: displayName,
     attestationType: attestation,
     authenticatorSelection,
     extensions,
+    excludedCredentialIDs: devices.map(dev => dev.credentialID),
   });
 
   return res.send({
@@ -46,21 +82,44 @@ fidoComplianceRouter.post('/attestation/options', (req, res) => {
  */
 fidoComplianceRouter.post('/attestation/result', (req, res) => {
   const { body } = req;
-  const { response } = body;
 
-  console.log('hello2');
-  console.log(body);
-  // const verified = verifyAttestationResponse(
-  //   {
-  //     base64AttestationObject: response.attestationObject,
-  //     base64ClientDataJSON: response.clientDataJSON,
-  //   },
-  // );
+  const user = inMemoryUserDeviceDB[loggedInUsername];
 
-  // console.log(verified);
+  const expectedChallenge = user.currentChallenge;
+
+  let verification;
+  try {
+    verification = verifyAttestationResponse({
+      credential: body,
+      expectedChallenge: Buffer.from(expectedChallenge, 'base64'),
+      expectedOrigin: origin,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(400).send({ errorMessage: error.message });
+  }
+
+  const { verified, authenticatorInfo } = verification;
+
+  if (verified) {
+    const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
+
+    const existingDevice = user.devices.find(device => device.credentialID === base64CredentialID);
+
+    if (!existingDevice) {
+      /**
+       * Add the returned device to the user's list of devices
+       */
+      user.devices.push({
+        publicKey: base64PublicKey,
+        credentialID: base64CredentialID,
+        counter,
+      });
+    }
+  }
 
   return res.send({
-    status: 'ok',
+    status: verified ? 'ok' : '',
     errorMessage: '',
   });
 });
