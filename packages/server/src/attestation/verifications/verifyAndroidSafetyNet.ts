@@ -10,13 +10,14 @@ type Options = {
   attStmt: AttestationStatement;
   clientDataHash: Buffer;
   authData: Buffer;
+  verifyTimestampMS?: boolean;
 };
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
 export default function verifyAttestationAndroidSafetyNet(options: Options): boolean {
-  const { attStmt, clientDataHash, authData } = options;
+  const { attStmt, clientDataHash, authData, verifyTimestampMS = true } = options;
   const { response, ver } = attStmt;
 
   if (!ver) {
@@ -40,17 +41,19 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
    */
   const { nonce, ctsProfileMatch, timestampMs } = PAYLOAD;
 
-  // Make sure timestamp is in the past
-  let now = Date.now();
-  if (timestampMs > Date.now()) {
-    throw new Error(`Payload timestamp "${timestampMs}" was later than "${now}" (SafetyNet)`);
-  }
+  if (verifyTimestampMS) {
+    // Make sure timestamp is in the past
+    let now = Date.now();
+    if (timestampMs > Date.now()) {
+      throw new Error(`Payload timestamp "${timestampMs}" was later than "${now}" (SafetyNet)`);
+    }
 
-  // Consider a SafetyNet attestation valid within a minute of it being performed
-  const timestampPlusDelay = timestampMs + 60 * 1000;
-  now = Date.now();
-  if (timestampPlusDelay < now) {
-    throw new Error(`Payload timestamp "${timestampPlusDelay}" has expired`);
+    // Consider a SafetyNet attestation valid within a minute of it being performed
+    const timestampPlusDelay = timestampMs + 60 * 1000;
+    now = Date.now();
+    if (timestampPlusDelay < now) {
+      throw new Error(`Payload timestamp "${timestampPlusDelay}" has expired`);
+    }
   }
 
   const nonceBase = Buffer.concat([authData, clientDataHash]);
