@@ -7,19 +7,42 @@ import decodeAttestationObject, {
 } from '../../helpers/decodeAttestationObject';
 import toHash from '../../helpers/toHash';
 
-test('should verify Android SafetyNet attestation', () => {
+let authData: Buffer;
+let attStmt: AttestationStatement;
+let clientDataHash: Buffer;
+
+beforeEach(() => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
-  const { authData, attStmt } = decodedAttestationObject;
 
+  authData = decodedAttestationObject.authData;
+  attStmt = decodedAttestationObject.attStmt;
+  clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
+});
+
+/**
+ * We need to use the `verifyTimestampMS` escape hatch until I can figure out how to generate a
+ * signature after modifying the payload with a `timestampMs` we can dynamically set
+ */
+test('should verify Android SafetyNet attestation', () => {
   const verified = verifyAndroidSafetyNet({
     attStmt,
     authData,
-    clientDataHash: toHash(base64url.toBuffer(clientDataJSON)),
+    clientDataHash,
     verifyTimestampMS: false,
   });
 
   expect(verified).toEqual(true);
+});
+
+test('should throw error when timestamp is not within one minute of now', () => {
+  expect(() => {
+    verifyAndroidSafetyNet({
+      attStmt,
+      authData,
+      clientDataHash,
+    });
+  }).toThrow(/has expired/i);
 });
 
 const attestationAndroidSafetyNet = {
