@@ -126,7 +126,7 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
-  if (!alg) {
+  if (Number.isNaN(Number(alg))) {
     throw new Error('Credential public key was missing alg');
   }
 
