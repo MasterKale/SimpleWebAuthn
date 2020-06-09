@@ -32,4 +32,5 @@ export type AttestationStatement = {
   x5c?: Buffer[];
   response?: Buffer;
   alg?: number;
+  ver?: string;
 };

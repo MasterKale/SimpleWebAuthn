@@ -17,13 +17,18 @@ type Options = {
  */
 export default function verifyAttestationAndroidSafetyNet(options: Options): boolean {
   const { attStmt, clientDataHash, authData } = options;
+  const { response, ver } = attStmt;
 
-  if (!attStmt.response) {
+  if (!ver) {
+    throw new Error('No ver value in attestation (SafetyNet)');
+  }
+
+  if (!response) {
     throw new Error('No response was included in attStmt by authenticator (SafetyNet)');
   }
 
   // Prepare to verify a JWT
-  const jwt = attStmt.response.toString('utf8');
+  const jwt = response.toString('utf8');
   const jwtParts = jwt.split('.');
 
   const HEADER: SafetyNetJWTHeader = JSON.parse(base64url.decode(jwtParts[0]));
