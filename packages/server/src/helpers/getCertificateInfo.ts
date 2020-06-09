@@ -4,6 +4,8 @@ export type CertificateInfo = {
   subject: { [key: string]: string };
   version: number;
   basicConstraintsCA: boolean;
+  notBefore: Date;
+  notAfter: Date;
 };
 
 type ExtInfo = {
@@ -43,5 +45,7 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
     subject,
     version,
     basicConstraintsCA,
+    notBefore: jsrsasign.zulutodate(subjectCert.getNotBefore()),
+    notAfter: jsrsasign.zulutodate(subjectCert.getNotAfter()),
   };
 }
