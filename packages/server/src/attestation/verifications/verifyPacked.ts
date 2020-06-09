@@ -50,7 +50,7 @@ export default function verifyAttestationPacked(options: Options): boolean {
     }
 
     if (!O) {
-      throw new Error('Batch certificate CN was empty (Packed|Full)');
+      throw new Error('Batch certificate O was empty (Packed|Full)');
     }
 
     if (!C || C.length !== 2) {
