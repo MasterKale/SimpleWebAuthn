@@ -70,11 +70,12 @@ export default function verifyAttestationPacked(options: Options): boolean {
       throw new Error('Certificate version was not `3` (ASN.1 value of 2) (Packed|Full)');
     }
 
-    const now = new Date();
+    let now = new Date();
     if (notBefore > now) {
       throw new Error(`Certificate not good before "${notBefore.toString()}"`);
     }
 
+    now = new Date();
     if (notAfter < now) {
       throw new Error(`Certificate not good after "${notAfter.toString()}"`);
     }
