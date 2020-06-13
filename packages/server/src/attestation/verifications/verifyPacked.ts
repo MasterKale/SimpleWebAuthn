@@ -40,9 +40,10 @@ export default function verifyAttestationPacked(options: Options): boolean {
 
   if (x5c) {
     const leafCert = convertASN1toPEM(x5c[0]);
-    const leafCertInfo = getCertificateInfo(leafCert);
+    const { subject, basicConstraintsCA, version, notBefore, notAfter } = getCertificateInfo(
+      leafCert,
+    );
 
-    const { subject, basicConstraintsCA, version } = leafCertInfo;
     const { OU, CN, O, C } = subject;
 
     if (OU !== 'Authenticator Attestation') {
@@ -67,6 +68,15 @@ export default function verifyAttestationPacked(options: Options): boolean {
 
     if (version !== 3) {
       throw new Error('Batch certificate version was not `3` (ASN.1 value of 2) (Packed|Full)');
+    }
+
+    const now = new Date();
+    if (notBefore > now) {
+      throw new Error(`Certificate not good before "${notBefore.toString()}"`);
+    }
+
+    if (notAfter < now) {
+      throw new Error(`Certificate not good after "${notAfter.toString()}"`);
     }
 
     verified = verifySignature(sig, signatureBase, leafCert);
