@@ -139,7 +139,7 @@ const GlobalSignRootCAR2 =
   'cmgQWpzU_qlULRuJQ_7TBj0_VLZjmmx6BEP3ojY-x1J96relc8geMJgEtslQIxq_H5COEBkEveegeGTLg';
 
 type SafetyNetJWTHeader = {
-  alg: 'string';
+  alg: string;
   x5c: string[];
 };
 
