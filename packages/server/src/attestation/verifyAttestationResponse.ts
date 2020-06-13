@@ -168,6 +168,9 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   } else if (fmt === ATTESTATION_FORMATS.TPM) {
     throw new Error(`Format "${fmt}" not yet supported`);
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
+    if (Object.keys(attStmt).length > 0) {
+      throw new Error('None attestation had unexpected attestation statement');
+    }
     // This is the weaker of the attestations, so there's nothing else to really check
     verified = true;
   } else {
