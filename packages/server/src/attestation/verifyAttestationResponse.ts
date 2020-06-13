@@ -95,7 +95,7 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   const { fmt, authData, attStmt } = attestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
+  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
@@ -149,6 +149,7 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
       credentialID,
       credentialPublicKey,
       rpIdHash,
+      aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.PACKED) {
     verified = verifyPacked({
