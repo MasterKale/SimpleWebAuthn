@@ -47,27 +47,27 @@ export default function verifyAttestationPacked(options: Options): boolean {
     const { OU, CN, O, C } = subject;
 
     if (OU !== 'Authenticator Attestation') {
-      throw new Error('Batch certificate OU was not "Authenticator Attestation" (Packed|Full)');
+      throw new Error('Certificate OU was not "Authenticator Attestation" (Packed|Full)');
     }
 
     if (!CN) {
-      throw new Error('Batch certificate CN was empty (Packed|Full)');
+      throw new Error('Certificate CN was empty (Packed|Full)');
     }
 
     if (!O) {
-      throw new Error('Batch certificate O was empty (Packed|Full)');
+      throw new Error('Certificate O was empty (Packed|Full)');
     }
 
     if (!C || C.length !== 2) {
-      throw new Error('Batch certificate C was not two-character ISO 3166 code (Packed|Full)');
+      throw new Error('Certificate C was not two-character ISO 3166 code (Packed|Full)');
     }
 
     if (basicConstraintsCA) {
-      throw new Error('Batch certificate basic constraints CA was not `false` (Packed|Full)');
+      throw new Error('Certificate basic constraints CA was not `false` (Packed|Full)');
     }
 
     if (version !== 3) {
-      throw new Error('Batch certificate version was not `3` (ASN.1 value of 2) (Packed|Full)');
+      throw new Error('Certificate version was not `3` (ASN.1 value of 2) (Packed|Full)');
     }
 
     const now = new Date();
