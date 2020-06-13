@@ -163,6 +163,10 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
       authData,
       clientDataHash,
     });
+  } else if (fmt === ATTESTATION_FORMATS.ANDROID_KEY) {
+    throw new Error(`Format "${fmt}" not yet supported`);
+  } else if (fmt === ATTESTATION_FORMATS.TPM) {
+    throw new Error(`Format "${fmt}" not yet supported`);
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
     // This is the weaker of the attestations, so there's nothing else to really check
     verified = true;
