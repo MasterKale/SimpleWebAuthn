@@ -1,6 +1,7 @@
 import jsrsasign from 'jsrsasign';
 
 export type CertificateInfo = {
+  issuer: { [key: string]: string };
   subject: { [key: string]: string };
   version: number;
   basicConstraintsCA: boolean;
@@ -29,6 +30,17 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
   const subjectCert = new jsrsasign.X509();
   subjectCert.readCertPEM(pemCertificate);
 
+  // Break apart the Issuer
+  const issuerString = subjectCert.getIssuerString();
+  const issuerParts = issuerString.slice(1).split('/');
+
+  const issuer: { [key: string]: string } = {};
+  issuerParts.forEach(field => {
+    const [key, val] = field.split('=');
+    issuer[key] = val;
+  });
+
+  // Break apart the Subject
   const subjectString = subjectCert.getSubjectString();
   const subjectParts = subjectString.slice(1).split('/');
 
@@ -42,6 +54,7 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
   const basicConstraintsCA = !!subjectCert.getExtBasicConstraints().cA;
 
   return {
+    issuer,
     subject,
     version,
     basicConstraintsCA,
