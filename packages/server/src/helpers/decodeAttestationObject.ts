@@ -35,4 +35,6 @@ export type AttestationStatement = {
   response?: Buffer;
   alg?: number;
   ver?: string;
+  certInfo?: Buffer;
+  pubArea?: Buffer;
 };
