@@ -10,7 +10,7 @@ type Options = {
   rpIdHash: Buffer;
   credentialID: Buffer;
   credentialPublicKey: Buffer;
-  aaguid?: Buffer;
+  aaguid: Buffer;
 };
 
 /**
@@ -48,7 +48,7 @@ export default function verifyAttestationFIDOU2F(options: Options): boolean {
   }
 
   // FIDO spec says that aaguid _must_ equal 0x00 here to be legit
-  const aaguidToHex = Number.parseInt(aaguid?.toString('hex'), 16);
+  const aaguidToHex = Number.parseInt(aaguid.toString('hex'), 16);
   if (aaguidToHex !== 0x00) {
     throw new Error(`AAGUID "${aaguidToHex}" was not expected value`);
   }

@@ -123,6 +123,10 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
     throw new Error('No public key was provided by authenticator');
   }
 
+  if (!aaguid) {
+    throw new Error('No AAGUID was present in attestation');
+  }
+
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
