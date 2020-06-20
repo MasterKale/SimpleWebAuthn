@@ -12,6 +12,7 @@ import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions'
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
+import verifyTPM from './verifications/tpm/verifyTPM';
 
 type Options = {
   credential: AttestationCredentialJSON;
@@ -171,7 +172,10 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   } else if (fmt === ATTESTATION_FORMATS.ANDROID_KEY) {
     throw new Error(`Format "${fmt}" not yet supported`);
   } else if (fmt === ATTESTATION_FORMATS.TPM) {
-    throw new Error(`Format "${fmt}" not yet supported`);
+    verified = verifyTPM({
+      aaguid,
+      attStmt,
+    });
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
     if (Object.keys(attStmt).length > 0) {
       throw new Error('None attestation had unexpected attestation statement');
