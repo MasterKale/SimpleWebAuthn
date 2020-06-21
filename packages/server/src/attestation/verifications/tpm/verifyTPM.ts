@@ -2,7 +2,6 @@ import type { AttestationStatement } from '../../../helpers/decodeAttestationObj
 
 import parseCertInfo from './parseCertInfo';
 import parsePubArea from './parsePubArea';
-import base64url from 'base64url';
 
 type Options = {
   aaguid: Buffer;
