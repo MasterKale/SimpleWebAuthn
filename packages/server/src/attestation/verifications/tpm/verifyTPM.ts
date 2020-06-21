@@ -59,7 +59,6 @@ export default function verifyTPM(options: Options): boolean {
     if (!n) {
       throw new Error('COSE public key missing n (TPM|RSA)');
     }
-
     if (!e) {
       throw new Error('COSE public key missing e (TPM|RSA)');
     }
