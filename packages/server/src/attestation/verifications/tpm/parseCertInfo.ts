@@ -1,4 +1,4 @@
-import { TPM_ALG } from './constants';
+import { TPM_ST, TPM_ALG } from './constants';
 
 export default function parseCertInfo(certInfo: Buffer): ParsedCertInfo {
   let certBuffer = certInfo;
@@ -84,24 +84,4 @@ type ParsedCertInfo = {
     name: Buffer;
     qualifiedName: Buffer;
   };
-};
-
-const TPM_ST: { [key: number]: string } = {
-  0x00c4: 'TPM_ST_RSP_COMMAND',
-  0x8000: 'TPM_ST_NULL',
-  0x8001: 'TPM_ST_NO_SESSIONS',
-  0x8002: 'TPM_ST_SESSIONS',
-  0x8014: 'TPM_ST_ATTEST_NV',
-  0x8015: 'TPM_ST_ATTEST_COMMAND_AUDIT',
-  0x8016: 'TPM_ST_ATTEST_SESSION_AUDIT',
-  0x8017: 'TPM_ST_ATTEST_CERTIFY',
-  0x8018: 'TPM_ST_ATTEST_QUOTE',
-  0x8019: 'TPM_ST_ATTEST_TIME',
-  0x801a: 'TPM_ST_ATTEST_CREATION',
-  0x8021: 'TPM_ST_CREATION',
-  0x8022: 'TPM_ST_VERIFIED',
-  0x8023: 'TPM_ST_AUTH_SECRET',
-  0x8024: 'TPM_ST_HASHCHECK',
-  0x8025: 'TPM_ST_AUTH_SIGNED',
-  0x8029: 'TPM_ST_FU_MANIFEST',
 };
