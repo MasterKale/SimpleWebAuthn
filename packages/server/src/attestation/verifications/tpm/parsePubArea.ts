@@ -81,7 +81,7 @@ export default function parsePubArea(pubArea: Buffer): ParsedPubArea {
 }
 
 type ParsedPubArea = {
-  type: string;
+  type: 'TPM_ALG_RSA' | 'TPM_ALG_ECC';
   nameAlg: string;
   objectAttributes: {
     fixedTPM: boolean;
