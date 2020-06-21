@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { TPM_ALG } from './constants';
+import { TPM_ALG, TPM_ECC_CURVE } from './constants';
 
 /**
  * Break apart a TPM attestation's pubArea buffer
@@ -116,16 +116,4 @@ type ECCParameters = {
   scheme: string;
   curveID: string;
   kdf: string;
-};
-
-const TPM_ECC_CURVE: { [key: number]: string } = {
-  0x0000: 'TPM_ECC_NONE',
-  0x0001: 'TPM_ECC_NIST_P192',
-  0x0002: 'TPM_ECC_NIST_P224',
-  0x0003: 'TPM_ECC_NIST_P256',
-  0x0004: 'TPM_ECC_NIST_P384',
-  0x0005: 'TPM_ECC_NIST_P521',
-  0x0010: 'TPM_ECC_BN_P256',
-  0x0011: 'TPM_ECC_BN_P638',
-  0x0020: 'TPM_ECC_SM2_P256',
 };

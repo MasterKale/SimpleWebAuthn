@@ -58,3 +58,15 @@ export const TPM_ALG: { [key: number]: string } = {
   0x0043: 'TPM_ALG_CFB',
   0x0044: 'TPM_ALG_ECB',
 };
+
+export const TPM_ECC_CURVE: { [key: number]: string } = {
+  0x0000: 'TPM_ECC_NONE',
+  0x0001: 'TPM_ECC_NIST_P192',
+  0x0002: 'TPM_ECC_NIST_P224',
+  0x0003: 'TPM_ECC_NIST_P256',
+  0x0004: 'TPM_ECC_NIST_P384',
+  0x0005: 'TPM_ECC_NIST_P521',
+  0x0010: 'TPM_ECC_BN_P256',
+  0x0011: 'TPM_ECC_BN_P638',
+  0x0020: 'TPM_ECC_SM2_P256',
+};
