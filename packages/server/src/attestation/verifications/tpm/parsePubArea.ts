@@ -48,7 +48,7 @@ export default function parsePubArea(pubArea: Buffer): ParsedPubArea {
       symmetric: TPM_ALG[rsaBuffer.slice(0, 2).readUInt16BE(0)],
       scheme: TPM_ALG[rsaBuffer.slice(2, 4).readUInt16BE(0)],
       keyBits: rsaBuffer.slice(4, 6).readUInt16BE(0),
-      exponent: rsaBuffer.slice(6, 10).readUInt16BE(0),
+      exponent: rsaBuffer.slice(6, 10).readUInt32BE(0),
     };
   } else if (type === 'TPM_ALG_ECC') {
     const eccBuffer = pubBuffer.slice(0, 8);
