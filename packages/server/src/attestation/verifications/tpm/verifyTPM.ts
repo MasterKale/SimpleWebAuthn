@@ -1,4 +1,7 @@
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
+import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
+import convertAAGUIDToString from '../../../helpers/convertAAGUIDToString';
+import { COSEKEYS } from '../../../helpers/convertCOSEtoPKCS';
 
 import parseCertInfo from './parseCertInfo';
 import parsePubArea from './parsePubArea';
@@ -6,10 +9,12 @@ import parsePubArea from './parsePubArea';
 type Options = {
   aaguid: Buffer;
   attStmt: AttestationStatement;
+  authData: Buffer;
+  credentialPublicKey: Buffer;
 };
 
 export default function verifyTPM(options: Options): boolean {
-  const { aaguid, attStmt, decodedPublicKey } = options;
+  const { aaguid, attStmt, authData, credentialPublicKey } = options;
   const { ver, alg, x5c, pubArea, certInfo } = attStmt;
 
   /**
@@ -37,25 +42,62 @@ export default function verifyTPM(options: Options): boolean {
 
   // TODO: Check that the “alg” field is set to the equivalent value to the signatureAlgorithm in
   // the metadata. You can find useful conversion tables in the appendix.
+  console.log('aaguid:', convertAAGUIDToString(aaguid));
 
   const parsedPubArea = parsePubArea(pubArea);
   console.log(parsedPubArea);
+  const { unique, type: pubType, parameters } = parsedPubArea;
 
-  // TODO: Verify that the public key specified by the parameters and unique fields of pubArea is
+  // Verify that the public key specified by the parameters and unique fields of pubArea is
   // identical to the credentialPublicKey in the attestedCredentialData in authenticatorData.
+  const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
-  // TODO: Check that pubArea.unique is set to the same public key, as the one in “authData” struct.
+  if (pubType === 'TPM_ALG_RSA') {
+    const n = cosePublicKey.get(COSEKEYS.n);
+    const e = cosePublicKey.get(COSEKEYS.e);
+
+    if (!n) {
+      throw new Error('COSE public key missing n (TPM|RSA)');
+    }
+
+    if (!e) {
+      throw new Error('COSE public key missing e (TPM|RSA)');
+    }
+
+    if (!unique.equals(n as Buffer)) {
+      throw new Error('PubArea unique is not same as credentialPublicKey (TPM|RSA)');
+    }
+
+    if (!parameters.rsa) {
+      throw new Error(`Parsed pubArea type is RSA, but missing parameters.rsa (TPM|RSA)`);
+    }
+
+    const eBuffer = e as Buffer;
+    // If `exponent` is equal to 0x00, then exponent is the default RSA exponent of 2^16+1 (65537)
+    const pubAreaExponent = parameters.rsa.exponent || 65537;
+
+    // Do some bit shifting to get to an integer
+    const eSum = eBuffer[0] + (eBuffer[1] << 8) + (eBuffer[2] << 16);
+
+    if (pubAreaExponent !== eSum) {
+      throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
+    }
+  } else if (pubType === 'TPM_ALG_ECC') {
+    throw new Error(`Unsupported pubArea.type "${pubType}"`);
+  } else {
+    throw new Error(`Unsupported pubArea.type "${pubType}"`);
+  }
 
   const parsedCertInfo = parseCertInfo(certInfo);
-  console.log(parsedCertInfo);
-  const { magic, type } = parsedCertInfo;
+  console.log({ parsedCertInfo });
+  const { magic, type: certType, attested } = parsedCertInfo;
 
   if (magic !== 4283712327) {
     throw new Error(`Unexpected magic value "${magic}", expected "4283712327" (TPM)`);
   }
 
-  if (type !== 'TPM_ST_ATTEST_CERTIFY') {
-    throw new Error(`Unexpected type "${type}", expected "TPM_ST_ATTEST_CERTIFY" (TPM)`);
+  if (certType !== 'TPM_ST_ATTEST_CERTIFY') {
+    throw new Error(`Unexpected type "${certType}", expected "TPM_ST_ATTEST_CERTIFY" (TPM)`);
   }
 
   // TODO: Hash pubArea to create pubAreaHash using the nameAlg in attested

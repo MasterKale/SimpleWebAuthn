@@ -175,6 +175,8 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
     verified = verifyTPM({
       aaguid,
       attStmt,
+      authData,
+      credentialPublicKey,
     });
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
     if (Object.keys(attStmt).length > 0) {
