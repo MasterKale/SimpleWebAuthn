@@ -5,8 +5,9 @@ import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
 import convertASN1toPEM from '../../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
+import verifySignature from '../../../helpers/verifySignature';
 
-import { TPM_ECC_CURVE } from './constants';
+import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
 import parseCertInfo from './parseCertInfo';
 import parsePubArea from './parsePubArea';
 
@@ -20,13 +21,17 @@ type Options = {
 
 export default function verifyTPM(options: Options): boolean {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash } = options;
-  const { ver, alg, x5c, pubArea, certInfo } = attStmt;
+  const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
 
   /**
    * Verify structures
    */
   if (ver !== '2.0') {
     throw new Error(`Unexpected ver "${ver}", expected "2.0" (TPM)`);
+  }
+
+  if (!sig) {
+    throw new Error('No attestation signature provided in attestation statement (TPM)');
   }
 
   if (!alg) {
@@ -144,7 +149,7 @@ export default function verifyTPM(options: Options): boolean {
 
   // Check that certInfo.attested.name is equals to attestedName.
   if (!attested.name.equals(attestedName)) {
-    throw new Error(`Attested name comparison failed (TPM|ECC)`);
+    throw new Error(`Attested name comparison failed (TPM)`);
   }
 
   // Concatenate authData with clientDataHash to create attToBeSigned
@@ -157,62 +162,86 @@ export default function verifyTPM(options: Options): boolean {
 
   // Check that certInfo.extraData is equals to attToBeSignedHash.
   if (!extraData.equals(attToBeSignedHash)) {
-    throw new Error('CertInfo extra data did not equal hashed attestation (TPM|ECC)');
+    throw new Error('CertInfo extra data did not equal hashed attestation (TPM)');
   }
 
   /**
    * Verify signature
    */
   if (x5c.length < 1) {
-    throw new Error('No certificates present in x5c array (TPM|ECC)');
+    throw new Error('No certificates present in x5c array (TPM)');
   }
 
   // Pick a leaf AIK certificate of the x5c array and parse it.
   const leafCertPEM = convertASN1toPEM(x5c[0]);
   // console.log(leafCertPEM);
-  const leafCertInfo = getCertificateInfo(leafCertPEM);
-  const { version, subject, notAfter, notBefore } = leafCertInfo;
-  console.log(leafCertInfo);
+  const leafCertInfo = getCertificateInfo(leafCertPEM, true);
+  const { basicConstraintsCA, version, subject, notAfter, notBefore, tpmInfo } = leafCertInfo;
+  // console.log(leafCertInfo);
+
+  if (basicConstraintsCA) {
+    throw new Error('Certificate basic constraints CA was not `false` (TPM)');
+  }
 
   // Check that certificate is of version 3 (value must be set to 2).
   if (version !== 3) {
-    throw new Error('Certificate version was not `3` (ASN.1 value of 2) (TPM|ECC)');
+    throw new Error('Certificate version was not `3` (ASN.1 value of 2) (TPM)');
   }
 
   // Check that Subject sequence is empty.
   if (Object.keys(subject).length > 0) {
-    throw new Error('Certificate subject was not empty (TPM|ECC)');
+    throw new Error('Certificate subject was not empty (TPM)');
   }
 
   // Check that certificate is currently valid
   let now = new Date();
   if (notBefore > now) {
-    throw new Error(`Certificate not good before "${notBefore.toString()}" (TPM|ECC)`);
+    throw new Error(`Certificate not good before "${notBefore.toString()}" (TPM)`);
   }
 
   // Check that certificate has not expired
   now = new Date();
   if (notAfter < now) {
-    throw new Error(`Certificate not good after "${notAfter.toString()}" (TPM|ECC)`);
+    throw new Error(`Certificate not good after "${notAfter.toString()}" (TPM)`);
   }
 
-  // TODO: Check that certificate contains subjectAltName(2.5.29.17) extension, and check that
-  // tcpaTpmManufacturer(2.23.133.2.1) field is set to the existing manufacturer ID. You can find
-  // list of TPM_MANUFACTURERS in the appendix.
+  const {
+    subjectAltNamePresent,
+    tcgAtTpmManufacturer,
+    tcgAtTpmModel,
+    tcgAtTpmVersion,
+    extKeyUsage,
+  } = tpmInfo;
 
-  // TODO: Check that certificate contains extKeyUsage(2.5.29.37) extension and it must contain
+  // Check that certificate contains subjectAltName(2.5.29.17) extension,
+  if (!subjectAltNamePresent) {
+    throw new Error('Certificate did not contain subjectAltName extension (TPM)');
+  }
+
+  if (!tcgAtTpmManufacturer || !tcgAtTpmModel || !tcgAtTpmVersion) {
+    throw new Error('Certificate contained incomplete subjectAltName data (TPM)');
+  }
+
+  // Check that tcpaTpmManufacturer (2.23.133.2.1) field is set to a valid manufacturer ID.
+  if (!TPM_MANUFACTURERS[tcgAtTpmManufacturer]) {
+    throw new Error(`Could not match TPM manufacturer "${tcgAtTpmManufacturer}" (TPM)`);
+  }
+
+  // Check that certificate contains extKeyUsage (2.5.29.37) extension and it must contain
   // tcg-kp-AIKCertificate (2.23.133.8.3) OID.
+  if (extKeyUsage !== '2.23.133.8.3') {
+    throw new Error(`Unexpected extKeyUsage "${extKeyUsage}", expected "2.23.133.8.3" (TPM)`);
+  }
 
   // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
   // that it’s value is set to the same AAGUID as in authData.
 
   // TODO: For attestationRoot in metadata.attestationRootCertificates, generate verification chain
-  // verifX5C by appending attestationRoot to the x5c. Try verifying verifX5C. If successful go to
+  // verifyX5C by appending attestationRoot to the x5c. Try verifying verifyX5C. If successful go to
   // next step. If fail try next attestationRoot. If no attestationRoots left to try, fail.
+  // const verifyX5C =
 
-  // TODO: Verify signature over certInfo with the public key extracted from AIK certificate.
-
-  // TODO: Get Martini friend, you are done!
-
-  throw new Error(`Format "tpm" not yet supported`);
+  // Verify signature over certInfo with the public key extracted from AIK certificate.
+  // Get Martini friend, you are done!
+  return verifySignature(sig, certInfo, leafCertPEM);
 }
