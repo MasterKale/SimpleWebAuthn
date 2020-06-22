@@ -1,9 +1,15 @@
 import elliptic from 'elliptic';
-import NodeRSA, { SigningSchemeHash } from 'node-rsa';
+import NodeRSA from 'node-rsa';
 
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 
-import convertCOSEtoPKCS, { COSEKEYS } from '../../helpers/convertCOSEtoPKCS';
+import convertCOSEtoPKCS, {
+  COSEKEYS,
+  COSEALGHASH,
+  COSECRV,
+  COSEKTY,
+  COSERSASCHEME,
+} from '../../helpers/convertCOSEtoPKCS';
 import toHash from '../../helpers/toHash';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
@@ -154,44 +160,3 @@ export default function verifyAttestationPacked(options: Options): boolean {
 
   return verified;
 }
-
-enum COSEKTY {
-  OKP = 1,
-  EC2 = 2,
-  RSA = 3,
-}
-
-const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
-  '-3': 'pss-sha256',
-  '-39': 'pss-sha512',
-  '-38': 'pss-sha384',
-  '-65535': 'pkcs1-sha1',
-  '-257': 'pkcs1-sha256',
-  '-258': 'pkcs1-sha384',
-  '-259': 'pkcs1-sha512',
-};
-
-// See https://w3c.github.io/webauthn/#sctn-alg-identifier
-const COSECRV: { [key: number]: string } = {
-  // alg: -7
-  1: 'p256',
-  // alg: -35
-  2: 'p384',
-  // alg: -36
-  3: 'p521',
-  // alg: -8
-  6: 'ed25519',
-};
-
-const COSEALGHASH: { [key: string]: string } = {
-  '-257': 'sha256',
-  '-258': 'sha384',
-  '-259': 'sha512',
-  '-65535': 'sha1',
-  '-39': 'sha512',
-  '-38': 'sha384',
-  '-37': 'sha256',
-  '-7': 'sha256',
-  '-8': 'sha512',
-  '-36': 'sha512',
-};
