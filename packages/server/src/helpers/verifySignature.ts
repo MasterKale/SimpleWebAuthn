@@ -6,11 +6,13 @@ import crypto from 'crypto';
  * @param signature attStmt.sig
  * @param signatureBase Output from Buffer.concat()
  * @param publicKey Authenticator's public key as a PEM certificate
+ * @param algo Which algorithm to use to verify the signature (default: `'sha256'`)
  */
 export default function verifySignature(
   signature: Buffer,
   signatureBase: Buffer,
   publicKey: string,
+  algo = 'sha256',
 ): boolean {
-  return crypto.createVerify('SHA256').update(signatureBase).verify(publicKey, signature);
+  return crypto.createVerify(algo).update(signatureBase).verify(publicKey, signature);
 }
