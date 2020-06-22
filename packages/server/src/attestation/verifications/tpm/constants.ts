@@ -70,3 +70,87 @@ export const TPM_ECC_CURVE: { [key: number]: string } = {
   0x0011: 'TPM_ECC_BN_P638',
   0x0020: 'TPM_ECC_SM2_P256',
 };
+
+type ManufacturerInfo = {
+  name: string;
+  id: string;
+};
+
+export const TPM_MANUFACTURERS: { [key: string]: ManufacturerInfo } = {
+  'id:414D4400': {
+    name: 'AMD',
+    id: 'AMD',
+  },
+  'id:41544D4C': {
+    name: 'Atmel',
+    id: 'ATML',
+  },
+  'id:4252434D': {
+    name: 'Broadcom',
+    id: 'BRCM',
+  },
+  'id:49424d00': {
+    name: 'IBM',
+    id: 'IBM',
+  },
+  'id:49465800': {
+    name: 'Infineon',
+    id: 'IFX',
+  },
+  'id:494E5443': {
+    name: 'Intel',
+    id: 'INTC',
+  },
+  'id:4C454E00': {
+    name: 'Lenovo',
+    id: 'LEN',
+  },
+  'id:4E534D20': {
+    name: 'National Semiconductor',
+    id: 'NSM',
+  },
+  'id:4E545A00': {
+    name: 'Nationz',
+    id: 'NTZ',
+  },
+  'id:4E544300': {
+    name: 'Nuvoton Technology',
+    id: 'NTC',
+  },
+  'id:51434F4D': {
+    name: 'Qualcomm',
+    id: 'QCOM',
+  },
+  'id:534D5343': {
+    name: 'SMSC',
+    id: 'SMSC',
+  },
+  'id:53544D20': {
+    name: 'ST Microelectronics',
+    id: 'STM',
+  },
+  'id:534D534E': {
+    name: 'Samsung',
+    id: 'SMSN',
+  },
+  'id:534E5300': {
+    name: 'Sinosun',
+    id: 'SNS',
+  },
+  'id:54584E00': {
+    name: 'Texas Instruments',
+    id: 'TXN',
+  },
+  'id:57454300': {
+    name: 'Winbond',
+    id: 'WEC',
+  },
+  'id:524F4343': {
+    name: 'Fuzhouk Rockchip',
+    id: 'ROCC',
+  },
+  'id:FFFFF1D0': {
+    name: 'FIDO Alliance',
+    id: 'FIDO',
+  },
+};
