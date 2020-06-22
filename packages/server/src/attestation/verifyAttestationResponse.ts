@@ -177,6 +177,7 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
       attStmt,
       authData,
       credentialPublicKey,
+      clientDataHash,
     });
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
     if (Object.keys(attStmt).length > 0) {

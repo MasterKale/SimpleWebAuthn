@@ -52,6 +52,7 @@ export default function parseCertInfo(certInfo: Buffer): ParsedCertInfo {
 
   const attested = {
     nameAlg: TPM_ALG[attestedName.slice(0, 2).readUInt16BE(0)],
+    nameAlgBuffer: attestedName.slice(0, 2),
     name: attestedName,
     qualifiedName,
   };
@@ -81,6 +82,7 @@ type ParsedCertInfo = {
   firmwareVersion: Buffer;
   attested: {
     nameAlg: string;
+    nameAlgBuffer: Buffer;
     name: Buffer;
     qualifiedName: Buffer;
   };

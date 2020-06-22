@@ -1,8 +1,12 @@
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import convertAAGUIDToString from '../../../helpers/convertAAGUIDToString';
-import { COSEKEYS } from '../../../helpers/convertCOSEtoPKCS';
+import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
+import toHash from '../../../helpers/toHash';
+import convertASN1toPEM from '../../../helpers/convertASN1toPEM';
+import getCertificateInfo from '../../../helpers/getCertificateInfo';
 
+import { TPM_ECC_CURVE } from './constants';
 import parseCertInfo from './parseCertInfo';
 import parsePubArea from './parsePubArea';
 
@@ -11,10 +15,11 @@ type Options = {
   attStmt: AttestationStatement;
   authData: Buffer;
   credentialPublicKey: Buffer;
+  clientDataHash: Buffer;
 };
 
 export default function verifyTPM(options: Options): boolean {
-  const { aaguid, attStmt, authData, credentialPublicKey } = options;
+  const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash } = options;
   const { ver, alg, x5c, pubArea, certInfo } = attStmt;
 
   /**
@@ -45,7 +50,7 @@ export default function verifyTPM(options: Options): boolean {
   console.log('aaguid:', convertAAGUIDToString(aaguid));
 
   const parsedPubArea = parsePubArea(pubArea);
-  console.log(parsedPubArea);
+  // console.log(parsedPubArea);
   const { unique, type: pubType, parameters } = parsedPubArea;
 
   // Verify that the public key specified by the parameters and unique fields of pubArea is
@@ -82,35 +87,78 @@ export default function verifyTPM(options: Options): boolean {
       throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
     }
   } else if (pubType === 'TPM_ALG_ECC') {
-    throw new Error(`Unsupported pubArea.type "${pubType}"`);
+    /**
+     * TODO: Confirm this all works fine. Conformance tools v1.3.4 don't currently test ECC so I
+     * had to eyeball it based on the **duo-labs/webauthn** library
+     */
+    const crv = cosePublicKey.get(COSEKEYS.crv);
+    const x = cosePublicKey.get(COSEKEYS.x);
+    const y = cosePublicKey.get(COSEKEYS.y);
+
+    if (!crv) {
+      throw new Error('COSE public key missing crv (TPM|ECC)');
+    }
+    if (!x) {
+      throw new Error('COSE public key missing x (TPM|ECC)');
+    }
+    if (!y) {
+      throw new Error('COSE public key missing y (TPM|ECC)');
+    }
+
+    if (!unique.equals(Buffer.concat([x as Buffer, y as Buffer]))) {
+      throw new Error('PubArea unique is not same as public key x and y (TPM|ECC)');
+    }
+
+    if (!parameters.ecc) {
+      throw new Error(`Parsed pubArea type is ECC, but missing parameters.ecc (TPM|ECC)`);
+    }
+
+    const pubAreaCurveID = parameters.ecc.curveID;
+    const pubKeyCurveID = TPM_ECC_CURVE[(crv as Buffer).readUInt16BE(0)];
+    if (pubAreaCurveID !== pubKeyCurveID) {
+      throw new Error(
+        `Unexpected public key curve ID "${pubKeyCurveID}", expected "${pubAreaCurveID}" (TPM|ECC)`,
+      );
+    }
   } else {
     throw new Error(`Unsupported pubArea.type "${pubType}"`);
   }
 
   const parsedCertInfo = parseCertInfo(certInfo);
-  console.log({ parsedCertInfo });
-  const { magic, type: certType, attested } = parsedCertInfo;
+  // console.log({ parsedCertInfo });
+  const { magic, type: certType, attested, extraData } = parsedCertInfo;
 
-  if (magic !== 4283712327) {
-    throw new Error(`Unexpected magic value "${magic}", expected "4283712327" (TPM)`);
+  if (magic !== 0xff544347) {
+    throw new Error(`Unexpected magic value "${magic}", expected "0xff544347" (TPM)`);
   }
 
   if (certType !== 'TPM_ST_ATTEST_CERTIFY') {
     throw new Error(`Unexpected type "${certType}", expected "TPM_ST_ATTEST_CERTIFY" (TPM)`);
   }
 
-  // TODO: Hash pubArea to create pubAreaHash using the nameAlg in attested
+  // Hash pubArea to create pubAreaHash using the nameAlg in attested
+  const pubAreaHash = toHash(pubArea, attested.nameAlg.replace('TPM_ALG_', ''));
 
-  // TODO: Concatenate attested.nameAlg and pubAreaHash to create attestedName.
+  // Concatenate attested.nameAlg and pubAreaHash to create attestedName.
+  const attestedName = Buffer.concat([attested.nameAlgBuffer, pubAreaHash]);
 
-  // TODO: Check that certInfo.attested.name is equals to attestedName.
+  // Check that certInfo.attested.name is equals to attestedName.
+  if (!attested.name.equals(attestedName)) {
+    throw new Error(`Attested name comparison failed (TPM|ECC)`);
+  }
 
-  // TODO: Concatenate authData with clientDataHash to create attToBeSigned
+  // Concatenate authData with clientDataHash to create attToBeSigned
+  const attToBeSigned = Buffer.concat([authData, clientDataHash]);
 
-  // TODO: Hash attToBeSigned using the algorithm specified in attStmt.alg to create
+  // Hash attToBeSigned using the algorithm specified in attStmt.alg to create
   // attToBeSignedHash
+  const hashAlg: string = COSEALGHASH[alg as number];
+  const attToBeSignedHash = toHash(attToBeSigned, hashAlg);
 
-  // TODO: Check that certInfo.extraData is equals to attToBeSignedHash.
+  // Check that certInfo.extraData is equals to attToBeSignedHash.
+  if (!extraData.equals(attToBeSignedHash)) {
+    throw new Error('CertInfo extra data did not equal hashed attestation (TPM|ECC)');
+  }
 
   /**
    * Verify signature
