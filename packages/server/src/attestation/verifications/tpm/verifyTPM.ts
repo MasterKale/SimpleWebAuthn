@@ -163,13 +163,38 @@ export default function verifyTPM(options: Options): boolean {
   /**
    * Verify signature
    */
-  // TODO: Pick a leaf AIK certificate of the x5c array and parse it.
+  if (x5c.length < 1) {
+    throw new Error('No certificates present in x5c array (TPM|ECC)');
+  }
 
-  // TODO: Check that certificate if of version 3(value must be set to 2).
+  // Pick a leaf AIK certificate of the x5c array and parse it.
+  const leafCertPEM = convertASN1toPEM(x5c[0]);
+  // console.log(leafCertPEM);
+  const leafCertInfo = getCertificateInfo(leafCertPEM);
+  const { version, subject, notAfter, notBefore } = leafCertInfo;
+  console.log(leafCertInfo);
 
-  // TODO: Check that Subject sequence is empty.
+  // Check that certificate is of version 3 (value must be set to 2).
+  if (version !== 3) {
+    throw new Error('Certificate version was not `3` (ASN.1 value of 2) (TPM|ECC)');
+  }
 
-  // TODO: Check that certificate is not expired and is started.
+  // Check that Subject sequence is empty.
+  if (Object.keys(subject).length > 0) {
+    throw new Error('Certificate subject was not empty (TPM|ECC)');
+  }
+
+  // Check that certificate is currently valid
+  let now = new Date();
+  if (notBefore > now) {
+    throw new Error(`Certificate not good before "${notBefore.toString()}" (TPM|ECC)`);
+  }
+
+  // Check that certificate has not expired
+  now = new Date();
+  if (notAfter < now) {
+    throw new Error(`Certificate not good after "${notAfter.toString()}" (TPM|ECC)`);
+  }
 
   // TODO: Check that certificate contains subjectAltName(2.5.29.17) extension, and check that
   // tcpaTpmManufacturer(2.23.133.2.1) field is set to the existing manufacturer ID. You can find
