@@ -41,13 +41,23 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
   });
 
   // Break apart the Subject
-  const subjectString = subjectCert.getSubjectString();
-  const subjectParts = subjectString.slice(1).split('/');
+  let subjectRaw = '/';
+  try {
+    subjectRaw = subjectCert.getSubjectString();
+  } catch (err) {
+    // Don't throw on an error that indicates an empty subject
+    if (err !== 'malformed RDN') {
+      throw err;
+    }
+  }
+  const subjectParts = subjectRaw.slice(1).split('/');
 
   const subject: { [key: string]: string } = {};
   subjectParts.forEach(field => {
-    const [key, val] = field.split('=');
-    subject[key] = val;
+    if (field) {
+      const [key, val] = field.split('=');
+      subject[key] = val;
+    }
   });
 
   const { version } = subjectCert as x5cCertificate;
