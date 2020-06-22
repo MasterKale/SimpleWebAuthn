@@ -243,5 +243,5 @@ export default function verifyTPM(options: Options): boolean {
 
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // Get Martini friend, you are done!
-  return verifySignature(sig, certInfo, leafCertPEM);
+  return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
 }
