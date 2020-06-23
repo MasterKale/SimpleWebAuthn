@@ -155,8 +155,7 @@ export default function verifyTPM(options: Options): boolean {
   // Concatenate authData with clientDataHash to create attToBeSigned
   const attToBeSigned = Buffer.concat([authData, clientDataHash]);
 
-  // Hash attToBeSigned using the algorithm specified in attStmt.alg to create
-  // attToBeSignedHash
+  // Hash attToBeSigned using the algorithm specified in attStmt.alg to create attToBeSignedHash
   const hashAlg: string = COSEALGHASH[alg as number];
   const attToBeSignedHash = toHash(attToBeSigned, hashAlg);
 
