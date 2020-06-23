@@ -174,7 +174,7 @@ export default function verifyTPM(options: Options): boolean {
   // Pick a leaf AIK certificate of the x5c array and parse it.
   const leafCertPEM = convertASN1toPEM(x5c[0]);
   // console.log(leafCertPEM);
-  const leafCertInfo = getCertificateInfo(leafCertPEM, true);
+  const leafCertInfo = getCertificateInfo(leafCertPEM, 'tpm');
   const { basicConstraintsCA, version, subject, notAfter, notBefore, tpmInfo } = leafCertInfo;
   // console.log(leafCertInfo);
 

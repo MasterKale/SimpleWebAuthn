@@ -38,7 +38,7 @@ interface x5cCertificate extends jsrsasign.X509 {
  */
 export default function getCertificateInfo(
   pemCertificate: string,
-  includeTPMInfo = false,
+  includeExtraInfo?: 'tpm' | 'android-key',
 ): CertificateInfo {
   const subjectCert = new X509();
   subjectCert.readCertPEM(pemCertificate);
@@ -83,7 +83,7 @@ export default function getCertificateInfo(
     tcgAtTpmVersion: '',
     extKeyUsage: '',
   };
-  if (includeTPMInfo) {
+  if (includeExtraInfo === 'tpm') {
     const asn1Dump = ASN1HEX.dump(subjectCert.hex);
     // console.log(asn1Dump);
     const asn1Lines: string[] = asn1Dump.split('\n');
