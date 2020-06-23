@@ -376,6 +376,37 @@ test('should validate TPM RSA response (SHA1)', () => {
   );
 });
 
+test('should validate Android-Key response', () => {
+  const expectedChallenge = '14e0d1b6-9c36-4849-aeec-ea64676449ef';
+  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
+  const verification = verifyAttestationResponse({
+    credential: {
+      id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+      rawId: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+      response: {
+        attestationObject:
+          'o2NmbXRrYW5kcm9pZC1rZXlnYXR0U3RtdKNjYWxnJmNzaWdYRjBEAiBzpQmnQw6jn-V33XTmlvkw4wyUW-CbyYd5Bltvl_8oHwIgY05YGCJIawM1INNQg4cshJKi847UVUBURLNkTd-BC2hjeDVjglkDGjCCAxYwggK9oAMCAQICAQEwCgYIKoZIzj0EAwIwgeQxRTBDBgNVBAMMPEZBS0UgQW5kcm9pZCBLZXlzdG9yZSBTb2Z0d2FyZSBBdHRlc3RhdGlvbiBJbnRlcm1lZGlhdGUgRkFLRTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk1ZMRIwEAYDVQQHDAlXYWtlZmllbGQwIBcNNzAwMjAxMDAwMDAwWhgPMjA5OTAxMzEyMzU5NTlaMCkxJzAlBgNVBAMMHkZBS0UgQW5kcm9pZCBLZXlzdG9yZSBLZXkgRkFLRTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239o6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7ajggEWMIIBEjALBgNVHQ8EBAMCB4AwgeEGCisGAQQB1nkCAREEgdIwgc8CAQIKAQACAQEKAQAEIEwhPC-SlsMm-UdaXBdqAIDXqyRDtjXSeja589CMqyF2BAAwab-FPQgCBgFe0-PPoL-FRVkEVzBVMS8wLQQoY29tLmFuZHJvaWQua2V5c3RvcmUuYW5kcm9pZGtleXN0b3JlZGVtbwIBATEiBCB0z8tQdIj1KRCFkcelBZGfMncy-8HYA1Jq6pgABtLYmDAyoQUxAwIBAqIDAgEDowQCAgEApQUxAwIBBKoDAgEBv4N4AwIBAr-FPgMCAQC_hT8CBQAwHwYDVR0jBBgwFoAUo9KqLO8NjPIkAtUctGC8v2pbJBQwCgYIKoZIzj0EAwIDRwAwRAIgHl4jYMq7nEV6pcuXJFNOsZHSX5Zn1UDy6RI9zsDR-C4CICNfJrQW1jyEuRUM1xR8VmKjkjIa2W22Z7NdyZz1CQq-WQMYMIIDFDCCArqgAwIBAgIBAjAKBggqhkjOPQQDAjCB3DE9MDsGA1UEAww0RkFLRSBBbmRyb2lkIEtleXN0b3JlIFNvZnR3YXJlIEF0dGVzdGF0aW9uIFJvb3QgRkFLRTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk1ZMRIwEAYDVQQHDAlXYWtlZmllbGQwHhcNMTkwNDI1MDU0OTMyWhcNNDYwOTEwMDU0OTMyWjCB5DFFMEMGA1UEAww8RkFLRSBBbmRyb2lkIEtleXN0b3JlIFNvZnR3YXJlIEF0dGVzdGF0aW9uIEludGVybWVkaWF0ZSBGQUtFMTEwLwYJKoZIhvcNAQkBFiJjb25mb3JtYW5jZS10b29sc0BmaWRvYWxsaWFuY2Uub3JnMRYwFAYDVQQKDA1GSURPIEFsbGlhbmNlMSIwIAYDVQQLDBlBdXRoZW50aWNhdG9yIEF0dGVzdGF0aW9uMQswCQYDVQQGEwJVUzELMAkGA1UECAwCTVkxEjAQBgNVBAcMCVdha2VmaWVsZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKtQYStiTRe7w7UbBEk7BUkLjB-LnbzzebLe3KB8UqHXtg3TIXXcK37dvCbbCNVfhvZxtpTcME2kooqMTgOm9cejYzBhMA8GA1UdEwEB_wQFMAMBAf8wDgYDVR0PAQH_BAQDAgKEMB0GA1UdDgQWBBSj0qos7w2M8iQC1Ry0YLy_alskFDAfBgNVHSMEGDAWgBRSmhsy4FaqzVEP71-ANwaL8pEjHTAKBggqhkjOPQQDAgNIADBFAiEAsW8uQC-0es5tOY3w_T7IshPj3o__B5IQRsHq8IlZKH0CIG75Q6isJ4twXhaLE4b0TkuLadd7i4zarqZsoaSWXy75aGF1dGhEYXRhWKQ93EcQ6cCIsinbqJ1WMiC7Ofcimv9GWwplaxr7mor4oEEAAABsVQ5LVKpHQJ-alRq3bBMBMQAgPPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0qlAQIDJiABIVggSMKrvCgY03_jattqoyAm_PSe4pNY1GtHb2Uxfcnbf2giWCDohwBeo8k8iNKsKUcMCZsm_8RKFiFirRH34beTvjiftg',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiIxNGUwZDFiNi05YzM2LTQ4NDktYWVlYy1lYTY0Njc2NDQ5ZWYiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
+      },
+      type: 'public-key',
+    },
+    expectedChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toEqual(true);
+  expect(verification.authenticatorInfo?.fmt).toEqual('android-key');
+  expect(verification.authenticatorInfo?.counter).toEqual(108);
+  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
+    'BEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239o6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
+  );
+  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
+    'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+  );
+});
+
 /**
  * Various Attestations Below
  */

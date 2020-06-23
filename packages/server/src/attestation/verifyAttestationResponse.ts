@@ -13,6 +13,7 @@ import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
+import verifyAndroidKey from './verifications/verifyAndroidKey';
 
 type Options = {
   credential: AttestationCredentialJSON;
@@ -170,7 +171,11 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
       clientDataHash,
     });
   } else if (fmt === ATTESTATION_FORMATS.ANDROID_KEY) {
-    throw new Error(`Format "${fmt}" not yet supported`);
+    verified = verifyAndroidKey({
+      attStmt,
+      authData,
+      clientDataHash,
+    });
   } else if (fmt === ATTESTATION_FORMATS.TPM) {
     verified = verifyTPM({
       aaguid,
