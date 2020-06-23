@@ -10,7 +10,7 @@ export type CertificateInfo = {
   notBefore: Date;
   notAfter: Date;
   extendedKeyUsageIDs: string[];
-  tpmInfo: {
+  tpmInfo?: {
     subjectAltNamePresent: boolean;
     tcgAtTpmManufacturer: string;
     tcgAtTpmModel: string;
@@ -76,14 +76,25 @@ export default function getCertificateInfo(
   const { version } = subjectCert as x5cCertificate;
   const basicConstraintsCA = !!subjectCert.getExtBasicConstraints().cA;
 
-  const tpmInfo = {
-    subjectAltNamePresent: false,
-    tcgAtTpmManufacturer: '',
-    tcgAtTpmModel: '',
-    tcgAtTpmVersion: '',
-    extKeyUsage: '',
+  const toReturn: CertificateInfo = {
+    issuer,
+    subject,
+    version,
+    basicConstraintsCA,
+    notBefore: zulutodate(subjectCert.getNotBefore()),
+    notAfter: zulutodate(subjectCert.getNotAfter()),
+    extendedKeyUsageIDs: subjectCert.getExtExtKeyUsageName(),
   };
+
   if (includeExtraInfo === 'tpm') {
+    const tpmInfo = {
+      subjectAltNamePresent: false,
+      tcgAtTpmManufacturer: '',
+      tcgAtTpmModel: '',
+      tcgAtTpmVersion: '',
+      extKeyUsage: '',
+    };
+
     const asn1Dump = ASN1HEX.dump(subjectCert.hex);
     // console.log(asn1Dump);
     const asn1Lines: string[] = asn1Dump.split('\n');
@@ -128,18 +139,11 @@ export default function getCertificateInfo(
         i += 3;
       }
     }
+
+    toReturn.tpmInfo = tpmInfo;
   }
 
-  return {
-    issuer,
-    subject,
-    version,
-    basicConstraintsCA,
-    notBefore: zulutodate(subjectCert.getNotBefore()),
-    notAfter: zulutodate(subjectCert.getNotAfter()),
-    extendedKeyUsageIDs: subjectCert.getExtExtKeyUsageName(),
-    tpmInfo,
-  };
+  return toReturn;
 }
 
 /**

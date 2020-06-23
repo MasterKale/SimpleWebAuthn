@@ -204,6 +204,10 @@ export default function verifyTPM(options: Options): boolean {
     throw new Error(`Certificate not good after "${notAfter.toString()}" (TPM)`);
   }
 
+  if (!tpmInfo) {
+    throw new Error(`No tpmInfo in leaf certificate info (TPM)`);
+  }
+
   const {
     subjectAltNamePresent,
     tcgAtTpmManufacturer,
