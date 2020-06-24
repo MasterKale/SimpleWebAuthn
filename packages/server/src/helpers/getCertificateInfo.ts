@@ -1,6 +1,4 @@
-/* eslint-disable-next-line */
-// @ts-ignore 2305
-import { X509, ASN1HEX, zulutodate } from 'jsrsasign';
+import { X509, zulutodate } from 'jsrsasign';
 
 export type CertificateInfo = {
   issuer: { [key: string]: string };
@@ -36,10 +34,7 @@ interface x5cCertificate extends jsrsasign.X509 {
  *
  * @param pemCertificate Result from call to `convertASN1toPEM(x5c[0])`
  */
-export default function getCertificateInfo(
-  pemCertificate: string,
-  includeExtraInfo?: 'tpm' | 'android-key',
-): CertificateInfo {
+export default function getCertificateInfo(pemCertificate: string): CertificateInfo {
   const subjectCert = new X509();
   subjectCert.readCertPEM(pemCertificate);
 
@@ -74,7 +69,7 @@ export default function getCertificateInfo(
   });
 
   const { version } = subjectCert as x5cCertificate;
-  const basicConstraintsCA = !!subjectCert.getExtBasicConstraints().cA;
+  const basicConstraintsCA = !!subjectCert.getExtBasicConstraints()?.cA;
 
   const toReturn: CertificateInfo = {
     issuer,
@@ -83,102 +78,8 @@ export default function getCertificateInfo(
     basicConstraintsCA,
     notBefore: zulutodate(subjectCert.getNotBefore()),
     notAfter: zulutodate(subjectCert.getNotAfter()),
-    extendedKeyUsageIDs: subjectCert.getExtExtKeyUsageName(),
+    extendedKeyUsageIDs: subjectCert.getExtExtKeyUsageName() || [],
   };
 
-  if (includeExtraInfo === 'tpm') {
-    const tpmInfo = {
-      subjectAltNamePresent: false,
-      tcgAtTpmManufacturer: '',
-      tcgAtTpmModel: '',
-      tcgAtTpmVersion: '',
-      extKeyUsage: '',
-    };
-
-    const asn1Dump = ASN1HEX.dump(subjectCert.hex);
-    // console.log(asn1Dump);
-    const asn1Lines: string[] = asn1Dump.split('\n');
-
-    const subjectAltNameID = '2 5 29 17';
-    const tcgAtTpmManufacturerID = '2 23 133 2 1';
-    const tcgAtTpmModelID = '2 23 133 2 2';
-    const tcgAtTpmVersionID = '2 23 133 2 3';
-    const extKeyUsageID = '2 5 29 37';
-
-    // Time to brute-force our way to victory
-    for (let i = 0; i < asn1Lines.length; i += 1) {
-      const line = asn1Lines[i];
-
-      if (!tpmInfo.subjectAltNamePresent && line.indexOf(subjectAltNameID) >= 0) {
-        // Value is on the next line
-        tpmInfo.subjectAltNamePresent = decodeASN1Boolean(asn1Lines[i + 1].trim());
-        i += 1;
-      }
-
-      if (!tpmInfo.tcgAtTpmManufacturer && line.indexOf(tcgAtTpmManufacturerID) >= 0) {
-        // Value is on the next line
-        tpmInfo.tcgAtTpmManufacturer = decodeASN1UTF8String(asn1Lines[i + 1].trim());
-        i += 1;
-      }
-
-      if (!tpmInfo.tcgAtTpmModel && line.indexOf(tcgAtTpmModelID) >= 0) {
-        // Value is on the next line
-        tpmInfo.tcgAtTpmModel = decodeASN1UTF8String(asn1Lines[i + 1].trim());
-        i += 1;
-      }
-
-      if (!tpmInfo.tcgAtTpmVersion && line.indexOf(tcgAtTpmVersionID) >= 0) {
-        // Value is on the next line
-        tpmInfo.tcgAtTpmVersion = decodeASN1UTF8String(asn1Lines[i + 1].trim());
-        i += 1;
-      }
-
-      if (!tpmInfo.extKeyUsage && line.indexOf(extKeyUsageID) >= 0) {
-        // Value is a few lines down
-        tpmInfo.extKeyUsage = decodeASN1ObjectIdentifier(asn1Lines[i + 3]);
-        i += 3;
-      }
-    }
-
-    toReturn.tpmInfo = tpmInfo;
-  }
-
   return toReturn;
-}
-
-/**
- * Some brute-force ASN.1 DER decode methods
- */
-
-/**
- * Convert a value like "BOOLEAN TRUE" to true
- */
-function decodeASN1Boolean(input: string): boolean {
-  return input === 'BOOLEAN TRUE';
-}
-
-/**
- * Convert a value like "UTF8String 'id:FFFFF1D0'" to "id:FFFFF1D0"
- */
-function decodeASN1UTF8String(input: string): string {
-  const matched = /UTF8String '([\w:]+)'/.exec(input);
-
-  if (!matched) {
-    return '';
-  }
-
-  return matched[1];
-}
-
-/**
- * Convert a value like "ObjectIdentifier (2 23 133 8 3)" to "2.23.133.8.3"
- */
-function decodeASN1ObjectIdentifier(input: string): string {
-  const matched = /ObjectIdentifier \(([\d ]+)\)/.exec(input);
-
-  if (!matched) {
-    return '';
-  }
-
-  return matched[1].replace(/ /g, '.');
 }
