@@ -6,11 +6,12 @@ type Options = {
   authData: Buffer;
   clientDataHash: Buffer;
   attStmt: AttestationStatement;
+  credentialPublicKey: Buffer;
 };
 
 export default function verifyAttestationAndroidKey(options: Options): boolean {
-  const { authData, clientDataHash, attStmt } = options;
-  const { x5c, sig } = attStmt;
+  const { authData, clientDataHash, attStmt, credentialPublicKey } = options;
+  const { x5c, sig, alg } = attStmt;
 
   if (!x5c) {
     throw new Error('No attestation certificate provided in attestation statement (AndroidKey)');

@@ -175,6 +175,7 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
       attStmt,
       authData,
       clientDataHash,
+      credentialPublicKey,
     });
   } else if (fmt === ATTESTATION_FORMATS.TPM) {
     verified = verifyTPM({
