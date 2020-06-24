@@ -1,11 +1,11 @@
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
-import convertAAGUIDToString from '../../../helpers/convertAAGUIDToString';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
 import convertASN1toPEM from '../../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
+import { leafCertToASN1Object, findOID, JASN1, ASN1Object } from '../../../helpers/asn1Utils';
 
 import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
 import parseCertInfo from './parseCertInfo';
@@ -52,7 +52,7 @@ export default function verifyTPM(options: Options): boolean {
 
   // TODO: Check that the “alg” field is set to the equivalent value to the signatureAlgorithm in
   // the metadata. You can find useful conversion tables in the appendix.
-  console.log('aaguid:', convertAAGUIDToString(aaguid));
+  // console.log('aaguid:', convertAAGUIDToString(aaguid));
 
   const parsedPubArea = parsePubArea(pubArea);
   // console.log(parsedPubArea);
@@ -174,8 +174,8 @@ export default function verifyTPM(options: Options): boolean {
   // Pick a leaf AIK certificate of the x5c array and parse it.
   const leafCertPEM = convertASN1toPEM(x5c[0]);
   // console.log(leafCertPEM);
-  const leafCertInfo = getCertificateInfo(leafCertPEM, 'tpm');
-  const { basicConstraintsCA, version, subject, notAfter, notBefore, tpmInfo } = leafCertInfo;
+  const leafCertInfo = getCertificateInfo(leafCertPEM);
+  const { basicConstraintsCA, version, subject, notAfter, notBefore } = leafCertInfo;
   // console.log(leafCertInfo);
 
   if (basicConstraintsCA) {
@@ -204,17 +204,13 @@ export default function verifyTPM(options: Options): boolean {
     throw new Error(`Certificate not good after "${notAfter.toString()}" (TPM)`);
   }
 
-  if (!tpmInfo) {
-    throw new Error(`No tpmInfo in leaf certificate info (TPM)`);
-  }
+  const certASN1 = leafCertToASN1Object(x5c[0]);
 
-  const {
-    subjectAltNamePresent,
-    tcgAtTpmManufacturer,
-    tcgAtTpmModel,
-    tcgAtTpmVersion,
-    extKeyUsage,
-  } = tpmInfo;
+  const subjectAltNamePresent = getASN1SubjectAltNamePresent(certASN1);
+  const tcgAtTpmManufacturer = getASN1TcgAtTpmManufacturer(certASN1);
+  const tcgAtTpmModel = getASN1TcgAtTpmModel(certASN1);
+  const tcgAtTpmVersion = getASN1TcgAtTpmVersion(certASN1);
+  const extKeyUsage = getASN1ExtKeyUsage(certASN1);
 
   // Check that certificate contains subjectAltName(2.5.29.17) extension,
   if (!subjectAltNamePresent) {
@@ -247,4 +243,164 @@ export default function verifyTPM(options: Options): boolean {
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // Get Martini friend, you are done!
   return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
+}
+
+function getASN1SubjectAltNamePresent(certASN1: ASN1Object): boolean {
+  const oid = '2.5.29.17';
+  const ext = findOID(certASN1, oid);
+
+  if (!ext) {
+    return false;
+  }
+
+  /**
+   * Return "true" (as an actual boolean) from the following data structure
+   * {
+   *   "type": "SEQUENCE",
+   *   "data": [
+   *     {
+   *       "type": "OBJECT_IDENTIFIER",
+   *       "data": "2.5.29.17\nsubjectAltName\nX.509 extension"
+   *     },
+   *     {
+   *       "type": "BOOLEAN",
+   *       "data": "true"
+   *     },
+   *     // ...snip...
+   *   ]
+   * }
+   */
+
+  return (ext.data as JASN1[])[1].data === 'true';
+}
+
+function getASN1TcgAtTpmManufacturer(certASN1: ASN1Object): string {
+  const oid = '2.23.133.2.1';
+  const ext = findOID(certASN1, oid);
+
+  if (!ext) {
+    return '';
+  }
+
+  /**
+   * Return "id:FFFFF1D0" from the following data structure
+   *
+   * {
+   *   "type": "SEQUENCE",
+   *   "data": [
+   *     {
+   *       "type": "OBJECT_IDENTIFIER",
+   *       "data": "2.23.133.2.1\ntcpaTpmManufacturer\nTCPA Attribute"
+   *     },
+   *     {
+   *       "type": "UTF8String",
+   *       "data": "id:FFFFF1D0"
+   *     }
+   *   ]
+   * }
+   */
+
+  return (ext.data as JASN1[])[1].data as string;
+}
+
+function getASN1TcgAtTpmModel(certASN1: ASN1Object): string {
+  const oid = '2.23.133.2.2';
+  const ext = findOID(certASN1, oid);
+
+  if (!ext) {
+    return '';
+  }
+
+  /**
+   * Return "NPCT6xx" from the following data structure
+   *
+   * {
+   *   "type": "SEQUENCE",
+   *   "data": [
+   *     {
+   *       "type": "OBJECT_IDENTIFIER",
+   *       "data": "2.23.133.2.2\ntcpaTpmModel\nTCPA Attribute"
+   *     },
+   *     {
+   *       "type": "UTF8String",
+   *       "data": "NPCT6xx"
+   *     }
+   *   ]
+   * }
+   */
+
+  return (ext.data as JASN1[])[1].data as string;
+}
+
+function getASN1TcgAtTpmVersion(certASN1: ASN1Object): string {
+  const oid = '2.23.133.2.3';
+  const ext = findOID(certASN1, oid);
+
+  if (!ext) {
+    return '';
+  }
+
+  /**
+   * Return "id:13" from the following data structure:
+   *
+   * {
+   *   "type": "SEQUENCE",
+   *   "data": [
+   *     {
+   *       "type": "OBJECT_IDENTIFIER",
+   *       "data": "2.23.133.2.3\ntcpaTpmVersion\nTCPA Attribute"
+   *     },
+   *     {
+   *       "type": "UTF8String",
+   *       "data": "id:13"
+   *     }
+   *   ]
+   * }
+   */
+
+  return (ext.data as JASN1[])[1].data as string;
+}
+
+function getASN1ExtKeyUsage(certASN1: ASN1Object): string {
+  const oid = '2.5.29.37';
+  const ext = findOID(certASN1, oid);
+
+  if (!ext) {
+    return '';
+  }
+
+  /**
+   * Return "2.23.133.8.3" from the following data structure:
+   *
+   * {
+   *   "type": "SEQUENCE",
+   *   "data": [
+   *     {
+   *       "type": "OBJECT_IDENTIFIER",
+   *       "data": "2.5.29.37\nextKeyUsage\nX.509 extension"
+   *     },
+   *     {
+   *       "type": "OCTET_STRING",
+   *       "data": [
+   *         {
+   *           "type": "SEQUENCE",
+   *           "data": [
+   *             {
+   *               "type": "OBJECT_IDENTIFIER",
+   *               "data": "2.23.133.8.3"
+   *             }
+   *           ]
+   *         }
+   *       ]
+   *     }
+   *   ]
+   * }
+   */
+
+  const root = ext.data as JASN1[];
+  const root1 = root[1].data as JASN1[];
+  const root2 = root1[0].data as JASN1[];
+  const value = root2[0].data as string;
+
+  return value;
 }
