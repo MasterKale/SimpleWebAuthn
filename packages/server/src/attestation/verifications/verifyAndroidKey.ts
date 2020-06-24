@@ -78,12 +78,15 @@ export default function verifyAttestationAndroidKey(options: Options): boolean {
   }
 
   // TODO: Confirm that the root certificate is an expected certificate
-  const rootCertPEM = convertASN1toPEM(x5c[x5c.length - 1]);
-  console.log(rootCertPEM);
+  // const rootCertPEM = convertASN1toPEM(x5c[x5c.length - 1]);
+  // console.log(rootCertPEM);
 
   // if (rootCertPEM !== expectedRootCert) {
   //   throw new Error('Root certificate was not expected certificate (AndroidKey)');
   // }
+
+  // TODO: Verify certificate path using the algorithm specified in RFC5280 section 6
+  // Related to to-be-implemented validateCertificatePath();
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
   const leafCertPEM = convertASN1toPEM(x5c[0]);
