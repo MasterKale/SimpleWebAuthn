@@ -91,7 +91,8 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
 
   const { subject } = commonCertInfo;
 
-  // TODO: Find out where this CN string is specified and if it might change
+  // Ensure the certificate was issued to this hostname
+  // See https://developer.android.com/training/safetynet/attestation#verify-attestation-response
   if (subject.CN !== 'attest.android.com') {
     throw new Error('Certificate common name was not "attest.android.com" (SafetyNet)');
   }
