@@ -204,6 +204,9 @@ export default function verifyTPM(options: Options): boolean {
     throw new Error(`Certificate not good after "${notAfter.toString()}" (TPM)`);
   }
 
+  /**
+   * Plumb the depths of the certificate's ASN.1-formatted data for some values we need to verify
+   */
   const certASN1 = leafCertToASN1Object(x5c[0]);
 
   const subjectAltNamePresent = getASN1SubjectAltNamePresent(certASN1);
