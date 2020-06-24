@@ -8,13 +8,6 @@ export type CertificateInfo = {
   notBefore: Date;
   notAfter: Date;
   extendedKeyUsageIDs: string[];
-  tpmInfo?: {
-    subjectAltNamePresent: boolean;
-    tcgAtTpmManufacturer: string;
-    tcgAtTpmModel: string;
-    tcgAtTpmVersion: string;
-    extKeyUsage: string;
-  };
 };
 
 type ExtInfo = {
