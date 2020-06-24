@@ -48,7 +48,7 @@ export default function verifyAttestationAndroidKey(options: Options): boolean {
   const credPubKeyPKCS = Buffer.concat([reservedByte, convertCOSEtoPKCS(credentialPublicKey)]);
 
   if (!credPubKeyPKCS.equals(certPubKey)) {
-    throw new Error('Credential public key does not leaf cert public key');
+    throw new Error('Credential public key does not equal leaf cert public key (AndroidKey)');
   }
 
   // Find Android KeyStore Extension in certificate extensions
