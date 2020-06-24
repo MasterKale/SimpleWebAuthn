@@ -26,6 +26,7 @@
     "node"
   ],
   "dependencies": {
+    "@lapo/asn1js": "^1.1.0",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "^3.0.1",
     "cbor": "^5.0.2",
