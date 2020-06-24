@@ -2,7 +2,11 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 
-const { generateAttestationOptions, verifyAttestationResponse } = require('@simplewebauthn/server');
+const {
+  generateAttestationOptions,
+  verifyAttestationResponse,
+  generateAssertionOptions,
+} = require('@simplewebauthn/server');
 
 const inMemoryUserDeviceDB = {
   // [username]: string: {
@@ -120,6 +124,36 @@ fidoComplianceRouter.post('/attestation/result', (req, res) => {
 
   return res.send({
     status: verified ? 'ok' : '',
+    errorMessage: '',
+  });
+});
+
+/**
+ * [FIDO2] Server Tests > GetAssertion Request
+ */
+fidoComplianceRouter.post('/assertion/options', (req, res) => {
+  const { body } = req;
+  const { username, userVerification, extensions } = body;
+
+  loggedInUsername = username;
+
+  let user = inMemoryUserDeviceDB[username];
+
+  const { devices } = user;
+
+  const challenge = uuidv4();
+  user.currentChallenge = challenge;
+
+  const opts = generateAssertionOptions({
+    challenge,
+    extensions,
+    userVerification,
+    allowedCredentialIDs: devices.map(dev => dev.credentialID),
+  });
+
+  return res.send({
+    ...opts,
+    status: 'ok',
     errorMessage: '',
   });
 });
