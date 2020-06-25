@@ -5,6 +5,7 @@ import type { AttestationStatement } from '../../helpers/decodeAttestationObject
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
+import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 
 type Options = {
   attStmt: AttestationStatement;
@@ -75,15 +76,7 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
    * START Verify Header
    */
   // Generate an array of certs constituting a full certificate chain
-  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map(cert => {
-    let pem = '';
-    // Take a string of characters and chop them up into 64-char lines (just like a PEM cert)
-    for (let i = 0; i < cert.length; i += 64) {
-      pem += `${cert.slice(i, i + 64)}\n`;
-    }
-
-    return `-----BEGIN CERTIFICATE-----\n${pem}-----END CERTIFICATE-----`;
-  });
+  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertASN1toPEM);
 
   const certificate = fullpathCert[0];
 
