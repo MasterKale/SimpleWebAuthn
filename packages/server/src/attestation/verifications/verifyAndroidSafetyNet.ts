@@ -5,6 +5,7 @@ import type { AttestationStatement } from '../../helpers/decodeAttestationObject
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
+import validateCertificatePath from '../../helpers/validateCertificatePath';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 
 type Options = {
@@ -90,8 +91,12 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
     throw new Error('Certificate common name was not "attest.android.com" (SafetyNet)');
   }
 
-  // TODO: Re-investigate this if we decide to "use MDS or Metadata Statements"
-  // validateCertificatePath(fullpathCert);
+  // Validate certificate path
+  try {
+    validateCertificatePath(fullpathCert);
+  } catch (err) {
+    throw new Error(`${err} (SafetyNet)`);
+  }
   /**
    * END Verify Header
    */
