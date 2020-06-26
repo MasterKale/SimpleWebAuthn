@@ -32,7 +32,7 @@ const fidoComplianceRouter = express.Router();
 
 let loggedInUsername = undefined;
 const serviceName = 'FIDO Conformance Test';
-const rpID = 'fido-compliance-test';
+const rpID = 'dev.dontneeda.pw';
 const origin = 'https://dev.dontneeda.pw';
 
 /**
