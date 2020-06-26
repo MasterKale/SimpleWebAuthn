@@ -9,6 +9,7 @@ import {
   JASN1,
 } from '../../helpers/asn1Utils';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
+import validateCertificatePath from '../../helpers/validateCertificatePath';
 
 type Options = {
   authData: Buffer;
@@ -85,8 +86,12 @@ export default function verifyAttestationAndroidKey(options: Options): boolean {
   //   throw new Error('Root certificate was not expected certificate (AndroidKey)');
   // }
 
-  // TODO: Verify certificate path using the algorithm specified in RFC5280 section 6
-  // Related to to-be-implemented validateCertificatePath();
+  // Verify certificate path
+  try {
+    validateCertificatePath(x5c.map(convertASN1toPEM));
+  } catch (err) {
+    throw new Error(`${err} (AndroidKey)`);
+  }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
   const leafCertPEM = convertASN1toPEM(x5c[0]);
