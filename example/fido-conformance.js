@@ -6,6 +6,7 @@ const {
   generateAttestationOptions,
   verifyAttestationResponse,
   generateAssertionOptions,
+  verifyAssertionResponse,
 } = require('@simplewebauthn/server');
 
 const inMemoryUserDeviceDB = {
@@ -154,6 +155,46 @@ fidoComplianceRouter.post('/assertion/options', (req, res) => {
   return res.send({
     ...opts,
     status: 'ok',
+    errorMessage: '',
+  });
+});
+
+fidoComplianceRouter.post('/assertion/result', (req, res) => {
+  const { body } = req;
+  const { id } = body;
+
+  const user = inMemoryUserDeviceDB[loggedInUsername];
+  const expectedChallenge = user.currentChallenge;
+  const existingDevice = user.devices.find(device => device.credentialID === id);
+
+  if (!existingDevice) {
+    throw new Error('Assertion device is not registered to user');
+  }
+
+  let verification;
+  try {
+    verification = verifyAssertionResponse({
+      credential: body,
+      expectedChallenge: Buffer.from(expectedChallenge, 'base64'),
+      expectedOrigin: origin,
+      expectedRPID: rpID,
+      authenticator: existingDevice,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(400).send({ errorMessage: error.message });
+  }
+
+  const { verified, authenticatorInfo } = verification;
+
+  if (verified) {
+    const { base64CredentialID, counter } = authenticatorInfo;
+    const existingDevice = user.devices.find(device => device.credentialID === base64CredentialID);
+    existingDevice.counter = counter;
+  }
+
+  return res.send({
+    status: verified ? 'ok' : '',
     errorMessage: '',
   });
 });
