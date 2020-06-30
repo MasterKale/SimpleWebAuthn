@@ -64,6 +64,10 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     intBuffer = intBuffer.slice(firstEncoded.byteLength);
   }
 
+  if (intBuffer.byteLength > 0) {
+    throw new Error('Leftover bytes detected while parsing authenticator data');
+  }
+
   return {
     rpIdHash,
     flagsBuf,
