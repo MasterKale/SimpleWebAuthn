@@ -1,3 +1,5 @@
+import cbor from 'cbor';
+
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
@@ -47,7 +49,11 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     credentialID = intBuffer.slice(0, credIDLen);
     intBuffer = intBuffer.slice(credIDLen);
 
-    credentialPublicKey = intBuffer;
+    // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
+    const firstDecoded = cbor.decodeFirstSync(intBuffer);
+    const firstEncoded = cbor.encode(firstDecoded);
+    credentialPublicKey = firstEncoded;
+    intBuffer = intBuffer.slice(firstEncoded.byteLength);
   }
 
   return {
