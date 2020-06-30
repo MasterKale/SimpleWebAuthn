@@ -56,6 +56,14 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     intBuffer = intBuffer.slice(firstEncoded.byteLength);
   }
 
+  let extensionsDataBuffer: Buffer | undefined = undefined;
+  if (flags.ed) {
+    const firstDecoded = cbor.decodeFirstSync(intBuffer);
+    const firstEncoded = cbor.encode(firstDecoded);
+    extensionsDataBuffer = firstEncoded;
+    intBuffer = intBuffer.slice(firstEncoded.byteLength);
+  }
+
   return {
     rpIdHash,
     flagsBuf,
@@ -65,6 +73,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     aaguid,
     credentialID,
     credentialPublicKey,
+    extensionsDataBuffer,
   };
 }
 
@@ -83,4 +92,5 @@ export type ParsedAuthenticatorData = {
   aaguid?: Buffer;
   credentialID?: Buffer;
   credentialPublicKey?: Buffer;
+  extensionsDataBuffer?: Buffer;
 };
