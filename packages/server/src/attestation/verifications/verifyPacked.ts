@@ -86,6 +86,16 @@ export default function verifyAttestationPacked(options: Options): boolean {
       throw new Error(`Certificate not good after "${notAfter.toString()}"`);
     }
 
+    // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
+    // that it’s value is set to the same AAGUID as in authData.
+
+    // TODO: Parse authData, and verify that authData.publicKey algorithm set to the corresponding
+    // algorithm to the one set in metadata statement.
+
+    // TODO: For each attestationRoot in metadata.attestationRootCertificates, generate verification
+    // chain verifX5C by appending attestationRoot to the x5c. Try verifying verifyX5C. If fail try
+    // next attestationRoot. If no attestationRoots left to try, return error.
+
     verified = verifySignature(sig, signatureBase, leafCert);
   } else {
     const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
