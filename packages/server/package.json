@@ -30,9 +30,11 @@
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "^3.0.1",
     "cbor": "^5.0.2",
+    "dotenv": "^8.2.0",
     "elliptic": "^6.5.2",
     "jsrsasign": "^8.0.15",
     "node-rsa": "^1.0.8"
   },
-  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
+  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
+  "devDependencies": {}
 }
