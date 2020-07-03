@@ -3,10 +3,12 @@ import fetch from 'node-fetch';
 
 import { ENV_VARS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
+import validateCertificatePath from '../helpers/validateCertificatePath';
+import convertASN1toPEM from '../helpers/convertASN1toPEM';
 
 import parseJWT from './parseJWT';
 
-const { ENABLE_MDS, MDS_TOC_URL, MDS_API_TOKEN } = ENV_VARS;
+const { ENABLE_MDS, MDS_TOC_URL, MDS_API_TOKEN, MDS_ROOT_CERT_URL } = ENV_VARS;
 
 type CachedAAGUID = {
   url: string;
@@ -111,7 +113,21 @@ class MetadataService {
       return;
     }
 
-    // Convert the nextUpdate property into a Date so we can detemrine when to redownload
+    // Download FIDO the root certificate and append it to the TOC certs
+    const respFIDORootCert = await fetch(MDS_ROOT_CERT_URL);
+    const rootCert = await respFIDORootCert.text();
+    const fullCertPath = header.x5c.map(convertASN1toPEM).concat(rootCert);
+
+    try {
+      // Validate the certificate chain
+      validateCertificatePath(fullCertPath);
+    } catch (err) {
+      console.error(err);
+      // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
+      return;
+    }
+
+    // Convert the nextUpdate property into a Date so we can determine when to redownload
     const [year, month, day] = payload.nextUpdate.split('-');
     this.nextUpdate = new Date(
       parseInt(year, 10),
