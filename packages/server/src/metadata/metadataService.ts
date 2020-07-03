@@ -121,16 +121,17 @@ class MetadataService {
 
     try {
       // Validate the certificate chain
+      // TODO: Check for certificate revocation
       validateCertificatePath(fullCertPath);
     } catch (err) {
       console.error(err);
-      // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
+      // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
+      // chain certificates is revoked"
       return;
     }
 
-    // TODO: Figure out why the signature won't verify here
+    // Verify the TOC JWT signature
     const leafCert = fullCertPath[0];
-
     const verified = KJUR.jws.JWS.verifyJWT(data, leafCert, {
       alg: [header.alg],
       // Empty values to appease TypeScript and this library's subtly mis-typed @types definitions
