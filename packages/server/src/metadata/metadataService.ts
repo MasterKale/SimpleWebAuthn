@@ -28,7 +28,6 @@ class MetadataService {
    *
    * If `process.env.ENABLE_MDS` is `'true'`, then the actual MDS API will be queried. Otherwise
    * known metadata statements can be provided as arguments.
-   *
    */
   async initialize(statements?: MetadataStatement[]): Promise<void> {
     if (ENABLE_MDS) {
