@@ -3,6 +3,7 @@ import { Base64URLString } from '@simplewebauthn/typescript-types';
 import fetch from 'node-fetch';
 
 import { ENV_VARS } from '../helpers/constants';
+import toHash from '../helpers/toHash';
 
 import parseJWT from './parseJWT';
 
@@ -10,6 +11,7 @@ const { ENABLE_MDS, MDS_TOC_URL, MDS_API_TOKEN } = ENV_VARS;
 
 type CachedAAGUID = {
   url: string;
+  hash: string;
   statement?: MetadataStatement;
 };
 
@@ -22,6 +24,7 @@ type CachedAAGUID = {
 class MetadataService {
   private cache: { [aaguid: string]: CachedAAGUID } = {};
   private nextUpdate: Date = new Date(0);
+  private tocAlg = '';
 
   /**
    * Prepare the service to handle live data, or prepared data.
@@ -35,7 +38,7 @@ class MetadataService {
     } else {
       if (statements?.length) {
         statements.forEach(statement => {
-          this.cache[statement.aaguid] = { url: '', statement };
+          this.cache[statement.aaguid] = { url: '', hash: '', statement };
         });
       }
     }
@@ -48,6 +51,10 @@ class MetadataService {
    * as per the `nextUpdate` property in the initial TOC download.
    */
   async getStatement(aaguid: string): Promise<MetadataStatement | undefined> {
+    if (!aaguid) {
+      return;
+    }
+
     if (ENABLE_MDS) {
       const now = new Date();
       if (now > this.nextUpdate) {
@@ -66,8 +73,18 @@ class MetadataService {
       const resp = await fetch(`${cached.url}?token=${MDS_API_TOKEN}`);
       const data = await resp.text();
       const statement: MetadataStatement = JSON.parse(base64url.decode(data));
-      // Update the cached entry with the latest statement
-      cached.statement = statement;
+
+      const hashAlg = this.tocAlg === 'ES256' ? 'SHA256' : undefined;
+      const calculatedHash = base64url.encode(toHash(data, hashAlg));
+
+      if (calculatedHash === cached.hash) {
+        // Update the cached entry with the latest statement
+        cached.statement = statement;
+      } else {
+        // From FIDO MDS docs: "Ignore the downloaded metadata statement if the hash value doesn't
+        // match."
+        cached.statement = undefined;
+      }
     }
 
     return cached.statement;
@@ -83,6 +100,7 @@ class MetadataService {
 
     // Break apart the JWT we get back
     const parsedJWT = parseJWT<MDSJWTTOCHeader, MDSJWTTOCPayload>(data);
+    const header = parsedJWT[0];
     const payload = parsedJWT[1];
 
     // Convert the nextUpdate property into a Date so we can detemrine when to redownload
@@ -94,6 +112,9 @@ class MetadataService {
       parseInt(day, 10),
     );
 
+    // Store the header `alg` so we know what to use when verifying metadata statement hashes
+    this.tocAlg = header.alg;
+
     // Prepare the in-memory cache of statements.
     for (const entry of payload.entries) {
       // Only cache entries with an `aaguid`
@@ -101,6 +122,7 @@ class MetadataService {
         const _entry = entry as TOCAAGUIDEntry;
         const cached: CachedAAGUID = {
           url: entry.url,
+          hash: entry.hash,
         };
 
         this.cache[_entry.aaguid] = cached;
