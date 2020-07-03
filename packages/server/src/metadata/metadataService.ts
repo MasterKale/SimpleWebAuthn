@@ -25,6 +25,7 @@ class MetadataService {
   private cache: { [aaguid: string]: CachedAAGUID } = {};
   private nextUpdate: Date = new Date(0);
   private tocAlg = '';
+  private tocNo = 0;
 
   /**
    * Prepare the service to handle live data, or prepared data.
@@ -103,6 +104,12 @@ class MetadataService {
     const header = parsedJWT[0];
     const payload = parsedJWT[1];
 
+    if (payload.no <= this.tocNo) {
+      // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
+      // number of the last Metadata TOC object cached locally."
+      return;
+    }
+
     // Convert the nextUpdate property into a Date so we can detemrine when to redownload
     const [year, month, day] = payload.nextUpdate.split('-');
     this.nextUpdate = new Date(
@@ -114,6 +121,9 @@ class MetadataService {
 
     // Store the header `alg` so we know what to use when verifying metadata statement hashes
     this.tocAlg = header.alg;
+
+    // Store the payload `no` to make sure we're getting the next TOC in the sequence
+    this.tocNo = payload.no;
 
     // Prepare the in-memory cache of statements.
     for (const entry of payload.entries) {
