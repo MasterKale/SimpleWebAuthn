@@ -33,8 +33,11 @@
     "dotenv": "^8.2.0",
     "elliptic": "^6.5.2",
     "jsrsasign": "^8.0.15",
+    "node-fetch": "^2.6.0",
     "node-rsa": "^1.0.8"
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.7"
+  }
 }
