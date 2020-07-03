@@ -115,8 +115,8 @@ class MetadataService {
 
     // Download FIDO the root certificate and append it to the TOC certs
     const respFIDORootCert = await fetch(MDS_ROOT_CERT_URL);
-    const rootCert = await respFIDORootCert.text();
-    const fullCertPath = header.x5c.map(convertASN1toPEM).concat(rootCert);
+    const fidoRootCert = await respFIDORootCert.text();
+    const fullCertPath = header.x5c.map(convertASN1toPEM).concat(fidoRootCert);
 
     try {
       // Validate the certificate chain
