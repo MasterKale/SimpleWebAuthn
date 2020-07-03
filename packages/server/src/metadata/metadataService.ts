@@ -1,11 +1,11 @@
 import { Base64URLString } from '@simplewebauthn/typescript-types';
 import fetch from 'node-fetch';
+import { KJUR } from 'jsrsasign';
 
 import { ENV_VARS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertASN1toPEM from '../helpers/convertASN1toPEM';
-import verifySignature from '../helpers/verifySignature';
 
 import parseJWT from './parseJWT';
 
@@ -130,12 +130,19 @@ class MetadataService {
 
     // TODO: Figure out why the signature won't verify here
     const leafCert = fullCertPath[0];
-    const jwtParts = data.split('.');
-    const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`, 'base64');
-    const signatureBuffer = Buffer.from(jwtParts[2], 'base64');
 
-    const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCert);
-    console.log({ verified });
+    const verified = KJUR.jws.JWS.verifyJWT(data, leafCert, {
+      alg: [header.alg],
+      // Empty values to appease TypeScript and this library's subtly mis-typed @types definitions
+      aud: [],
+      iss: [],
+      sub: [],
+    });
+
+    if (!verified) {
+      // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
+      return;
+    }
 
     // Convert the nextUpdate property into a Date so we can determine when to redownload
     const [year, month, day] = payload.nextUpdate.split('-');
