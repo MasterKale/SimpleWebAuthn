@@ -1,4 +1,3 @@
-import base64url from 'base64url';
 import { Base64URLString } from '@simplewebauthn/typescript-types';
 import fetch from 'node-fetch';
 
@@ -73,10 +72,12 @@ class MetadataService {
       // Download the metadata statement if it's not been cached
       const resp = await fetch(`${cached.url}?token=${MDS_API_TOKEN}`);
       const data = await resp.text();
-      const statement: MetadataStatement = JSON.parse(base64url.decode(data));
+      const statement: MetadataStatement = JSON.parse(
+        Buffer.from(data, 'base64').toString('ascii'),
+      );
 
       const hashAlg = this.tocAlg === 'ES256' ? 'SHA256' : undefined;
-      const calculatedHash = base64url.encode(toHash(data, hashAlg));
+      const calculatedHash = toHash(data, hashAlg).toString('base64');
 
       if (calculatedHash === cached.hash) {
         // Update the cached entry with the latest statement
