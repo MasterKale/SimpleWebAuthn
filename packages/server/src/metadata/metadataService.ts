@@ -6,6 +6,7 @@ import { ENV_VARS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertASN1toPEM from '../helpers/convertASN1toPEM';
+import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 
 import parseJWT from './parseJWT';
 
@@ -53,9 +54,13 @@ class MetadataService {
    * If `process.env.ENABLE_MDS` is `'true'`, then this method will coordinate re-downloading data
    * as per the `nextUpdate` property in the initial TOC download.
    */
-  async getStatement(aaguid: string): Promise<MetadataStatement | undefined> {
+  async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
     if (!aaguid) {
       return;
+    }
+
+    if (aaguid instanceof Buffer) {
+      aaguid = convertAAGUIDToString(aaguid);
     }
 
     if (ENABLE_MDS) {
