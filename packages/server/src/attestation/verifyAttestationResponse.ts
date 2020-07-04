@@ -36,7 +36,9 @@ type Options = {
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  */
-export default function verifyAttestationResponse(options: Options): VerifiedAttestation {
+export default async function verifyAttestationResponse(
+  options: Options,
+): Promise<VerifiedAttestation> {
   const {
     credential,
     expectedChallenge,
