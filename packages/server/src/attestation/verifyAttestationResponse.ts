@@ -160,7 +160,7 @@ export default async function verifyAttestationResponse(
       aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.PACKED) {
-    verified = verifyPacked({
+    verified = await verifyPacked({
       attStmt,
       authData,
       clientDataHash,

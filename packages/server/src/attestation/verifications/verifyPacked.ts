@@ -27,7 +27,7 @@ type Options = {
 /**
  * Verify an attestation response with fmt 'packed'
  */
-export default function verifyAttestationPacked(options: Options): boolean {
+export default async function verifyAttestationPacked(options: Options): Promise<boolean> {
   const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid } = options;
 
   const { sig, x5c, alg } = attStmt;
