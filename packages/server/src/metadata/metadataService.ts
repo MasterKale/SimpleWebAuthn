@@ -18,6 +18,12 @@ type CachedAAGUID = {
   statement?: MetadataStatement;
 };
 
+enum SERVICE_STATE {
+  CLEAN,
+  REFRESHING,
+  READY,
+}
+
 /**
  * A basic service to coordinate interactions with the FIDO Metadata Service. This includes TOC
  * download and parsing, and on-demand requesting and caching of individual metadata statements.
@@ -29,6 +35,7 @@ class MetadataService {
   private nextUpdate: Date = new Date(0);
   private tocAlg = '';
   private tocNo = 0;
+  private state: SERVICE_STATE = SERVICE_STATE.CLEAN;
 
   /**
    * Prepare the service to handle live data, or prepared data.
@@ -55,6 +62,10 @@ class MetadataService {
    * as per the `nextUpdate` property in the initial TOC download.
    */
   async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
+    if (this.state === SERVICE_STATE.CLEAN) {
+      throw new Error('MetadataService.initialize() must be called before this method can be used');
+    }
+
     if (!aaguid) {
       return;
     }
@@ -104,6 +115,8 @@ class MetadataService {
    * Download and process the latest TOC from MDS
    */
   private async downloadTOC() {
+    this.state = SERVICE_STATE.REFRESHING;
+
     // Query MDS for the latest TOC
     const respTOC = await fetch(`${MDS_TOC_URL}?token=${MDS_API_TOKEN}`);
     const data = await respTOC.text();
@@ -116,6 +129,7 @@ class MetadataService {
     if (payload.no <= this.tocNo) {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
       // number of the last Metadata TOC object cached locally."
+      this.state = SERVICE_STATE.READY;
       return;
     }
 
@@ -132,6 +146,7 @@ class MetadataService {
       console.error(err);
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
+      this.state = SERVICE_STATE.READY;
       return;
     }
 
@@ -147,6 +162,7 @@ class MetadataService {
 
     if (!verified) {
       // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
+      this.state = SERVICE_STATE.READY;
       return;
     }
 
@@ -178,6 +194,8 @@ class MetadataService {
         this.cache[_entry.aaguid] = cached;
       }
     }
+
+    this.state = SERVICE_STATE.READY;
   }
 }
 
