@@ -21,13 +21,14 @@ type Options = {
   clientDataHash: Buffer;
   authData: Buffer;
   credentialPublicKey: Buffer;
+  aaguid: Buffer;
 };
 
 /**
  * Verify an attestation response with fmt 'packed'
  */
 export default function verifyAttestationPacked(options: Options): boolean {
-  const { attStmt, clientDataHash, authData, credentialPublicKey } = options;
+  const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid } = options;
 
   const { sig, x5c, alg } = attStmt;
 

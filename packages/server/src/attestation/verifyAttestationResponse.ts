@@ -163,6 +163,7 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
       authData,
       clientDataHash,
       credentialPublicKey,
+      aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
     verified = verifyAndroidSafetynet({
