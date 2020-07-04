@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 
@@ -7,7 +8,26 @@ const {
   verifyAttestationResponse,
   generateAssertionOptions,
   verifyAssertionResponse,
+  MetadataService,
 } = require('@simplewebauthn/server');
+
+/**
+ * Load JSON metadata statements provided by the Conformance Tools
+ *
+ * FIDO2 > TESTS CONFIGURATION > DOWNLOAD SERVER METADATA (button)
+ */
+// Update this to whatever folder you extracted the statements to
+const conformanceMetadataPath = './fido-conformance-mds-v1.3.4';
+const conformanceMetadataFilenames = fs.readdirSync(conformanceMetadataPath);
+const statements = [];
+for (const statementPath of conformanceMetadataFilenames) {
+  if (statementPath.endsWith('.json')) {
+    const contents = fs.readFileSync(`${conformanceMetadataPath}/${statementPath}`, 'utf-8');
+    statements.push(JSON.parse(contents));
+  }
+}
+// Initialize the metadata service with the prepared statements
+MetadataService.initialize(statements);
 
 const inMemoryUserDeviceDB = {
   // [username]: string: {
