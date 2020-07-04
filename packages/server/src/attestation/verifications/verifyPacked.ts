@@ -2,7 +2,6 @@ import elliptic from 'elliptic';
 import NodeRSA from 'node-rsa';
 
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
-
 import convertCOSEtoPKCS, {
   COSEKEYS,
   COSEALGHASH,
@@ -15,6 +14,8 @@ import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
 import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
+import { FIDO_METADATA_AUTH_ALG_TO_COSE } from '../../helpers/constants';
+import MetadataService from '../../metadata/metadataService';
 
 type Options = {
   attStmt: AttestationStatement;
@@ -38,6 +39,18 @@ export default async function verifyAttestationPacked(options: Options): Promise
 
   if (typeof alg !== 'number') {
     throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
+  }
+
+  // If a metadata statement is available then make sure the attestation statement indicates the
+  // expected alg
+  const statement = await MetadataService.getStatement(aaguid);
+  if (statement) {
+    const metaCOSE = FIDO_METADATA_AUTH_ALG_TO_COSE[statement.authenticationAlgorithm];
+    if (metaCOSE.alg !== alg) {
+      throw new Error(
+        `Attestation alg "${alg}" did not match metadata auth alg "${metaCOSE.alg}" (Packed)`,
+      );
+    }
   }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
