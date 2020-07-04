@@ -74,6 +74,9 @@ class MetadataService {
       aaguid = convertAAGUIDToString(aaguid);
     }
 
+    // If a TOC refresh is in progress then pause this until the service is ready
+    await this.pauseUntilReady();
+
     if (ENABLE_MDS) {
       const now = new Date();
       if (now > this.nextUpdate) {
@@ -196,6 +199,37 @@ class MetadataService {
     }
 
     this.state = SERVICE_STATE.READY;
+  }
+
+  /**
+   * A helper method to pause execution until the service is ready
+   */
+  private async pauseUntilReady(): Promise<void> {
+    if (this.state === SERVICE_STATE.READY) {
+      return;
+    }
+
+    // State isn't ready, so set up polling
+    const readyPromise = new Promise<void>((resolve, reject) => {
+      const totalTimeoutMS = 70000;
+      const intervalMS = 100;
+      let iterations = totalTimeoutMS / intervalMS;
+
+      // Check service state every `intervalMS` milliseconds
+      const intervalID: NodeJS.Timeout = setInterval(() => {
+        if (iterations < 1) {
+          clearInterval(intervalID);
+          reject(`State did not become ready in ${totalTimeoutMS / 1000} seconds`);
+        } else if (this.state === SERVICE_STATE.READY) {
+          clearInterval(intervalID);
+          resolve();
+        }
+
+        iterations -= 1;
+      }, intervalMS);
+    });
+
+    return readyPromise;
   }
 }
 
