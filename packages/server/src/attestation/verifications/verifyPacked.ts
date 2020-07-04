@@ -14,8 +14,8 @@ import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
 import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
-import { FIDO_METADATA_AUTH_ALG_TO_COSE } from '../../helpers/constants';
 import MetadataService from '../../metadata/metadataService';
+import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
 type Options = {
   attStmt: AttestationStatement;
@@ -39,18 +39,6 @@ export default async function verifyAttestationPacked(options: Options): Promise
 
   if (typeof alg !== 'number') {
     throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
-  }
-
-  // If a metadata statement is available then make sure the attestation statement indicates the
-  // expected alg
-  const statement = await MetadataService.getStatement(aaguid);
-  if (statement) {
-    const metaCOSE = FIDO_METADATA_AUTH_ALG_TO_COSE[statement.authenticationAlgorithm];
-    if (metaCOSE.alg !== alg) {
-      throw new Error(
-        `Attestation alg "${alg}" did not match metadata auth alg "${metaCOSE.alg}" (Packed)`,
-      );
-    }
   }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
@@ -103,12 +91,15 @@ export default async function verifyAttestationPacked(options: Options): Promise
     // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
     // that it’s value is set to the same AAGUID as in authData.
 
-    // TODO: Parse authData, and verify that authData.publicKey algorithm set to the corresponding
-    // algorithm to the one set in metadata statement.
-
-    // TODO: For each attestationRoot in metadata.attestationRootCertificates, generate verification
-    // chain verifX5C by appending attestationRoot to the x5c. Try verifying verifyX5C. If fail try
-    // next attestationRoot. If no attestationRoots left to try, return error.
+    // If available, validate attestation alg and x5c with info in the metadata statement
+    const statement = await MetadataService.getStatement(aaguid);
+    if (statement) {
+      try {
+        verifyAttestationWithMetadata(statement, alg, x5c);
+      } catch (err) {
+        throw new Error(`${err} (Packed)`);
+      }
+    }
 
     verified = verifySignature(sig, signatureBase, leafCert);
   } else {
