@@ -36,7 +36,7 @@ export default async function verifyAttestationPacked(options: Options): Promise
     throw new Error('No attestation signature provided in attestation statement (Packed)');
   }
 
-  if (Number.isNaN(Number(alg))) {
+  if (typeof alg !== 'number') {
     throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
   }
 

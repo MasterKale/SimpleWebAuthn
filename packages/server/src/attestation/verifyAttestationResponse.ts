@@ -134,8 +134,8 @@ export default async function verifyAttestationResponse(
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
-  if (Number.isNaN(Number(alg))) {
-    throw new Error('Credential public key was missing alg');
+  if (typeof alg !== 'number') {
+    throw new Error('Credential public key was missing numeric alg');
   }
 
   // Make sure the key algorithm is one we specified within the attestation options
