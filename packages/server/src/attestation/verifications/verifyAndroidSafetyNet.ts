@@ -7,6 +7,7 @@ import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
+import MetadataService from '../../metadata/metadataService';
 
 type Options = {
   attStmt: AttestationStatement;
@@ -79,14 +80,10 @@ export default async function verifyAttestationAndroidSafetyNet(
   /**
    * START Verify Header
    */
-  // Generate an array of certs constituting a full certificate chain
-  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertASN1toPEM);
+  const leafCert = convertASN1toPEM(HEADER.x5c[0]);
+  const leafCertInfo = getCertificateInfo(leafCert);
 
-  const certificate = fullpathCert[0];
-
-  const commonCertInfo = getCertificateInfo(certificate);
-
-  const { subject } = commonCertInfo;
+  const { subject } = leafCertInfo;
 
   // Ensure the certificate was issued to this hostname
   // See https://developer.android.com/training/safetynet/attestation#verify-attestation-response
@@ -94,11 +91,39 @@ export default async function verifyAttestationAndroidSafetyNet(
     throw new Error('Certificate common name was not "attest.android.com" (SafetyNet)');
   }
 
-  // Validate certificate path
-  try {
-    validateCertificatePath(fullpathCert);
-  } catch (err) {
-    throw new Error(`${err} (SafetyNet)`);
+  const statement = await MetadataService.getStatement(aaguid);
+  if (statement) {
+    // Try to validate the chain with each metadata root cert until we find one that works
+    let validated = false;
+    for (const rootCert of statement.attestationRootCertificates) {
+      try {
+        const path = [...HEADER.x5c, rootCert].map(convertASN1toPEM);
+        validated = validateCertificatePath(path);
+      } catch (err) {
+        // Swallow the error for now
+        validated = false;
+      }
+
+      // Don't continue if we've validated a full path
+      if (validated) {
+        break;
+      }
+    }
+
+    if (!validated) {
+      throw new Error(
+        `Could not validate certificate path with any metadata root certificates (SafetyNet)`,
+      );
+    }
+  } else {
+    // Validate certificate path using a fixed global root cert
+    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertASN1toPEM);
+
+    try {
+      validateCertificatePath(path);
+    } catch (err) {
+      throw new Error(`${err} (SafetyNet)`);
+    }
   }
   /**
    * END Verify Header
@@ -110,7 +135,7 @@ export default async function verifyAttestationAndroidSafetyNet(
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, certificate);
+  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCert);
   /**
    * END Verify Signature
    */
