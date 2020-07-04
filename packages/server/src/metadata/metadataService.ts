@@ -52,6 +52,7 @@ class MetadataService {
           this.cache[statement.aaguid] = { url: '', hash: '', statement };
         });
       }
+      this.state = SERVICE_STATE.READY;
     }
   }
 
