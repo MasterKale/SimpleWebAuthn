@@ -12,14 +12,17 @@ type Options = {
   attStmt: AttestationStatement;
   clientDataHash: Buffer;
   authData: Buffer;
+  aaguid: Buffer;
   verifyTimestampMS?: boolean;
 };
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
-export default function verifyAttestationAndroidSafetyNet(options: Options): boolean {
-  const { attStmt, clientDataHash, authData, verifyTimestampMS = true } = options;
+export default async function verifyAttestationAndroidSafetyNet(
+  options: Options,
+): Promise<boolean> {
+  const { attStmt, clientDataHash, authData, aaguid, verifyTimestampMS = true } = options;
   const { response, ver } = attStmt;
 
   if (!ver) {

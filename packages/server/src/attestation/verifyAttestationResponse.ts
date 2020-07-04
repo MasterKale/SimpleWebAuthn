@@ -168,10 +168,11 @@ export default async function verifyAttestationResponse(
       aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
-    verified = verifyAndroidSafetynet({
+    verified = await verifyAndroidSafetynet({
       attStmt,
       authData,
       clientDataHash,
+      aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.ANDROID_KEY) {
     verified = verifyAndroidKey({
