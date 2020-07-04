@@ -8,6 +8,7 @@ import getCertificateInfo from '../../helpers/getCertificateInfo';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import MetadataService from '../../metadata/metadataService';
+import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
 type Options = {
   attStmt: AttestationStatement;
@@ -24,10 +25,14 @@ export default async function verifyAttestationAndroidSafetyNet(
   options: Options,
 ): Promise<boolean> {
   const { attStmt, clientDataHash, authData, aaguid, verifyTimestampMS = true } = options;
-  const { response, ver } = attStmt;
+  const { response, ver, alg } = attStmt;
 
   if (!ver) {
     throw new Error('No ver value in attestation (SafetyNet)');
+  }
+
+  if (typeof alg !== 'number') {
+    throw new Error(`Attestation Statement alg "${alg}" is not a number (SafetyNet)`);
   }
 
   if (!response) {
@@ -93,27 +98,10 @@ export default async function verifyAttestationAndroidSafetyNet(
 
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
-    // Try to validate the chain with each metadata root cert until we find one that works
-    let validated = false;
-    for (const rootCert of statement.attestationRootCertificates) {
-      try {
-        const path = [...HEADER.x5c, rootCert].map(convertASN1toPEM);
-        validated = validateCertificatePath(path);
-      } catch (err) {
-        // Swallow the error for now
-        validated = false;
-      }
-
-      // Don't continue if we've validated a full path
-      if (validated) {
-        break;
-      }
-    }
-
-    if (!validated) {
-      throw new Error(
-        `Could not validate certificate path with any metadata root certificates (SafetyNet)`,
-      );
+    try {
+      verifyAttestationWithMetadata(statement, alg, HEADER.x5c);
+    } catch (err) {
+      throw new Error(`${err} (SafetyNet)`);
     }
   } else {
     // Validate certificate path using a fixed global root cert
