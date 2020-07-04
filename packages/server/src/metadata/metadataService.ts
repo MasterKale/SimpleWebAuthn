@@ -238,7 +238,7 @@ const metadataService = new MetadataService();
 
 export default metadataService;
 
-type MetadataStatement = {
+export type MetadataStatement = {
   aaguid: string;
   assertionScheme: string;
   attachmentHint: number;
