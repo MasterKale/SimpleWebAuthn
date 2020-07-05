@@ -25,14 +25,10 @@ export default async function verifyAttestationAndroidSafetyNet(
   options: Options,
 ): Promise<boolean> {
   const { attStmt, clientDataHash, authData, aaguid, verifyTimestampMS = true } = options;
-  const { response, ver, alg } = attStmt;
+  const { response, ver } = attStmt;
 
   if (!ver) {
     throw new Error('No ver value in attestation (SafetyNet)');
-  }
-
-  if (typeof alg !== 'number') {
-    throw new Error(`Attestation Statement alg "${alg}" is not a number (SafetyNet)`);
   }
 
   if (!response) {
@@ -99,6 +95,8 @@ export default async function verifyAttestationAndroidSafetyNet(
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
     try {
+      // Convert from alg in JWT header to a number in the metadata
+      const alg = HEADER.alg === 'RS256' ? -257 : -99999;
       verifyAttestationWithMetadata(statement, alg, HEADER.x5c);
     } catch (err) {
       throw new Error(`${err} (SafetyNet)`);
