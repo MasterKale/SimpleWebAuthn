@@ -19,13 +19,14 @@ const {
   generateAssertionOptions,
   verifyAssertionResponse,
   // Support for FIDO MDS
-  MetadataService,
+  // MetadataService,
 } = require('@simplewebauthn/server');
 
 /**
- * Initialize MetadataService to enable support for the FIDO Metadata Service. Metadata enables
- * a greater degree of certainty that the devices interacting with this server are what they claim
- * to be according to their manufacturer.
+ * Initialize MetadataService to enable support for the FIDO Metadata Service (MDS).
+ *
+ * Metadata enables a greater degree of certainty that the devices interacting with this server are
+ * what they claim to be according to their manufacturer.
  *
  * Use of MetadataService is _not_ required to use @simplewebauthn/server. If you do choose to use
  * it, you'll need to set the following environment variables (.env files are supported):
@@ -36,7 +37,7 @@ const {
  * See https://mds2.fidoalliance.org/tokens/ to register for a free access token. When they ask for
  * an Organization Name, "Self" works just fine.
  */
-MetadataService.initialize();
+// MetadataService.initialize();
 
 const app = express();
 const host = '0.0.0.0';
