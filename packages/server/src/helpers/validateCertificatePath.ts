@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // ASN1HEX exists in the lib, but not typings, I swear
 // @ts-ignore 2305
-import { KJUR, X509, ASN1HEX } from 'jsrsasign';
+import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
 
 const { crypto } = KJUR;
 
@@ -33,6 +33,15 @@ export default function validateCertificatePath(certificates: string[]): boolean
 
     console.log('x issuer:', subjectCert.getIssuerString());
     console.log('x+1 subject:', issuerCert.getSubjectString());
+
+    // Check that intermediate certificate is within its valid time window
+    const notBefore = zulutodate(issuerCert.getNotBefore());
+    const notAfter = zulutodate(issuerCert.getNotAfter());
+
+    const now = new Date();
+    if (notBefore > now || notAfter < now) {
+      throw new Error('Intermediate certificate is not yet valid or expired');
+    }
 
     if (subjectCert.getIssuerString() !== issuerCert.getSubjectString()) {
       throw new Error('Invalid certificate path: subject issuer did not match issuer subject');
