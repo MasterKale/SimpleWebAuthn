@@ -19,7 +19,7 @@ type Options = {
   clientDataHash: Buffer;
 };
 
-export default function verifyTPM(options: Options): boolean {
+export default async function verifyTPM(options: Options): Promise<boolean> {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash } = options;
   const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
 

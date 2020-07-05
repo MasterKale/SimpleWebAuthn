@@ -183,7 +183,7 @@ export default async function verifyAttestationResponse(
       aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.TPM) {
-    verified = verifyTPM({
+    verified = await verifyTPM({
       aaguid,
       attStmt,
       authData,
