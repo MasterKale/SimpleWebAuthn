@@ -94,6 +94,13 @@ export default async function verifyAttestationPacked(options: Options): Promise
     // If available, validate attestation alg and x5c with info in the metadata statement
     const statement = await MetadataService.getStatement(aaguid);
     if (statement) {
+      // The presence of x5c means this is a full attestation. Check to see if attestationTypes
+      // includes packed attestations.
+      // See constants > FIDO_METADATA_ATTESTATION_TYPES for what this number means
+      if (statement.attestationTypes.indexOf(15879) < 0) {
+        throw new Error('Metadata does not indicate support for full attestations (Packed|Full)');
+      }
+
       try {
         verifyAttestationWithMetadata(statement, alg, x5c);
       } catch (err) {
