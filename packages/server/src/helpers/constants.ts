@@ -30,7 +30,8 @@ type COSEInfo = {
  * A mapping of ALG_SIGN hex values (as unsigned shorts) to COSE curve values. Keys should appear as
  * values in a metadata statement's `authenticationAlgorithm` property.
  *
- * From https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-registry-v2.0-rd-20180702.html#authentication-algorithms
+ * From https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-registry-v2.0-rd-20180702.html
+ * FIDO Registry of Predefined Values - 3.6.1 Authentication Algorithms
  */
 export const FIDO_METADATA_AUTH_ALG_TO_COSE: { [algKey: number]: COSEInfo } = {
   // ALG_SIGN_SECP256R1_ECDSA_SHA256_RAW
@@ -57,4 +58,19 @@ export const FIDO_METADATA_AUTH_ALG_TO_COSE: { [algKey: number]: COSEInfo } = {
   17: { kty: 2, alg: -36, crv: 3 },
   // ALG_SIGN_SECP521R1_ECDSA_SHA512_RAW
   18: { kty: 1, alg: -8, crv: 6 },
+};
+
+/**
+ * A map of ATTESTATION hex values (as unsigned shorts). Keys should
+ * appear as values in a metadata statement's `attestationTypes` property.
+ *
+ * From https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-registry-v2.0-rd-20180702.html
+ * FIDO Registry of Predefined Values - 3.6.3 Authenticator Attestation Types
+ */
+export const FIDO_METADATA_ATTESTATION_TYPES: { [type: string]: string } = {
+  15879: 'ATTESTATION_BASIC_FULL',
+  // Self attestation
+  15880: 'ATTESTATION_BASIC_SURROGATE',
+  15881: 'ATTESTATION_ECDAA',
+  15882: 'ATTESTATION_ATTCA',
 };
