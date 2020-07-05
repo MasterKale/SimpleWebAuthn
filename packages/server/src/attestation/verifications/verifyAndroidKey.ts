@@ -9,7 +9,8 @@ import {
   JASN1,
 } from '../../helpers/asn1Utils';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
-import validateCertificatePath from '../../helpers/validateCertificatePath';
+import MetadataService from '../../metadata/metadataService';
+import verifyAttestationWithMetadata from 'metadata/verifyAttestationWithMetadata';
 
 type Options = {
   authData: Buffer;
@@ -87,11 +88,13 @@ export default async function verifyAttestationAndroidKey(options: Options): Pro
   //   throw new Error('Root certificate was not expected certificate (AndroidKey)');
   // }
 
-  // Verify certificate path
-  try {
-    validateCertificatePath(x5c.map(convertASN1toPEM));
-  } catch (err) {
-    throw new Error(`${err} (AndroidKey)`);
+  const statement = await MetadataService.getStatement(aaguid);
+  if (statement) {
+    try {
+      verifyAttestationWithMetadata(statement, alg, x5c);
+    } catch (err) {
+      throw new Error(`${err.message} (AndroidKey)`);
+    }
   }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
