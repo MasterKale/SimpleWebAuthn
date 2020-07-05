@@ -27,6 +27,7 @@ for (const statementPath of conformanceMetadataFilenames) {
   }
 }
 // Initialize the metadata service with the prepared statements
+console.log('initializing metadata service with', conformanceMetadataFilenames);
 MetadataService.initialize(statements);
 
 const inMemoryUserDeviceDB = {
@@ -105,7 +106,7 @@ fidoComplianceRouter.post('/attestation/options', (req, res) => {
 /**
  * [FIDO2] Server Tests > MakeCredential Response
  */
-fidoComplianceRouter.post('/attestation/result', (req, res) => {
+fidoComplianceRouter.post('/attestation/result', async (req, res) => {
   const { body } = req;
 
   const user = inMemoryUserDeviceDB[loggedInUsername];
@@ -114,7 +115,7 @@ fidoComplianceRouter.post('/attestation/result', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAttestationResponse({
+    verification = await verifyAttestationResponse({
       credential: body,
       expectedChallenge: Buffer.from(expectedChallenge, 'base64'),
       expectedOrigin: origin,
