@@ -10,7 +10,7 @@ import {
 } from '../../helpers/asn1Utils';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
 import MetadataService from '../../metadata/metadataService';
-import verifyAttestationWithMetadata from 'metadata/verifyAttestationWithMetadata';
+import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
 type Options = {
   authData: Buffer;
