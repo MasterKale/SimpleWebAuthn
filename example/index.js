@@ -156,7 +156,6 @@ app.get('/generate-attestation-options', (req, res) => {
        * the types of authenticators that users to can use for attestation
        */
       authenticatorSelection: {
-        authenticatorAttachment: 'cross-platform',
         userVerification: 'preferred',
         requireResidentKey: false,
       },
