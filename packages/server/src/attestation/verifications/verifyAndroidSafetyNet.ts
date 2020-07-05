@@ -59,7 +59,7 @@ export default async function verifyAttestationAndroidSafetyNet(
     const timestampPlusDelay = timestampMs + 60 * 1000;
     now = Date.now();
     if (timestampPlusDelay < now) {
-      throw new Error(`Payload timestamp "${timestampPlusDelay}" has expired`);
+      throw new Error(`Payload timestamp "${timestampPlusDelay}" has expired (SafetyNet)`);
     }
   }
 
@@ -99,7 +99,7 @@ export default async function verifyAttestationAndroidSafetyNet(
       const alg = HEADER.alg === 'RS256' ? -257 : -99999;
       verifyAttestationWithMetadata(statement, alg, HEADER.x5c);
     } catch (err) {
-      throw new Error(`${err} (SafetyNet)`);
+      throw new Error(`${err.message} (SafetyNet)`);
     }
   } else {
     // Validate certificate path using a fixed global root cert
@@ -108,7 +108,7 @@ export default async function verifyAttestationAndroidSafetyNet(
     try {
       validateCertificatePath(path);
     } catch (err) {
-      throw new Error(`${err} (SafetyNet)`);
+      throw new Error(`${err.message} (SafetyNet)`);
     }
   }
   /**
