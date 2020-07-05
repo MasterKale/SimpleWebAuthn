@@ -142,7 +142,6 @@ class MetadataService {
       // TODO: Check for certificate revocation
       validateCertificatePath(fullCertPath);
     } catch (err) {
-      console.error(err);
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
       this.state = SERVICE_STATE.READY;
