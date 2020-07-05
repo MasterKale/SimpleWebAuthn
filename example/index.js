@@ -146,7 +146,7 @@ app.get('/generate-attestation-options', (req, res) => {
   );
 });
 
-app.post('/verify-attestation', (req, res) => {
+app.post('/verify-attestation', async (req, res) => {
   const { body } = req;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
@@ -155,7 +155,7 @@ app.post('/verify-attestation', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAttestationResponse({
+    verification = await verifyAttestationResponse({
       credential: body,
       expectedChallenge,
       expectedOrigin: origin,
