@@ -31,9 +31,6 @@ export default function validateCertificatePath(certificates: string[]): boolean
     const issuerCert = new X509();
     issuerCert.readCertPEM(issuerPem);
 
-    console.log('x issuer:', subjectCert.getIssuerString());
-    console.log('x+1 subject:', issuerCert.getSubjectString());
-
     // Check that intermediate certificate is within its valid time window
     const notBefore = zulutodate(issuerCert.getNotBefore());
     const notAfter = zulutodate(issuerCert.getNotAfter());
