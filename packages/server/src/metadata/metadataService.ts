@@ -19,7 +19,6 @@ type CachedAAGUID = {
 };
 
 enum SERVICE_STATE {
-  CLEAN,
   REFRESHING,
   READY,
 }
@@ -35,7 +34,7 @@ class MetadataService {
   private nextUpdate: Date = new Date(0);
   private tocAlg = '';
   private tocNo = 0;
-  private state: SERVICE_STATE = SERVICE_STATE.CLEAN;
+  private state: SERVICE_STATE = SERVICE_STATE.READY;
 
   /**
    * Prepare the service to handle live data, or prepared data.
@@ -63,10 +62,6 @@ class MetadataService {
    * as per the `nextUpdate` property in the initial TOC download.
    */
   async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
-    if (this.state === SERVICE_STATE.CLEAN) {
-      throw new Error('MetadataService.initialize() must be called before this method can be used');
-    }
-
     if (!aaguid) {
       return;
     }
