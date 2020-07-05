@@ -16,10 +16,11 @@ type Options = {
   clientDataHash: Buffer;
   attStmt: AttestationStatement;
   credentialPublicKey: Buffer;
+  aaguid: Buffer;
 };
 
-export default function verifyAttestationAndroidKey(options: Options): boolean {
-  const { authData, clientDataHash, attStmt, credentialPublicKey } = options;
+export default async function verifyAttestationAndroidKey(options: Options): Promise<boolean> {
+  const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid } = options;
   const { x5c, sig, alg } = attStmt;
 
   if (!x5c) {

@@ -175,11 +175,12 @@ export default async function verifyAttestationResponse(
       aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.ANDROID_KEY) {
-    verified = verifyAndroidKey({
+    verified = await verifyAndroidKey({
       attStmt,
       authData,
       clientDataHash,
       credentialPublicKey,
+      aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.TPM) {
     verified = verifyTPM({
