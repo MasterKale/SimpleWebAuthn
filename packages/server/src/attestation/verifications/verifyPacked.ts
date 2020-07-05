@@ -80,12 +80,12 @@ export default async function verifyAttestationPacked(options: Options): Promise
 
     let now = new Date();
     if (notBefore > now) {
-      throw new Error(`Certificate not good before "${notBefore.toString()}"`);
+      throw new Error(`Certificate not good before "${notBefore.toString()}" (Packed|Full)`);
     }
 
     now = new Date();
     if (notAfter < now) {
-      throw new Error(`Certificate not good after "${notAfter.toString()}"`);
+      throw new Error(`Certificate not good after "${notAfter.toString()}" (Packed|Full)`);
     }
 
     // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
@@ -104,7 +104,7 @@ export default async function verifyAttestationPacked(options: Options): Promise
       try {
         verifyAttestationWithMetadata(statement, alg, x5c);
       } catch (err) {
-        throw new Error(`${err} (Packed)`);
+        throw new Error(`${err.message} (Packed|Full)`);
       }
     }
 
