@@ -6,6 +6,8 @@ import convertASN1toPEM from '../../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
 import { leafCertToASN1Object, findOID, JASN1, ASN1Object } from '../../../helpers/asn1Utils';
+import MetadataService from '../../../metadata/metadataService';
+import verifyAttestationWithMetadata from '../../../metadata/verifyAttestationWithMetadata';
 
 import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
 import parseCertInfo from './parseCertInfo';
@@ -50,12 +52,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
     throw new Error('Attestation statement did not contain certInfo (TPM)');
   }
 
-  // TODO: Check that the “alg” field is set to the equivalent value to the signatureAlgorithm in
-  // the metadata. You can find useful conversion tables in the appendix.
-  // console.log('aaguid:', convertAAGUIDToString(aaguid));
-
   const parsedPubArea = parsePubArea(pubArea);
-  // console.log(parsedPubArea);
   const { unique, type: pubType, parameters } = parsedPubArea;
 
   // Verify that the public key specified by the parameters and unique fields of pubArea is
@@ -130,7 +127,6 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   const parsedCertInfo = parseCertInfo(certInfo);
-  // console.log({ parsedCertInfo });
   const { magic, type: certType, attested, extraData } = parsedCertInfo;
 
   if (magic !== 0xff544347) {
@@ -173,10 +169,8 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
 
   // Pick a leaf AIK certificate of the x5c array and parse it.
   const leafCertPEM = convertASN1toPEM(x5c[0]);
-  // console.log(leafCertPEM);
   const leafCertInfo = getCertificateInfo(leafCertPEM);
   const { basicConstraintsCA, version, subject, notAfter, notBefore } = leafCertInfo;
-  // console.log(leafCertInfo);
 
   if (basicConstraintsCA) {
     throw new Error('Certificate basic constraints CA was not `false` (TPM)');
@@ -238,10 +232,15 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
   // that it’s value is set to the same AAGUID as in authData.
 
-  // TODO: For attestationRoot in metadata.attestationRootCertificates, generate verification chain
-  // verifyX5C by appending attestationRoot to the x5c. Try verifying verifyX5C. If successful go to
-  // next step. If fail try next attestationRoot. If no attestationRoots left to try, fail.
-  // const verifyX5C =
+  // Run some metadata checks if a statement exists for this authenticator
+  const statement = await MetadataService.getStatement(aaguid);
+  if (statement) {
+    try {
+      verifyAttestationWithMetadata(statement, alg, x5c);
+    } catch (err) {
+      throw new Error(`${err.message} (TPM)`);
+    }
+  }
 
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // Get Martini friend, you are done!
