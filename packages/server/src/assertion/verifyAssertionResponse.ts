@@ -6,6 +6,7 @@ import toHash from '../helpers/toHash';
 import convertASN1toPEM from '../helpers/convertASN1toPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import isBase64URLString from '../helpers/isBase64URLString';
 
 type Options = {
   credential: AssertionCredentialJSON;
@@ -39,10 +40,34 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     authenticator,
     requireUserVerification = false,
   } = options;
-  const { response } = credential;
+  const { id, rawId, type: credentialType, response } = credential;
+
+  // Ensure credential specified an ID
+  if (!id) {
+    throw new Error('Missing credential ID');
+  }
+
+  // Ensure ID is base64url-encoded
+  if (id !== rawId) {
+    throw new Error('Credential ID was not base64url-encoded');
+  }
+
+  // Make sure credential type is public-key
+  if (credentialType !== 'public-key') {
+    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
+  }
+
+  if (!response) {
+    throw new Error('Credential missing response');
+  }
+
+  if (typeof response?.clientDataJSON !== 'string') {
+    throw new Error('Credential response clientDataJSON was not a string');
+  }
+
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
-  const { type, origin, challenge } = clientDataJSON;
+  const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an assertion
   if (type !== 'webauthn.get') {
@@ -60,6 +85,28 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   // Check that the origin is our site
   if (origin !== expectedOrigin) {
     throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
+  }
+
+  if (!isBase64URLString(response.authenticatorData)) {
+    throw new Error('Credential response authenticatorData was not a base64url string');
+  }
+
+  if (!isBase64URLString(response.signature)) {
+    throw new Error('Credential response signature was not a base64url string');
+  }
+
+  if (typeof response.userHandle !== 'string') {
+    throw new Error('Credential response userHandle was not a string');
+  }
+
+  if (tokenBinding) {
+    if (typeof tokenBinding !== 'object') {
+      throw new Error('ClientDataJSON tokenBinding was not an object');
+    }
+
+    if (['present', 'supported', 'notSupported'].indexOf(tokenBinding.status) < 0) {
+      throw new Error(`Unexpected tokenBinding status ${tokenBinding.status}`);
+    }
   }
 
   const authDataBuffer = base64url.toBuffer(response.authenticatorData);
