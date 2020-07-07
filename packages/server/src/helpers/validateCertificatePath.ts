@@ -94,10 +94,13 @@ async function isCertRevoked(cert: X509): Promise<boolean> {
   const certAuthKeyID = cert.getExtAuthorityKeyIdentifier();
   if (certAuthKeyID) {
     const cached = cacheRevokedCerts[certAuthKeyID.kid];
-    const now = new Date();
-    // If there's a nextUpdate then make sure we're before it
-    if (!cached.nextUpdate || cached.nextUpdate > now) {
-      return cached.revokedCerts.indexOf(certSerialHex) >= 0;
+    if (cached) {
+      console.log(`Found cached info for CA ID ${certAuthKeyID}`, cached);
+      const now = new Date();
+      // If there's a nextUpdate then make sure we're before it
+      if (!cached.nextUpdate || cached.nextUpdate > now) {
+        return cached.revokedCerts.indexOf(certSerialHex) >= 0;
+      }
     }
   }
 
