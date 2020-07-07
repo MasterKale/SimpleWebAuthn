@@ -63,8 +63,24 @@ export default async function validateCertificatePath(certificates: string[]): P
   return true;
 }
 
+/**
+ * A cache of revoked cert serial numbers by Authority Key ID
+ */
+type CAAuthorityInfo = {
+  // A list of certificates serial numbers in hex format
+  revokedCerts: string[];
+  // An optional date by which an update should be published
+  nextUpdate?: Date;
+};
+const cacheRevokedCerts: { [certAuthorityKeyID: string]: CAAuthorityInfo } = {};
+
+/**
+ * A method to pull a CRL from a certificate and compare its serial number to the list of revoked
+ * certificate serial numbers within the CRL.
+ *
+ * CRL certificate structure referenced from https://tools.ietf.org/html/rfc5280#page-117
+ */
 async function isCertRevoked(cert: X509): Promise<boolean> {
-  const certSerialHex = cert.getSerialNumberHex();
   const crlURL = cert.getExtCRLDistributionPointsURI();
 
   // If no URL is provided then we have nothing to check
@@ -72,19 +88,31 @@ async function isCertRevoked(cert: X509): Promise<boolean> {
     return false;
   }
 
-  const crlCert = new X509();
+  const certSerialHex = cert.getSerialNumberHex();
 
-  // Download the CRL
+  // Check to see if we've got cached info for the cert's CA
+  const certAuthKeyID = cert.getExtAuthorityKeyIdentifier();
+  if (certAuthKeyID) {
+    const cached = cacheRevokedCerts[certAuthKeyID.kid];
+    const now = new Date();
+    // If there's a nextUpdate then make sure we're before it
+    if (!cached.nextUpdate || cached.nextUpdate > now) {
+      return cached.revokedCerts.indexOf(certSerialHex) >= 0;
+    }
+  }
+
+  // Download and read the CRL
+  const crlCert = new X509();
   try {
     const respCRL = await fetch(crlURL[0]);
     const dataCRL = await respCRL.text();
-    console.log(`Reading PEM: ${dataCRL}`);
     crlCert.readCertPEM(dataCRL);
   } catch (err) {
     return false;
   }
 
-  const crlASN1 = leafCertToASN1Object(Buffer.from(cert.hex, 'hex'));
+  // Start diving into the CRL's ASN.1 data structure
+  const crlASN1 = leafCertToASN1Object(Buffer.from(crlCert.hex, 'hex'));
   const crlJSON = asn1ObjectToJSON(crlASN1);
 
   const root0 = (crlJSON.data as JASN1[])[0];
@@ -94,7 +122,19 @@ async function isCertRevoked(cert: X509): Promise<boolean> {
     return false;
   }
 
-  // Drill down into the ASN structure
+  const newCached: CAAuthorityInfo = {
+    revokedCerts: [],
+    nextUpdate: undefined,
+  };
+
+  // nextUpdate
+  const root04 = (root0.data as JASN1[])[4];
+  if (root04) {
+    console.log('nextUpdate:', root04.data);
+    newCached.nextUpdate = new Date(root04.data as string);
+  }
+
+  // revokedCertificates
   const root05 = (root0.data as JASN1[])[5];
   const revokedCerts = root05.data;
 
@@ -106,12 +146,21 @@ async function isCertRevoked(cert: X509): Promise<boolean> {
         if (typeof certSerialSequence === 'string') {
           // Grab the value after "\n" in "(115 bit)\n23373519225161898650309958210680307"
           const revokedHex = parseInt(certSerialSequence.split('\n')[1], 10).toString(16);
+          // Push the revoked cert serial hex into the cache
+          newCached.revokedCerts.push(revokedHex);
+
+          // Check to see if this cert is one of the revoked certificates
           console.log(`Checking if cert ${certSerialHex} matches revoked ${revokedHex}`);
           if (certSerialHex === revokedHex) {
             return true;
           }
         }
       }
+    }
+
+    // Cache the results
+    if (certAuthKeyID) {
+      cacheRevokedCerts[certAuthKeyID.kid] = newCached;
     }
   }
 
