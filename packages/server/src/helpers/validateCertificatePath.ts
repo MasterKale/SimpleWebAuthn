@@ -34,6 +34,10 @@ export default async function validateCertificatePath(certificates: string[]): P
     const issuerCert = new X509();
     issuerCert.readCertPEM(issuerPem);
 
+    if (subjectCertRevoked) {
+      throw new Error(`Found revoked certificate in certificate path`);
+    }
+
     // Check that intermediate certificate is within its valid time window
     const notBefore = zulutodate(issuerCert.getNotBefore());
     const notAfter = zulutodate(issuerCert.getNotAfter());
