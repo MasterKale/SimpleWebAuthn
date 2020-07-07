@@ -3,10 +3,15 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist",
+    "typeRoots": [
+      "./types",
+      "node_modules/@types"
+    ],
     "plugins": [
       // These replace the path helpers above with relative paths at build time
       { "transform": "typescript-transform-paths" },
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
-  }
+  },
+  "exclude": ["types"]
 }
