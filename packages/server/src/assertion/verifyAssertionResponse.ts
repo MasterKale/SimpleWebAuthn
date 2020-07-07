@@ -14,7 +14,7 @@ type Options = {
   expectedOrigin: string;
   expectedRPID: string;
   authenticator: AuthenticatorDevice;
-  requireUserVerification?: boolean;
+  fidoUserVerification?: UserVerificationRequirement;
 };
 
 /**
@@ -28,8 +28,9 @@ type Options = {
  * @param expectedOrigin Website URL that the attestation should have occurred on
  * @param expectedRPID RP ID that was specified in the attestation options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
- * @param requireUserVerification (Optional) Enforce user verification by the authenticator
- * (via PIN, fingerprint, etc...)
+ * @param fidoUserVerification (Optional) The value specified for `userVerification` when calling
+ * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
+ * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
 export default function verifyAssertionResponse(options: Options): VerifiedAssertion {
   const {
@@ -38,7 +39,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     expectedOrigin,
     expectedRPID,
     authenticator,
-    requireUserVerification = false,
+    fidoUserVerification,
   } = options;
   const { id, rawId, type: credentialType, response } = credential;
 
@@ -119,14 +120,21 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     throw new Error(`Unexpected RP ID hash`);
   }
 
-  // Make sure someone was physically present
-  if (!flags.up) {
-    throw new Error('User not present during assertion');
-  }
-
-  // Enforce user verification if specified
-  if (requireUserVerification && !flags.uv) {
-    throw new Error('User verification required, but user could not be verified');
+  // Enforce user verification if required
+  if (fidoUserVerification) {
+    if (fidoUserVerification === 'required') {
+      // Require `flags.uv` be true (implies `flags.up` is true)
+      if (!flags.uv) {
+        throw new Error('User verification required, but user could not be verified');
+      }
+    } else if (fidoUserVerification === 'preferred' || fidoUserVerification === 'discouraged') {
+      // Ignore `flags.uv`
+    }
+  } else {
+    // WebAuthn only requires the user presence flag be true
+    if (!flags.up) {
+      throw new Error('User not present during assertion');
+    }
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
