@@ -97,7 +97,7 @@ export default async function verifyAttestationAndroidSafetyNet(
     try {
       // Convert from alg in JWT header to a number in the metadata
       const alg = HEADER.alg === 'RS256' ? -257 : -99999;
-      verifyAttestationWithMetadata(statement, alg, HEADER.x5c);
+      await verifyAttestationWithMetadata(statement, alg, HEADER.x5c);
     } catch (err) {
       throw new Error(`${err.message} (SafetyNet)`);
     }
@@ -106,7 +106,7 @@ export default async function verifyAttestationAndroidSafetyNet(
     const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertASN1toPEM);
 
     try {
-      validateCertificatePath(path);
+      await validateCertificatePath(path);
     } catch (err) {
       throw new Error(`${err.message} (SafetyNet)`);
     }

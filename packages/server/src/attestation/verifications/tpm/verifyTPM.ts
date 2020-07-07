@@ -236,7 +236,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
     try {
-      verifyAttestationWithMetadata(statement, alg, x5c);
+      await verifyAttestationWithMetadata(statement, alg, x5c);
     } catch (err) {
       throw new Error(`${err.message} (TPM)`);
     }

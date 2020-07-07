@@ -12,7 +12,7 @@ const { crypto } = KJUR;
  * Traverse an array of PEM certificates and ensure they form a proper chain
  * @param certificates Typically the result of `x5c.map(convertASN1toPEM)`
  */
-export default function validateCertificatePath(certificates: string[]): boolean {
+export default async function validateCertificatePath(certificates: string[]): Promise<boolean> {
   if (new Set(certificates).size !== certificates.length) {
     throw new Error('Invalid certificate path: found duplicate certificates');
   }

@@ -102,7 +102,7 @@ export default async function verifyAttestationPacked(options: Options): Promise
       }
 
       try {
-        verifyAttestationWithMetadata(statement, alg, x5c);
+        await verifyAttestationWithMetadata(statement, alg, x5c);
       } catch (err) {
         throw new Error(`${err.message} (Packed|Full)`);
       }
