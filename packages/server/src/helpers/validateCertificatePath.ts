@@ -2,6 +2,9 @@
 // ASN1HEX exists in the lib, but not typings, I swear
 // @ts-ignore 2305
 import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
+import fetch from 'node-fetch';
+
+import { leafCertToASN1Object, asn1ObjectToJSON, JASN1 } from './asn1Utils';
 
 const { crypto } = KJUR;
 
@@ -58,4 +61,59 @@ export default function validateCertificatePath(certificates: string[]): boolean
   }
 
   return true;
+}
+
+async function isCertRevoked(cert: X509): Promise<boolean> {
+  const certSerialHex = cert.getSerialNumberHex();
+  const crlURL = cert.getExtCRLDistributionPointsURI();
+
+  // If no URL is provided then we have nothing to check
+  if (!crlURL) {
+    return false;
+  }
+
+  const crlCert = new X509();
+
+  // Download the CRL
+  try {
+    const respCRL = await fetch(crlURL[0]);
+    const dataCRL = await respCRL.text();
+    console.log(`Reading PEM: ${dataCRL}`);
+    crlCert.readCertPEM(dataCRL);
+  } catch (err) {
+    return false;
+  }
+
+  const crlASN1 = leafCertToASN1Object(Buffer.from(cert.hex, 'hex'));
+  const crlJSON = asn1ObjectToJSON(crlASN1);
+
+  const root0 = (crlJSON.data as JASN1[])[0];
+
+  if ((root0.data as JASN1[])?.length < 7) {
+    // CRL is empty
+    return false;
+  }
+
+  // Drill down into the ASN structure
+  const root05 = (root0.data as JASN1[])[5];
+  const revokedCerts = root05.data;
+
+  if (revokedCerts) {
+    for (const cert of revokedCerts) {
+      const certSerialData = (cert as JASN1).data;
+      if (certSerialData) {
+        const certSerialSequence = (certSerialData[0] as JASN1).data;
+        if (typeof certSerialSequence === 'string') {
+          // Grab the value after "\n" in "(115 bit)\n23373519225161898650309958210680307"
+          const revokedHex = parseInt(certSerialSequence.split('\n')[1], 10).toString(16);
+          console.log(`Checking if cert ${certSerialHex} matches revoked ${revokedHex}`);
+          if (certSerialHex === revokedHex) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
 }
