@@ -91,7 +91,7 @@ class MetadataService {
       const resp = await fetch(`${cached.url}?token=${MDS_API_TOKEN}`);
       const data = await resp.text();
       const statement: MetadataStatement = JSON.parse(
-        Buffer.from(data, 'base64').toString('ascii'),
+        Buffer.from(data, 'base64').toString('utf-8'),
       );
 
       const hashAlg = this.tocAlg === 'ES256' ? 'SHA256' : undefined;
