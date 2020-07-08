@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { KJUR } from 'jsrsasign';
 import base64url from 'base64url';
 
-import { ENV_VARS } from '../helpers/constants';
+import { ENV_VARS, FIDO_AUTHENTICATOR_STATUS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertASN1toPEM from '../helpers/convertASN1toPEM';
@@ -14,8 +14,9 @@ import parseJWT from './parseJWT';
 const { ENABLE_MDS, MDS_TOC_URL, MDS_API_TOKEN, MDS_ROOT_CERT_URL } = ENV_VARS;
 
 type CachedAAGUID = {
-  url: string;
-  hash: string;
+  url: TOCEntry['url'];
+  hash: TOCEntry['hash'];
+  statusReports: TOCEntry['statusReports'];
   statement?: MetadataStatement;
 };
 
@@ -49,7 +50,7 @@ class MetadataService {
     } else {
       if (statements?.length) {
         statements.forEach(statement => {
-          this.cache[statement.aaguid] = { url: '', hash: '', statement };
+          this.cache[statement.aaguid] = { url: '', hash: '', statement, statusReports: [] };
         });
       }
       this.state = SERVICE_STATE.READY;
@@ -85,6 +86,19 @@ class MetadataService {
 
     if (!cached) {
       return;
+    }
+
+    // Check to see if the this aaguid has a status report with a "compromised" status
+    for (const report of cached.statusReports) {
+      const { status } = report;
+      if (
+        status === 'USER_VERIFICATION_BYPASS' ||
+        status === 'ATTESTATION_KEY_COMPROMISE' ||
+        status === 'USER_KEY_REMOTE_COMPROMISE' ||
+        status === 'USER_KEY_PHYSICAL_COMPROMISE'
+      ) {
+        throw new Error(`Detected compromised aaguid "${aaguid}"`);
+      }
     }
 
     if (!cached.statement && ENABLE_MDS) {
@@ -188,6 +202,7 @@ class MetadataService {
         const cached: CachedAAGUID = {
           url: entry.url,
           hash: entry.hash,
+          statusReports: entry.statusReports,
         };
 
         this.cache[_entry.aaguid] = cached;
@@ -278,7 +293,7 @@ type TOCEntry = {
   aaguid?: string;
   attestationCertificateKeyIdentifiers: string[];
   statusReports: {
-    status: string;
+    status: FIDO_AUTHENTICATOR_STATUS;
     certificateNumber: string;
     certificate: string;
     certificationDescriptor: string;
