@@ -85,7 +85,9 @@ class MetadataService {
     const cached = this.cache[aaguid];
 
     if (!cached) {
-      return;
+      // TODO: FIDO conformance requires this, but it seems excessive for WebAuthn. Investigate
+      // later
+      throw new Error(`Unlisted aaguid "${aaguid}" in TOC`);
     }
 
     // Check to see if the this aaguid has a status report with a "compromised" status
