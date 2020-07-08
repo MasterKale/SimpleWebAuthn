@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { KJUR } from 'jsrsasign';
 import base64url from 'base64url';
 
-import { ENV_VARS, FIDO_AUTHENTICATOR_STATUS } from '../helpers/constants';
+import { FIDO_AUTHENTICATOR_STATUS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertASN1toPEM from '../helpers/convertASN1toPEM';
@@ -11,13 +11,26 @@ import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 
 import parseJWT from './parseJWT';
 
-const { ENABLE_MDS, MDS_TOC_URL, MDS_API_TOKEN, MDS_ROOT_CERT_URL } = ENV_VARS;
-
+// Cached WebAuthn metadata statements
 type CachedAAGUID = {
   url: TOCEntry['url'];
   hash: TOCEntry['hash'];
   statusReports: TOCEntry['statusReports'];
   statement?: MetadataStatement;
+  tocURL?: CachedMDS['url'];
+};
+
+// Cached MDS APIs from which TOCs are downloaded
+type CachedMDS = {
+  url: string;
+  alg: string;
+  no: number;
+  nextUpdate: Date;
+  rootCertURL: string;
+  // Specify a query param, etc... to be appended to the end of a metadata statement URL
+  // TODO: This will need to be extended later, for now support FIDO MDS API that requires an API
+  // token passed as a query param
+  metadataURLSuffix: string;
 };
 
 enum SERVICE_STATE {
@@ -32,10 +45,8 @@ enum SERVICE_STATE {
  * https://fidoalliance.org/metadata/
  */
 class MetadataService {
-  private cache: { [aaguid: string]: CachedAAGUID } = {};
-  private nextUpdate: Date = new Date(0);
-  private tocAlg = '';
-  private tocNo = 0;
+  private mdsCache: { [url: string]: CachedMDS } = {};
+  private statementCache: { [aaguid: string]: CachedAAGUID } = {};
   private state: SERVICE_STATE = SERVICE_STATE.READY;
 
   /**
@@ -44,24 +55,64 @@ class MetadataService {
    * If `process.env.ENABLE_MDS` is `'true'`, then the actual MDS API will be queried. Otherwise
    * known metadata statements can be provided as arguments.
    */
-  async initialize(statements?: MetadataStatement[]): Promise<void> {
-    if (ENABLE_MDS) {
-      await this.downloadTOC();
-    } else {
-      if (statements?.length) {
-        statements.forEach(statement => {
-          this.cache[statement.aaguid] = { url: '', hash: '', statement, statusReports: [] };
-        });
-      }
-      this.state = SERVICE_STATE.READY;
+  async initialize(opts: {
+    statements?: MetadataStatement[];
+    mdsServers?: Pick<CachedMDS, 'url' | 'rootCertURL' | 'metadataURLSuffix'>[];
+  }): Promise<void> {
+    const { mdsServers, statements } = opts;
+
+    this.state = SERVICE_STATE.REFRESHING;
+
+    // If metadata statements are provided, load them into the cache
+    if (statements?.length) {
+      console.log(`Adding ${statements.length} statements to cache`);
+
+      statements.forEach(statement => {
+        // Only cache statements that are for FIDO2-compatible authenticators
+        if (statement.aaguid) {
+          this.statementCache[statement.aaguid] = {
+            url: '',
+            hash: '',
+            statement,
+            statusReports: [],
+          };
+        }
+      });
     }
+
+    // If MDS servers are provided, then process them and add their statements to the cache
+    if (mdsServers?.length) {
+      console.log(`Querying ${mdsServers.length} MDS services`);
+
+      for (const server of mdsServers) {
+        try {
+          console.log(`Service: ${server.url}`);
+          await this.downloadTOC({
+            url: server.url,
+            rootCertURL: server.rootCertURL,
+            metadataURLSuffix: server.metadataURLSuffix,
+            alg: '',
+            no: 0,
+            nextUpdate: new Date(0),
+          });
+        } catch (err) {
+          // Notify of the error and move on
+          console.error(`Error processing ${server.url}: ${err.message}`);
+        }
+      }
+    }
+
+    console.log('MDS cache:', JSON.stringify(Object.keys(this.mdsCache)));
+    console.log('Statement cache:', JSON.stringify(Object.keys(this.statementCache)));
+
+    this.state = SERVICE_STATE.READY;
   }
 
   /**
    * Get a metadata statement for a given aaguid. Defaults to returning a cached statement.
    *
-   * If `process.env.ENABLE_MDS` is `'true'`, then this method will coordinate re-downloading data
-   * as per the `nextUpdate` property in the initial TOC download.
+   * This method will coordinate updating the TOC as per the `nextUpdate` property in the initial
+   * TOC download.
    */
   async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
     if (!aaguid) {
@@ -75,23 +126,33 @@ class MetadataService {
     // If a TOC refresh is in progress then pause this until the service is ready
     await this.pauseUntilReady();
 
-    if (ENABLE_MDS) {
-      const now = new Date();
-      if (now > this.nextUpdate) {
-        await this.downloadTOC();
-      }
-    }
+    // Try to grab a cached statement
+    const cachedStatement = this.statementCache[aaguid];
 
-    const cached = this.cache[aaguid];
-
-    if (!cached) {
+    if (!cachedStatement) {
       // TODO: FIDO conformance requires this, but it seems excessive for WebAuthn. Investigate
       // later
       throw new Error(`Unlisted aaguid "${aaguid}" in TOC`);
     }
 
+    console.debug('Found cached statement:', cachedStatement);
+
+    // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
+    if (cachedStatement.tocURL) {
+      const mds = this.mdsCache[cachedStatement.tocURL];
+      const now = new Date();
+      if (now > mds.nextUpdate) {
+        try {
+          this.state = SERVICE_STATE.REFRESHING;
+          await this.downloadTOC(mds);
+        } finally {
+          this.state = SERVICE_STATE.READY;
+        }
+      }
+    }
+
     // Check to see if the this aaguid has a status report with a "compromised" status
-    for (const report of cached.statusReports) {
+    for (const report of cachedStatement.statusReports) {
       const { status } = report;
       if (
         status === 'USER_VERIFICATION_BYPASS' ||
@@ -103,39 +164,45 @@ class MetadataService {
       }
     }
 
-    if (!cached.statement && ENABLE_MDS) {
+    // If the statement hasn't been cached but came from an MDS TOC, then download it
+    if (!cachedStatement.statement && cachedStatement.tocURL) {
       // Download the metadata statement if it's not been cached
-      const resp = await fetch(`${cached.url}?token=${MDS_API_TOKEN}`);
+      console.debug('Downloading statement from', cachedStatement.url);
+      const resp = await fetch(cachedStatement.url);
       const data = await resp.text();
       const statement: MetadataStatement = JSON.parse(
         Buffer.from(data, 'base64').toString('utf-8'),
       );
 
-      const hashAlg = this.tocAlg === 'ES256' ? 'SHA256' : undefined;
+      const mds = this.mdsCache[cachedStatement.tocURL];
+
+      const hashAlg = mds?.alg === 'ES256' ? 'SHA256' : undefined;
       const calculatedHash = base64url.encode(toHash(data, hashAlg));
 
-      if (calculatedHash === cached.hash) {
+      if (calculatedHash === cachedStatement.hash) {
+        console.log('hash matched, storing statement in cache');
         // Update the cached entry with the latest statement
-        cached.statement = statement;
+        cachedStatement.statement = statement;
       } else {
         // From FIDO MDS docs: "Ignore the downloaded metadata statement if the hash value doesn't
         // match."
-        cached.statement = undefined;
+        cachedStatement.statement = undefined;
         throw new Error(`Downloaded metadata for aaguid "${aaguid}" but hash did not match`);
       }
     }
 
-    return cached.statement;
+    return cachedStatement.statement;
   }
 
   /**
    * Download and process the latest TOC from MDS
    */
-  private async downloadTOC() {
-    this.state = SERVICE_STATE.REFRESHING;
+  private async downloadTOC(mds: CachedMDS) {
+    const { url, no, rootCertURL, metadataURLSuffix } = mds;
 
     // Query MDS for the latest TOC
-    const respTOC = await fetch(`${MDS_TOC_URL}?token=${MDS_API_TOKEN}`);
+    console.debug(`Downloading TOC: ${url}`);
+    const respTOC = await fetch(url);
     const data = await respTOC.text();
 
     // Break apart the JWT we get back
@@ -143,17 +210,20 @@ class MetadataService {
     const header = parsedJWT[0];
     const payload = parsedJWT[1];
 
-    if (payload.no <= this.tocNo) {
+    if (payload.no <= no) {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
       // number of the last Metadata TOC object cached locally."
-      this.state = SERVICE_STATE.READY;
-      return;
+      throw new Error(`Latest TOC no. "${payload.no}" is not greater than previous ${no}`);
     }
 
-    // Download FIDO the root certificate and append it to the TOC certs
-    const respFIDORootCert = await fetch(MDS_ROOT_CERT_URL);
-    const fidoRootCert = await respFIDORootCert.text();
-    const fullCertPath = header.x5c.map(convertASN1toPEM).concat(fidoRootCert);
+    let fullCertPath = header.x5c.map(convertASN1toPEM);
+    if (rootCertURL.length > 0) {
+      console.debug(`Downloading root cert: ${rootCertURL}`);
+      // Download FIDO the root certificate and append it to the TOC certs
+      const respFIDORootCert = await fetch(rootCertURL);
+      const fidoRootCert = await respFIDORootCert.text();
+      fullCertPath = fullCertPath.concat(fidoRootCert);
+    }
 
     try {
       // Validate the certificate chain
@@ -180,20 +250,7 @@ class MetadataService {
       throw new Error('TOC signature could not be verified');
     }
 
-    // Convert the nextUpdate property into a Date so we can determine when to redownload
-    const [year, month, day] = payload.nextUpdate.split('-');
-    this.nextUpdate = new Date(
-      parseInt(year, 10),
-      // Months need to be zero-indexed
-      parseInt(month, 10) - 1,
-      parseInt(day, 10),
-    );
-
-    // Store the header `alg` so we know what to use when verifying metadata statement hashes
-    this.tocAlg = header.alg;
-
-    // Store the payload `no` to make sure we're getting the next TOC in the sequence
-    this.tocNo = payload.no;
+    console.log(`TOC verified, caching ${payload.entries.length} statements`);
 
     // Prepare the in-memory cache of statements.
     for (const entry of payload.entries) {
@@ -201,16 +258,33 @@ class MetadataService {
       if (entry.aaguid) {
         const _entry = entry as TOCAAGUIDEntry;
         const cached: CachedAAGUID = {
-          url: entry.url,
+          url: `${entry.url}${metadataURLSuffix}`,
           hash: entry.hash,
           statusReports: entry.statusReports,
+          // An easy way for us to link back to a cached MDS API entry
+          tocURL: url,
         };
 
-        this.cache[_entry.aaguid] = cached;
+        this.statementCache[_entry.aaguid] = cached;
       }
     }
 
-    this.state = SERVICE_STATE.READY;
+    // Cache this MDS API
+    const [year, month, day] = payload.nextUpdate.split('-');
+    this.mdsCache[url] = {
+      ...mds,
+      // Store the header `alg` so we know what to use when verifying metadata statement hashes
+      alg: header.alg,
+      // Store the payload `no` to make sure we're getting the next TOC in the sequence
+      no: payload.no,
+      // Convert the nextUpdate property into a Date so we can determine when to re-download
+      nextUpdate: new Date(
+        parseInt(year, 10),
+        // Months need to be zero-indexed
+        parseInt(month, 10) - 1,
+        parseInt(day, 10),
+      ),
+    };
   }
 
   /**
