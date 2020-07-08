@@ -121,6 +121,7 @@ class MetadataService {
         // From FIDO MDS docs: "Ignore the downloaded metadata statement if the hash value doesn't
         // match."
         cached.statement = undefined;
+        throw new Error(`Downloaded metadata for aaguid "${aaguid}" but hash did not match`);
       }
     }
 
