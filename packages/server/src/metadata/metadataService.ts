@@ -1,6 +1,7 @@
 import { Base64URLString } from '@simplewebauthn/typescript-types';
 import fetch from 'node-fetch';
 import { KJUR } from 'jsrsasign';
+import base64url from 'base64url';
 
 import { ENV_VARS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
@@ -95,7 +96,7 @@ class MetadataService {
       );
 
       const hashAlg = this.tocAlg === 'ES256' ? 'SHA256' : undefined;
-      const calculatedHash = toHash(data, hashAlg).toString('base64');
+      const calculatedHash = base64url.encode(toHash(data, hashAlg));
 
       if (calculatedHash === cached.hash) {
         // Update the cached entry with the latest statement
