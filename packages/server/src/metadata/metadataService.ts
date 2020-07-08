@@ -162,8 +162,7 @@ class MetadataService {
     } catch (err) {
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
-      this.state = SERVICE_STATE.READY;
-      return;
+      throw new Error('TOC certificate path could not be validated');
     }
 
     // Verify the TOC JWT signature
@@ -178,8 +177,7 @@ class MetadataService {
 
     if (!verified) {
       // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
-      this.state = SERVICE_STATE.READY;
-      return;
+      throw new Error('TOC signature could not be verified');
     }
 
     // Convert the nextUpdate property into a Date so we can determine when to redownload
