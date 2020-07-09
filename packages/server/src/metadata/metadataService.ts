@@ -87,7 +87,6 @@ class MetadataService {
 
       for (const server of mdsServers) {
         try {
-          console.log(`Service: ${server.url}`);
           await this.downloadTOC({
             url: server.url,
             rootCertURL: server.rootCertURL,
@@ -139,8 +138,6 @@ class MetadataService {
       // later
       throw new Error(`Unlisted aaguid "${aaguid}" in TOC`);
     }
-
-    console.debug('Found cached statement:', cachedStatement);
 
     // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
     if (cachedStatement.tocURL) {
