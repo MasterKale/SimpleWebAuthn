@@ -1,7 +1,7 @@
 import { X509 } from 'jsrsasign';
 import fetch from 'node-fetch';
-
-import { leafCertToASN1Object, asn1ObjectToJSON, JASN1 } from './asn1Utils';
+import { AsnParser } from '@peculiar/asn1-schema';
+import { CertificateList } from '@peculiar/asn1-x509';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID
@@ -77,17 +77,7 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
     return false;
   }
 
-  // Start diving into the CRL's ASN.1 data structure
-  const crlASN1 = leafCertToASN1Object(Buffer.from(crlCert.hex, 'hex'));
-  const crlJSON = asn1ObjectToJSON(crlASN1);
-
-  const root0 = (crlJSON.data as JASN1[])[0];
-
-  if ((root0.data as JASN1[])?.length < 7) {
-    // CRL is empty
-    console.log('CRL is empty');
-    return false;
-  }
+  const data = AsnParser.parse(Buffer.from(crlCert.hex, 'hex'), CertificateList);
 
   const newCached: CAAuthorityInfo = {
     revokedCerts: [],
@@ -95,34 +85,17 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
   };
 
   // nextUpdate
-  const root04 = (root0.data as JASN1[])[4];
-  if (root04) {
-    console.log('nextUpdate:', root04.data);
-    newCached.nextUpdate = new Date(root04.data as string);
+  if (data.tbsCertList.nextUpdate) {
+    newCached.nextUpdate = data.tbsCertList.nextUpdate.getTime();
   }
 
   // revokedCertificates
-  const root05 = (root0.data as JASN1[])[5];
-  const revokedCerts = root05.data;
+  const revokedCerts = data.tbsCertList.revokedCertificates;
 
   if (revokedCerts) {
     for (const cert of revokedCerts) {
-      const certSerialData = (cert as JASN1).data;
-      if (certSerialData) {
-        const certSerialSequence = (certSerialData[0] as JASN1).data;
-        if (typeof certSerialSequence === 'string') {
-          // Grab the value after "\n" in "(115 bit)\n23373519225161898650309958210680307"
-          const revokedHex = parseInt(certSerialSequence.split('\n')[1], 10).toString(16);
-          // Push the revoked cert serial hex into the cache
-          newCached.revokedCerts.push(revokedHex);
-
-          // Check to see if this cert is one of the revoked certificates
-          console.log(`Checking if cert ${certSerialHex} matches revoked ${revokedHex}`);
-          if (certSerialHex === revokedHex) {
-            return true;
-          }
-        }
-      }
+      const revokedHex = Buffer.from(cert.userCertificate).toString('hex');
+      newCached.revokedCerts.push(revokedHex);
     }
 
     // Cache the results
@@ -130,6 +103,9 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
       console.log(`Adding cached info for CA ID ${certAuthKeyID.kid}:`, newCached);
       cacheRevokedCerts[certAuthKeyID.kid] = newCached;
     }
+
+    console.log('checking if this cert is in new list of revoked certs');
+    return newCached.revokedCerts.indexOf(certSerialHex) >= 0;
   }
 
   return false;
