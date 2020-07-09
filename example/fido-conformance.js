@@ -44,6 +44,7 @@ const inMemoryUserDeviceDB = {
   //      */
   //   ],
   //   currentChallenge: undefined,
+  //   currentAssertionUserVerification: undefined,
   // },
 };
 
@@ -165,6 +166,7 @@ fidoComplianceRouter.post('/assertion/options', (req, res) => {
 
   const challenge = uuidv4();
   user.currentChallenge = challenge;
+  user.currentAssertionUserVerification = userVerification;
 
   const opts = generateAssertionOptions({
     challenge,
@@ -185,12 +187,12 @@ fidoComplianceRouter.post('/assertion/result', (req, res) => {
   const { id } = body;
 
   const user = inMemoryUserDeviceDB[loggedInUsername];
-  const expectedChallenge = user.currentChallenge;
-  const existingDevice = user.devices.find(device => device.credentialID === id);
 
-  if (!existingDevice) {
-    throw new Error('Assertion device is not registered to user');
-  }
+  // Pull up values specified when generation assertion options
+  const expectedChallenge = user.currentChallenge;
+  const userVerification = user.currentAssertionUserVerification;
+
+  const existingDevice = user.devices.find(device => device.credentialID === id);
 
   let verification;
   try {
@@ -200,6 +202,7 @@ fidoComplianceRouter.post('/assertion/result', (req, res) => {
       expectedOrigin: origin,
       expectedRPID: rpID,
       authenticator: existingDevice,
+      fidoUserVerification: userVerification,
     });
   } catch (error) {
     console.error(error.message);
