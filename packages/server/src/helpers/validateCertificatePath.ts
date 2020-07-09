@@ -33,6 +33,9 @@ export default async function validateCertificatePath(certificates: string[]): P
     const issuerCert = new X509();
     issuerCert.readCertPEM(issuerPem);
 
+    // Check for certificate revocation
+    const subjectCertRevoked = await isCertRevoked(subjectCert);
+
     if (subjectCertRevoked) {
       throw new Error(`Found revoked certificate in certificate path`);
     }
