@@ -1,14 +1,9 @@
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import verifySignature from '../../helpers/verifySignature';
-import {
-  leafCertToASN1Object,
-  findOID,
-  asn1ObjectToJSON,
-  ASN1Object,
-  JASN1,
-} from '../../helpers/asn1Utils';
+import { leafCertToASN1Object, findOID, ASN1Object, JASN1 } from '../../helpers/asn1Utils';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
+import parseCertificateASN1 from '../../helpers/parseCertificateBuffer';
 import MetadataService from '../../metadata/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
@@ -40,17 +35,16 @@ export default async function verifyAttestationAndroidKey(options: Options): Pro
 
   // Check that credentialPublicKey matches the public key in the attestation certificate
   // Find the public cert in the certificate as PKCS
-  const certPubKey = getASN1CertificatePublicKey(certASN1);
-
-  if (!certPubKey) {
-    throw new Error('Could not retrieve public key from leaf certificate (AndroidKey)');
-  }
+  const parsedCert = parseCertificateASN1(x5c[0]);
+  console.log('extensions:', parsedCert.tbsCertificate.extensions);
+  const parsedCertPubKey = Buffer.from(
+    parsedCert.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey,
+  );
 
   // Convert the credentialPublicKey to PKCS
-  const reservedByte = Buffer.from([0x00]);
-  const credPubKeyPKCS = Buffer.concat([reservedByte, convertCOSEtoPKCS(credentialPublicKey)]);
+  const credPubKeyPKCS = convertCOSEtoPKCS(credentialPublicKey);
 
-  if (!credPubKeyPKCS.equals(certPubKey)) {
+  if (!credPubKeyPKCS.equals(parsedCertPubKey)) {
     throw new Error('Credential public key does not equal leaf cert public key (AndroidKey)');
   }
 
@@ -148,15 +142,6 @@ function getASN1ExtKeyStore(certASN1: ASN1Object): KeyStoreExtensionDescription 
     softwareEnforced,
     teeEnforced,
   };
-}
-
-function getASN1CertificatePublicKey(certASN1: ASN1Object): Buffer | undefined {
-  const certJSON = asn1ObjectToJSON(certASN1);
-  const certTBS = (certJSON.data as JASN1[])[0];
-  const certPubKey = (certTBS.data as JASN1[])[6];
-  const certPubBuffer = (certPubKey.data as JASN1[])[1].data;
-
-  return certPubBuffer as Buffer;
 }
 
 // TODO: Find the most up-to-date expected root cert, the one from Yuriy's article doesn't match
