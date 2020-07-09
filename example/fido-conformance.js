@@ -157,7 +157,7 @@ fidoComplianceRouter.post('/attestation/result', async (req, res) => {
       expectedOrigin: origin,
     });
   } catch (error) {
-    console.error(`RP: ${error.message}`);
+    console.error(`RP - attestation: ${error.message}`);
     return res.status(400).send({ errorMessage: error.message });
   }
 
@@ -240,7 +240,7 @@ fidoComplianceRouter.post('/assertion/result', (req, res) => {
       fidoUserVerification: userVerification,
     });
   } catch (error) {
-    console.error(error.message);
+    console.error(`RP - assertion: ${error.message}`);
     return res.status(400).send({ errorMessage: error.message });
   }
 
