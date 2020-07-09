@@ -21,23 +21,23 @@ const cacheRevokedCerts: { [certAuthorityKeyID: string]: CAAuthorityInfo } = {};
  * CRL certificate structure referenced from https://tools.ietf.org/html/rfc5280#page-117
  */
 export default async function isCertRevoked(cert: X509): Promise<boolean> {
-  let crlURL = undefined;
-  try {
-    crlURL = cert.getExtCRLDistributionPointsURI();
-  } catch (err) {
-    // Cert probably didn't include any CDP URIs
-    return false;
-  }
-
-  // If no URL is provided then we have nothing to check
-  if (!crlURL) {
-    return false;
-  }
-
+  console.log(`Getting cert serial`);
   const certSerialHex = cert.getSerialNumberHex();
 
+  console.log(`Checking certificate revocation for ${cert.getSerialNumberHex()}`);
+
   // Check to see if we've got cached info for the cert's CA
-  const certAuthKeyID = cert.getExtAuthorityKeyIdentifier();
+  console.log(`Getting cert auth key ID`);
+  let certAuthKeyID: { kid: string } | null = null;
+  try {
+    certAuthKeyID = cert.getExtAuthorityKeyIdentifier();
+  } catch (err) {
+    console.error('error getting auth key id:', err.message);
+    return false;
+  }
+
+  console.log('cert auth key id:', certAuthKeyID);
+
   if (certAuthKeyID) {
     const cached = cacheRevokedCerts[certAuthKeyID.kid];
     if (cached) {
@@ -50,13 +50,30 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
     }
   }
 
+  let crlURL = undefined;
+  try {
+    crlURL = cert.getExtCRLDistributionPointsURI();
+  } catch (err) {
+    // Cert probably didn't include any CDP URIs
+    console.error(`Error getting cert CDP URIs: ${err.message}`);
+    return false;
+  }
+
+  // If no URL is provided then we have nothing to check
+  if (!crlURL) {
+    console.error(`No CDP URIs for certificate`);
+    return false;
+  }
+
   // Download and read the CRL
   const crlCert = new X509();
   try {
+    console.error(`Download CRL`);
     const respCRL = await fetch(crlURL[0]);
     const dataCRL = await respCRL.text();
     crlCert.readCertPEM(dataCRL);
   } catch (err) {
+    console.error(`Error downloading CRL: ${err.message}`);
     return false;
   }
 
@@ -68,6 +85,7 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
 
   if ((root0.data as JASN1[])?.length < 7) {
     // CRL is empty
+    console.log('CRL is empty');
     return false;
   }
 
