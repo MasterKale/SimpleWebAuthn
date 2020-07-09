@@ -34,6 +34,7 @@ type CachedMDS = {
 };
 
 enum SERVICE_STATE {
+  DISABLED,
   REFRESHING,
   READY,
 }
@@ -47,7 +48,7 @@ enum SERVICE_STATE {
 class MetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedAAGUID } = {};
-  private state: SERVICE_STATE = SERVICE_STATE.READY;
+  private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
 
   /**
    * Prepare the service to handle live data, or prepared data.
@@ -115,6 +116,10 @@ class MetadataService {
    * TOC download.
    */
   async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
+    if (this.state === SERVICE_STATE.DISABLED) {
+      return;
+    }
+
     if (!aaguid) {
       return;
     }
