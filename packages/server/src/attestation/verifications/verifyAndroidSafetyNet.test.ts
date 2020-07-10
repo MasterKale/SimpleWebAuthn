@@ -5,11 +5,13 @@ import verifyAndroidSafetyNet from './verifyAndroidSafetyNet';
 import decodeAttestationObject, {
   AttestationStatement,
 } from '../../helpers/decodeAttestationObject';
+import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 import toHash from '../../helpers/toHash';
 
 let authData: Buffer;
 let attStmt: AttestationStatement;
 let clientDataHash: Buffer;
+let aaguid: Buffer;
 
 beforeEach(() => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
@@ -18,31 +20,36 @@ beforeEach(() => {
   authData = decodedAttestationObject.authData;
   attStmt = decodedAttestationObject.attStmt;
   clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
+
+  const parsedAuthData = parseAuthenticatorData(authData);
+  aaguid = parsedAuthData.aaguid!;
 });
 
 /**
  * We need to use the `verifyTimestampMS` escape hatch until I can figure out how to generate a
  * signature after modifying the payload with a `timestampMs` we can dynamically set
  */
-test('should verify Android SafetyNet attestation', () => {
-  const verified = verifyAndroidSafetyNet({
+test('should verify Android SafetyNet attestation', async () => {
+  const verified = await verifyAndroidSafetyNet({
     attStmt,
     authData,
     clientDataHash,
     verifyTimestampMS: false,
+    aaguid,
   });
 
   expect(verified).toEqual(true);
 });
 
-test('should throw error when timestamp is not within one minute of now', () => {
-  expect(() => {
+test('should throw error when timestamp is not within one minute of now', async () => {
+  await expect(
     verifyAndroidSafetyNet({
       attStmt,
       authData,
       clientDataHash,
-    });
-  }).toThrow(/has expired/i);
+      aaguid,
+    }),
+  ).rejects.toThrow(/has expired/i);
 });
 
 const attestationAndroidSafetyNet = {
