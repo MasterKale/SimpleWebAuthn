@@ -5,7 +5,8 @@
     "outDir": "./dist",
     "typeRoots": [
       "./types",
-      "node_modules/@types"
+      "./node_modules/@types",
+      "../../node_modules/@types"
     ],
     "experimentalDecorators": true,
     "plugins": [
