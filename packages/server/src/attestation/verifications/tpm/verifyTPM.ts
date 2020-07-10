@@ -1,3 +1,6 @@
+import { AsnParser } from '@peculiar/asn1-schema';
+import { Certificate, id_ce_subjectAltName, SubjectAlternativeName } from '@peculiar/asn1-x509';
+
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
@@ -203,13 +206,25 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
    */
   const certASN1 = leafCertToASN1Object(x5c[0]);
 
-  const subjectAltNamePresent = getASN1SubjectAltNamePresent(certASN1);
   const tcgAtTpmManufacturer = getASN1TcgAtTpmManufacturer(certASN1);
   const tcgAtTpmModel = getASN1TcgAtTpmModel(certASN1);
   const tcgAtTpmVersion = getASN1TcgAtTpmVersion(certASN1);
   const extKeyUsage = getASN1ExtKeyUsage(certASN1);
 
-  // Check that certificate contains subjectAltName(2.5.29.17) extension,
+  const parsedCert = AsnParser.parse(x5c[0], Certificate);
+
+  if (!parsedCert.tbsCertificate.extensions) {
+    throw new Error('Certificate was missing extensions (TPM)');
+  }
+
+  let subjectAltNamePresent: SubjectAlternativeName | undefined;
+  parsedCert.tbsCertificate.extensions.forEach(ext => {
+    if (ext.extnID === id_ce_subjectAltName) {
+      subjectAltNamePresent = AsnParser.parse(ext.extnValue.slice(0), SubjectAlternativeName);
+    }
+  });
+
+  // Check that certificate contains subjectAltName (2.5.29.17) extension,
   if (!subjectAltNamePresent) {
     throw new Error('Certificate did not contain subjectAltName extension (TPM)');
   }
@@ -245,35 +260,6 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // Get Martini friend, you are done!
   return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
-}
-
-function getASN1SubjectAltNamePresent(certASN1: ASN1Object): boolean {
-  const oid = '2.5.29.17';
-  const ext = findOID(certASN1, oid);
-
-  if (!ext) {
-    return false;
-  }
-
-  /**
-   * Return "true" (as an actual boolean) from the following data structure
-   * {
-   *   "type": "SEQUENCE",
-   *   "data": [
-   *     {
-   *       "type": "OBJECT_IDENTIFIER",
-   *       "data": "2.5.29.17\nsubjectAltName\nX.509 extension"
-   *     },
-   *     {
-   *       "type": "BOOLEAN",
-   *       "data": "true"
-   *     },
-   *     // ...snip...
-   *   ]
-   * }
-   */
-
-  return (ext.data as JASN1[])[1].data === 'true';
 }
 
 function getASN1TcgAtTpmManufacturer(certASN1: ASN1Object): string {
