@@ -27,6 +27,7 @@
   ],
   "dependencies": {
     "@lapo/asn1js": "^1.1.0",
+    "@peculiar/asn1-android": "^2.0.7-alpha.0",
     "@peculiar/asn1-schema": "^2.0.5",
     "@peculiar/asn1-x509": "^2.0.5",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
