@@ -234,7 +234,7 @@ class MetadataService {
     } catch (err) {
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
-      throw new Error('TOC certificate path could not be validated');
+      throw new Error(`TOC certificate path could not be validated: ${err.message}`);
     }
 
     // Verify the TOC JWT signature
