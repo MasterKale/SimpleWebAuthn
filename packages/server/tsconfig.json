@@ -1,5 +1,8 @@
 {
   "extends": "../../tsconfig.json",
+  "include": [
+    "./src/**/*"
+  ],
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist",
@@ -14,14 +17,5 @@
       { "transform": "typescript-transform-paths" },
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
-  },
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts",
-    "**/setupTests.ts",
-    "**/__mocks__/*",
-    "**/dist/*",
-    "./*.ts",
-    "types"
-  ]
+  }
 }
