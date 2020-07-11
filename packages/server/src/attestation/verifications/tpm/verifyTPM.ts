@@ -5,6 +5,7 @@ import {
   SubjectAlternativeName,
   id_ce_extKeyUsage,
   ExtendedKeyUsage,
+  RelativeDistinguishedName,
 } from '@peculiar/asn1-x509';
 
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
@@ -14,7 +15,6 @@ import toHash from '../../../helpers/toHash';
 import convertASN1toPEM from '../../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
-import { leafCertToASN1Object, findOID, JASN1, ASN1Object } from '../../../helpers/asn1Utils';
 import MetadataService from '../../../metadata/metadataService';
 import verifyAttestationWithMetadata from '../../../metadata/verifyAttestationWithMetadata';
 
@@ -210,12 +210,6 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   /**
    * Plumb the depths of the certificate's ASN.1-formatted data for some values we need to verify
    */
-  const certASN1 = leafCertToASN1Object(x5c[0]);
-
-  const tcgAtTpmManufacturer = getASN1TcgAtTpmManufacturer(certASN1);
-  const tcgAtTpmModel = getASN1TcgAtTpmModel(certASN1);
-  const tcgAtTpmVersion = getASN1TcgAtTpmVersion(certASN1);
-
   const parsedCert = AsnParser.parse(x5c[0], Certificate);
 
   if (!parsedCert.tbsCertificate.extensions) {
@@ -236,6 +230,16 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   if (!subjectAltNamePresent) {
     throw new Error('Certificate did not contain subjectAltName extension (TPM)');
   }
+
+  // TPM-specific values are buried within `directoryName`, so first make sure there are values
+  // there.
+  if (!subjectAltNamePresent[0].directoryName?.[0].length) {
+    throw new Error('Certificate subjectAltName extension directoryName was empty (TPM)');
+  }
+
+  const { tcgAtTpmManufacturer, tcgAtTpmModel, tcgAtTpmVersion } = getTcgAtTpmValues(
+    subjectAltNamePresent[0].directoryName[0],
+  );
 
   if (!tcgAtTpmManufacturer || !tcgAtTpmModel || !tcgAtTpmVersion) {
     throw new Error('Certificate contained incomplete subjectAltName data (TPM)');
@@ -274,89 +278,37 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
 }
 
-function getASN1TcgAtTpmManufacturer(certASN1: ASN1Object): string {
-  const oid = '2.23.133.2.1';
-  const ext = findOID(certASN1, oid);
+/**
+ * Contain logic for pulling TPM-specific values out of subjectAlternativeName extension
+ */
+function getTcgAtTpmValues(
+  root: RelativeDistinguishedName,
+): {
+  tcgAtTpmManufacturer?: string;
+  tcgAtTpmModel?: string;
+  tcgAtTpmVersion?: string;
+} {
+  const oidManufacturer = '2.23.133.2.1';
+  const oidModel = '2.23.133.2.2';
+  const oidVersion = '2.23.133.2.3';
 
-  if (!ext) {
-    return '';
-  }
+  let tcgAtTpmManufacturer: string | undefined;
+  let tcgAtTpmModel: string | undefined;
+  let tcgAtTpmVersion: string | undefined;
 
-  /**
-   * Return "id:FFFFF1D0" from the following data structure
-   *
-   * {
-   *   "type": "SEQUENCE",
-   *   "data": [
-   *     {
-   *       "type": "OBJECT_IDENTIFIER",
-   *       "data": "2.23.133.2.1\ntcpaTpmManufacturer\nTCPA Attribute"
-   *     },
-   *     {
-   *       "type": "UTF8String",
-   *       "data": "id:FFFFF1D0"
-   *     }
-   *   ]
-   * }
-   */
+  root.forEach(attr => {
+    if (attr.type === oidManufacturer) {
+      tcgAtTpmManufacturer = attr.value.toString();
+    } else if (attr.type === oidModel) {
+      tcgAtTpmModel = attr.value.toString();
+    } else if (attr.type === oidVersion) {
+      tcgAtTpmVersion = attr.value.toString();
+    }
+  });
 
-  return (ext.data as JASN1[])[1].data as string;
-}
-
-function getASN1TcgAtTpmModel(certASN1: ASN1Object): string {
-  const oid = '2.23.133.2.2';
-  const ext = findOID(certASN1, oid);
-
-  if (!ext) {
-    return '';
-  }
-
-  /**
-   * Return "NPCT6xx" from the following data structure
-   *
-   * {
-   *   "type": "SEQUENCE",
-   *   "data": [
-   *     {
-   *       "type": "OBJECT_IDENTIFIER",
-   *       "data": "2.23.133.2.2\ntcpaTpmModel\nTCPA Attribute"
-   *     },
-   *     {
-   *       "type": "UTF8String",
-   *       "data": "NPCT6xx"
-   *     }
-   *   ]
-   * }
-   */
-
-  return (ext.data as JASN1[])[1].data as string;
-}
-
-function getASN1TcgAtTpmVersion(certASN1: ASN1Object): string {
-  const oid = '2.23.133.2.3';
-  const ext = findOID(certASN1, oid);
-
-  if (!ext) {
-    return '';
-  }
-
-  /**
-   * Return "id:13" from the following data structure:
-   *
-   * {
-   *   "type": "SEQUENCE",
-   *   "data": [
-   *     {
-   *       "type": "OBJECT_IDENTIFIER",
-   *       "data": "2.23.133.2.3\ntcpaTpmVersion\nTCPA Attribute"
-   *     },
-   *     {
-   *       "type": "UTF8String",
-   *       "data": "id:13"
-   *     }
-   *   ]
-   * }
-   */
-
-  return (ext.data as JASN1[])[1].data as string;
+  return {
+    tcgAtTpmManufacturer,
+    tcgAtTpmModel,
+    tcgAtTpmVersion,
+  };
 }
