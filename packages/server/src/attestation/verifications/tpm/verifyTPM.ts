@@ -1,5 +1,11 @@
 import { AsnParser } from '@peculiar/asn1-schema';
-import { Certificate, id_ce_subjectAltName, SubjectAlternativeName } from '@peculiar/asn1-x509';
+import {
+  Certificate,
+  id_ce_subjectAltName,
+  SubjectAlternativeName,
+  id_ce_extKeyUsage,
+  ExtendedKeyUsage,
+} from '@peculiar/asn1-x509';
 
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
@@ -209,7 +215,6 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   const tcgAtTpmManufacturer = getASN1TcgAtTpmManufacturer(certASN1);
   const tcgAtTpmModel = getASN1TcgAtTpmModel(certASN1);
   const tcgAtTpmVersion = getASN1TcgAtTpmVersion(certASN1);
-  const extKeyUsage = getASN1ExtKeyUsage(certASN1);
 
   const parsedCert = AsnParser.parse(x5c[0], Certificate);
 
@@ -218,9 +223,12 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   let subjectAltNamePresent: SubjectAlternativeName | undefined;
+  let extKeyUsage: ExtendedKeyUsage | undefined;
   parsedCert.tbsCertificate.extensions.forEach(ext => {
     if (ext.extnID === id_ce_subjectAltName) {
       subjectAltNamePresent = AsnParser.parse(ext.extnValue.slice(0), SubjectAlternativeName);
+    } else if (ext.extnID === id_ce_extKeyUsage) {
+      extKeyUsage = AsnParser.parse(ext.extnValue.slice(0), ExtendedKeyUsage);
     }
   });
 
@@ -233,6 +241,10 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
     throw new Error('Certificate contained incomplete subjectAltName data (TPM)');
   }
 
+  if (!extKeyUsage) {
+    throw new Error('Certificate did not contain ExtendedKeyUsage extension (TPM)');
+  }
+
   // Check that tcpaTpmManufacturer (2.23.133.2.1) field is set to a valid manufacturer ID.
   if (!TPM_MANUFACTURERS[tcgAtTpmManufacturer]) {
     throw new Error(`Could not match TPM manufacturer "${tcgAtTpmManufacturer}" (TPM)`);
@@ -240,8 +252,8 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
 
   // Check that certificate contains extKeyUsage (2.5.29.37) extension and it must contain
   // tcg-kp-AIKCertificate (2.23.133.8.3) OID.
-  if (extKeyUsage !== '2.23.133.8.3') {
-    throw new Error(`Unexpected extKeyUsage "${extKeyUsage}", expected "2.23.133.8.3" (TPM)`);
+  if (extKeyUsage[0] !== '2.23.133.8.3') {
+    throw new Error(`Unexpected extKeyUsage "${extKeyUsage[0]}", expected "2.23.133.8.3" (TPM)`);
   }
 
   // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
@@ -347,48 +359,4 @@ function getASN1TcgAtTpmVersion(certASN1: ASN1Object): string {
    */
 
   return (ext.data as JASN1[])[1].data as string;
-}
-
-function getASN1ExtKeyUsage(certASN1: ASN1Object): string {
-  const oid = '2.5.29.37';
-  const ext = findOID(certASN1, oid);
-
-  if (!ext) {
-    return '';
-  }
-
-  /**
-   * Return "2.23.133.8.3" from the following data structure:
-   *
-   * {
-   *   "type": "SEQUENCE",
-   *   "data": [
-   *     {
-   *       "type": "OBJECT_IDENTIFIER",
-   *       "data": "2.5.29.37\nextKeyUsage\nX.509 extension"
-   *     },
-   *     {
-   *       "type": "OCTET_STRING",
-   *       "data": [
-   *         {
-   *           "type": "SEQUENCE",
-   *           "data": [
-   *             {
-   *               "type": "OBJECT_IDENTIFIER",
-   *               "data": "2.23.133.8.3"
-   *             }
-   *           ]
-   *         }
-   *       ]
-   *     }
-   *   ]
-   * }
-   */
-
-  const root = ext.data as JASN1[];
-  const root1 = root[1].data as JASN1[];
-  const root2 = root1[0].data as JASN1[];
-  const value = root2[0].data as string;
-
-  return value;
 }
