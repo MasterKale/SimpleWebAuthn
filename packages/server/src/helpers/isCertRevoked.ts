@@ -68,12 +68,12 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
   // Download and read the CRL
   const crlCert = new X509();
   try {
-    console.log(`Download CRL`);
+    console.log(`Downloading CRL:`, crlURL[0]);
     const respCRL = await fetch(crlURL[0]);
     const dataCRL = await respCRL.text();
     crlCert.readCertPEM(dataCRL);
   } catch (err) {
-    console.error(`Error downloading CRL: ${err.message}`);
+    console.error(`Error downloading CRL: ${err}`);
     return false;
   }
 
