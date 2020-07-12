@@ -35,14 +35,11 @@ Lower-level API documentation for the methods in this library is available [here
 
 ## Supported Attestation Formats
 
-SimpleWebAuthn can verify the following attestation formats:
+SimpleWebAuthn supports [all six WebAuthn attestation formats](https://w3c.github.io/webauthn/#sctn-defined-attestation-formats), including:
 
-- `fido-u2f`
-- `packed`
-  - Supported Certificates
-    - `X5C`
-    - `COSE - EC2`
-    - `COSE - RSA` (code is present but needs further testing)
-    - `COSE - OKP` (code is present but needs further testing)
-- `android-safetynet`
-- `none`
+- **Packed**
+- **TPM**
+- **Android Key**
+- **Android SafetyNet**
+- **FIDO U2F**
+- **None**
