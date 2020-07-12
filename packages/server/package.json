@@ -32,7 +32,6 @@
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "^3.0.1",
     "cbor": "^5.0.2",
-    "dotenv": "^8.2.0",
     "elliptic": "^6.5.2",
     "jsrsasign": "^8.0.20",
     "node-fetch": "^2.6.0",
