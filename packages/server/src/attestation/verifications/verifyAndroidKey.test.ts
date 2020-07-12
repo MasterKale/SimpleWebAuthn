@@ -21,6 +21,5 @@ test('should verify Android KeyStore response', async () => {
     expectedRPID: 'dev.dontneeda.pw',
   });
 
-  // console.log(verification);
   expect(verification.verified).toEqual(true);
 });
