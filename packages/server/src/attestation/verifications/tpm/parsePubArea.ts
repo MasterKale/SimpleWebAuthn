@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { TPM_ALG, TPM_ECC_CURVE } from './constants';
 
 /**
