@@ -4,6 +4,8 @@
  *
  * The webpages served from ./public use @simplewebauthn/browser.
  */
+require('dotenv').config();
+
 const https = require('https');
 const fs = require('fs');
 
@@ -29,15 +31,21 @@ const {
  * what they claim to be according to their manufacturer.
  *
  * Use of MetadataService is _not_ required to use @simplewebauthn/server. If you do choose to use
- * it, you'll need to set the following environment variables (.env files are supported):
- *
- * ENABLE_MDS=true
- * MDS_API_TOKEN=YourFIDOAccessTokenGoesHere
+ * it, you'll need to provide at least one MDS endpoint
  *
  * See https://mds2.fidoalliance.org/tokens/ to register for a free access token. When they ask for
  * an Organization Name, "Self" works just fine.
  */
-// MetadataService.initialize();
+// const mdsAPIToken = process.env.MDS_API_TOKEN;
+// MetadataService.initialize({
+//   mdsServers: [
+//     {
+//       url: `https://mds2.fidoalliance.org/?token=${mdsAPIToken}`,
+//       rootCertURL: 'https://mds.fidoalliance.org/Root.cer',
+//       metadataURLSuffix: `?token=${mdsAPIToken}`,
+//     },
+//   ],
+// });
 
 const app = express();
 const host = '0.0.0.0';
