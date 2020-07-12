@@ -58,13 +58,17 @@ class MetadataService {
    */
   async initialize(opts: {
     statements?: MetadataStatement[];
-    mdsServers?: Pick<CachedMDS, 'url' | 'rootCertURL' | 'metadataURLSuffix'>[];
+    mdsServers: Pick<CachedMDS, 'url' | 'rootCertURL' | 'metadataURLSuffix'>[];
   }): Promise<void> {
+    if (!opts) {
+      throw new Error('MetadataService initialization options are missing');
+    }
+
     const { mdsServers, statements } = opts;
 
     this.state = SERVICE_STATE.REFRESHING;
 
-    // If metadata statements are provided, load them into the cache
+    // If metadata statements are provided, load them into the cache first
     if (statements?.length) {
       console.log(`Adding ${statements.length} statements to cache`);
 
@@ -79,6 +83,10 @@ class MetadataService {
           };
         }
       });
+    }
+
+    if (!mdsServers.length) {
+      throw new Error('MetadataService must be initialized with at least one MDS server');
     }
 
     // If MDS servers are provided, then process them and add their statements to the cache
