@@ -1,11 +1,11 @@
 import { AsnParser } from '@peculiar/asn1-schema';
+import { Certificate } from '@peculiar/asn1-x509';
 import { KeyDescription, id_ce_keyDescription } from '@peculiar/asn1-android';
 
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import verifySignature from '../../helpers/verifySignature';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
-import parseCertificateASN1 from '../../helpers/parseCertificateBuffer';
 import MetadataService from '../../metadata/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
@@ -35,7 +35,7 @@ export default async function verifyAttestationAndroidKey(options: Options): Pro
 
   // Check that credentialPublicKey matches the public key in the attestation certificate
   // Find the public cert in the certificate as PKCS
-  const parsedCert = parseCertificateASN1(x5c[0]);
+  const parsedCert = AsnParser.parse(x5c[0], Certificate);
   const parsedCertPubKey = Buffer.from(
     parsedCert.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey,
   );
