@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-// ASN1HEX exists in the lib, but not typings, I swear
+// `ASN1HEX` exists in the lib but not in its typings
 // @ts-ignore 2305
 import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
 
