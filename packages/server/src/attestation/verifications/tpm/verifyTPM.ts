@@ -274,7 +274,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   // Verify signature over certInfo with the public key extracted from AIK certificate.
-  // Get Martini friend, you are done!
+  // In the wise words of Yuriy Ackermann: "Get Martini friend, you are done!"
   return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
 }
 
