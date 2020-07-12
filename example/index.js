@@ -11,7 +11,7 @@ const fs = require('fs');
 
 const express = require('express');
 
-const FIDOConformanceRoutes = require('./fido-conformance');
+// const FIDOConformanceRoutes = require('./fido-conformance');
 
 const {
   // Registration ("Attestation")
@@ -53,6 +53,7 @@ const port = 443;
 
 app.use(express.static('./public/'));
 app.use(express.json());
+// app.use('/fido', FIDOConformanceRoutes);
 
 /**
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
@@ -286,8 +287,6 @@ app.post('/verify-assertion', (req, res) => {
 
   res.send({ verified });
 });
-
-app.use('/fido', FIDOConformanceRoutes);
 
 https
   .createServer(
