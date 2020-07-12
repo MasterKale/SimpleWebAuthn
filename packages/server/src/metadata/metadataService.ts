@@ -51,14 +51,11 @@ class MetadataService {
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
 
   /**
-   * Prepare the service to handle live data, or prepared data.
-   *
-   * If `process.env.ENABLE_MDS` is `'true'`, then the actual MDS API will be queried. Otherwise
-   * known metadata statements can be provided as arguments.
+   * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
    */
   async initialize(opts: {
-    statements?: MetadataStatement[];
     mdsServers: Pick<CachedMDS, 'url' | 'rootCertURL' | 'metadataURLSuffix'>[];
+    statements?: MetadataStatement[];
   }): Promise<void> {
     if (!opts) {
       throw new Error('MetadataService initialization options are missing');
