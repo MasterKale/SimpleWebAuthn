@@ -7,7 +7,6 @@ export type CertificateInfo = {
   basicConstraintsCA: boolean;
   notBefore: Date;
   notAfter: Date;
-  extendedKeyUsageIDs: string[];
 };
 
 type ExtInfo = {
@@ -71,7 +70,6 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
     basicConstraintsCA,
     notBefore: zulutodate(subjectCert.getNotBefore()),
     notAfter: zulutodate(subjectCert.getNotAfter()),
-    extendedKeyUsageIDs: subjectCert.getExtExtKeyUsageName() || [],
   };
 
   return toReturn;
