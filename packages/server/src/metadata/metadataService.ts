@@ -40,7 +40,7 @@ enum SERVICE_STATE {
 }
 
 /**
- * A basic service to coordinate interactions with the FIDO Metadata Service. This includes TOC
+ * A basic service for coordinating interactions with the FIDO Metadata Service. This includes TOC
  * download and parsing, and on-demand requesting and caching of individual metadata statements.
  *
  * https://fidoalliance.org/metadata/
