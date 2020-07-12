@@ -63,7 +63,7 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
   const { version } = subjectCert as x5cCertificate;
   const basicConstraintsCA = !!subjectCert.getExtBasicConstraints()?.cA;
 
-  const toReturn: CertificateInfo = {
+  return {
     issuer,
     subject,
     version,
@@ -71,6 +71,4 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
     notBefore: zulutodate(subjectCert.getNotBefore()),
     notAfter: zulutodate(subjectCert.getNotAfter()),
   };
-
-  return toReturn;
 }
