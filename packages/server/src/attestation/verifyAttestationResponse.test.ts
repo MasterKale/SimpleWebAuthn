@@ -33,8 +33,8 @@ afterEach(() => {
   mockVerifyFIDOU2F.mockRestore();
 });
 
-test('should verify FIDO U2F attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify FIDO U2F attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -52,8 +52,8 @@ test('should verify FIDO U2F attestation', () => {
   );
 });
 
-test('should verify Packed (EC2) attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify Packed (EC2) attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationPacked,
     expectedChallenge: attestationPackedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -72,8 +72,8 @@ test('should verify Packed (EC2) attestation', () => {
   );
 });
 
-test('should verify Packed (X5C) attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify Packed (X5C) attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationPackedX5C,
     expectedChallenge: attestationPackedX5CChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -91,8 +91,8 @@ test('should verify Packed (X5C) attestation', () => {
   );
 });
 
-test('should verify None attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify None attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -110,29 +110,29 @@ test('should verify None attestation', () => {
   );
 });
 
-test('should throw when response challenge is not expected value', () => {
-  expect(() => {
+test('should throw when response challenge is not expected value', async () => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/attestation challenge/i);
+    }),
+  ).rejects.toThrow(/attestation challenge/i);
 });
 
-test('should throw when response origin is not expected value', () => {
-  expect(() => {
+test('should throw when response origin is not expected value', async () => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://different.address',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/attestation origin/i);
+    }),
+  ).rejects.toThrow(/attestation origin/i);
 });
 
-test('should throw when attestation type is not webauthn.create', () => {
+test('should throw when attestation type is not webauthn.create', async () => {
   const origin = 'https://dev.dontneeda.pw';
   const challenge = attestationNoneChallenge;
 
@@ -143,17 +143,17 @@ test('should throw when attestation type is not webauthn.create', () => {
     challenge: attestationNoneChallenge,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: challenge,
       expectedOrigin: origin,
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/attestation type/i);
+    }),
+  ).rejects.toThrow(/attestation type/i);
 });
 
-test('should throw if an unexpected attestation format is specified', () => {
+test('should throw if an unexpected attestation format is specified', async () => {
   const fmt = 'fizzbuzz';
 
   const realAtteObj = decodeAttestationObject.default(attestationNone.response.attestationObject);
@@ -164,17 +164,17 @@ test('should throw if an unexpected attestation format is specified', () => {
     fmt,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/unsupported attestation format/i);
+    }),
+  ).rejects.toThrow(/unsupported attestation format/i);
 });
 
-test('should throw error if assertion RP ID is unexpected value', () => {
+test('should throw error if assertion RP ID is unexpected value', async () => {
   const { authData } = decodeAttestationObject.default(attestationNone.response.attestationObject);
   const actualAuthData = parseAuthenticatorData.default(authData);
 
@@ -183,17 +183,17 @@ test('should throw error if assertion RP ID is unexpected value', () => {
     rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/rp id/i);
+    }),
+  ).rejects.toThrow(/rp id/i);
 });
 
-test('should throw error if user was not present', () => {
+test('should throw error if user was not present', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -201,17 +201,17 @@ test('should throw error if user was not present', () => {
     },
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/not present/i);
+    }),
+  ).rejects.toThrow(/not present/i);
 });
 
-test('should throw if the authenticator does not give back credential ID', () => {
+test('should throw if the authenticator does not give back credential ID', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -220,17 +220,17 @@ test('should throw if the authenticator does not give back credential ID', () =>
     credentialID: undefined,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/credential id/i);
+    }),
+  ).rejects.toThrow(/credential id/i);
 });
 
-test('should throw if the authenticator does not give back credential public key', () => {
+test('should throw if the authenticator does not give back credential public key', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -240,54 +240,54 @@ test('should throw if the authenticator does not give back credential public key
     credentialPublicKey: undefined,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/public key/i);
+    }),
+  ).rejects.toThrow(/public key/i);
 });
 
-test('should throw error if no alg is specified in public key', () => {
+test('should throw error if no alg is specified in public key', async () => {
   mockDecodePubKey.mockReturnValue({
     get: () => undefined,
     credentialID: '',
     credentialPublicKey: '',
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/missing alg/i);
+    }),
+  ).rejects.toThrow(/missing numeric alg/i);
 });
 
-test('should throw error if unsupported alg is used', () => {
+test('should throw error if unsupported alg is used', async () => {
   mockDecodePubKey.mockReturnValue({
     get: () => -999,
     credentialID: '',
     credentialPublicKey: '',
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/unexpected public key/i);
+    }),
+  ).rejects.toThrow(/unexpected public key/i);
 });
 
-test('should not include authenticator info if not verified', () => {
+test('should not include authenticator info if not verified', async () => {
   mockVerifyFIDOU2F.mockReturnValue(false);
 
-  const verification = verifyAttestationResponse({
+  const verification = await verifyAttestationResponse({
     credential: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -298,7 +298,7 @@ test('should not include authenticator info if not verified', () => {
   expect(verification.authenticatorInfo).toBeUndefined();
 });
 
-test('should throw an error if user verification is required but user was not verified', () => {
+test('should throw an error if user verification is required but user was not verified', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -307,21 +307,21 @@ test('should throw an error if user verification is required but user was not ve
     },
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationFIDOU2F,
       expectedChallenge: attestationFIDOU2FChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
       requireUserVerification: true,
-    });
-  }).toThrow(/user could not be verified/i);
+    }),
+  ).rejects.toThrow(/user could not be verified/i);
 });
 
-test('should validate TPM RSA response (SHA256)', () => {
+test('should validate TPM RSA response (SHA256)', async () => {
   const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
   jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
-  const verification = verifyAttestationResponse({
+  const verification = await verifyAttestationResponse({
     credential: {
       id: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
       rawId: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
@@ -347,10 +347,10 @@ test('should validate TPM RSA response (SHA256)', () => {
   );
 });
 
-test('should validate TPM RSA response (SHA1)', () => {
+test('should validate TPM RSA response (SHA1)', async () => {
   const expectedChallenge = 'f4e8d87b-d363-47cc-ab4d-1a84647bf245';
   jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
-  const verification = verifyAttestationResponse({
+  const verification = await verifyAttestationResponse({
     credential: {
       id: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
       rawId: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
@@ -376,10 +376,10 @@ test('should validate TPM RSA response (SHA1)', () => {
   );
 });
 
-test('should validate Android-Key response', () => {
+test('should validate Android-Key response', async () => {
   const expectedChallenge = '14e0d1b6-9c36-4849-aeec-ea64676449ef';
   jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
-  const verification = verifyAttestationResponse({
+  const verification = await verifyAttestationResponse({
     credential: {
       id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
       rawId: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
