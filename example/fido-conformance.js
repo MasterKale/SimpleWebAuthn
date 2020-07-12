@@ -31,38 +31,7 @@ for (const statementPath of conformanceMetadataFilenames) {
 console.log('initializing metadata service with', conformanceMetadataFilenames);
 MetadataService.initialize({
   statements,
-  mdsServers: [
-    {
-      url:
-        'https://fidoalliance.co.nz/mds//execute/5abc7da5609b63e58c44144bc7a6bc9a2cc27ee520fb35dd03fcad36146d1a8e',
-      rootCertURL: 'https://fidoalliance.co.nz/mds/pki/MDSROOT.crt',
-      metadataURLSuffix: '',
-    },
-    {
-      url:
-        'https://fidoalliance.co.nz/mds//execute/6382ec8aee2d9c31d4ab3a1d01bd87796346e09d772ea0808e8602c70940caad',
-      rootCertURL: 'https://fidoalliance.co.nz/mds/pki/MDSROOT.crt',
-      metadataURLSuffix: '',
-    },
-    {
-      url:
-        'https://fidoalliance.co.nz/mds//execute/82764926806f16480a1dd607428e789395d3453d7dc71d5914f44b6f2af56c1a',
-      rootCertURL: 'https://fidoalliance.co.nz/mds/pki/MDSROOT.crt',
-      metadataURLSuffix: '',
-    },
-    {
-      url:
-        'https://fidoalliance.co.nz/mds//execute/9bb53a0c09e8d8abc1760498df17c3111545a5376296985cfc613c611e90757a',
-      rootCertURL: 'https://fidoalliance.co.nz/mds/pki/MDSROOT.crt',
-      metadataURLSuffix: '',
-    },
-    {
-      url:
-        'https://fidoalliance.co.nz/mds//execute/d6dba4496be1a76148bc88799425bb23e01183ef0149b85042462650e94a9a62',
-      rootCertURL: 'https://fidoalliance.co.nz/mds/pki/MDSROOT.crt',
-      metadataURLSuffix: '',
-    },
-  ],
+  mdsServers: [],
 });
 
 const inMemoryUserDeviceDB = {
