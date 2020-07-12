@@ -96,7 +96,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     throw new Error('Credential response signature was not a base64url string');
   }
 
-  if (typeof response.userHandle !== 'string') {
+  if (response.userHandle && typeof response.userHandle !== 'string') {
     throw new Error('Credential response userHandle was not a string');
   }
 
