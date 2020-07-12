@@ -232,6 +232,10 @@ fidoComplianceRouter.post('/assertion/result', (req, res) => {
   });
 });
 
+/**
+ * A catch-all for future test routes we might need to support but haven't yet defined (helps with
+ * discovering which routes, what methods, and what data need to be defined)
+ */
 fidoComplianceRouter.all('*', (req, res, next) => {
   console.log(req.url);
   console.log(req.method);
