@@ -86,7 +86,7 @@ export default async function verifyAttestationResponse(
   }
 
   if (tokenBinding) {
-    if (!(tokenBinding instanceof Object)) {
+    if (typeof tokenBinding !== 'object') {
       throw new Error(`Unexpected value for TokenBinding "${tokenBinding}"`);
     }
 
