@@ -171,7 +171,7 @@ test('should throw an error if user verification is required but user was not ve
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
-      requireUserVerification: true,
+      fidoUserVerification: 'required',
     });
   }).toThrow(/user could not be verified/i);
 });
@@ -182,7 +182,7 @@ test('should throw an error if user verification is required but user was not ve
 
 const assertionResponse = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
-  rawId: '',
+  rawId: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   response: {
     authenticatorData: 'PdxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KABAAAAkA==',
     clientDataJSON:
@@ -194,7 +194,7 @@ const assertionResponse = {
       'jhd45bDx92wjXKs900=',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.get',
+  type: 'public-key',
 };
 const assertionChallenge = 'totallyUniqueValueEveryTime';
 const assertionOrigin = 'https://dev.dontneeda.pw';
