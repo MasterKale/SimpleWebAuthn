@@ -39,19 +39,19 @@ export const FIDO_METADATA_AUTH_ALG_TO_COSE: { [algKey: number]: COSEInfo } = {
 };
 
 /**
- * A map of ATTESTATION hex values (as unsigned shorts). Keys should
- * appear as values in a metadata statement's `attestationTypes` property.
+ * A map of ATTESTATION hex values (as unsigned shorts). Values should appear in a metadata
+ * statement's `attestationTypes` property.
  *
  * From https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-registry-v2.0-rd-20180702.html
  * FIDO Registry of Predefined Values - 3.6.3 Authenticator Attestation Types
  */
-export const FIDO_METADATA_ATTESTATION_TYPES: { [type: string]: string } = {
-  15879: 'ATTESTATION_BASIC_FULL',
+export enum FIDO_METADATA_ATTESTATION_TYPES {
+  ATTESTATION_BASIC_FULL = 15879,
   // Self attestation
-  15880: 'ATTESTATION_BASIC_SURROGATE',
-  15881: 'ATTESTATION_ECDAA',
-  15882: 'ATTESTATION_ATTCA',
-};
+  ATTESTATION_BASIC_SURROGATE = 15880,
+  ATTESTATION_ECDAA = 15881,
+  ATTESTATION_ATTCA = 15882,
+}
 
 export type FIDO_AUTHENTICATOR_STATUS =
   | 'NOT_FIDO_CERTIFIED'
