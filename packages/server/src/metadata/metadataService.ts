@@ -70,8 +70,6 @@ class MetadataService {
 
     // If metadata statements are provided, load them into the cache first
     if (statements?.length) {
-      console.log(`Adding ${statements.length} statements to cache`);
-
       statements.forEach(statement => {
         // Only cache statements that are for FIDO2-compatible authenticators
         if (statement.aaguid) {
@@ -91,8 +89,6 @@ class MetadataService {
 
     // If MDS servers are provided, then process them and add their statements to the cache
     if (mdsServers?.length) {
-      console.log(`Querying ${mdsServers.length} MDS services`);
-
       for (const server of mdsServers) {
         try {
           await this.downloadTOC({
@@ -105,13 +101,9 @@ class MetadataService {
           });
         } catch (err) {
           // Notify of the error and move on
-          console.error(`Error processing ${server.url}: ${err.message}`);
         }
       }
     }
-
-    console.log('MDS cache:', JSON.stringify(Object.keys(this.mdsCache)));
-    console.log('Statement cache:', JSON.stringify(Object.keys(this.statementCache)));
 
     this.state = SERVICE_STATE.READY;
   }
@@ -177,7 +169,6 @@ class MetadataService {
     // If the statement hasn't been cached but came from an MDS TOC, then download it
     if (!cachedStatement.statement && cachedStatement.tocURL) {
       // Download the metadata statement if it's not been cached
-      console.debug('Downloading statement from', cachedStatement.url);
       const resp = await fetch(cachedStatement.url);
       const data = await resp.text();
       const statement: MetadataStatement = JSON.parse(
@@ -190,7 +181,6 @@ class MetadataService {
       const calculatedHash = base64url.encode(toHash(data, hashAlg));
 
       if (calculatedHash === cachedStatement.hash) {
-        console.log('hash matched, storing statement in cache');
         // Update the cached entry with the latest statement
         cachedStatement.statement = statement;
       } else {
@@ -211,7 +201,6 @@ class MetadataService {
     const { url, no, rootCertURL, metadataURLSuffix } = mds;
 
     // Query MDS for the latest TOC
-    console.debug(`Downloading TOC: ${url}`);
     const respTOC = await fetch(url);
     const data = await respTOC.text();
 
@@ -228,7 +217,6 @@ class MetadataService {
 
     let fullCertPath = header.x5c.map(convertASN1toPEM);
     if (rootCertURL.length > 0) {
-      console.debug(`Downloading root cert: ${rootCertURL}`);
       // Download FIDO the root certificate and append it to the TOC certs
       const respFIDORootCert = await fetch(rootCertURL);
       const fidoRootCert = await respFIDORootCert.text();
@@ -259,8 +247,6 @@ class MetadataService {
       // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
       throw new Error('TOC signature could not be verified');
     }
-
-    console.log(`TOC verified, caching ${payload.entries.length} statements`);
 
     // Prepare the in-memory cache of statements.
     for (const entry of payload.entries) {
