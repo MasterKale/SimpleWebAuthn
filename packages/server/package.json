@@ -6,6 +6,11 @@
   "types": "dist/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+    "directory": "packages/server"
+  },
   "homepage": "https://github.com/MasterKale/SimpleWebAuthn/packages/server#readme",
   "publishConfig": {
     "access": "public"
