@@ -11,7 +11,7 @@
     "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
     "directory": "packages/browser"
   },
-  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/packages/browser#readme",
+  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/browser#readme",
   "publishConfig": {
     "access": "public"
   },
