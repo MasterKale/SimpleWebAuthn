@@ -2,10 +2,13 @@
   "name": "simplewebauthn-monorepo",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap --scope=@simplewebauthn/typescript-types && lerna bootstrap --scope=@simplewebauthn/browser --scope=@simplewebauthn/server",
+    "bootstrap": "npm run build:types && npm run build:browser && npm run build:server",
     "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/",
     "docs": "npm run bootstrap && typedoc --tsconfig tsconfig.json",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "build:types": "lerna bootstrap --scope=@simplewebauthn/typescript-types",
+    "build:browser": "lerna bootstrap --scope=@simplewebauthn/browser",
+    "build:server": "lerna bootstrap --scope=@simplewebauthn/server"
   },
   "devDependencies": {
     "@types/cbor": "^5.0.0",

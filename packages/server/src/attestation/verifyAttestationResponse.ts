@@ -8,16 +8,18 @@ import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import convertCOSEtoPKCS, { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 
-import { supportedCOSEAlgorithIdentifiers } from './generateAttestationOptions';
+import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
+import verifyTPM from './verifications/tpm/verifyTPM';
+import verifyAndroidKey from './verifications/verifyAndroidKey';
 
 type Options = {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string;
-  expectedRPID: string;
+  expectedRPID?: string;
   requireUserVerification?: boolean;
 };
 
@@ -34,7 +36,9 @@ type Options = {
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  */
-export default function verifyAttestationResponse(options: Options): VerifiedAttestation {
+export default async function verifyAttestationResponse(
+  options: Options,
+): Promise<VerifiedAttestation> {
   const {
     credential,
     expectedChallenge,
@@ -42,10 +46,26 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
     expectedRPID,
     requireUserVerification = false,
   } = options;
-  const { response } = credential;
+  const { id, rawId, type: credentialType, response } = credential;
+
+  // Ensure credential specified an ID
+  if (!id) {
+    throw new Error('Missing credential ID');
+  }
+
+  // Ensure ID is base64url-encoded
+  if (id !== rawId) {
+    throw new Error('Credential ID was not base64url-encoded');
+  }
+
+  // Make sure credential type is public-key
+  if (credentialType !== 'public-key') {
+    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
+  }
+
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
-  const { type, origin, challenge } = clientDataJSON;
+  const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an attestation
   if (type !== 'webauthn.create') {
@@ -53,9 +73,10 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
   }
 
   // Ensure the device provided the challenge we gave it
-  if (challenge !== expectedChallenge) {
+  const encodedExpectedChallenge = base64url.encode(expectedChallenge);
+  if (challenge !== encodedExpectedChallenge) {
     throw new Error(
-      `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected attestation challenge "${challenge}", expected "${encodedExpectedChallenge}"`,
     );
   }
 
@@ -64,16 +85,28 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
     throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
   }
 
+  if (tokenBinding) {
+    if (typeof tokenBinding !== 'object') {
+      throw new Error(`Unexpected value for TokenBinding "${tokenBinding}"`);
+    }
+
+    if (['present', 'supported', 'not-supported'].indexOf(tokenBinding.status) < 0) {
+      throw new Error(`Unexpected tokenBinding.status value of "${tokenBinding.status}"`);
+    }
+  }
+
   const attestationObject = decodeAttestationObject(response.attestationObject);
   const { fmt, authData, attStmt } = attestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
+  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
-  const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-  if (!rpIdHash.equals(expectedRPIDHash)) {
-    throw new Error(`Unexpected RP ID hash`);
+  if (expectedRPID) {
+    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+    if (!rpIdHash.equals(expectedRPIDHash)) {
+      throw new Error(`Unexpected RP ID hash`);
+    }
   }
 
   // Make sure someone was physically present
@@ -94,16 +127,20 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
     throw new Error('No public key was provided by authenticator');
   }
 
+  if (!aaguid) {
+    throw new Error('No AAGUID was present in attestation');
+  }
+
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
-  if (!alg) {
-    throw new Error('Credential public key was missing alg');
+  if (typeof alg !== 'number') {
+    throw new Error('Credential public key was missing numeric alg');
   }
 
   // Make sure the key algorithm is one we specified within the attestation options
-  if (!supportedCOSEAlgorithIdentifiers.includes(alg as number)) {
-    const supported = supportedCOSEAlgorithIdentifiers.join(', ');
+  if (!supportedCOSEAlgorithmIdentifiers.includes(alg as number)) {
+    const supported = supportedCOSEAlgorithmIdentifiers.join(', ');
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
@@ -120,21 +157,43 @@ export default function verifyAttestationResponse(options: Options): VerifiedAtt
       credentialID,
       credentialPublicKey,
       rpIdHash,
+      aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.PACKED) {
-    verified = verifyPacked({
+    verified = await verifyPacked({
       attStmt,
       authData,
       clientDataHash,
       credentialPublicKey,
+      aaguid,
     });
   } else if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
-    verified = verifyAndroidSafetynet({
+    verified = await verifyAndroidSafetynet({
       attStmt,
       authData,
       clientDataHash,
+      aaguid,
+    });
+  } else if (fmt === ATTESTATION_FORMATS.ANDROID_KEY) {
+    verified = await verifyAndroidKey({
+      attStmt,
+      authData,
+      clientDataHash,
+      credentialPublicKey,
+      aaguid,
+    });
+  } else if (fmt === ATTESTATION_FORMATS.TPM) {
+    verified = await verifyTPM({
+      aaguid,
+      attStmt,
+      authData,
+      credentialPublicKey,
+      clientDataHash,
     });
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
+    if (Object.keys(attStmt).length > 0) {
+      throw new Error('None attestation had unexpected attestation statement');
+    }
     // This is the weaker of the attestations, so there's nothing else to really check
     verified = true;
   } else {

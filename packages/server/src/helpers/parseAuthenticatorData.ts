@@ -1,7 +1,15 @@
+import cbor from 'cbor';
+
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
 export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorData {
+  if (authData.byteLength < 37) {
+    throw new Error(
+      `Authenticator data was ${authData.byteLength} bytes, expected at least 37 bytes`,
+    );
+  }
+
   let intBuffer = authData;
 
   const rpIdHash = intBuffer.slice(0, 32);
@@ -41,7 +49,23 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     credentialID = intBuffer.slice(0, credIDLen);
     intBuffer = intBuffer.slice(credIDLen);
 
-    credentialPublicKey = intBuffer;
+    // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
+    const firstDecoded = cbor.decodeFirstSync(intBuffer);
+    const firstEncoded = cbor.encode(firstDecoded);
+    credentialPublicKey = firstEncoded;
+    intBuffer = intBuffer.slice(firstEncoded.byteLength);
+  }
+
+  let extensionsDataBuffer: Buffer | undefined = undefined;
+  if (flags.ed) {
+    const firstDecoded = cbor.decodeFirstSync(intBuffer);
+    const firstEncoded = cbor.encode(firstDecoded);
+    extensionsDataBuffer = firstEncoded;
+    intBuffer = intBuffer.slice(firstEncoded.byteLength);
+  }
+
+  if (intBuffer.byteLength > 0) {
+    throw new Error('Leftover bytes detected while parsing authenticator data');
   }
 
   return {
@@ -53,6 +77,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     aaguid,
     credentialID,
     credentialPublicKey,
+    extensionsDataBuffer,
   };
 }
 
@@ -71,4 +96,5 @@ export type ParsedAuthenticatorData = {
   aaguid?: Buffer;
   credentialID?: Buffer;
   credentialPublicKey?: Buffer;
+  extensionsDataBuffer?: Buffer;
 };

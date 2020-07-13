@@ -1,32 +1,45 @@
 import elliptic from 'elliptic';
-import NodeRSA, { SigningSchemeHash } from 'node-rsa';
+import NodeRSA from 'node-rsa';
 
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
-
-import convertCOSEtoPKCS, { COSEKEYS } from '../../helpers/convertCOSEtoPKCS';
+import convertCOSEtoPKCS, {
+  COSEKEYS,
+  COSEALGHASH,
+  COSECRV,
+  COSEKTY,
+  COSERSASCHEME,
+} from '../../helpers/convertCOSEtoPKCS';
+import { FIDO_METADATA_ATTESTATION_TYPES } from '../../helpers/constants';
 import toHash from '../../helpers/toHash';
 import convertASN1toPEM from '../../helpers/convertASN1toPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
 import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
+import MetadataService from '../../metadata/metadataService';
+import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
 type Options = {
   attStmt: AttestationStatement;
   clientDataHash: Buffer;
   authData: Buffer;
   credentialPublicKey: Buffer;
+  aaguid: Buffer;
 };
 
 /**
  * Verify an attestation response with fmt 'packed'
  */
-export default function verifyAttestationPacked(options: Options): boolean {
-  const { attStmt, clientDataHash, authData, credentialPublicKey } = options;
+export default async function verifyAttestationPacked(options: Options): Promise<boolean> {
+  const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid } = options;
 
-  const { sig, x5c } = attStmt;
+  const { sig, x5c, alg } = attStmt;
 
   if (!sig) {
     throw new Error('No attestation signature provided in attestation statement (Packed)');
+  }
+
+  if (typeof alg !== 'number') {
+    throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
   }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
@@ -36,33 +49,66 @@ export default function verifyAttestationPacked(options: Options): boolean {
 
   if (x5c) {
     const leafCert = convertASN1toPEM(x5c[0]);
-    const leafCertInfo = getCertificateInfo(leafCert);
+    const { subject, basicConstraintsCA, version, notBefore, notAfter } = getCertificateInfo(
+      leafCert,
+    );
 
-    const { subject, basicConstraintsCA, version } = leafCertInfo;
     const { OU, CN, O, C } = subject;
 
     if (OU !== 'Authenticator Attestation') {
-      throw new Error('Batch certificate OU was not "Authenticator Attestation" (Packed|Full');
+      throw new Error('Certificate OU was not "Authenticator Attestation" (Packed|Full)');
     }
 
     if (!CN) {
-      throw new Error('Batch certificate CN was empty (Packed|Full');
+      throw new Error('Certificate CN was empty (Packed|Full)');
     }
 
     if (!O) {
-      throw new Error('Batch certificate CN was empty (Packed|Full');
+      throw new Error('Certificate O was empty (Packed|Full)');
     }
 
     if (!C || C.length !== 2) {
-      throw new Error('Batch certificate C was not two-character ISO 3166 code (Packed|Full');
+      throw new Error('Certificate C was not two-character ISO 3166 code (Packed|Full)');
     }
 
     if (basicConstraintsCA) {
-      throw new Error('Batch certificate basic constraints CA was not `false` (Packed|Full');
+      throw new Error('Certificate basic constraints CA was not `false` (Packed|Full)');
     }
 
     if (version !== 3) {
-      throw new Error('Batch certificate version was not `3` (ASN.1 value of 2) (Packed|Full');
+      throw new Error('Certificate version was not `3` (ASN.1 value of 2) (Packed|Full)');
+    }
+
+    let now = new Date();
+    if (notBefore > now) {
+      throw new Error(`Certificate not good before "${notBefore.toString()}" (Packed|Full)`);
+    }
+
+    now = new Date();
+    if (notAfter < now) {
+      throw new Error(`Certificate not good after "${notAfter.toString()}" (Packed|Full)`);
+    }
+
+    // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
+    // that it’s value is set to the same AAGUID as in authData.
+
+    // If available, validate attestation alg and x5c with info in the metadata statement
+    const statement = await MetadataService.getStatement(aaguid);
+    if (statement) {
+      // The presence of x5c means this is a full attestation. Check to see if attestationTypes
+      // includes packed attestations.
+      if (
+        statement.attestationTypes.indexOf(FIDO_METADATA_ATTESTATION_TYPES.ATTESTATION_BASIC_FULL) <
+        0
+      ) {
+        throw new Error('Metadata does not indicate support for full attestations (Packed|Full)');
+      }
+
+      try {
+        await verifyAttestationWithMetadata(statement, alg, x5c);
+      } catch (err) {
+        throw new Error(`${err.message} (Packed|Full)`);
+      }
     }
 
     verified = verifySignature(sig, signatureBase, leafCert);
@@ -70,11 +116,6 @@ export default function verifyAttestationPacked(options: Options): boolean {
     const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
     const kty = cosePublicKey.get(COSEKEYS.kty);
-    const alg = cosePublicKey.get(COSEKEYS.alg);
-
-    if (!alg) {
-      throw new Error('COSE public key was missing alg (Packed|Self)');
-    }
 
     if (!kty) {
       throw new Error('COSE public key was missing kty (Packed|Self)');
@@ -144,44 +185,3 @@ export default function verifyAttestationPacked(options: Options): boolean {
 
   return verified;
 }
-
-enum COSEKTY {
-  OKP = 1,
-  EC2 = 2,
-  RSA = 3,
-}
-
-const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
-  '-3': 'pss-sha256',
-  '-39': 'pss-sha512',
-  '-38': 'pss-sha384',
-  '-65535': 'pkcs1-sha1',
-  '-257': 'pkcs1-sha256',
-  '-258': 'pkcs1-sha384',
-  '-259': 'pkcs1-sha512',
-};
-
-// See https://w3c.github.io/webauthn/#sctn-alg-identifier
-const COSECRV: { [key: number]: string } = {
-  // alg: -7
-  1: 'p256',
-  // alg: -35
-  2: 'p384',
-  // alg: -36
-  3: 'p521',
-  // alg: -8
-  6: 'ed25519',
-};
-
-const COSEALGHASH: { [key: string]: string } = {
-  '-257': 'sha256',
-  '-258': 'sha384',
-  '-259': 'sha512',
-  '-65535': 'sha1',
-  '-39': 'sha512',
-  '-38': 'sha384',
-  '-37': 'sha256',
-  '-7': 'sha256',
-  '-8': 'sha512',
-  '-36': 'sha512',
-};

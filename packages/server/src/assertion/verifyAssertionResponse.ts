@@ -6,6 +6,7 @@ import toHash from '../helpers/toHash';
 import convertASN1toPEM from '../helpers/convertASN1toPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import isBase64URLString from '../helpers/isBase64URLString';
 
 type Options = {
   credential: AssertionCredentialJSON;
@@ -13,7 +14,7 @@ type Options = {
   expectedOrigin: string;
   expectedRPID: string;
   authenticator: AuthenticatorDevice;
-  requireUserVerification?: boolean;
+  fidoUserVerification?: UserVerificationRequirement;
 };
 
 /**
@@ -27,8 +28,9 @@ type Options = {
  * @param expectedOrigin Website URL that the attestation should have occurred on
  * @param expectedRPID RP ID that was specified in the attestation options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
- * @param requireUserVerification (Optional) Enforce user verification by the authenticator
- * (via PIN, fingerprint, etc...)
+ * @param fidoUserVerification (Optional) The value specified for `userVerification` when calling
+ * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
+ * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
 export default function verifyAssertionResponse(options: Options): VerifiedAssertion {
   const {
@@ -37,27 +39,75 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     expectedOrigin,
     expectedRPID,
     authenticator,
-    requireUserVerification = false,
+    fidoUserVerification,
   } = options;
-  const { response } = credential;
+  const { id, rawId, type: credentialType, response } = credential;
+
+  // Ensure credential specified an ID
+  if (!id) {
+    throw new Error('Missing credential ID');
+  }
+
+  // Ensure ID is base64url-encoded
+  if (id !== rawId) {
+    throw new Error('Credential ID was not base64url-encoded');
+  }
+
+  // Make sure credential type is public-key
+  if (credentialType !== 'public-key') {
+    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
+  }
+
+  if (!response) {
+    throw new Error('Credential missing response');
+  }
+
+  if (typeof response?.clientDataJSON !== 'string') {
+    throw new Error('Credential response clientDataJSON was not a string');
+  }
+
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
 
-  const { type, origin, challenge } = clientDataJSON;
+  const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an assertion
   if (type !== 'webauthn.get') {
     throw new Error(`Unexpected assertion type: ${type}`);
   }
 
-  if (challenge !== expectedChallenge) {
+  // Ensure the device provided the challenge we gave it
+  const encodedExpectedChallenge = base64url.encode(expectedChallenge);
+  if (challenge !== encodedExpectedChallenge) {
     throw new Error(
-      `Unexpected assertion challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected assertion challenge "${challenge}", expected "${encodedExpectedChallenge}"`,
     );
   }
 
   // Check that the origin is our site
   if (origin !== expectedOrigin) {
     throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
+  }
+
+  if (!isBase64URLString(response.authenticatorData)) {
+    throw new Error('Credential response authenticatorData was not a base64url string');
+  }
+
+  if (!isBase64URLString(response.signature)) {
+    throw new Error('Credential response signature was not a base64url string');
+  }
+
+  if (response.userHandle && typeof response.userHandle !== 'string') {
+    throw new Error('Credential response userHandle was not a string');
+  }
+
+  if (tokenBinding) {
+    if (typeof tokenBinding !== 'object') {
+      throw new Error('ClientDataJSON tokenBinding was not an object');
+    }
+
+    if (['present', 'supported', 'notSupported'].indexOf(tokenBinding.status) < 0) {
+      throw new Error(`Unexpected tokenBinding status ${tokenBinding.status}`);
+    }
   }
 
   const authDataBuffer = base64url.toBuffer(response.authenticatorData);
@@ -70,14 +120,21 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     throw new Error(`Unexpected RP ID hash`);
   }
 
-  // Make sure someone was physically present
-  if (!flags.up) {
-    throw new Error('User not present during assertion');
-  }
-
-  // Enforce user verification if specified
-  if (requireUserVerification && !flags.uv) {
-    throw new Error('User verification required, but user could not be verified');
+  // Enforce user verification if required
+  if (fidoUserVerification) {
+    if (fidoUserVerification === 'required') {
+      // Require `flags.uv` be true (implies `flags.up` is true)
+      if (!flags.uv) {
+        throw new Error('User verification required, but user could not be verified');
+      }
+    } else if (fidoUserVerification === 'preferred' || fidoUserVerification === 'discouraged') {
+      // Ignore `flags.uv`
+    }
+  } else {
+    // WebAuthn only requires the user presence flag be true
+    if (!flags.up) {
+      throw new Error('User not present during assertion');
+    }
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));

@@ -1,9 +1,12 @@
-import jsrsasign from 'jsrsasign';
+import { X509, zulutodate } from 'jsrsasign';
 
 export type CertificateInfo = {
+  issuer: { [key: string]: string };
   subject: { [key: string]: string };
   version: number;
   basicConstraintsCA: boolean;
+  notBefore: Date;
+  notAfter: Date;
 };
 
 type ExtInfo = {
@@ -24,24 +27,48 @@ interface x5cCertificate extends jsrsasign.X509 {
  * @param pemCertificate Result from call to `convertASN1toPEM(x5c[0])`
  */
 export default function getCertificateInfo(pemCertificate: string): CertificateInfo {
-  const subjectCert = new jsrsasign.X509();
+  const subjectCert = new X509();
   subjectCert.readCertPEM(pemCertificate);
 
-  const subjectString = subjectCert.getSubjectString();
-  const subjectParts = subjectString.slice(1).split('/');
+  // Break apart the Issuer
+  const issuerString = subjectCert.getIssuerString();
+  const issuerParts = issuerString.slice(1).split('/');
+
+  const issuer: { [key: string]: string } = {};
+  issuerParts.forEach(field => {
+    const [key, val] = field.split('=');
+    issuer[key] = val;
+  });
+
+  // Break apart the Subject
+  let subjectRaw = '/';
+  try {
+    subjectRaw = subjectCert.getSubjectString();
+  } catch (err) {
+    // Don't throw on an error that indicates an empty subject
+    if (err !== 'malformed RDN') {
+      throw err;
+    }
+  }
+  const subjectParts = subjectRaw.slice(1).split('/');
 
   const subject: { [key: string]: string } = {};
   subjectParts.forEach(field => {
-    const [key, val] = field.split('=');
-    subject[key] = val;
+    if (field) {
+      const [key, val] = field.split('=');
+      subject[key] = val;
+    }
   });
 
   const { version } = subjectCert as x5cCertificate;
-  const basicConstraintsCA = !!subjectCert.getExtBasicConstraints().cA;
+  const basicConstraintsCA = !!subjectCert.getExtBasicConstraints()?.cA;
 
   return {
+    issuer,
     subject,
     version,
     basicConstraintsCA,
+    notBefore: zulutodate(subjectCert.getNotBefore()),
+    notAfter: zulutodate(subjectCert.getNotAfter()),
   };
 }

@@ -33,8 +33,8 @@ afterEach(() => {
   mockVerifyFIDOU2F.mockRestore();
 });
 
-test('should verify FIDO U2F attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify FIDO U2F attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -52,8 +52,8 @@ test('should verify FIDO U2F attestation', () => {
   );
 });
 
-test('should verify Packed (EC2) attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify Packed (EC2) attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationPacked,
     expectedChallenge: attestationPackedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -72,8 +72,8 @@ test('should verify Packed (EC2) attestation', () => {
   );
 });
 
-test('should verify Packed (X5C) attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify Packed (X5C) attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationPackedX5C,
     expectedChallenge: attestationPackedX5CChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -91,8 +91,8 @@ test('should verify Packed (X5C) attestation', () => {
   );
 });
 
-test('should verify None attestation', () => {
-  const verification = verifyAttestationResponse({
+test('should verify None attestation', async () => {
+  const verification = await verifyAttestationResponse({
     credential: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -110,48 +110,29 @@ test('should verify None attestation', () => {
   );
 });
 
-test('should verify Android SafetyNet attestation', () => {
-  const verification = verifyAttestationResponse({
-    credential: attestationAndroidSafetyNet,
-    expectedChallenge: attestationAndroidSafetyNetChallenge,
-    expectedOrigin: 'https://dev.dontneeda.pw',
-    expectedRPID: 'dev.dontneeda.pw',
-  });
-
-  expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('android-safetynet');
-  expect(verification.authenticatorInfo?.counter).toEqual(0);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'BJPiEh3cHIn9qBHLOe_XEhrPHaeVUQbK83uKe2hmvsLYqjdcH5xxr1pQ4sL7GGncZ-HJ9NLSGPCznMv9tP83UAs',
-  );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'AQy9gSmVYQXGuzd492rA2qEqwN7SYE_xOCjduU4QVagRwnX30mbfW75Lu4TwXHe-gc1O2PnJF7JVJA9dyJm83Xs',
-  );
-});
-
-test('should throw when response challenge is not expected value', () => {
-  expect(() => {
+test('should throw when response challenge is not expected value', async () => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/attestation challenge/i);
+    }),
+  ).rejects.toThrow(/attestation challenge/i);
 });
 
-test('should throw when response origin is not expected value', () => {
-  expect(() => {
+test('should throw when response origin is not expected value', async () => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://different.address',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/attestation origin/i);
+    }),
+  ).rejects.toThrow(/attestation origin/i);
 });
 
-test('should throw when attestation type is not webauthn.create', () => {
+test('should throw when attestation type is not webauthn.create', async () => {
   const origin = 'https://dev.dontneeda.pw';
   const challenge = attestationNoneChallenge;
 
@@ -162,17 +143,17 @@ test('should throw when attestation type is not webauthn.create', () => {
     challenge: attestationNoneChallenge,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: challenge,
       expectedOrigin: origin,
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/attestation type/i);
+    }),
+  ).rejects.toThrow(/attestation type/i);
 });
 
-test('should throw if an unexpected attestation format is specified', () => {
+test('should throw if an unexpected attestation format is specified', async () => {
   const fmt = 'fizzbuzz';
 
   const realAtteObj = decodeAttestationObject.default(attestationNone.response.attestationObject);
@@ -183,33 +164,36 @@ test('should throw if an unexpected attestation format is specified', () => {
     fmt,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/unsupported attestation format/i);
+    }),
+  ).rejects.toThrow(/unsupported attestation format/i);
 });
 
-test('should throw error if assertion RP ID is unexpected value', () => {
+test('should throw error if assertion RP ID is unexpected value', async () => {
+  const { authData } = decodeAttestationObject.default(attestationNone.response.attestationObject);
+  const actualAuthData = parseAuthenticatorData.default(authData);
+
   mockParseAuthData.mockReturnValue({
+    ...actualAuthData,
     rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
-    flags: 0,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: '',
-    });
-  }).toThrow(/rp id/i);
+      expectedRPID: 'dev.dontneeda.pw',
+    }),
+  ).rejects.toThrow(/rp id/i);
 });
 
-test('should throw error if user was not present', () => {
+test('should throw error if user was not present', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -217,17 +201,17 @@ test('should throw error if user was not present', () => {
     },
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/not present/i);
+    }),
+  ).rejects.toThrow(/not present/i);
 });
 
-test('should throw if the authenticator does not give back credential ID', () => {
+test('should throw if the authenticator does not give back credential ID', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -236,17 +220,17 @@ test('should throw if the authenticator does not give back credential ID', () =>
     credentialID: undefined,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/credential id/i);
+    }),
+  ).rejects.toThrow(/credential id/i);
 });
 
-test('should throw if the authenticator does not give back credential public key', () => {
+test('should throw if the authenticator does not give back credential public key', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -256,54 +240,54 @@ test('should throw if the authenticator does not give back credential public key
     credentialPublicKey: undefined,
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/public key/i);
+    }),
+  ).rejects.toThrow(/public key/i);
 });
 
-test('should throw error if no alg is specified in public key', () => {
+test('should throw error if no alg is specified in public key', async () => {
   mockDecodePubKey.mockReturnValue({
     get: () => undefined,
     credentialID: '',
     credentialPublicKey: '',
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/missing alg/i);
+    }),
+  ).rejects.toThrow(/missing numeric alg/i);
 });
 
-test('should throw error if unsupported alg is used', () => {
+test('should throw error if unsupported alg is used', async () => {
   mockDecodePubKey.mockReturnValue({
     get: () => -999,
     credentialID: '',
     credentialPublicKey: '',
   });
 
-  expect(() => {
+  await expect(
     verifyAttestationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
-    });
-  }).toThrow(/unexpected public key/i);
+    }),
+  ).rejects.toThrow(/unexpected public key/i);
 });
 
-test('should not include authenticator info if not verified', () => {
+test('should not include authenticator info if not verified', async () => {
   mockVerifyFIDOU2F.mockReturnValue(false);
 
-  const verification = verifyAttestationResponse({
+  const verification = await verifyAttestationResponse({
     credential: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -314,7 +298,7 @@ test('should not include authenticator info if not verified', () => {
   expect(verification.authenticatorInfo).toBeUndefined();
 });
 
-test('should throw an error if user verification is required but user was not verified', () => {
+test('should throw an error if user verification is required but user was not verified', async () => {
   mockParseAuthData.mockReturnValue({
     rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
@@ -323,15 +307,104 @@ test('should throw an error if user verification is required but user was not ve
     },
   });
 
-  expect(() => {
-    const verification = verifyAttestationResponse({
+  await expect(
+    verifyAttestationResponse({
       credential: attestationFIDOU2F,
       expectedChallenge: attestationFIDOU2FChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
       requireUserVerification: true,
-    });
-  }).toThrow(/user could not be verified/i);
+    }),
+  ).rejects.toThrow(/user could not be verified/i);
+});
+
+test('should validate TPM RSA response (SHA256)', async () => {
+  const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
+  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
+  const verification = await verifyAttestationResponse({
+    credential: {
+      id: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
+      rawId: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
+      response: {
+        attestationObject:
+          'o2NmbXRjdHBtZ2F0dFN0bXSmY2FsZzkBAGNzaWdZAQBoZraUgitkw10bZI2MMWDECGf3LgbkX1XoSUhWhxawE8gX1oQdbYbIx-LjtFZkBqp7Nsq8qdeQBGhSJbSbE1wLfP5Xs3d110KmD4LzrCmt_rn3LYQDhDIonft8xJIpAHppEKCxziHMWCPXbntIeQ8pHEZmjBTIN5CJyxHQeUp1LniMQ0CGRknSlE4Av6aHrnoGUgnrsyXmzMn0BWxtdGIhsheAIiBanXGqMdLQ5cGc1HRmGh9U4NrVE-W7nJBLuA5H9K6-t9TfTySYInzr81XEsh6Ei5ijGT2Cc1MmaU4utbB-LyUG9v_oy9EpdOAu4v2jBOBkms0CxrErdWCKl7b5Y3ZlcmMyLjBjeDVjglkEhzCCBIMwggNroAMCAQICDwS6zyQ0LwxSSoQYLc7HVjANBgkqhkiG9w0BAQsFADBBMT8wPQYDVQQDEzZOQ1UtTlRDLUtFWUlELUZGOTkwMzM4RTE4NzA3OUE2Q0Q2QTAzQURDNTcyMzc0NDVGNkE0OUEwHhcNMTgwMjAxMDAwMDAwWhcNMjUwMTMxMjM1OTU5WjAAMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA-IYIfmLnyIHdgjwb2Y-KzMYI2HjN6WseCH8f9N7G3zZpSE9xZxrutKpgoE5wzV2STtkvgd5xikTdIrneWGcNeIW2xhdH2dAVnhL1OiRdLf1CneJHUO78t5-3pmCynqMlUW1VELC-mpaY_kbpNF0Fxn3MhV_-LwtinS5FCvsHpMdKJ_md2e9CDAiI7IqdeK9_sPA5hzDsq9nXsBn0MCcSEppWojwLG3pqmnBWsrLGJCyT5OBi2yNiD0pWMhgromksz6AfFraVDHX8d7E-GoDHedLujnZIm3fAiWDvmdgmZVxX6bxLSWZqWZoSNuJSRasoulVDzDOBHYBWGKLJGgPdMwIDAQABo4IBtzCCAbMwDgYDVR0PAQH_BAQDAgeAMAwGA1UdEwEB_wQCMAAwewYDVR0gAQH_BHEwbzBtBgkrBgEEAYI3FR8wYDBeBggrBgEFBQcCAjBSHlAARgBBAEsARQAgAEYASQBEAE8AIABUAEMAUABBACAAVAByAHUAcwB0AGUAZAAgAFAAbABhAHQAZgBvAHIAbQAgAEkAZABlAG4AdABpAHQAeTAQBgNVHSUECTAHBgVngQUIAzBKBgNVHREBAf8EQDA-pDwwOjE4MA4GBWeBBQIDDAVpZDoxMzAQBgVngQUCAgwHTlBDVDZ4eDAUBgVngQUCAQwLaWQ6RkZGRkYxRDAwHwYDVR0jBBgwFoAUdOhwbuNi8U8_KoCvb3uGHTvHco0wHQYDVR0OBBYEFNiSs3HuWy41m937TQw7EyHG4L3_MHgGCCsGAQUFBwEBBGwwajBoBggrBgEFBQcwAoZcaHR0cHM6Ly9maWRvYWxsaWFuY2UuY28ubnovdHBtcGtpL05DVS1OVEMtS0VZSUQtRkY5OTAzMzhFMTg3MDc5QTZDRDZBMDNBREM1NzIzNzQ0NUY2QTQ5QS5jcnQwDQYJKoZIhvcNAQELBQADggEBAHCSnX7NtGUl1gyIRsprAS1y4TfvEfxpmsrbTruacYBDQ4z5o2uoMYYV2txkvI_pH4kxOolSS9oTz7iNGpKv1yB3x40rMRsiUNs7EyhmH7RE73DOBxlMkr1vHJudiIircI1EifC7FKiDqssKKws8apYE1BZYj6swuG2LOx1LUHd-hP473u0XEv8WbRXY3Pr1I9DODhfMkJDLUKg_l7YI2oowgathLG5_ci0Ad2EHn9122Y1StwSr0r7-cfrTwNxt2bPnZ61hkI_Em7IlCsuol0wak1Ba-UqEWDuTMRmMn3AF59rmIQ2yPdj4ae0DBnSsP13DZj8ihPT68SsaY7HiURBZBgUwggYBMIID6aADAgECAg8EV2dM14jMuwRaKXATKH8wDQYJKoZIhvcNAQELBQAwgb8xCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJNWTESMBAGA1UEBwwJV2FrZWZpZWxkMRYwFAYDVQQKDA1GSURPIEFsbGlhbmNlMQwwCgYDVQQLDANDV0cxNjA0BgNVBAMMLUZJRE8gRmFrZSBUUE0gUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgMjAxODExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzAeFw0xNzAyMDEwMDAwMDBaFw0zNTAxMzEyMzU5NTlaMEExPzA9BgNVBAMTNk5DVS1OVEMtS0VZSUQtRkY5OTAzMzhFMTg3MDc5QTZDRDZBMDNBREM1NzIzNzQ0NUY2QTQ5QTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANc-c30RpQd-_LCoiLJbXz3t_vqciOIovwjez79_DtVgi8G9Ph-tPL-lC0ueFGBMSPcKd_RDdSFe2QCYQd9e0DtiFxra-uWGa0olI1hHI7bK2GzNAZSTKEbwgqpf8vXMQ-7SPajg6PfxSOLH_Nj2yd6tkNkUSdlGtWfY8XGB3n-q--nt3UHdUQWEtgUoTe5abBXsG7MQSuTNoad3v6vk-tLd0W44ivM6pbFqFUHchx8mGLApCpjlVXrfROaCoc9E91hG9B-WNvekJ0dM6kJ658Hy7yscQ6JdqIEolYojCtWaWNmwcfv--OE1Ax_4Ub24gl3hpB9EOcBCzpb4UFmLYUECAwEAAaOCAXUwggFxMAsGA1UdDwQEAwIBhjAWBgNVHSAEDzANMAsGCSsGAQQBgjcVHzAbBgNVHSUEFDASBgkrBgEEAYI3FSQGBWeBBQgDMBIGA1UdEwEB_wQIMAYBAf8CAQAwHQYDVR0OBBYEFHTocG7jYvFPPyqAr297hh07x3KNMB8GA1UdIwQYMBaAFEMRFpma7p1QN8JP_uJbFckJMz8yMGgGA1UdHwRhMF8wXaBboFmGV2h0dHBzOi8vZmlkb2FsbGlhbmNlLmNvLm56L3RwbXBraS9jcmwvRklETyBGYWtlIFRQTSBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAyMDE4LmNybDBvBggrBgEFBQcBAQRjMGEwXwYIKwYBBQUHMAKGU2h0dHBzOi8vZmlkb2FsbGlhbmNlLmNvLm56L3RwbXBraS9GSURPIEZha2UgVFBNIFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDIwMTguY3J0MA0GCSqGSIb3DQEBCwUAA4ICAQBI6GeuxIkeKcmRmFQnkPnkvSybRIJEkzWKa2f00vdBygxtzpkXF2WMHbvuMU3_K3WMFzg2xkSPjM3x_-UxOWGYgVIq8fXUdy2NhmLz4tPI65_nQXpS22rzmXFzsj4x9yS0JF2NnW5xm-O8UdckFdwIZx4Ew_zA-rIF3hqbY4Ejz2AdsbvHJo-WTpu-wWDbBQyR19eqNyYZ6vf9K8DB2JZviIDXdOpkuOJLA40MKMlnhv5K4BZs7mDZIaPzNA_MrcH3_dYXq4tIoGu5Pr1ZNCQ--93XYG1eRbvCgSDYUCRza5AgBGCIhmx2-tqLYeCd9qdy4O9R9c9qRjEThbjnGStYZ0DuB6VCaH1WjiRqyq4VNi9cv15-RoC4zswWwuHee97AAJ_Tx29w6S4Kw9DQR6A0vtw_OHLuOkGH63ns0DACf_h1MvsAMnXXX0Q0P8IpNdBQGvLvrRtRdBNx06NHY1HGZOZ9PdJ6J4mnroB2ln3cMGZG9kyRv2vbwq6sCrYZVYjo3tf4MUtkEY4FijoYbMEDK7VlbTiDPnobhkxI1-bz5DTFnR3IfVybYAeGrBCKSg2UUTPvVgM3WZ-oGlP8W9dg1347hqgxP0vLgDM6cV7rhaFC_ZAf2Et9KLRZSj7lNpJWxHxPyz9mM4w3qFwdgWKwlXl3OQtJRT4Kbs6r3gzB5WdwdWJBcmVhWQE2AAEACwAGBHIAIJ3_y_NsODrmmfuYaNxty4nXFTiEvigDkiwSQVi_rSKuABAAEAgAAAAAAAEArcc8OfVrJfMVj_e8D07tk0g5brIcLIS_BnnRwBztUetpt5zcttYQiyZUGm3y3qUVEP7_ZqtzwplfNbQUqrURlOf2JStEdsnru-ekp09_XOoSgtzwT7f8XYy_3HM-B_-9w7p3wet0GTrXXgLLMFe1jy6jAEaH7jPi0Pyx5zYLgsqQ3MYQA7lKkLaIH8GbJJ01SD8cxnH6p0OxERfQ_QDliEPGIzrE4vwds0vEjskiiBVBsMGHDxuw4ghPkCXCPn6cnUQ5xKulMW5GIAe1yuAZZjypcLl5AQ1_XoJfzGuAe1tlib2Gynr7umfCnOcvjiE6TVQ2CmwSt6isoeMiFKQdTWhjZXJ0SW5mb1it_1RDR4AXACIACxHmjtRNtTcuFCluL4Ssx4OYdRiBkh4w_CKgb4tzx5RTACBUXhu5udUi6GBvBBGsIF5MfQKIIDBdBStwWHfPWQx-FQAAAAFHcBdIVWl7S8aFYKUBc375jTRWVfsAIgALjZ3k0w--c4p2uu7urgJWOfxm0k2XJW4x9EEu0o-HzrIAIgAL_U4kZaJRRPAELcp-Gp4lh_iSA_uUtdHNVhq5vjbJ0KVoYXV0aERhdGFZAWc93EcQ6cCIsinbqJ1WMiC7Ofcimv9GWwplaxr7mor4oEEAAAAep9bZOooNEeialKbPcQcvcwAglGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPOkAQMDOQEAIFkBAK3HPDn1ayXzFY_3vA9O7ZNIOW6yHCyEvwZ50cAc7VHrabec3LbWEIsmVBpt8t6lFRD-_2arc8KZXzW0FKq1EZTn9iUrRHbJ67vnpKdPf1zqEoLc8E-3_F2Mv9xzPgf_vcO6d8HrdBk6114CyzBXtY8uowBGh-4z4tD8sec2C4LKkNzGEAO5SpC2iB_BmySdNUg_HMZx-qdDsREX0P0A5YhDxiM6xOL8HbNLxI7JIogVQbDBhw8bsOIIT5Alwj5-nJ1EOcSrpTFuRiAHtcrgGWY8qXC5eQENf16CX8xrgHtbZYm9hsp6-7pnwpznL44hOk1UNgpsEreorKHjIhSkHU0hQwEAAQ',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiIzYTA3Y2Y4NS1lN2I2LTQ0N2YtODI3MC1iMjU0MzNmNjAxOGUiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
+      },
+      type: 'public-key',
+    },
+    expectedChallenge: expectedChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toEqual(true);
+  expect(verification.authenticatorInfo?.fmt).toEqual('tpm');
+  expect(verification.authenticatorInfo?.counter).toEqual(30);
+  expect(verification.authenticatorInfo?.base64PublicKey).toEqual('BAEAAQ');
+  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
+    'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
+  );
+});
+
+test('should validate TPM RSA response (SHA1)', async () => {
+  const expectedChallenge = 'f4e8d87b-d363-47cc-ab4d-1a84647bf245';
+  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
+  const verification = await verifyAttestationResponse({
+    credential: {
+      id: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
+      rawId: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
+      response: {
+        attestationObject:
+          'o2NmbXRjdHBtZ2F0dFN0bXSmY2FsZzn__mNzaWdZAQA7MkOLfnxF5Z0RsXHc0OoVV-wkR6gKW92FFuBU79qeu7bxzMONC0uJ1mLt4SmhKsKZss1UqEx37tjwhzRE3wgNFGEEwK274W6xDVsU2ZimAvW_hZZwQAK5I3b35oJcQQxoc2iTv6XHDfwmf1pDa3d35idsNrv_-wQttjapdycRmkt7POPFAVMvooIY1bW6xk4fNIdqhHN1X6E2eT9k7IHcnQfdpqo_PpxxHzH1sLm00D3GanqMQFO0RlfE6HUZmfrTh8WpnwPwRZ_AH7njRS_eNvFm_oPX-19YRgzY0GFJb_b7tsL_EejBbygnIh4SCXEj9XfV0mneXKZuh47HzC2sY3ZlcmMyLjBjeDVjglkEhzCCBIMwggNroAMCAQICDwQzi_r9IpiaTHT5hcpSFTANBgkqhkiG9w0BAQsFADBBMT8wPQYDVQQDEzZOQ1UtTlRDLUtFWUlELUZGOTkwMzM4RTE4NzA3OUE2Q0Q2QTAzQURDNTcyMzc0NDVGNkE0OUEwHhcNMTgwMjAxMDAwMDAwWhcNMjUwMTMxMjM1OTU5WjAAMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArqFSXnyuWEwydvMZN8iP-HW-XnQ8thzSa0KbFr2JUdGN8ox4Re5VicuIW5uFn_0_l-lTvngIR5JTlyaSLr7VrXNqlv4fNax0ZBbaYqgXaBJMhXpBjVCvjSZuNvCxd-7vLbqXuCNdNPAkSU1RKXN4ATZJfOBeCLDBWh-puudODIGTaz6nG_q78Qh7oErN279BsP77DcfoR47Em1eZpWXe9ezyvXuV5bqS04CaG_AnN1KU3o5madqio3Xlf3OXTEEKhLNTEu4-Oay_sykWRd7iflPipE981PqXCw9bVJM089cg952Eyo8N94Uzjb6XT4zkRsBYonzoIywzqCYlvklAlQIDAQABo4IBtzCCAbMwDgYDVR0PAQH_BAQDAgeAMAwGA1UdEwEB_wQCMAAwewYDVR0gAQH_BHEwbzBtBgkrBgEEAYI3FR8wYDBeBggrBgEFBQcCAjBSHlAARgBBAEsARQAgAEYASQBEAE8AIABUAEMAUABBACAAVAByAHUAcwB0AGUAZAAgAFAAbABhAHQAZgBvAHIAbQAgAEkAZABlAG4AdABpAHQAeTAQBgNVHSUECTAHBgVngQUIAzBKBgNVHREBAf8EQDA-pDwwOjE4MA4GBWeBBQIDDAVpZDoxMzAQBgVngQUCAgwHTlBDVDZ4eDAUBgVngQUCAQwLaWQ6RkZGRkYxRDAwHwYDVR0jBBgwFoAUdOhwbuNi8U8_KoCvb3uGHTvHco0wHQYDVR0OBBYEFE9_Zz1qQuzOlnNmLOEjQnzvQoj5MHgGCCsGAQUFBwEBBGwwajBoBggrBgEFBQcwAoZcaHR0cHM6Ly9maWRvYWxsaWFuY2UuY28ubnovdHBtcGtpL05DVS1OVEMtS0VZSUQtRkY5OTAzMzhFMTg3MDc5QTZDRDZBMDNBREM1NzIzNzQ0NUY2QTQ5QS5jcnQwDQYJKoZIhvcNAQELBQADggEBAI-t9Opuc5rr7FrOUD0jJaXm-jg84L7QWeKoJ67znWGH09D0SBLsARPTAexUjDYQdoF7nWm4viw9NTXhUk3qLxd4G9602r8ht1FmgyqZz_jHLDnGJniXjJm5ILizCdwjlSDcN68lSkKcwAp5uScSorT9EDhB067Pexs4oJUo1-ZicdHyYsJu0i6wqhq2OVVufj2vifU82fw-xPzGkP4RXyWKWnxBfD2ofrLilL24GEIlrpB48y8EKeH8zsFGirsSM8wtT6pa0hBz2OBW4YWkGpOxNHIXTuafOS6ZLqeugg1P0KutUgGrdcQzZwcN6t9OwEV1imd3vmIgGD13qgCldN5ZBgUwggYBMIID6aADAgECAg8EV2dM14jMuwRaKXATKH8wDQYJKoZIhvcNAQELBQAwgb8xCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJNWTESMBAGA1UEBwwJV2FrZWZpZWxkMRYwFAYDVQQKDA1GSURPIEFsbGlhbmNlMQwwCgYDVQQLDANDV0cxNjA0BgNVBAMMLUZJRE8gRmFrZSBUUE0gUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgMjAxODExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzAeFw0xNzAyMDEwMDAwMDBaFw0zNTAxMzEyMzU5NTlaMEExPzA9BgNVBAMTNk5DVS1OVEMtS0VZSUQtRkY5OTAzMzhFMTg3MDc5QTZDRDZBMDNBREM1NzIzNzQ0NUY2QTQ5QTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANc-c30RpQd-_LCoiLJbXz3t_vqciOIovwjez79_DtVgi8G9Ph-tPL-lC0ueFGBMSPcKd_RDdSFe2QCYQd9e0DtiFxra-uWGa0olI1hHI7bK2GzNAZSTKEbwgqpf8vXMQ-7SPajg6PfxSOLH_Nj2yd6tkNkUSdlGtWfY8XGB3n-q--nt3UHdUQWEtgUoTe5abBXsG7MQSuTNoad3v6vk-tLd0W44ivM6pbFqFUHchx8mGLApCpjlVXrfROaCoc9E91hG9B-WNvekJ0dM6kJ658Hy7yscQ6JdqIEolYojCtWaWNmwcfv--OE1Ax_4Ub24gl3hpB9EOcBCzpb4UFmLYUECAwEAAaOCAXUwggFxMAsGA1UdDwQEAwIBhjAWBgNVHSAEDzANMAsGCSsGAQQBgjcVHzAbBgNVHSUEFDASBgkrBgEEAYI3FSQGBWeBBQgDMBIGA1UdEwEB_wQIMAYBAf8CAQAwHQYDVR0OBBYEFHTocG7jYvFPPyqAr297hh07x3KNMB8GA1UdIwQYMBaAFEMRFpma7p1QN8JP_uJbFckJMz8yMGgGA1UdHwRhMF8wXaBboFmGV2h0dHBzOi8vZmlkb2FsbGlhbmNlLmNvLm56L3RwbXBraS9jcmwvRklETyBGYWtlIFRQTSBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAyMDE4LmNybDBvBggrBgEFBQcBAQRjMGEwXwYIKwYBBQUHMAKGU2h0dHBzOi8vZmlkb2FsbGlhbmNlLmNvLm56L3RwbXBraS9GSURPIEZha2UgVFBNIFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IDIwMTguY3J0MA0GCSqGSIb3DQEBCwUAA4ICAQBI6GeuxIkeKcmRmFQnkPnkvSybRIJEkzWKa2f00vdBygxtzpkXF2WMHbvuMU3_K3WMFzg2xkSPjM3x_-UxOWGYgVIq8fXUdy2NhmLz4tPI65_nQXpS22rzmXFzsj4x9yS0JF2NnW5xm-O8UdckFdwIZx4Ew_zA-rIF3hqbY4Ejz2AdsbvHJo-WTpu-wWDbBQyR19eqNyYZ6vf9K8DB2JZviIDXdOpkuOJLA40MKMlnhv5K4BZs7mDZIaPzNA_MrcH3_dYXq4tIoGu5Pr1ZNCQ--93XYG1eRbvCgSDYUCRza5AgBGCIhmx2-tqLYeCd9qdy4O9R9c9qRjEThbjnGStYZ0DuB6VCaH1WjiRqyq4VNi9cv15-RoC4zswWwuHee97AAJ_Tx29w6S4Kw9DQR6A0vtw_OHLuOkGH63ns0DACf_h1MvsAMnXXX0Q0P8IpNdBQGvLvrRtRdBNx06NHY1HGZOZ9PdJ6J4mnroB2ln3cMGZG9kyRv2vbwq6sCrYZVYjo3tf4MUtkEY4FijoYbMEDK7VlbTiDPnobhkxI1-bz5DTFnR3IfVybYAeGrBCKSg2UUTPvVgM3WZ-oGlP8W9dg1347hqgxP0vLgDM6cV7rhaFC_ZAf2Et9KLRZSj7lNpJWxHxPyz9mM4w3qFwdgWKwlXl3OQtJRT4Kbs6r3gzB5WdwdWJBcmVhWQE2AAEACwAGBHIAIJ3_y_NsODrmmfuYaNxty4nXFTiEvigDkiwSQVi_rSKuABAAEAgAAAAAAAEAs5f8A9uD2ec_qaNha8KEFXXdd4KLfwpC_KeAfzbyQQuTsAGCg4pYov8I_tAgPDGp26UiJ8fU3Z8-rfdTobncFE9PlvwR0iyvzKhXI2Vq0eS2FZlac9RIB9w6zk62uAJaIBKtg9gmJLT6z3u46BPqE97wGFyvL80Ay0cmsSP2dakuCi5SwnWo1vDxqcNWEYzA8OrOvRmVPJl5IDTzAlIdU2dW5wryUzvX55i4w46nUBkVOG1qPLRYwi_INftlg_9p9PrcLep_lKMeVZ0dXUCRuGsDJWpwQpBhqTm91gQ0PCtdGCSdnrz4SShiWoQb7tg8ZquqSwgFwr9JmtxB4_j5g2hjZXJ0SW5mb1ih_1RDR4AXACIACxHmjtRNtTcuFCluL4Ssx4OYdRiBkh4w_CKgb4tzx5RTABS0TKJrlCTTWAOuZgxyOOh4sQ-ftQAAAAFHcBdIVWl7S8aFYKUBc375jTRWVfsAIgAL9vygl2NWFPZdCG3U1TrQ6RqfwNj7JxfCS5KpKXX44JEAIgAL4hZ6iGIhUFHeo5Tst6Kcwm-Nfh0I366P3MLYgbSPuhxoYXV0aERhdGFZAWc93EcQ6cCIsinbqJ1WMiC7Ofcimv9GWwplaxr7mor4oEEAAABh8kS2flNkT9WfkMOWInMX2wAgoELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflWkAQMDOf_-IFkBALOX_APbg9nnP6mjYWvChBV13XeCi38KQvyngH828kELk7ABgoOKWKL_CP7QIDwxqdulIifH1N2fPq33U6G53BRPT5b8EdIsr8yoVyNlatHkthWZWnPUSAfcOs5OtrgCWiASrYPYJiS0-s97uOgT6hPe8Bhcry_NAMtHJrEj9nWpLgouUsJ1qNbw8anDVhGMwPDqzr0ZlTyZeSA08wJSHVNnVucK8lM71-eYuMOOp1AZFThtajy0WMIvyDX7ZYP_afT63C3qf5SjHlWdHV1AkbhrAyVqcEKQYak5vdYENDwrXRgknZ68-EkoYlqEG-7YPGarqksIBcK_SZrcQeP4-YMhQwEAAQ',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiJmNGU4ZDg3Yi1kMzYzLTQ3Y2MtYWI0ZC0xYTg0NjQ3YmYyNDUiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
+      },
+      type: 'public-key',
+    },
+    expectedChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toEqual(true);
+  expect(verification.authenticatorInfo?.fmt).toEqual('tpm');
+  expect(verification.authenticatorInfo?.counter).toEqual(97);
+  expect(verification.authenticatorInfo?.base64PublicKey).toEqual('BAEAAQ');
+  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
+    'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
+  );
+});
+
+test('should validate Android-Key response', async () => {
+  const expectedChallenge = '14e0d1b6-9c36-4849-aeec-ea64676449ef';
+  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
+  const verification = await verifyAttestationResponse({
+    credential: {
+      id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+      rawId: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+      response: {
+        attestationObject:
+          'o2NmbXRrYW5kcm9pZC1rZXlnYXR0U3RtdKNjYWxnJmNzaWdYRjBEAiBzpQmnQw6jn-V33XTmlvkw4wyUW-CbyYd5Bltvl_8oHwIgY05YGCJIawM1INNQg4cshJKi847UVUBURLNkTd-BC2hjeDVjglkDGjCCAxYwggK9oAMCAQICAQEwCgYIKoZIzj0EAwIwgeQxRTBDBgNVBAMMPEZBS0UgQW5kcm9pZCBLZXlzdG9yZSBTb2Z0d2FyZSBBdHRlc3RhdGlvbiBJbnRlcm1lZGlhdGUgRkFLRTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk1ZMRIwEAYDVQQHDAlXYWtlZmllbGQwIBcNNzAwMjAxMDAwMDAwWhgPMjA5OTAxMzEyMzU5NTlaMCkxJzAlBgNVBAMMHkZBS0UgQW5kcm9pZCBLZXlzdG9yZSBLZXkgRkFLRTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239o6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7ajggEWMIIBEjALBgNVHQ8EBAMCB4AwgeEGCisGAQQB1nkCAREEgdIwgc8CAQIKAQACAQEKAQAEIEwhPC-SlsMm-UdaXBdqAIDXqyRDtjXSeja589CMqyF2BAAwab-FPQgCBgFe0-PPoL-FRVkEVzBVMS8wLQQoY29tLmFuZHJvaWQua2V5c3RvcmUuYW5kcm9pZGtleXN0b3JlZGVtbwIBATEiBCB0z8tQdIj1KRCFkcelBZGfMncy-8HYA1Jq6pgABtLYmDAyoQUxAwIBAqIDAgEDowQCAgEApQUxAwIBBKoDAgEBv4N4AwIBAr-FPgMCAQC_hT8CBQAwHwYDVR0jBBgwFoAUo9KqLO8NjPIkAtUctGC8v2pbJBQwCgYIKoZIzj0EAwIDRwAwRAIgHl4jYMq7nEV6pcuXJFNOsZHSX5Zn1UDy6RI9zsDR-C4CICNfJrQW1jyEuRUM1xR8VmKjkjIa2W22Z7NdyZz1CQq-WQMYMIIDFDCCArqgAwIBAgIBAjAKBggqhkjOPQQDAjCB3DE9MDsGA1UEAww0RkFLRSBBbmRyb2lkIEtleXN0b3JlIFNvZnR3YXJlIEF0dGVzdGF0aW9uIFJvb3QgRkFLRTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk1ZMRIwEAYDVQQHDAlXYWtlZmllbGQwHhcNMTkwNDI1MDU0OTMyWhcNNDYwOTEwMDU0OTMyWjCB5DFFMEMGA1UEAww8RkFLRSBBbmRyb2lkIEtleXN0b3JlIFNvZnR3YXJlIEF0dGVzdGF0aW9uIEludGVybWVkaWF0ZSBGQUtFMTEwLwYJKoZIhvcNAQkBFiJjb25mb3JtYW5jZS10b29sc0BmaWRvYWxsaWFuY2Uub3JnMRYwFAYDVQQKDA1GSURPIEFsbGlhbmNlMSIwIAYDVQQLDBlBdXRoZW50aWNhdG9yIEF0dGVzdGF0aW9uMQswCQYDVQQGEwJVUzELMAkGA1UECAwCTVkxEjAQBgNVBAcMCVdha2VmaWVsZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABKtQYStiTRe7w7UbBEk7BUkLjB-LnbzzebLe3KB8UqHXtg3TIXXcK37dvCbbCNVfhvZxtpTcME2kooqMTgOm9cejYzBhMA8GA1UdEwEB_wQFMAMBAf8wDgYDVR0PAQH_BAQDAgKEMB0GA1UdDgQWBBSj0qos7w2M8iQC1Ry0YLy_alskFDAfBgNVHSMEGDAWgBRSmhsy4FaqzVEP71-ANwaL8pEjHTAKBggqhkjOPQQDAgNIADBFAiEAsW8uQC-0es5tOY3w_T7IshPj3o__B5IQRsHq8IlZKH0CIG75Q6isJ4twXhaLE4b0TkuLadd7i4zarqZsoaSWXy75aGF1dGhEYXRhWKQ93EcQ6cCIsinbqJ1WMiC7Ofcimv9GWwplaxr7mor4oEEAAABsVQ5LVKpHQJ-alRq3bBMBMQAgPPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0qlAQIDJiABIVggSMKrvCgY03_jattqoyAm_PSe4pNY1GtHb2Uxfcnbf2giWCDohwBeo8k8iNKsKUcMCZsm_8RKFiFirRH34beTvjiftg',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiIxNGUwZDFiNi05YzM2LTQ4NDktYWVlYy1lYTY0Njc2NDQ5ZWYiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
+      },
+      type: 'public-key',
+    },
+    expectedChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toEqual(true);
+  expect(verification.authenticatorInfo?.fmt).toEqual('android-key');
+  expect(verification.authenticatorInfo?.counter).toEqual(108);
+  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
+    'BEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239o6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
+  );
+  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
+    'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+  );
 });
 
 /**
@@ -353,8 +426,8 @@ const attestationFIDOU2F = {
 const attestationFIDOU2FChallenge = 'totallyUniqueValueEveryAttestation';
 
 const attestationPacked = {
-  id: '',
-  rawId: '',
+  id: 'bbb',
+  rawId: 'bbb',
   response: {
     attestationObject:
       'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
@@ -369,14 +442,14 @@ const attestationPacked = {
       'ZSJ9',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
 const attestationPackedChallenge = 's6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM';
 
 const attestationPackedX5C = {
   // TODO: Grab these from another iPhone attestation
-  id: '',
-  rawId: '',
+  id: 'aaa',
+  rawId: 'aaa',
   response: {
     attestationObject:
       'o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAIMt_hGMtdgpIVIwMOeKK' +
@@ -400,7 +473,7 @@ const attestationPackedX5C = {
       'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0=',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
 const attestationPackedX5CChallenge = 'totallyUniqueValueEveryTime';
 
@@ -419,106 +492,6 @@ const attestationNone = {
       'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9',
   },
   getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
+  type: 'public-key',
 };
 const attestationNoneChallenge = 'hEccPWuziP00H0p5gxh2_u5_PC4NeYgd';
-
-const attestationAndroidSafetyNet = {
-  id: 'AQy9gSmVYQXGuzd492rA2qEqwN7SYE_xOCjduU4QVagRwnX30mbfW75Lu4TwXHe-gc1O2PnJF7JVJA9dyJm83Xs',
-  rawId: 'AQy9gSmVYQXGuzd492rA2qEqwN7SYE_xOCjduU4QVagRwnX30mbfW75Lu4TwXHe-gc1O2PnJF7JVJA9dyJm83Xs',
-  response: {
-    attestationObject:
-      'o2NmbXRxYW5kcm9pZC1zYWZldHluZXRnYXR0U3RtdKJjdmVyaDE3MTIyMDM3aHJlc' +
-      '3BvbnNlWRS9ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbmcxWXlJNld5Sk5TVWxHYTJwRFEwSkljV2RCZDBsQ1FXZEpVV' +
-      'kpZY205T01GcFBaRkpyUWtGQlFVRkJRVkIxYm5wQlRrSm5hM0ZvYTJsSE9YY3dRa0ZSYzBaQlJFSkRUVkZ6ZDBOU' +
-      'ldVUldVVkZIUlhkS1ZsVjZSV1ZOUW5kSFFURlZSVU5vVFZaU01qbDJXako0YkVsR1VubGtXRTR3U1VaT2JHTnVXb' +
-      'kJaTWxaNlRWSk5kMFZSV1VSV1VWRkVSWGR3U0ZaR1RXZFJNRVZuVFZVNGVFMUNORmhFVkVVMFRWUkJlRTFFUVROT' +
-      'lZHc3dUbFp2V0VSVVJUVk5WRUYzVDFSQk0wMVVhekJPVm05M1lrUkZURTFCYTBkQk1WVkZRbWhOUTFaV1RYaEZla' +
-      '0ZTUW1kT1ZrSkJaMVJEYTA1b1lrZHNiV0l6U25WaFYwVjRSbXBCVlVKblRsWkNRV05VUkZVeGRtUlhOVEJaVjJ4M' +
-      'VNVWmFjRnBZWTNoRmVrRlNRbWRPVmtKQmIxUkRhMlIyWWpKa2MxcFRRazFVUlUxNFIzcEJXa0puVGxaQ1FVMVVSV' +
-      'zFHTUdSSFZucGtRelZvWW0xU2VXSXliR3RNYlU1MllsUkRRMEZUU1hkRVVWbEtTMjlhU1doMlkwNUJVVVZDUWxGQ' +
-      'lJHZG5SVkJCUkVORFFWRnZRMmRuUlVKQlRtcFlhM293WlVzeFUwVTBiU3N2UnpWM1QyOHJXRWRUUlVOeWNXUnVPR' +
-      'Gh6UTNCU04yWnpNVFJtU3pCU2FETmFRMWxhVEVaSWNVSnJOa0Z0V2xaM01rczVSa2N3VHpseVVsQmxVVVJKVmxKN' +
-      'VJUTXdVWFZ1VXpsMVowaEROR1ZuT1c5MmRrOXRLMUZrV2pKd09UTllhSHAxYmxGRmFGVlhXRU40UVVSSlJVZEtTe' +
-      'k5UTW1GQlpucGxPVGxRVEZNeU9XaE1ZMUYxV1ZoSVJHRkROMDlhY1U1dWIzTnBUMGRwWm5NNGRqRnFhVFpJTDNob' +
-      '2JIUkRXbVV5YkVvck4wZDFkSHBsZUV0d2VIWndSUzkwV2xObVlsazVNRFZ4VTJ4Q2FEbG1jR293TVRWamFtNVJSb' +
-      'XRWYzBGVmQyMUxWa0ZWZFdWVmVqUjBTMk5HU3pSd1pYWk9UR0Y0UlVGc0swOXJhV3hOZEVsWlJHRmpSRFZ1Wld3M' +
-      'GVFcHBlWE0wTVROb1lXZHhWekJYYUdnMVJsQXpPV2hIYXpsRkwwSjNVVlJxWVhwVGVFZGtkbGd3YlRaNFJsbG9hQ' +
-      'zh5VmsxNVdtcFVORXQ2VUVwRlEwRjNSVUZCWVU5RFFXeG5kMmRuU2xWTlFUUkhRVEZWWkVSM1JVSXZkMUZGUVhkS' +
-      'lJtOUVRVlJDWjA1V1NGTlZSVVJFUVV0Q1oyZHlRbWRGUmtKUlkwUkJWRUZOUW1kT1ZraFNUVUpCWmpoRlFXcEJRV' +
-      'TFDTUVkQk1WVmtSR2RSVjBKQ1VYRkNVWGRIVjI5S1FtRXhiMVJMY1hWd2J6UlhObmhVTm1veVJFRm1RbWRPVmtoV' +
-      'FRVVkhSRUZYWjBKVFdUQm1hSFZGVDNaUWJTdDRaMjU0YVZGSE5rUnlabEZ1T1V0NlFtdENaMmR5UW1kRlJrSlJZM' +
-      'EpCVVZKWlRVWlpkMHAzV1VsTGQxbENRbEZWU0UxQlIwZEhNbWd3WkVoQk5reDVPWFpaTTA1M1RHNUNjbUZUTlc1a' +
-      'U1qbHVUREprTUdONlJuWk5WRUZ5UW1kbmNrSm5SVVpDVVdOM1FXOVpabUZJVWpCalJHOTJURE5DY21GVE5XNWlNa' +
-      'mx1VERKa2VtTnFTWFpTTVZKVVRWVTRlRXh0VG5sa1JFRmtRbWRPVmtoU1JVVkdha0ZWWjJoS2FHUklVbXhqTTFGM' +
-      'VdWYzFhMk50T1hCYVF6VnFZakl3ZDBsUldVUldVakJuUWtKdmQwZEVRVWxDWjFwdVoxRjNRa0ZuU1hkRVFWbExTM' +
-      '2RaUWtKQlNGZGxVVWxHUVhwQmRrSm5UbFpJVWpoRlMwUkJiVTFEVTJkSmNVRm5hR2cxYjJSSVVuZFBhVGgyV1ROS' +
-      '2MweHVRbkpoVXpWdVlqSTVia3d3WkZWVmVrWlFUVk0xYW1OdGQzZG5aMFZGUW1kdmNrSm5SVVZCWkZvMVFXZFJRM' +
-      'EpKU0RGQ1NVaDVRVkJCUVdSM1EydDFVVzFSZEVKb1dVWkpaVGRGTmt4TldqTkJTMUJFVjFsQ1VHdGlNemRxYW1RN' +
-      'E1FOTVRVE5qUlVGQlFVRlhXbVJFTTFCTVFVRkJSVUYzUWtsTlJWbERTVkZEVTFwRFYyVk1Tblp6YVZaWE5rTm5LM' +
-      'mRxTHpsM1dWUktVbnAxTkVocGNXVTBaVmswWXk5dGVYcHFaMGxvUVV4VFlta3ZWR2g2WTNweGRHbHFNMlJyTTNaa' +
-      'VRHTkpWek5NYkRKQ01HODNOVWRSWkdoTmFXZGlRbWRCU0ZWQlZtaFJSMjFwTDFoM2RYcFVPV1ZIT1ZKTVNTdDRNR' +
-      'm95ZFdKNVdrVldla0UzTlZOWlZtUmhTakJPTUVGQlFVWnRXRkU1ZWpWQlFVRkNRVTFCVW1wQ1JVRnBRbU5EZDBFN' +
-      'WFqZE9WRWRZVURJM09IbzBhSEl2ZFVOSWFVRkdUSGx2UTNFeVN6QXJlVXhTZDBwVlltZEpaMlk0WjBocWRuQjNNb' +
-      'TFDTVVWVGFuRXlUMll6UVRCQlJVRjNRMnR1UTJGRlMwWlZlVm8zWmk5UmRFbDNSRkZaU2t0dldrbG9kbU5PUVZGR' +
-      'lRFSlJRVVJuWjBWQ1FVazVibFJtVWt0SlYyZDBiRmRzTTNkQ1REVTFSVlJXTm10aGVuTndhRmN4ZVVGak5VUjFiV' +
-      'FpZVHpReGExcDZkMG8yTVhkS2JXUlNVbFF2VlhORFNYa3hTMFYwTW1Nd1JXcG5iRzVLUTBZeVpXRjNZMFZYYkV4U' +
-      'ldUSllVRXg1Um1wclYxRk9ZbE5vUWpGcE5GY3lUbEpIZWxCb2RETnRNV0kwT1doaWMzUjFXRTAyZEZnMVEzbEZTR' +
-      'zVVYURoQ2IyMDBMMWRzUm1sb2VtaG5iamd4Ukd4a2IyZDZMMHN5VlhkTk5sTTJRMEl2VTBWNGEybFdabllyZW1KS' +
-      '01ISnFkbWM1TkVGc1pHcFZabFYzYTBrNVZrNU5ha1ZRTldVNGVXUkNNMjlNYkRabmJIQkRaVVkxWkdkbVUxZzBWV' +
-      'Gw0TXpWdmFpOUpTV1F6VlVVdlpGQndZaTl4WjBkMmMydG1aR1Y2ZEcxVmRHVXZTMU50Y21sM1kyZFZWMWRsV0daV' +
-      'Vlra3plbk5wYTNkYVltdHdiVkpaUzIxcVVHMW9kalJ5YkdsNlIwTkhkRGhRYmpod2NUaE5Na3RFWmk5UU0ydFdiM' +
-      '1F6WlRFNFVUMGlMQ0pOU1VsRlUycERRMEY2UzJkQmQwbENRV2RKVGtGbFR6QnRjVWRPYVhGdFFrcFhiRkYxUkVGT' +
-      '1FtZHJjV2hyYVVjNWR6QkNRVkZ6UmtGRVFrMU5VMEYzU0dkWlJGWlJVVXhGZUdSSVlrYzVhVmxYZUZSaFYyUjFTV' +
-      'VpLZG1JelVXZFJNRVZuVEZOQ1UwMXFSVlJOUWtWSFFURlZSVU5vVFV0U01uaDJXVzFHYzFVeWJHNWlha1ZVVFVKR' +
-      'lIwRXhWVVZCZUUxTFVqSjRkbGx0Um5OVk1teHVZbXBCWlVaM01IaE9la0V5VFZSVmQwMUVRWGRPUkVwaFJuY3dlV' +
-      'TFVUlhsTlZGVjNUVVJCZDA1RVNtRk5SVWw0UTNwQlNrSm5UbFpDUVZsVVFXeFdWRTFTTkhkSVFWbEVWbEZSUzBWN' +
-      'FZraGlNamx1WWtkVloxWklTakZqTTFGblZUSldlV1J0YkdwYVdFMTRSWHBCVWtKblRsWkNRVTFVUTJ0a1ZWVjVRa' +
-      '1JSVTBGNFZIcEZkMmRuUldsTlFUQkhRMU54UjFOSllqTkVVVVZDUVZGVlFVRTBTVUpFZDBGM1oyZEZTMEZ2U1VKQ' +
-      'lVVUlJSMDA1UmpGSmRrNHdOWHByVVU4NUszUk9NWEJKVW5aS2VucDVUMVJJVnpWRWVrVmFhRVF5WlZCRGJuWlZRV' +
-      'EJSYXpJNFJtZEpRMlpMY1VNNVJXdHpRelJVTW1aWFFsbHJMMnBEWmtNelVqTldXazFrVXk5a1RqUmFTME5GVUZwU' +
-      '2NrRjZSSE5wUzFWRWVsSnliVUpDU2pWM2RXUm5lbTVrU1UxWlkweGxMMUpIUjBac05YbFBSRWxMWjJwRmRpOVRTa' +
-      '2d2VlV3clpFVmhiSFJPTVRGQ2JYTkxLMlZSYlUxR0t5dEJZM2hIVG1oeU5UbHhUUzg1YVd3M01Va3laRTQ0Umtkb' +
-      'VkyUmtkM1ZoWldvMFlsaG9jREJNWTFGQ1ltcDRUV05KTjBwUU1HRk5NMVEwU1N0RWMyRjRiVXRHYzJKcWVtRlVUa' +
-      '001ZFhwd1JteG5UMGxuTjNKU01qVjRiM2x1VlhoMk9IWk9iV3R4TjNwa1VFZElXR3Q0VjFrM2IwYzVhaXRLYTFKN' +
-      'VFrRkNhemRZY2twbWIzVmpRbHBGY1VaS1NsTlFhemRZUVRCTVMxY3dXVE42Tlc5Nk1rUXdZekYwU2t0M1NFRm5UV' +
-      'UpCUVVkcVoyZEZlazFKU1VKTWVrRlBRbWRPVmtoUk9FSkJaamhGUWtGTlEwRlpXWGRJVVZsRVZsSXdiRUpDV1hkR' +
-      '1FWbEpTM2RaUWtKUlZVaEJkMFZIUTBOelIwRlJWVVpDZDAxRFRVSkpSMEV4VldSRmQwVkNMM2RSU1UxQldVSkJaa' +
-      'mhEUVZGQmQwaFJXVVJXVWpCUFFrSlpSVVpLYWxJclJ6UlJOamdyWWpkSFEyWkhTa0ZpYjA5ME9VTm1NSEpOUWpoS' +
-      'FFURlZaRWwzVVZsTlFtRkJSa3AyYVVJeFpHNUlRamRCWVdkaVpWZGlVMkZNWkM5alIxbFpkVTFFVlVkRFEzTkhRV' +
-      'kZWUmtKM1JVSkNRMnQzU25wQmJFSm5aM0pDWjBWR1FsRmpkMEZaV1ZwaFNGSXdZMFJ2ZGt3eU9XcGpNMEYxWTBkM' +
-      'GNFeHRaSFppTW1OMldqTk9lVTFxUVhsQ1owNVdTRkk0UlV0NlFYQk5RMlZuU21GQmFtaHBSbTlrU0ZKM1QyazRkb' +
-      'Gt6U25OTWJrSnlZVk0xYm1JeU9XNU1NbVI2WTJwSmRsb3pUbmxOYVRWcVkyMTNkMUIzV1VSV1VqQm5Ra1JuZDA1c' +
-      'VFUQkNaMXB1WjFGM1FrRm5TWGRMYWtGdlFtZG5ja0puUlVaQ1VXTkRRVkpaWTJGSVVqQmpTRTAyVEhrNWQyRXlhM' +
-      '1ZhTWpsMlduazVlVnBZUW5aak1td3dZak5LTlV4NlFVNUNaMnR4YUd0cFJ6bDNNRUpCVVhOR1FVRlBRMEZSUlVGS' +
-      'GIwRXJUbTV1TnpoNU5uQlNhbVE1V0d4UlYwNWhOMGhVWjJsYUwzSXpVazVIYTIxVmJWbElVRkZ4TmxOamRHazVVR' +
-      'VZoYW5aM1VsUXlhVmRVU0ZGeU1ESm1aWE54VDNGQ1dUSkZWRlYzWjFwUksyeHNkRzlPUm5ab2MwODVkSFpDUTA5S' +
-      'llYcHdjM2RYUXpsaFNqbDRhblUwZEZkRVVVZzRUbFpWTmxsYVdpOVlkR1ZFVTBkVk9WbDZTbkZRYWxrNGNUTk5SS' +
-      'Gh5ZW0xeFpYQkNRMlkxYnpodGR5OTNTalJoTWtjMmVIcFZjalpHWWpaVU9FMWpSRTh5TWxCTVVrdzJkVE5OTkZSN' +
-      'mN6TkJNazB4YWpaaWVXdEtXV2s0ZDFkSlVtUkJka3RNVjFwMUwyRjRRbFppZWxsdGNXMTNhMjAxZWt4VFJGYzFia' +
-      '2xCU21KRlRFTlJRMXAzVFVnMU5uUXlSSFp4YjJaNGN6WkNRbU5EUmtsYVZWTndlSFUyZURaMFpEQldOMU4yU2tOR' +
-      'GIzTnBjbE50U1dGMGFpODVaRk5UVmtSUmFXSmxkRGh4THpkVlN6UjJORnBWVGpnd1lYUnVXbm94ZVdjOVBTSmRmU' +
-      'S5leUp1YjI1alpTSTZJbkZyYjB4dE9XSnJUeXNyYzJoMFZITnZheXRqUW1GRmJFcEJXa1pXTUcxRlFqQTVVbWcxV' +
-      'TNKWVpGVTlJaXdpZEdsdFpYTjBZVzF3VFhNaU9qRTFOalUwTWpReU5qSTNOek1zSW1Gd2ExQmhZMnRoWjJWT1lXM' +
-      'WxJam9pWTI5dExtZHZiMmRzWlM1aGJtUnliMmxrTG1kdGN5SXNJbUZ3YTBScFoyVnpkRk5vWVRJMU5pSTZJaXR0Y' +
-      '0ZKQ016RjRRemRTYUdsaWN5OWxWbUVyTDNWQ05XNTFaMVVyV0UxRFFXa3plSFZKZGpaMGIwMDlJaXdpWTNSelVIS' +
-      'nZabWxzWlUxaGRHTm9JanAwY25WbExDSmhjR3REWlhKMGFXWnBZMkYwWlVScFoyVnpkRk5vWVRJMU5pSTZXeUk0V' +
-      'URGelZ6QkZVRXBqYzJ4M04xVjZVbk5wV0V3Mk5IY3JUelV3UldRclVrSkpRM1JoZVRGbk1qUk5QU0pkTENKaVlYT' +
-      'nBZMGx1ZEdWbmNtbDBlU0k2ZEhKMVpYMC5yUW5Ib2FZVGgxTEU2VVZwaU1lZWFidDdUeWJ3dzdXZk42RzJ5R01tZ' +
-      'kVjbTFabjRWalZkenpoY1BqTS1WR052aWl1RGxyZ2VuWEViZ082V05YNlYzc0hHVjN1VGxGMlBuOUZsY3YxWmItS' +
-      '2NGVHZUd29iYnY3LUp5VUZzTlhTSnhHZFRTOWxwNU5EdDFnWGJ6OVpORWhzVXI3ajBqbWNyaU9rR29PRzM4MXRSa' +
-      '0Vqdk5aa0hpMkF1UDF2MWM4RXg3cEpZc09ISzJxaDlmSHFuSlAzcGowUFc3WThpcDBSTVZaNF9xZzFqc0dMMnZ0O' +
-      'G12cEJFMjg5dE1fcnROdm94TWU2aEx0Q1ZkdE9ZRjIzMWMtWVFJd2FEbnZWdDcwYW5XLUZYdUx3R1J5dWhfRlpNM' +
-      '3FCSlhhcXdCNjNITk5uMmh5MFRDdHQ4RDdIMmI4MGltWkZRX1FoYXV0aERhdGFYxT3cRxDpwIiyKduonVYyILs59' +
-      'yKa_0ZbCmVrGvuaivigRQAAAAC5P9lh8uZGL7EiggAiR954AEEBDL2BKZVhBca7N3j3asDaoSrA3tJgT_E4KN25T' +
-      'hBVqBHCdffSZt9bvku7hPBcd76BzU7Y-ckXslUkD13Imbzde6UBAgMmIAEhWCCT4hId3ByJ_agRyznv1xIazx2nl' +
-      'VEGyvN7intoZr7C2CJYIKo3XB-cca9aUOLC-xhp3GfhyfTS0hjws5zL_bT_N1AL',
-    clientDataJSON:
-      'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWDNaV1VHOUZOREpF' +
-      'YUMxM2F6Tmlka2h0WVd0MGFWWjJSVmxETFV4M1FsZyIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
-      'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0',
-  },
-  getClientExtensionResults: () => ({}),
-  type: 'webauthn.create',
-};
-const attestationAndroidSafetyNetChallenge = '_vVPoE42Dh-wk3bvHmaktiVvEYC-LwBX';

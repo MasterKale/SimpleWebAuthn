@@ -1,8 +1,17 @@
 {
   "extends": "../../tsconfig.json",
+  "include": [
+    "./src/**/*"
+  ],
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "./dist",
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types",
+      "../../node_modules/@types"
+    ],
+    "experimentalDecorators": true,
     "plugins": [
       // These replace the path helpers above with relative paths at build time
       { "transform": "typescript-transform-paths" },

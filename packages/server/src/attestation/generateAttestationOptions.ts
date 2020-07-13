@@ -20,7 +20,18 @@ type Options = {
 
 // Supported crypto algo identifiers
 // See https://w3c.github.io/webauthn/#sctn-alg-identifier
-export const supportedCOSEAlgorithIdentifiers: COSEAlgorithmIdentifier[] = [-7, -35, -36, -8];
+export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
+  -7,
+  -8,
+  -36,
+  -37,
+  -38,
+  -39,
+  -257,
+  -258,
+  -259,
+  -65535,
+];
 
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
@@ -71,7 +82,7 @@ export default function generateAttestationOptions(
       name: userName,
       displayName: userDisplayName,
     },
-    pubKeyCredParams: supportedCOSEAlgorithIdentifiers.map(id => ({
+    pubKeyCredParams: supportedCOSEAlgorithmIdentifiers.map(id => ({
       alg: id,
       type: 'public-key',
     })),

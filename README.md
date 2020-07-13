@@ -4,6 +4,7 @@
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=simplewebauthn)
 
 - [Overview](#overview)
+- [Example](#example)
 - [Philosophy](#philosophy)
 - [Tested Devices](#tested-devices)
 - [Development](#development)
@@ -26,6 +27,10 @@ See these packages' READMEs for more specific implementation information.
 
 In-depth API documentation for all of the packages in this project is available here: https://docs.simplewebauthn.dev/
 
+## Example
+
+For a practical guide to implementing these libraries, take a look at the [example project](./example). It includes a single-file Express server and a few HTML files that, combined with the packages in this repo, are close to all it takes to get up and running with WebAuthn.
+
 ## Philosophy
 
 WebAuthn is a browser API that enables the use of physical, cryptographically-secure hardware "authenticators" to provide stronger replacements to passwords or 2FA.
@@ -45,8 +50,6 @@ On the surface, this is a relatively straightforward dance. Unfortunately the va
 **Enter SimpleWebAuthn.**
 
 SimpleWebAuthn attempts to offer a developer-friendly pair of libraries that simplify the above dance. [@simplewebauthn/server](./packages/server/) exports a small number of methods requiring a handful of simple inputs that pair with the two primary methods exported by [@simplewebauthn/browser](./packages/browser). No converting back and forth between `Uint8Array` (or was this supposed to be an `ArrayBuffer`...?) and `String`, no worrying about JSON compatibility - **SimpleWebAuthn takes care of it all!**
-
-For a practical guide to implementing these to libraries, take a look at the [example project](./example). It includes a single-file Express server and a few HTML files that, combined with the packages in this repo, are close to all it takes to get up and running with WebAuthn.
 
 ## Tested Devices
 

@@ -18,6 +18,8 @@ export enum ATTESTATION_FORMATS {
   FIDO_U2F = 'fido-u2f',
   PACKED = 'packed',
   ANDROID_SAFETYNET = 'android-safetynet',
+  ANDROID_KEY = 'android-key',
+  TPM = 'tpm',
   NONE = 'none',
 }
 
@@ -31,4 +33,8 @@ export type AttestationStatement = {
   sig?: Buffer;
   x5c?: Buffer[];
   response?: Buffer;
+  alg?: number;
+  ver?: string;
+  certInfo?: Buffer;
+  pubArea?: Buffer;
 };

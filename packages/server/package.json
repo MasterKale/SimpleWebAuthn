@@ -26,12 +26,19 @@
     "node"
   ],
   "dependencies": {
+    "@peculiar/asn1-android": "^2.0.7-alpha.0",
+    "@peculiar/asn1-schema": "^2.0.5",
+    "@peculiar/asn1-x509": "^2.0.5",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "^3.0.1",
     "cbor": "^5.0.2",
     "elliptic": "^6.5.2",
-    "jsrsasign": "^8.0.15",
+    "jsrsasign": "^8.0.20",
+    "node-fetch": "^2.6.0",
     "node-rsa": "^1.0.8"
   },
-  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
+  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.7"
+  }
 }

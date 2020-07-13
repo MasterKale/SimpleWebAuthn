@@ -5,25 +5,38 @@ import type { AttestationStatement } from '../../helpers/decodeAttestationObject
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
+import validateCertificatePath from '../../helpers/validateCertificatePath';
+import convertASN1toPEM from '../../helpers/convertASN1toPEM';
+import MetadataService from '../../metadata/metadataService';
+import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
 type Options = {
   attStmt: AttestationStatement;
   clientDataHash: Buffer;
   authData: Buffer;
+  aaguid: Buffer;
+  verifyTimestampMS?: boolean;
 };
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
-export default function verifyAttestationAndroidSafetyNet(options: Options): boolean {
-  const { attStmt, clientDataHash, authData } = options;
+export default async function verifyAttestationAndroidSafetyNet(
+  options: Options,
+): Promise<boolean> {
+  const { attStmt, clientDataHash, authData, aaguid, verifyTimestampMS = true } = options;
+  const { response, ver } = attStmt;
 
-  if (!attStmt.response) {
+  if (!ver) {
+    throw new Error('No ver value in attestation (SafetyNet)');
+  }
+
+  if (!response) {
     throw new Error('No response was included in attStmt by authenticator (SafetyNet)');
   }
 
   // Prepare to verify a JWT
-  const jwt = attStmt.response.toString('utf8');
+  const jwt = response.toString('utf8');
   const jwtParts = jwt.split('.');
 
   const HEADER: SafetyNetJWTHeader = JSON.parse(base64url.decode(jwtParts[0]));
@@ -33,7 +46,22 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
   /**
    * START Verify PAYLOAD
    */
-  const { nonce, ctsProfileMatch } = PAYLOAD;
+  const { nonce, ctsProfileMatch, timestampMs } = PAYLOAD;
+
+  if (verifyTimestampMS) {
+    // Make sure timestamp is in the past
+    let now = Date.now();
+    if (timestampMs > Date.now()) {
+      throw new Error(`Payload timestamp "${timestampMs}" was later than "${now}" (SafetyNet)`);
+    }
+
+    // Consider a SafetyNet attestation valid within a minute of it being performed
+    const timestampPlusDelay = timestampMs + 60 * 1000;
+    now = Date.now();
+    if (timestampPlusDelay < now) {
+      throw new Error(`Payload timestamp "${timestampPlusDelay}" has expired (SafetyNet)`);
+    }
+  }
 
   const nonceBase = Buffer.concat([authData, clientDataHash]);
   const nonceBuffer = toHash(nonceBase);
@@ -53,30 +81,36 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
   /**
    * START Verify Header
    */
-  // Generate an array of certs constituting a full certificate chain
-  const fullpathCert = HEADER.x5c.concat([GlobalSignRootCAR2]).map(cert => {
-    let pem = '';
-    // Take a string of characters and chop them up into 64-char lines (just like a PEM cert)
-    for (let i = 0; i < cert.length; i += 64) {
-      pem += `${cert.slice(i, i + 64)}\n`;
-    }
+  const leafCert = convertASN1toPEM(HEADER.x5c[0]);
+  const leafCertInfo = getCertificateInfo(leafCert);
 
-    return `-----BEGIN CERTIFICATE-----\n${pem}-----END CERTIFICATE-----`;
-  });
+  const { subject } = leafCertInfo;
 
-  const certificate = fullpathCert[0];
-
-  const commonCertInfo = getCertificateInfo(certificate);
-
-  const { subject } = commonCertInfo;
-
-  // TODO: Find out where this CN string is specified and if it might change
+  // Ensure the certificate was issued to this hostname
+  // See https://developer.android.com/training/safetynet/attestation#verify-attestation-response
   if (subject.CN !== 'attest.android.com') {
     throw new Error('Certificate common name was not "attest.android.com" (SafetyNet)');
   }
 
-  // TODO: Re-investigate this if we decide to "use MDS or Metadata Statements"
-  // validateCertificatePath(fullpathCert);
+  const statement = await MetadataService.getStatement(aaguid);
+  if (statement) {
+    try {
+      // Convert from alg in JWT header to a number in the metadata
+      const alg = HEADER.alg === 'RS256' ? -257 : -99999;
+      await verifyAttestationWithMetadata(statement, alg, HEADER.x5c);
+    } catch (err) {
+      throw new Error(`${err.message} (SafetyNet)`);
+    }
+  } else {
+    // Validate certificate path using a fixed global root cert
+    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertASN1toPEM);
+
+    try {
+      await validateCertificatePath(path);
+    } catch (err) {
+      throw new Error(`${err.message} (SafetyNet)`);
+    }
+  }
   /**
    * END Verify Header
    */
@@ -87,7 +121,7 @@ export default function verifyAttestationAndroidSafetyNet(options: Options): boo
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, certificate);
+  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCert);
   /**
    * END Verify Signature
    */
@@ -118,7 +152,7 @@ const GlobalSignRootCAR2 =
   'cmgQWpzU_qlULRuJQ_7TBj0_VLZjmmx6BEP3ojY-x1J96relc8geMJgEtslQIxq_H5COEBkEveegeGTLg';
 
 type SafetyNetJWTHeader = {
-  alg: 'string';
+  alg: string;
   x5c: string[];
 };
 

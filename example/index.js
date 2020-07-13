@@ -4,6 +4,7 @@
  *
  * The webpages served from ./public use @simplewebauthn/browser.
  */
+
 const https = require('https');
 const fs = require('fs');
 
@@ -26,16 +27,25 @@ app.use(express.static('./public/'));
 app.use(express.json());
 
 /**
+ * If the words "metadata statements" mean anything to you, you'll want to check out this file. It
+ * contains an example of a more complex deployment of SimpleWebAuthn with support enabled for the
+ * FIDO Metadata Service. This enables greater control over the types of authenticators that can
+ * interact with the Rely Party (a.k.a. "RP", a.k.a. "this server").
+ */
+// const FIDOConformanceRoutes = require('./fido-conformance');
+// app.use('/fido', FIDOConformanceRoutes);
+
+/**
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
  * represents the expected URL from which an attestation or assertion occurs.
  */
 const rpID = 'dev.yourdomain.com';
 const origin = `https://${rpID}`;
 /**
- * WebAuthn expects you to be able to uniquely identify the user that performs an attestation or
- * assertion. The user ID you specify here should be your internal, _unique_ ID for that user
- * (uuid, etc...). Avoid using identifying information here, like email addresses, as it may be
- * stored within the authenticator.
+ * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that
+ * performs an attestation or assertion. The user ID you specify here should be your internal,
+ * _unique_ ID for that user (uuid, etc...). Avoid using identifying information here, like email
+ * addresses, as it may be stored within the authenticator.
  *
  * Here, the example server assumes the following user has completed login:
  */
@@ -136,7 +146,6 @@ app.get('/generate-attestation-options', (req, res) => {
        * the types of authenticators that users to can use for attestation
        */
       authenticatorSelection: {
-        authenticatorAttachment: 'cross-platform',
         userVerification: 'preferred',
         requireResidentKey: false,
       },
@@ -144,7 +153,7 @@ app.get('/generate-attestation-options', (req, res) => {
   );
 });
 
-app.post('/verify-attestation', (req, res) => {
+app.post('/verify-attestation', async (req, res) => {
   const { body } = req;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
@@ -153,7 +162,7 @@ app.post('/verify-attestation', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAttestationResponse({
+    verification = await verifyAttestationResponse({
       credential: body,
       expectedChallenge,
       expectedOrigin: origin,
