@@ -14,12 +14,12 @@
 This monorepo contains two complimentary libraries to help reduce the amount of work needed to
 incorporate WebAuthn into a website. The following packages are maintained here:
 
-- [@simplewebauthn/server](./packages/server/)
-- [@simplewebauthn/browser](./packages/browser)
+- [@simplewebauthn/server](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/server)
+- [@simplewebauthn/browser](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/browser)
 
 An additional package is also included that contains shared TypeScript definitions:
 
-- [@simplewebauthn/typescript-types](./packages/typescript-types/)
+- [@simplewebauthn/typescript-types](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types/)
 
 See these packages' READMEs for more specific implementation information.
 
@@ -29,7 +29,7 @@ In-depth API documentation for all of the packages in this project is available 
 
 ## Example
 
-For a practical guide to implementing these libraries, take a look at the [example project](./example). It includes a single-file Express server and a few HTML files that, combined with the packages in this repo, are close to all it takes to get up and running with WebAuthn.
+For a practical guide to implementing these libraries, take a look at the [example project](https://github.com/MasterKale/SimpleWebAuthn/tree/master/example). It includes a single-file Express server and a few HTML files that, combined with the packages in this repo, are close to all it takes to get up and running with WebAuthn.
 
 ## Philosophy
 
@@ -49,7 +49,7 @@ On the surface, this is a relatively straightforward dance. Unfortunately the va
 
 **Enter SimpleWebAuthn.**
 
-SimpleWebAuthn attempts to offer a developer-friendly pair of libraries that simplify the above dance. [@simplewebauthn/server](./packages/server/) exports a small number of methods requiring a handful of simple inputs that pair with the two primary methods exported by [@simplewebauthn/browser](./packages/browser). No converting back and forth between `Uint8Array` (or was this supposed to be an `ArrayBuffer`...?) and `String`, no worrying about JSON compatibility - **SimpleWebAuthn takes care of it all!**
+SimpleWebAuthn attempts to offer a developer-friendly pair of libraries that simplify the above dance. **@simplewebauthn/server** exports a small number of methods requiring a handful of simple inputs that pair with the two primary methods exported by **@simplewebauthn/browser**. No converting back and forth between `Uint8Array` (or was this supposed to be an `ArrayBuffer`...?) and `String`, no worrying about JSON compatibility - **SimpleWebAuthn takes care of it all!**
 
 ## Tested Devices
 

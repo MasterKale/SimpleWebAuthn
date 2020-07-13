@@ -1,6 +1,6 @@
 # SimpleWebAuthn Example
 
-A fully-functional reference implementation of [@simplewebauthn/server](../packages/server) and [@simplewebauthn/browser](../packages/browser).
+A fully-functional reference implementation of **@simplewebauthn/server** and **@simplewebauthn/browser**.
 
 ## Requirements
 

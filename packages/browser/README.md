@@ -35,6 +35,6 @@ The library's methods will be available on the global `SimpleWebAuthnBrowser` ob
 
 ## Usage
 
-Check out [the example's public/ folder](../../example/public/) for a practical implementation of this library.
+Check out [the example's public/ folder](https://github.com/MasterKale/SimpleWebAuthn/tree/master/example/public/) for a practical implementation of this library.
 
 Lower-level API documentation for the methods in this library is available [here](https://docs.simplewebauthn.dev/modules/_simplewebauthn_browser.html).
