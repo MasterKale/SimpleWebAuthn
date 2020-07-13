@@ -4,7 +4,6 @@
   "command": {
     "publish": {
       "ignoreChanges": [
-        "*.md",
         "*.config.js",
         ".eslintrc.js",
         ".prettierignore",
