@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.7.0 - The one that passes FIDO conformance testing
+
+**Packages:**
+
+- @simplewebauthn/browser@0.7.0
+- @simplewebauthn/server@0.7.0
+- @simplewebauthn/typescript-types@0.7.0
+
+**Changes:**
+
+- **[server]** Add support for TPM attestations
+- **[server]** Add support for Android Key attestations
+- **[server]** Add support for authenticator metadata statements and the FIDO Metadata Service (MDS)
+
+### Breaking Changes
+
+- **[server]** The return type of `verifyAttestationResponse()` changed from `boolean` to `Promise<boolean>`. This was necessary to support querying FIDO MDS for an authenticator metadata statement during attestation verification.
+- **[server]** The optional `requireUserVerification` parameter of `verifyAssertionResponse()` has been replaced with the new optional `fidoUserVerification` parameter. This enables greater control over user verification when verifying assertions.
+
 ## v0.6.1
 
 **Packages:**
