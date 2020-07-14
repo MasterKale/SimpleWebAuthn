@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.1
+
+**Packages:**
+
+- @simplewebauthn/browser@0.7.1
+- @simplewebauthn/server@0.7.1
+- @simplewebauthn/typescript-types@0.7.1
+
+**Changes:**
+
+- Fixed broken README and Homepage links in package listings on NPMJS.com
+
 ## v0.7.0 - The one that passes FIDO conformance testing
 
 **Packages:**
