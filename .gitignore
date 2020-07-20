@@ -6,3 +6,5 @@ docs/
 .env
 example/localhost.key
 example/localhost.crt
+example/fido-conformance-mds/*
+!example/fido-conformance-mds/.gitkeep
