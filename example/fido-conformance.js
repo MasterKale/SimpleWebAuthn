@@ -28,10 +28,10 @@ const fidoRouteSuffix = '/fido';
  *
  * FIDO2 > TESTS CONFIGURATION > DOWNLOAD SERVER METADATA (button)
  */
-// Update this to whatever folder you extracted the statements to
 const statements = [];
 
 try {
+  // Update this to whatever folder you extracted the statements to
   const conformanceMetadataPath = './fido-conformance-mds-v1.3.4';
   const conformanceMetadataFilenames = fs.readdirSync(conformanceMetadataPath);
   for (const statementPath of conformanceMetadataFilenames) {
