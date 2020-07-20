@@ -40,7 +40,6 @@ try {
       statements.push(JSON.parse(contents));
     }
   }
-  console.log('initializing metadata service with', conformanceMetadataFilenames);
 } catch (err) {
   // pass
 }
@@ -66,6 +65,13 @@ fetch('https://fidoalliance.co.nz/mds/getEndpoints', {
       statements,
       mdsServers,
     });
+  })
+  .finally(() => {
+    if (statements.length) {
+      console.log(
+        `ℹ️  Initializing metadata service with ${statements.length} local statements`,
+      );
+    }
 
     console.log('🔐 FIDO Conformance routes ready');
   });
