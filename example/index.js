@@ -39,7 +39,7 @@ app.use(express.json());
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
  * represents the expected URL from which an attestation or assertion occurs.
  */
-const rpID = 'dev.yourdomain.com';
+const rpID = 'localhost';
 const origin = `https://${rpID}`;
 /**
  * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that
@@ -84,7 +84,7 @@ const loggedInUserId = 'internalUserId';
 const inMemoryUserDeviceDB = {
   [loggedInUserId]: {
     id: loggedInUserId,
-    username: 'user@yourdomain.com',
+    username: 'user@localhost',
     devices: [
       /**
        * {
@@ -272,14 +272,10 @@ https
   .createServer(
     {
       /**
-       * You'll need to provide a SSL cert and key here because
-       * WebAuthn can only be run from HTTPS:// URLs
-       *
-       * HINT: If you create a `dev` subdomain A-record that points to 127.0.0.1,
-       * you can manually generate an HTTPS certificate for it using Let's Encrypt certbot.
+       * WebAuthn can only be run from https:// URLs. See the README on how to generate this SSL cert and key pair using mkcert
        */
-      key: fs.readFileSync('./dev.yourdomain.com.key'),
-      cert: fs.readFileSync('./dev.yourdomain.com.crt'),
+      key: fs.readFileSync('./localhost.key'),
+      cert: fs.readFileSync('./localhost.crt'),
     },
     app,
   )
