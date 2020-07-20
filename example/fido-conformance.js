@@ -13,6 +13,10 @@ const {
   MetadataService,
 } = require('@simplewebauthn/server');
 
+const serviceName = 'FIDO Conformance Test';
+const rpID = 'localhost';
+const origin = 'https://localhost';
+
 /**
  * Load JSON metadata statements provided by the Conformance Tools
  *
@@ -82,9 +86,6 @@ const inMemoryUserDeviceDB = {
 const fidoComplianceRouter = express.Router();
 
 let loggedInUsername = undefined;
-const serviceName = 'FIDO Conformance Test';
-const rpID = 'localhost';
-const origin = 'https://localhost';
 
 /**
  * [FIDO2] Server Tests > MakeCredential Request
