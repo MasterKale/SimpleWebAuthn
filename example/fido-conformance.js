@@ -13,9 +13,16 @@ const {
   MetadataService,
 } = require('@simplewebauthn/server');
 
+
+/**
+ * Create paths specifically for testing with the FIDO Conformance Tools
+ */
+const fidoConformanceRouter = express.Router();
+
 const serviceName = 'FIDO Conformance Test';
 const rpID = 'localhost';
 const origin = 'https://localhost';
+const fidoRouteSuffix = '/fido';
 
 /**
  * Load JSON metadata statements provided by the Conformance Tools
@@ -79,18 +86,13 @@ const inMemoryUserDeviceDB = {
   //   currentAssertionUserVerification: undefined,
   // },
 };
-
-/**
- * Create paths specifically for testing with the FIDO Conformance Tools
- */
-const fidoComplianceRouter = express.Router();
-
+// A cheap way of remembering who's "logged in" between the request for options and the response
 let loggedInUsername = undefined;
 
 /**
  * [FIDO2] Server Tests > MakeCredential Request
  */
-fidoComplianceRouter.post('/attestation/options', (req, res) => {
+fidoConformanceRouter.post('/attestation/options', (req, res) => {
   const { body } = req;
   const { username, displayName, authenticatorSelection, attestation, extensions } = body;
 
@@ -136,7 +138,7 @@ fidoComplianceRouter.post('/attestation/options', (req, res) => {
 /**
  * [FIDO2] Server Tests > MakeCredential Response
  */
-fidoComplianceRouter.post('/attestation/result', async (req, res) => {
+fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   const { body } = req;
 
   const user = inMemoryUserDeviceDB[loggedInUsername];
@@ -183,7 +185,7 @@ fidoComplianceRouter.post('/attestation/result', async (req, res) => {
 /**
  * [FIDO2] Server Tests > GetAssertion Request
  */
-fidoComplianceRouter.post('/assertion/options', (req, res) => {
+fidoConformanceRouter.post('/assertion/options', (req, res) => {
   const { body } = req;
   const { username, userVerification, extensions } = body;
 
@@ -211,7 +213,7 @@ fidoComplianceRouter.post('/assertion/options', (req, res) => {
   });
 });
 
-fidoComplianceRouter.post('/assertion/result', (req, res) => {
+fidoConformanceRouter.post('/assertion/result', (req, res) => {
   const { body } = req;
   const { id } = body;
 
@@ -256,7 +258,7 @@ fidoComplianceRouter.post('/assertion/result', (req, res) => {
  * A catch-all for future test routes we might need to support but haven't yet defined (helps with
  * discovering which routes, what methods, and what data need to be defined)
  */
-fidoComplianceRouter.all('*', (req, res, next) => {
+fidoConformanceRouter.all('*', (req, res, next) => {
   console.log(req.url);
   console.log(req.method);
   console.log(req.body);
@@ -264,4 +266,7 @@ fidoComplianceRouter.all('*', (req, res, next) => {
   next();
 });
 
-module.exports = fidoComplianceRouter;
+module.exports = {
+  fidoConformanceRouter,
+  fidoRouteSuffix,
+};
