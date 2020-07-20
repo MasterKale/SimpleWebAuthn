@@ -23,3 +23,44 @@ test('should verify TPM response', async () => {
 
   expect(verification.verified).toEqual(true);
 });
+
+test('should verify real Windows 10 TPM response', async () => {
+  /**
+   * Generated on real hardware on 07/19/2020
+   *
+   * TPM Info:
+   * - Intel (INTC)
+   * - Manufacturer Version: 303.12.0.0
+   * - Specification Version: 2.0
+   * - PPI Specification Version: 1.3
+   * - TPM Specification Sub-Version: 1.16
+   * - PC Client Specification Version: 1.00
+   *
+   * attestationType: 'none',
+   * authenticatorSelection: {
+   *   authenticatorAttachment: 'platform',
+   *   userVerification: 'required',
+   *   requireResidentKey: true,
+   * },
+   */
+  const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBdHRlc3RhdGlvbg';
+  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
+  const verification = await verifyAttestationResponse({
+    credential: {
+      id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
+      rawId: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
+      response: {
+        attestationObject:
+          'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBZz3cRxDpwIiyKduonVYyILs59yKa_0ZbCmVrGvuaivigRQAAAAAAAAAAAAAAAAAAAAAAAAAAACBgnwUwz4CZxS3vdc9ffjVZdZ3vKkEzKUaOOG7SDdXMwaQBAwM5AQAgWQEApv_PmJTe2G_iJrhSngUuvPA7RezOQ4Btgwg3fGZag23gzkHe2_bPYdMeFMOPVdZsnLIlouUTLX8w6CcoosTajmDIwsgV16koSUicz89phFUoNgmKi7XuzSxkg9C5WOQnFIcEaIUVC03Jpmd9mFTk13pH3xsGPafApzL_bzjxQV3cbmwlAFi8h8t6S2sPD2kh8mrKeU_qT6LB-vkKUq35A-122RN8BwZyfHLp-CKWXPAVSqFVGlMJtVxNOAHm5DaJ812map-lOOZYMu15rosIPLNhsAVFyUQ3DsOb9lAPwb1sNCRRF1umvOzTlEk9Fiq_NneNBqyIVPSBsLBeof4lwyFDAQAB',
+        clientDataJSON:
+          'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhGMVpWWmhiSFZsUlhabGNubEJkSFJsYzNSaGRHbHZiZyIsIm9yaWdpbiI6Imh0dHBzOi8vZGV2LmRvbnRuZWVkYS5wdyIsImNyb3NzT3JpZ2luIjpmYWxzZX0',
+      },
+      type: 'public-key',
+    },
+    expectedChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toEqual(true);
+});
