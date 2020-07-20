@@ -32,8 +32,8 @@ app.use(express.json());
  * FIDO Metadata Service. This enables greater control over the types of authenticators that can
  * interact with the Rely Party (a.k.a. "RP", a.k.a. "this server").
  */
-const { fidoRouteSuffix, fidoConformanceRouter } = require('./fido-conformance');
-app.use(fidoRouteSuffix, fidoConformanceRouter);
+// const { fidoRouteSuffix, fidoConformanceRouter } = require('./fido-conformance');
+// app.use(fidoRouteSuffix, fidoConformanceRouter);
 
 /**
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
