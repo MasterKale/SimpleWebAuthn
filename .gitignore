@@ -4,3 +4,5 @@ coverage/
 .DS_Store
 docs/
 .env
+example/localhost.key
+example/localhost.crt
