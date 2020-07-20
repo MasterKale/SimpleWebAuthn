@@ -83,8 +83,8 @@ const fidoComplianceRouter = express.Router();
 
 let loggedInUsername = undefined;
 const serviceName = 'FIDO Conformance Test';
-const rpID = 'dev.dontneeda.pw';
-const origin = 'https://dev.dontneeda.pw';
+const rpID = 'localhost';
+const origin = 'https://localhost';
 
 /**
  * [FIDO2] Server Tests > MakeCredential Request
