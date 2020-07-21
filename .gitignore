@@ -4,7 +4,7 @@ coverage/
 .DS_Store
 docs/
 .env
-example/localhost.key
-example/localhost.crt
+example/*.key
+example/*.crt
 example/fido-conformance-mds/*
 !example/fido-conformance-mds/.gitkeep
