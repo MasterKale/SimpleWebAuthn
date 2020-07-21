@@ -84,7 +84,7 @@ const loggedInUserId = 'internalUserId';
 const inMemoryUserDeviceDB = {
   [loggedInUserId]: {
     id: loggedInUserId,
-    username: 'user@localhost',
+    username: `user@${rpID}`,
     devices: [
       /**
        * {
@@ -274,8 +274,8 @@ https
       /**
        * WebAuthn can only be run from https:// URLs. See the README on how to generate this SSL cert and key pair using mkcert
        */
-      key: fs.readFileSync('./localhost.key'),
-      cert: fs.readFileSync('./localhost.crt'),
+      key: fs.readFileSync(`./${rpID}.key`),
+      cert: fs.readFileSync(`./${rpID}.crt`),
     },
     app,
   )
