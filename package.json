@@ -4,7 +4,7 @@
   "scripts": {
     "bootstrap": "npm run build:types && npm run build:browser && npm run build:server",
     "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/",
-    "docs": "npm run bootstrap && typedoc --tsconfig tsconfig.json",
+    "docs": "npm run bootstrap && typedoc --tsconfig tsconfigdoc.json",
     "test": "lerna run test",
     "build:types": "lerna bootstrap --scope=@simplewebauthn/typescript-types",
     "build:browser": "lerna bootstrap --scope=@simplewebauthn/browser",

@@ -15,23 +15,5 @@
     "**/setupTests.ts",
     "**/__mocks__/*",
     "**/dist/*"
-  ],
-  "typedocOptions": {
-    "out": "docs",
-    "inputFiles": [
-      "./packages/server/src/index.ts",
-      "./packages/browser/src/index.ts",
-      "./packages/typescript-types/src/index.ts"
-    ],
-    "readme": "./DOCS.md",
-    "mode": "library",
-    "name": "@SimpleWebAuthn",
-    "excludeExternals": true,
-    "excludeNotExported": true,
-    "excludePrivate": true,
-    "plugin": [
-      // Relative to somewhere deep in `node_modules/typedocs`
-      "../../../../../typedoc-plugin-external-module-name"
-    ]
-  }
+  ]
 }
