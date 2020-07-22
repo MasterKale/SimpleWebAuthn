@@ -1,5 +1,11 @@
 {
   "extends": "./tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@simplewebauthn/*": ["packages/*/src"]
+    }
+  },
   "typedocOptions": {
     "out": "docs",
     "inputFiles": [
