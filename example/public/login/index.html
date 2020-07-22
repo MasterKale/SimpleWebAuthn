@@ -23,7 +23,13 @@
       const elemSuccess = document.getElementById('success');
       const elemError = document.getElementById('error');
 
-      const { startAssertion } = SimpleWebAuthnBrowser;
+      const { startAssertion, supportsWebauthn } = SimpleWebAuthnBrowser;
+
+      // Hide the Begin button if the browser is incapable of using WebAuthn
+      if (!supportsWebauthn()) {
+        elemBegin.style.display = 'none';
+        elemError.innerText = 'It seems this browser doesn\'t support WebAuthn...';
+      }
 
       elemBegin.addEventListener('click', async () => {
         // Reset success/error messages
