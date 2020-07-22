@@ -4,6 +4,10 @@
 
 Please check out the links in the sidebar for package-specific documentation.
 
+## Homepage
+
+Visit the SimpleWebAuthn homepage at https://simplewebauthn.dev
+
 ## Github
 
 Source code is hosted on Github and can be viewed [here](https://github.com/MasterKale/SimpleWebAuthn).
