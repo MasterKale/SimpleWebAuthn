@@ -17,12 +17,6 @@ This package is available on **npm**:
 npm install @simplewebauthn/browser
 ```
 
-It can then be imported into a project as usual:
-
-```js
-import SimpleWebAuthnBrowser from '@simplewebauthn/browser';
-```
-
 ### UMD
 
 This package can also be installed via **unpkg** by including the following script in your page's `<head>` element:
@@ -35,6 +29,4 @@ The library's methods will be available on the global `SimpleWebAuthnBrowser` ob
 
 ## Usage
 
-Check out [the example's public/ folder](https://github.com/MasterKale/SimpleWebAuthn/tree/master/example/public/) for a practical implementation of this library.
-
-Lower-level API documentation for the methods in this library is available [here](https://docs.simplewebauthn.dev/modules/_simplewebauthn_browser.html).
+You can find in-depth documentation on this package here: https://simplewebauthn.dev/docs/packages/browser

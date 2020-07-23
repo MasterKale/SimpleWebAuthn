@@ -17,21 +17,9 @@ This package is available on **npm**:
 npm install @simplewebauthn/server
 ```
 
-It can then be imported into a Node project as usual:
-
-```js
-// ESModule
-import SimpleWebAuthnServer from '@simplewebauthn/server';
-// CommonJS
-const SimpleWebAuthnServer = require('@simplewebauthn/server');
-```
-
 ## Usage
 
-Check out [the example's index.js](https://github.com/MasterKale/SimpleWebAuthn/blob/master/example/index.js) for a practical implementation of this library.
-
-Lower-level API documentation for the methods in this library is available [here](https://docs.simplewebauthn.dev/modules/_simplewebauthn_server.html).
-
+You can find in-depth documentation on this package here: https://simplewebauthn.dev/docs/packages/server
 
 ## Supported Attestation Formats
 
