@@ -43,7 +43,7 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
   -258,
   // RSASSA-PKCS1-v1_5 w/ SHA-512
   -259,
-  // RSASSA-PKCS1-v1_5 w/ SHA-1 (Deprecated, for legacy support)
+  // RSASSA-PKCS1-v1_5 w/ SHA-1 (Deprecated; here for legacy support)
   -65535,
 ];
 
