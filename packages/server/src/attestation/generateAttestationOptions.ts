@@ -16,6 +16,7 @@ type Options = {
   suggestedTransports?: AuthenticatorTransport[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
   extensions?: AuthenticationExtensionsClientInputs;
+  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
 
 // Supported crypto algo identifiers
@@ -60,6 +61,8 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
  * @param authenticatorSelection Advanced criteria for restricting the types of authenticators that
  * may be used
  * @param extensions Additional plugins the authenticator or browser should use during attestation
+ * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
+ * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export default function generateAttestationOptions(
   options: Options,
@@ -77,6 +80,7 @@ export default function generateAttestationOptions(
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     authenticatorSelection,
     extensions,
+    supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
 
   return {
@@ -90,7 +94,7 @@ export default function generateAttestationOptions(
       name: userName,
       displayName: userDisplayName,
     },
-    pubKeyCredParams: supportedCOSEAlgorithmIdentifiers.map(id => ({
+    pubKeyCredParams: supportedAlgorithmIDs.map(id => ({
       alg: id,
       type: 'public-key',
     })),
