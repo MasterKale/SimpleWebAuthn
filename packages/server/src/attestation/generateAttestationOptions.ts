@@ -30,7 +30,6 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
   -257,
   -258,
   -259,
-  -65535,
 ];
 
 /**
