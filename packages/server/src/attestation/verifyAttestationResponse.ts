@@ -21,6 +21,7 @@ type Options = {
   expectedOrigin: string;
   expectedRPID?: string;
   requireUserVerification?: boolean;
+  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
 
 /**
@@ -35,6 +36,8 @@ type Options = {
  * @param expectedRPID RP ID that was specified in the attestation options
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
+ * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
+ * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export default async function verifyAttestationResponse(
   options: Options,
@@ -45,6 +48,7 @@ export default async function verifyAttestationResponse(
     expectedOrigin,
     expectedRPID,
     requireUserVerification = false,
+    supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
   const { id, rawId, type: credentialType, response } = credential;
 
@@ -139,8 +143,8 @@ export default async function verifyAttestationResponse(
   }
 
   // Make sure the key algorithm is one we specified within the attestation options
-  if (!supportedCOSEAlgorithmIdentifiers.includes(alg as number)) {
-    const supported = supportedCOSEAlgorithmIdentifiers.join(', ');
+  if (!supportedAlgorithmIDs.includes(alg as number)) {
+    const supported = supportedAlgorithmIDs.join(', ');
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
