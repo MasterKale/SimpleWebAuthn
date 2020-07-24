@@ -43,6 +43,8 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
   -258,
   // RSASSA-PKCS1-v1_5 w/ SHA-512
   -259,
+  // RSASSA-PKCS1-v1_5 w/ SHA-1 (Deprecated, for legacy support)
+  -65535,
 ];
 
 /**
@@ -86,6 +88,17 @@ export default function generateAttestationOptions(
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
 
+  /**
+   * Filter out known bad/deprecated/etc... algorithm ID's before preparing pubKeyCredParams
+   * from the array of algorithm ID's
+   */
+  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs
+    .filter(id => id !== -65535)
+    .map(id => ({
+      alg: id,
+      type: 'public-key',
+    }));
+
   return {
     challenge,
     rp: {
@@ -97,10 +110,7 @@ export default function generateAttestationOptions(
       name: userName,
       displayName: userDisplayName,
     },
-    pubKeyCredParams: supportedAlgorithmIDs.map(id => ({
-      alg: id,
-      type: 'public-key',
-    })),
+    pubKeyCredParams,
     timeout,
     attestation: attestationType,
     excludeCredentials: excludedCredentialIDs.map(id => ({
