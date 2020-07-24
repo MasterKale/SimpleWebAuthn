@@ -16,15 +16,21 @@ export default async function verifyAttestationWithMetadata(
     throw new Error(`Attestation alg "${alg}" did not match metadata auth alg "${metaCOSE.alg}"`);
   }
 
+  // Make a copy of x5c so we don't modify the original
+  const path = [...x5c].map(convertASN1toPEM);
+
   // Try to validate the chain with each metadata root cert until we find one that works
   let foundValidPath = false;
   for (const rootCert of statement.attestationRootCertificates) {
     try {
-      const path = [...x5c, rootCert].map(convertASN1toPEM);
+      // Push the root cert to the cert path and try to validate it
+      path.push(convertASN1toPEM(rootCert));
       foundValidPath = await validateCertificatePath(path);
     } catch (err) {
       // Swallow the error for now
       foundValidPath = false;
+      // Remove the root cert before we try again with another
+      path.splice(path.length - 1, 1);
     }
 
     // Don't continue if we've validated a full path
