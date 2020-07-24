@@ -16,20 +16,34 @@ type Options = {
   suggestedTransports?: AuthenticatorTransport[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
   extensions?: AuthenticationExtensionsClientInputs;
+  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
 
-// Supported crypto algo identifiers
-// See https://w3c.github.io/webauthn/#sctn-alg-identifier
+/**
+ * Supported crypto algo identifiers
+ * See https://w3c.github.io/webauthn/#sctn-alg-identifier
+ * and https://www.iana.org/assignments/cose/cose.xhtml#algorithms
+ */
 export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
+  // ECDSA w/ SHA-256
   -7,
+  // EdDSA
   -8,
+  // ECDSA w/ SHA-512
   -36,
+  // RSASSA-PSS w/ SHA-256
   -37,
+  // RSASSA-PSS w/ SHA-384
   -38,
+  // RSASSA-PSS w/ SHA-512
   -39,
+  // RSASSA-PKCS1-v1_5 w/ SHA-256
   -257,
+  // RSASSA-PKCS1-v1_5 w/ SHA-384
   -258,
+  // RSASSA-PKCS1-v1_5 w/ SHA-512
   -259,
+  // RSASSA-PKCS1-v1_5 w/ SHA-1 (Deprecated; here for legacy support)
   -65535,
 ];
 
@@ -52,6 +66,8 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
  * @param authenticatorSelection Advanced criteria for restricting the types of authenticators that
  * may be used
  * @param extensions Additional plugins the authenticator or browser should use during attestation
+ * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
+ * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export default function generateAttestationOptions(
   options: Options,
@@ -69,7 +85,19 @@ export default function generateAttestationOptions(
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     authenticatorSelection,
     extensions,
+    supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
+
+  /**
+   * Filter out known bad/deprecated/etc... algorithm ID's before preparing pubKeyCredParams
+   * from the array of algorithm ID's
+   */
+  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs
+    .filter(id => id !== -65535)
+    .map(id => ({
+      alg: id,
+      type: 'public-key',
+    }));
 
   return {
     challenge,
@@ -82,10 +110,7 @@ export default function generateAttestationOptions(
       name: userName,
       displayName: userDisplayName,
     },
-    pubKeyCredParams: supportedCOSEAlgorithmIdentifiers.map(id => ({
-      alg: id,
-      type: 'public-key',
-    })),
+    pubKeyCredParams,
     timeout,
     attestation: attestationType,
     excludeCredentials: excludedCredentialIDs.map(id => ({
