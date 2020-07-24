@@ -19,8 +19,11 @@ type Options = {
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
 
-// Supported crypto algo identifiers
-// See https://w3c.github.io/webauthn/#sctn-alg-identifier
+/**
+ * Supported crypto algo identifiers
+ * See https://w3c.github.io/webauthn/#sctn-alg-identifier
+ * and https://www.iana.org/assignments/cose/cose.xhtml#algorithms
+ */
 export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
   // ECDSA w/ SHA-256
   -7,
