@@ -21,14 +21,23 @@ type Options = {
 // Supported crypto algo identifiers
 // See https://w3c.github.io/webauthn/#sctn-alg-identifier
 export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
+  // ECDSA w/ SHA-256
   -7,
+  // EdDSA
   -8,
+  // ECDSA w/ SHA-512
   -36,
+  // RSASSA-PSS w/ SHA-256
   -37,
+  // RSASSA-PSS w/ SHA-384
   -38,
+  // RSASSA-PSS w/ SHA-512
   -39,
+  // RSASSA-PKCS1-v1_5 w/ SHA-256
   -257,
+  // RSASSA-PKCS1-v1_5 w/ SHA-384
   -258,
+  // RSASSA-PKCS1-v1_5 w/ SHA-512
   -259,
 ];
 
