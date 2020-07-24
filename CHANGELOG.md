@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.2
+
+**Packages:**
+
+- @simplewebauthn/browser@0.7.2
+- @simplewebauthn/server@0.7.2
+
+**Changes:**
+
+- **[server]** Added support for specifying a custom array of COSE algorithm identifiers when calling `generateAttestationOptions()` and `verifyAttestationResponse()`
+- **[browser]** Updated README.md with new doc URLs
+
 ## v0.7.1
 
 **Packages:**
