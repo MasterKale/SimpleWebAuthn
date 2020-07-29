@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@simplewebauthn/server": "^0.7.3",
+    "@simplewebauthn/server": "^0.7.4",
     "express": "^4.17.1",
     "node-fetch": "^2.6.0"
   },
