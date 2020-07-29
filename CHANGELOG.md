@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.3
+
+**Packages:**
+
+- @simplewebauthn/browser@0.7.3
+- @simplewebauthn/server@0.7.3
+
+**Changes:**
+
+- **[browser]** Add support for UTF-8 values in server challenges
+- **[server]** Minor performance improvement
+
 ## v0.7.2
 
 **Packages:**
