@@ -17,6 +17,7 @@ const mockClientDataJSON = 'mockClientDataJSON';
 const mockSignature = 'mockSignature';
 const mockUserHandle = 'mockUserHandle';
 
+// With ASCII challenge
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
   challenge: 'fizz',
   allowCredentials: [
@@ -26,6 +27,13 @@ const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
       transports: ['nfc'],
     },
   ],
+  timeout: 1,
+};
+
+// With UTF-8 challenge
+const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
+  challenge: 'やれやれだぜ',
+  allowCredentials: [],
   timeout: 1,
 };
 
@@ -117,6 +125,32 @@ test('should throw error if assertion is cancelled for some reason', async done 
   );
 
   await expect(startAssertion(goodOpts1)).rejects.toThrow('Assertion was not completed');
+
+  done();
+});
+
+test('should handle UTF-8 challenges', async done => {
+  mockSupportsWebauthn.mockReturnValue(true);
+
+  // Stub out a response so the method won't throw
+  mockNavigatorGet.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({
+          response: {},
+          getClientExtensionResults: () => ({}),
+        });
+      });
+    },
+  );
+
+  await startAssertion(goodOpts2UTF8);
+
+  const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
+
+  expect(JSON.stringify(argsPublicKey.challenge)).toEqual(
+    '{"0":227,"1":130,"2":132,"3":227,"4":130,"5":140,"6":227,"7":130,"8":132,"9":227,"10":130,"11":140,"12":227,"13":129,"14":160,"15":227,"16":129,"17":156}',
+  );
 
   done();
 });
