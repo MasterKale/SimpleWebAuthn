@@ -21,6 +21,7 @@
     "eslint": "^7.1.0",
     "husky": "^4.2.5",
     "jest": "^25.1.0",
+    "jest-environment-jsdom": "^26.1.0",
     "lerna": "^3.21.0",
     "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
