@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.4
+
+**Packages:**
+
+- @simplewebauthn/browser@0.7.4
+- @simplewebauthn/server@0.7.4
+
+**Changes:**
+
+- **[browser]** Update dependencies
+- **[server]** Update dependencies
+
 ## v0.7.3
 
 **Packages:**
