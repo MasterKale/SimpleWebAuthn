@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/browser",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "SimpleWebAuthn for Browsers",
   "main": "dist/simplewebauthn-browser.min.js",
   "types": "dist/index.d.ts",
