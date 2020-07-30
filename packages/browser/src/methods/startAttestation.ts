@@ -6,6 +6,7 @@ import {
 
 import toUint8Array from '../helpers/toUint8Array';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
+import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
@@ -24,18 +25,16 @@ export default async function startAttestation(
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
   const publicKey: PublicKeyCredentialCreationOptions = {
     ...creationOptionsJSON,
-    challenge: toUint8Array(creationOptionsJSON.challenge),
+    challenge: base64URLStringToBuffer(creationOptionsJSON.challenge),
     user: {
       ...creationOptionsJSON.user,
       id: toUint8Array(creationOptionsJSON.user.id),
     },
-    excludeCredentials: creationOptionsJSON.excludeCredentials.map(
-      toPublicKeyCredentialDescriptor,
-    ),
+    excludeCredentials: creationOptionsJSON.excludeCredentials.map(toPublicKeyCredentialDescriptor),
   };
 
   // Wait for the user to complete attestation
-  const credential = await navigator.credentials.create({ publicKey }) as AttestationCredential;
+  const credential = (await navigator.credentials.create({ publicKey })) as AttestationCredential;
 
   if (!credential) {
     throw new Error('Attestation was not completed');
