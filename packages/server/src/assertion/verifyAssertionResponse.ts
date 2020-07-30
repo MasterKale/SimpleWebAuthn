@@ -23,8 +23,8 @@ type Options = {
  * **Options:**
  *
  * @param credential Authenticator credential returned by browser's `startAssertion()`
- * @param expectedChallenge The random value provided to generateAssertionOptions for the
- * authenticator to sign
+ * @param expectedChallenge The base64url-encoded `options.challenge` returned by
+ * `generateAssertionOptions()`
  * @param expectedOrigin Website URL that the attestation should have occurred on
  * @param expectedRPID RP ID that was specified in the attestation options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
@@ -76,10 +76,9 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   }
 
   // Ensure the device provided the challenge we gave it
-  const encodedExpectedChallenge = base64url.encode(expectedChallenge);
-  if (challenge !== encodedExpectedChallenge) {
+  if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected assertion challenge "${challenge}", expected "${encodedExpectedChallenge}"`,
+      `Unexpected assertion challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 
