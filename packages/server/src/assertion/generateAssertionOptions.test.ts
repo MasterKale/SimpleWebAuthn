@@ -1,3 +1,5 @@
+import base64url from 'base64url';
+
 import generateAssertionOptions from './generateAssertionOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -10,7 +12,7 @@ test('should generate credential request options suitable for sending via JSON',
   });
 
   expect(options).toEqual({
-    challenge,
+    challenge: base64url.encode(challenge),
     allowCredentials: [
       {
         id: 'MTIzNA==',

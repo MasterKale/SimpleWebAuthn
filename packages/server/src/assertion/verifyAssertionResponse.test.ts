@@ -196,7 +196,7 @@ const assertionResponse = {
   getClientExtensionResults: () => ({}),
   type: 'public-key',
 };
-const assertionChallenge = 'totallyUniqueValueEveryTime';
+const assertionChallenge = base64url.encode('totallyUniqueValueEveryTime');
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator = {
@@ -222,7 +222,7 @@ const assertionFirstTimeUsedResponse = {
   },
   type: 'public-key',
 };
-const assertionFirstTimeUsedChallenge = 'totallyUniqueValueEveryAssertion';
+const assertionFirstTimeUsedChallenge = base64url.encode('totallyUniqueValueEveryAssertion');
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
 const authenticatorFirstTimeUsed = {
   publicKey:
