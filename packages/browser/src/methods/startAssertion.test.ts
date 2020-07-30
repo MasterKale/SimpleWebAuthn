@@ -4,6 +4,8 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import supportsWebauthn from '../helpers/supportsWebauthn';
+import toUint8Array from '../helpers/toUint8Array';
+import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
 import startAssertion from './startAssertion';
 
@@ -19,7 +21,7 @@ const mockUserHandle = 'mockUserHandle';
 
 // With ASCII challenge
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: 'fizz',
+  challenge: bufferToBase64URLString(toUint8Array('fizz')),
   allowCredentials: [
     {
       id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
@@ -32,7 +34,7 @@ const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
 
 // With UTF-8 challenge
 const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: 'やれやれだぜ',
+  challenge: bufferToBase64URLString(toUint8Array('やれやれだぜ')),
   allowCredentials: [],
   timeout: 1,
 };
@@ -62,7 +64,7 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
   const credId = argsPublicKey.allowCredentials[0].id;
 
-  expect(JSON.stringify(argsPublicKey.challenge)).toEqual('{"0":102,"1":105,"2":122,"3":122}');
+  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
   // Make sure the credential ID is an ArrayBuffer with a length of 64
   expect(credId instanceof ArrayBuffer).toEqual(true);
   expect(credId.byteLength).toEqual(64);
@@ -148,8 +150,27 @@ test('should handle UTF-8 challenges', async done => {
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
 
-  expect(JSON.stringify(argsPublicKey.challenge)).toEqual(
-    '{"0":227,"1":130,"2":132,"3":227,"4":130,"5":140,"6":227,"7":130,"8":132,"9":227,"10":130,"11":140,"12":227,"13":129,"14":160,"15":227,"16":129,"17":156}',
+  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(
+    new Uint8Array([
+      227,
+      130,
+      132,
+      227,
+      130,
+      140,
+      227,
+      130,
+      132,
+      227,
+      130,
+      140,
+      227,
+      129,
+      160,
+      227,
+      129,
+      156,
+    ]),
   );
 
   done();

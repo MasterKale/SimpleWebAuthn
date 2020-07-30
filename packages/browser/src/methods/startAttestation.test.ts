@@ -5,6 +5,7 @@ import {
 
 import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
+import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
 import startAttestation from './startAttestation';
 
@@ -17,7 +18,7 @@ const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';
 
 const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
-  challenge: 'fizz',
+  challenge: bufferToBase64URLString(toUint8Array('fizz')),
   attestation: 'direct',
   pubKeyCredParams: [
     {
@@ -35,11 +36,13 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
     name: 'username',
   },
   timeout: 1,
-  excludeCredentials: [{
-    id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
-    type: 'public-key',
-    transports: ['internal'],
-  }],
+  excludeCredentials: [
+    {
+      id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
+      type: 'public-key',
+      transports: ['internal'],
+    },
+  ],
 };
 
 beforeEach(() => {
@@ -65,8 +68,8 @@ test('should convert options before passing to navigator.credentials.create(...)
   const credId = argsPublicKey.excludeCredentials[0].id;
 
   // Make sure challenge and user.id are converted to Buffers
-  expect(JSON.stringify(argsPublicKey.challenge)).toEqual('{"0":102,"1":105,"2":122,"3":122}');
-  expect(JSON.stringify(argsPublicKey.user.id)).toEqual('{"0":53,"1":54,"2":55,"3":56}');
+  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
+  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(new Uint8Array([53, 54, 55, 56]));
 
   // Confirm construction of excludeCredentials array
   expect(credId instanceof ArrayBuffer).toEqual(true);
