@@ -2,13 +2,16 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   Base64URLString,
 } from '@simplewebauthn/typescript-types';
+import base64url from 'base64url';
+
+import generateChallenge from '../helpers/generateChallenge';
 
 type Options = {
   serviceName: string;
   rpID: string;
-  challenge: string;
   userID: string;
   userName: string;
+  challenge?: string | Buffer;
   userDisplayName?: string;
   timeout?: number;
   attestationType?: AttestationConveyancePreference;
@@ -54,9 +57,9 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
  *
  * @param serviceName Friendly user-visible website name
  * @param rpID Valid domain name (after `https://`)
- * @param challenge Random string the authenticator needs to sign and pass back
  * @param userID User's website-specific unique ID
  * @param userName User's website-specific username (email, etc...)
+ * @param challenge Random string the authenticator needs to sign and pass back
  * @param userDisplayName User's actual name
  * @param timeout How long (in ms) the user can take to complete attestation
  * @param attestationType Specific attestation statement
@@ -75,9 +78,9 @@ export default function generateAttestationOptions(
   const {
     serviceName,
     rpID,
-    challenge,
     userID,
     userName,
+    challenge = generateChallenge(),
     userDisplayName = userName,
     timeout = 60000,
     attestationType = 'none',
@@ -100,7 +103,7 @@ export default function generateAttestationOptions(
     }));
 
   return {
-    challenge,
+    challenge: base64url.encode(challenge),
     rp: {
       name: serviceName,
       id: rpID,
