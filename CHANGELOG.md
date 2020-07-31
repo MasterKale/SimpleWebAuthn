@@ -1,5 +1,60 @@
 # Changelog
 
+## v0.8.0 - The one with better challenges
+
+**Packages:**
+
+- @simplewebauthn/browser@0.8.0
+- @simplewebauthn/server@0.8.0
+- @simplewebauthn/typescript-types@0.8.0
+
+**Changes:**
+
+- **[server]** The `challenge` parameter of `generateAttestationOptions()` and `generateAssertionOptions()` is now _optional_.
+  - **When undefined** the library will generate a random challenge. This value will be base64url-encoded in preparation for transit to the front end.
+  - **When defined** the value will be directly encoded to base64url in preparation for transit to the front end.
+- **[browser]** `startAttestation()` and `startAssertion()` now convert the base64url-encoded `options.challenge` to a buffer before passing it to the authenticator.
+
+### Breaking Changes
+
+- **[server]** `verifyAttestationResponse()` and `verifyAssertionResponse()` now require the base64url-encoded challenge to be passed in as `expectedChallenge`:
+
+Before:
+
+```js
+const challenge = 'someChallenge';
+
+const opts = generateAttestationOptions({
+  ...atteOpts,
+  challenge,
+});
+
+const verification = verifyAttestationResponse({
+  ...atteResp,
+  // Raw original value
+  expectedChallenge: challenge,
+});
+```
+
+After:
+
+```js
+const challenge = 'someChallenge';
+
+const opts = generateAttestationOptions({
+  ...atteOpts,
+  // This is now optional
+  challenge,
+});
+
+const verification = verifyAttestationResponse({
+  ...atteResp,
+  // Now expected to be the base64url-encoded `challenge` returned
+  // by `generateAttestationOptions()`
+  expectedChallenge: opts.challenge,
+});
+```
+
 ## v0.7.4
 
 **Packages:**
