@@ -19,7 +19,7 @@ type Options = {
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
  *
  * @param allowedCredentialIDs Array of base64url-encoded authenticator IDs registered by the
- * @param challenge Random string the authenticator needs to sign and pass back
+ * @param challenge Random value the authenticator needs to sign and pass back
  * user for assertion
  * @param timeout How long (in ms) the user can take to complete assertion
  * @param suggestedTransports Suggested types of authenticators for assertion

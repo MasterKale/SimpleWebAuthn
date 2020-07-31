@@ -59,7 +59,7 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
  * @param rpID Valid domain name (after `https://`)
  * @param userID User's website-specific unique ID
  * @param userName User's website-specific username (email, etc...)
- * @param challenge Random string the authenticator needs to sign and pass back
+ * @param challenge Random value the authenticator needs to sign and pass back
  * @param userDisplayName User's actual name
  * @param timeout How long (in ms) the user can take to complete attestation
  * @param attestationType Specific attestation statement
