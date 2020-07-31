@@ -320,7 +320,6 @@ test('should throw an error if user verification is required but user was not ve
 
 test('should validate TPM RSA response (SHA256)', async () => {
   const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
-  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyAttestationResponse({
     credential: {
       id: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
@@ -349,7 +348,6 @@ test('should validate TPM RSA response (SHA256)', async () => {
 
 test('should validate TPM RSA response (SHA1)', async () => {
   const expectedChallenge = 'f4e8d87b-d363-47cc-ab4d-1a84647bf245';
-  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyAttestationResponse({
     credential: {
       id: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
@@ -378,7 +376,6 @@ test('should validate TPM RSA response (SHA1)', async () => {
 
 test('should validate Android-Key response', async () => {
   const expectedChallenge = '14e0d1b6-9c36-4849-aeec-ea64676449ef';
-  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyAttestationResponse({
     credential: {
       id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
@@ -423,7 +420,7 @@ const attestationFIDOU2F = {
   getClientExtensionResults: () => ({}),
   type: 'public-key',
 };
-const attestationFIDOU2FChallenge = 'totallyUniqueValueEveryAttestation';
+const attestationFIDOU2FChallenge = base64url.encode('totallyUniqueValueEveryAttestation');
 
 const attestationPacked = {
   id: 'bbb',
@@ -444,7 +441,7 @@ const attestationPacked = {
   getClientExtensionResults: () => ({}),
   type: 'public-key',
 };
-const attestationPackedChallenge = 's6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM';
+const attestationPackedChallenge = base64url.encode('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
 
 const attestationPackedX5C = {
   // TODO: Grab these from another iPhone attestation
@@ -475,7 +472,7 @@ const attestationPackedX5C = {
   getClientExtensionResults: () => ({}),
   type: 'public-key',
 };
-const attestationPackedX5CChallenge = 'totallyUniqueValueEveryTime';
+const attestationPackedX5CChallenge = base64url.encode('totallyUniqueValueEveryTime');
 
 const attestationNone = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
@@ -494,4 +491,4 @@ const attestationNone = {
   getClientExtensionResults: () => ({}),
   type: 'public-key',
 };
-const attestationNoneChallenge = 'hEccPWuziP00H0p5gxh2_u5_PC4NeYgd';
+const attestationNoneChallenge = base64url.encode('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');

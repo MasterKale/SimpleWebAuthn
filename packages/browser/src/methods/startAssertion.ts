@@ -4,8 +4,8 @@ import {
   AssertionCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 
-import toUint8Array from '../helpers/toUint8Array';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
+import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
@@ -24,14 +24,12 @@ export default async function startAssertion(
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...requestOptionsJSON,
-    challenge: toUint8Array(requestOptionsJSON.challenge),
-    allowCredentials: requestOptionsJSON.allowCredentials.map(
-      toPublicKeyCredentialDescriptor,
-    ),
+    challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
+    allowCredentials: requestOptionsJSON.allowCredentials.map(toPublicKeyCredentialDescriptor),
   };
 
   // Wait for the user to complete assertion
-  const credential = await navigator.credentials.get({ publicKey }) as AssertionCredential;
+  const credential = (await navigator.credentials.get({ publicKey })) as AssertionCredential;
 
   if (!credential) {
     throw new Error('Assertion was not completed');

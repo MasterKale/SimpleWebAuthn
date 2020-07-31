@@ -30,8 +30,8 @@ type Options = {
  * **Options:**
  *
  * @param credential Authenticator credential returned by browser's `startAttestation()`
- * @param expectedChallenge The random value provided to generateAttestationOptions for the
- * authenticator to sign
+ * @param expectedChallenge The base64url-encoded `options.challenge` returned by
+ * `generateAttestationOptions()`
  * @param expectedOrigin Website URL that the attestation should have occurred on
  * @param expectedRPID RP ID that was specified in the attestation options
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
@@ -77,10 +77,9 @@ export default async function verifyAttestationResponse(
   }
 
   // Ensure the device provided the challenge we gave it
-  const encodedExpectedChallenge = base64url.encode(expectedChallenge);
-  if (challenge !== encodedExpectedChallenge) {
+  if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected attestation challenge "${challenge}", expected "${encodedExpectedChallenge}"`,
+      `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 

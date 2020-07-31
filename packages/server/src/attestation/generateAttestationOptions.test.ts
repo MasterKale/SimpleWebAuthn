@@ -1,3 +1,5 @@
+jest.mock('../helpers/generateChallenge');
+
 import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -20,7 +22,8 @@ test('should generate credential request options suitable for sending via JSON',
   });
 
   expect(options).toEqual({
-    challenge,
+    // Challenge, base64url-encoded
+    challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
     rp: {
       name: serviceName,
       id: rpID,
@@ -124,4 +127,16 @@ test('should set extensions if specified', () => {
   expect(options.extensions).toEqual({
     appid: 'simplewebauthn',
   });
+});
+
+test('should generate a challenge if one is not provided', () => {
+  const options = generateAttestationOptions({
+    rpID: 'not.real',
+    serviceName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
+
+  // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
+  expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });

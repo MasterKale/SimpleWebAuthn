@@ -1,3 +1,5 @@
+jest.mock('../helpers/generateChallenge');
+
 import generateAssertionOptions from './generateAssertionOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -10,7 +12,8 @@ test('should generate credential request options suitable for sending via JSON',
   });
 
   expect(options).toEqual({
-    challenge,
+    // base64url-encoded
+    challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
     allowCredentials: [
       {
         id: 'MTIzNA==',
@@ -57,6 +60,16 @@ test('should set extensions if specified', () => {
   expect(options.extensions).toEqual({
     appid: 'simplewebauthn',
   });
+});
+
+test('should generate a challenge if one is not provided', () => {
+  const opts = { ...goodOpts1 };
+  delete opts.challenge;
+
+  const options = generateAssertionOptions(opts);
+
+  // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
+  expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });
 
 const goodOpts1 = {
