@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
 const fetch = require('node-fetch');
 
 const {
@@ -11,7 +10,6 @@ const {
   verifyAssertionResponse,
   MetadataService,
 } = require('@simplewebauthn/server');
-
 
 /**
  * Create paths specifically for testing with the FIDO Conformance Tools
@@ -52,10 +50,10 @@ fetch('https://fidoalliance.co.nz/mds/getEndpoints', {
   body: JSON.stringify({ endpoint: `${origin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
 })
-  .then((resp) => resp.json())
-  .then((json) => {
+  .then(resp => resp.json())
+  .then(json => {
     const routes = json.result;
-    const mdsServers = routes.map((url) => ({
+    const mdsServers = routes.map(url => ({
       url,
       rootCertURL: 'https://fidoalliance.co.nz/mds/pki/MDSROOT.crt',
       metadataURLSuffix: '',
@@ -68,9 +66,7 @@ fetch('https://fidoalliance.co.nz/mds/getEndpoints', {
   })
   .finally(() => {
     if (statements.length) {
-      console.log(
-        `ℹ️  Initializing metadata service with ${statements.length} local statements`,
-      );
+      console.log(`ℹ️  Initializing metadata service with ${statements.length} local statements`);
     }
 
     console.log('🔐 FIDO Conformance routes ready');
@@ -119,13 +115,9 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
 
   const { devices } = user;
 
-  const challenge = uuidv4();
-  user.currentChallenge = challenge;
-
   const opts = generateAttestationOptions({
     serviceName,
     rpID,
-    challenge,
     userID: username,
     userName: username,
     userDisplayName: displayName,
@@ -134,6 +126,8 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
     extensions,
     excludedCredentialIDs: devices.map(dev => dev.credentialID),
   });
+
+  user.currentChallenge = opts.challenge;
 
   return res.send({
     ...opts,
@@ -156,7 +150,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   try {
     verification = await verifyAttestationResponse({
       credential: body,
-      expectedChallenge: Buffer.from(expectedChallenge, 'base64'),
+      expectedChallenge,
       expectedOrigin: origin,
     });
   } catch (error) {
@@ -202,16 +196,14 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
 
   const { devices } = user;
 
-  const challenge = uuidv4();
-  user.currentChallenge = challenge;
-  user.currentAssertionUserVerification = userVerification;
-
   const opts = generateAssertionOptions({
-    challenge,
     extensions,
     userVerification,
     allowedCredentialIDs: devices.map(dev => dev.credentialID),
   });
+
+  user.currentChallenge = opts.challenge;
+  user.currentAssertionUserVerification = userVerification;
 
   return res.send({
     ...opts,
@@ -236,7 +228,7 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
   try {
     verification = verifyAssertionResponse({
       credential: body,
-      expectedChallenge: Buffer.from(expectedChallenge, 'base64'),
+      expectedChallenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
       authenticator: existingDevice,

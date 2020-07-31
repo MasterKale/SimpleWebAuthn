@@ -117,40 +117,37 @@ app.get('/generate-attestation-options', (req, res) => {
     devices,
   } = user;
 
+  const options = generateAttestationOptions({
+    serviceName: 'SimpleWebAuthn Example',
+    rpID,
+    userID: loggedInUserId,
+    userName: username,
+    timeout: 60000,
+    attestationType: 'direct',
+    /**
+     * Passing in a user's list of already-registered authenticator IDs here prevents users from
+     * registering the same device multiple times. The authenticator will simply throw an error in
+     * the browser if it's asked to perform an attestation when one of these ID's already resides
+     * on it.
+     */
+    excludedCredentialIDs: devices.map(dev => dev.credentialID),
+    /**
+     * The optional authenticatorSelection property allows for specifying more constraints around
+     * the types of authenticators that users to can use for attestation
+     */
+    authenticatorSelection: {
+      userVerification: 'preferred',
+      requireResidentKey: false,
+    },
+  });
+
   /**
-   * A new, random value needs to be generated every time an attestation is performed!
    * The server needs to temporarily remember this value for verification, so don't lose it until
    * after you verify an authenticator response.
    */
-  const challenge = 'totallyUniqueValueEveryAttestation';
-  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
+  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = options.challenge;
 
-  res.send(
-    generateAttestationOptions({
-      serviceName: 'SimpleWebAuthn Example',
-      rpID,
-      challenge,
-      userID: loggedInUserId,
-      userName: username,
-      timeout: 60000,
-      attestationType: 'direct',
-      /**
-       * Passing in a user's list of already-registered authenticator IDs here prevents users from
-       * registering the same device multiple times. The authenticator will simply throw an error in
-       * the browser if it's asked to perform an attestation when one of these ID's already resides
-       * on it.
-       */
-      excludedCredentialIDs: devices.map(dev => dev.credentialID),
-      /**
-       * The optional authenticatorSelection property allows for specifying more constraints around
-       * the types of authenticators that users to can use for attestation
-       */
-      authenticatorSelection: {
-        userVerification: 'preferred',
-        requireResidentKey: false,
-      },
-    }),
-  );
+  res.send(options);
 });
 
 app.post('/verify-attestation', async (req, res) => {
@@ -202,26 +199,23 @@ app.get('/generate-assertion-options', (req, res) => {
   // You need to know the user by this point
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
+  const options = generateAssertionOptions({
+    timeout: 60000,
+    allowedCredentialIDs: user.devices.map(data => data.credentialID),
+    /**
+     * This optional value controls whether or not the authenticator needs be able to uniquely
+     * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
+     */
+    userVerification: 'preferred',
+  });
+
   /**
-   * A new, random value needs to be generated every time an assertion is performed!
    * The server needs to temporarily remember this value for verification, so don't lose it until
    * after you verify an authenticator response.
    */
-  const challenge = 'totallyUniqueValueEveryAssertion';
-  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = challenge;
+  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = options.challenge;
 
-  res.send(
-    generateAssertionOptions({
-      challenge,
-      timeout: 60000,
-      allowedCredentialIDs: user.devices.map(data => data.credentialID),
-      /**
-       * This optional value controls whether or not the authenticator needs be able to uniquely
-       * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
-       */
-      userVerification: 'preferred',
-    }),
-  );
+  res.send(options);
 });
 
 app.post('/verify-assertion', (req, res) => {
