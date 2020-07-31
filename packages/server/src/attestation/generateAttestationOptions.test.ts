@@ -1,5 +1,6 @@
+jest.mock('../helpers/generateChallenge');
+
 import generateAttestationOptions from './generateAttestationOptions';
-import base64url from 'base64url';
 
 test('should generate credential request options suitable for sending via JSON', () => {
   const serviceName = 'SimpleWebAuthn';
@@ -21,7 +22,8 @@ test('should generate credential request options suitable for sending via JSON',
   });
 
   expect(options).toEqual({
-    challenge: base64url.encode(challenge),
+    // Challenge, base64url-encoded
+    challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
     rp: {
       name: serviceName,
       id: rpID,
@@ -52,7 +54,7 @@ test('should map excluded credential IDs if specified', () => {
   const options = generateAttestationOptions({
     serviceName: 'SimpleWebAuthn',
     rpID: 'not.real',
-    challenge: base64url.encode('totallyrandomvalue'),
+    challenge: 'totallyrandomvalue',
     userID: '1234',
     userName: 'usernameHere',
     excludedCredentialIDs: ['someIDhere'],
@@ -125,4 +127,16 @@ test('should set extensions if specified', () => {
   expect(options.extensions).toEqual({
     appid: 'simplewebauthn',
   });
+});
+
+test('should generate a challenge if one is not provided', () => {
+  const options = generateAttestationOptions({
+    rpID: 'not.real',
+    serviceName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
+
+  // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
+  expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });
