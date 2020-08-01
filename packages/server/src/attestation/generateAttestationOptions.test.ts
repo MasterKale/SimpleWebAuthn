@@ -141,7 +141,7 @@ test('should generate a challenge if one is not provided', () => {
   expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });
 
-test('should use custom supported algorithm IDs when provided', () => {
+test('should use custom supported algorithm IDs as-is when provided', () => {
   const options = generateAttestationOptions({
     rpID: 'not.real',
     serviceName: 'SimpleWebAuthn',
