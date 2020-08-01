@@ -51,7 +51,8 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
 ];
 
 /**
- * Filter out known bad/deprecated/etc... algorithm ID's
+ * Filter out known bad/deprecated/etc... algorithm ID's so they're not used for new attestations.
+ * See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id => id !== -65535);
 
