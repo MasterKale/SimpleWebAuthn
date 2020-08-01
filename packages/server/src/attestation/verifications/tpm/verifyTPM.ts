@@ -220,9 +220,9 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   let extKeyUsage: ExtendedKeyUsage | undefined;
   parsedCert.tbsCertificate.extensions.forEach(ext => {
     if (ext.extnID === id_ce_subjectAltName) {
-      subjectAltNamePresent = AsnParser.parse(ext.extnValue.slice(0), SubjectAlternativeName);
+      subjectAltNamePresent = AsnParser.parse(ext.extnValue, SubjectAlternativeName);
     } else if (ext.extnID === id_ce_extKeyUsage) {
-      extKeyUsage = AsnParser.parse(ext.extnValue.slice(0), ExtendedKeyUsage);
+      extKeyUsage = AsnParser.parse(ext.extnValue, ExtendedKeyUsage);
     }
   });
 

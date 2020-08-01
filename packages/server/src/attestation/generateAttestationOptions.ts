@@ -51,6 +51,12 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
 ];
 
 /**
+ * Filter out known bad/deprecated/etc... algorithm ID's so they're not used for new attestations.
+ * See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
+ */
+const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id => id !== -65535);
+
+/**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
  *
  * **Options:**
@@ -88,19 +94,16 @@ export default function generateAttestationOptions(
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
     authenticatorSelection,
     extensions,
-    supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
+    supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
   } = options;
 
   /**
-   * Filter out known bad/deprecated/etc... algorithm ID's before preparing pubKeyCredParams
-   * from the array of algorithm ID's
+   * Prepare pubKeyCredParams from the array of algorithm ID's
    */
-  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs
-    .filter(id => id !== -65535)
-    .map(id => ({
-      alg: id,
-      type: 'public-key',
-    }));
+  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs.map(id => ({
+    alg: id,
+    type: 'public-key',
+  }));
 
   return {
     challenge: base64url.encode(challenge),
