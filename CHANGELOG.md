@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.8.1
+
+**Packages:**
+
+- @simplewebauthn/server@0.8.1
+
+**Changes:**
+
+- **[server]** Stop filtering out algorithm ID's from `supportedAlgorithmIDs` when calling `generateAttestationOptions()`
+- **[server]** Fix a bug when verifying TPM attestation extensions
+
 ## v0.8.0 - The one with better challenges
 
 **Packages:**
