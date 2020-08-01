@@ -140,3 +140,19 @@ test('should generate a challenge if one is not provided', () => {
   // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
   expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });
+
+test('should use custom supported algorithm IDs when provided', () => {
+  const options = generateAttestationOptions({
+    rpID: 'not.real',
+    serviceName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    supportedAlgorithmIDs: [-7, -8, -65535],
+  });
+
+  expect(options.pubKeyCredParams).toEqual([
+    { alg: -7, type: 'public-key' },
+    { alg: -8, type: 'public-key' },
+    { alg: -65535, type: 'public-key' },
+  ]);
+});
