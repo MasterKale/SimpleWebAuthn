@@ -26,8 +26,9 @@
     "prepublish": "npm run build"
   },
   "keywords": [
-    "webauthn",
     "typescript",
+    "webauthn",
+    "fido",
     "node"
   ],
   "dependencies": {

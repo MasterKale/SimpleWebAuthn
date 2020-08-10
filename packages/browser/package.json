@@ -23,8 +23,9 @@
     "prepublish": "npm run build"
   },
   "keywords": [
-    "webauthn",
     "typescript",
+    "webauthn",
+    "fido",
     "umd"
   ],
   "devDependencies": {
