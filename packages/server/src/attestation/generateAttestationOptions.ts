@@ -51,6 +51,18 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
 ];
 
 /**
+ * Set up some default authenticator selection options as per the latest spec:
+ * https://www.w3.org/TR/webauthn-2/#dictdef-authenticatorselectioncriteria
+ *
+ * Helps with some older platforms (e.g. Android 7.0 Nougat) that may not be aware of these
+ * defaults.
+ */
+const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
+  requireResidentKey: false,
+  userVerification: 'preferred',
+};
+
+/**
  * Filter out known bad/deprecated/etc... algorithm ID's so they're not used for new attestations.
  * See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
@@ -92,7 +104,7 @@ export default function generateAttestationOptions(
     attestationType = 'none',
     excludedCredentialIDs = [],
     suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
-    authenticatorSelection,
+    authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
     supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
   } = options;
