@@ -47,6 +47,10 @@ test('should generate credential request options suitable for sending via JSON',
     timeout,
     attestation: attestationType,
     excludeCredentials: [],
+    authenticatorSelection: {
+      requireResidentKey: false,
+      userVerification: 'preferred',
+    },
   });
 });
 
