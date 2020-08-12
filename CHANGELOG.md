@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.8.2
+
+**Packages:**
+
+- @simplewebauthn/browser@0.8.2
+- @simplewebauthn/server@0.8.2
+- @simplewebauthn/typescript-types@0.8.2
+
+**Changes:**
+
+- **[server]** Return explicit defaults for `authenticatorSelection` in return value from `generateAttestationOptions()` for enhanced device compatibility.
+- **[browser]** Version sync.
+- **[typescript-types]** Version sync.
+
 ## v0.8.1
 
 **Packages:**
