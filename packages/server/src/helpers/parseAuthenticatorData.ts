@@ -3,7 +3,7 @@ import cbor from 'cbor';
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
-export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorData {
+export default function parseAuthenticatorData(authData: Buffer): AuthenticatorData {
   if (authData.byteLength < 37) {
     throw new Error(
       `Authenticator data was ${authData.byteLength} bytes, expected at least 37 bytes`,
@@ -81,7 +81,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
   };
 }
 
-export type ParsedAuthenticatorData = {
+export type AuthenticatorData = {
   rpIdHash: Buffer;
   flagsBuf: Buffer;
   flags: {
