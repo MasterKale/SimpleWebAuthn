@@ -1,6 +1,6 @@
 import base64url from 'base64url';
-
 import { AssertionCredentialJSON } from '@simplewebauthn/typescript-types';
+
 import decodeClientDataJSON, { ClientDataJSON } from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData, { AuthenticatorData } from '../helpers/parseAuthenticatorData';
 
