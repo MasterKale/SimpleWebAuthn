@@ -53,7 +53,7 @@ export default function verifyAttestationFIDOU2F(options: Options): boolean {
     throw new Error(`AAGUID "${aaguidToHex}" was not expected value`);
   }
 
-  const publicKeyCertPEM = convertX509CertToPEM(x5c[0]);
+  const leafCertPEM = convertX509CertToPEM(x5c[0]);
 
-  return verifySignature(sig, signatureBase, publicKeyCertPEM);
+  return verifySignature(sig, signatureBase, leafCertPEM);
 }
