@@ -12,7 +12,7 @@ import type { AttestationStatement } from '../../../helpers/decodeAttestationObj
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
-import convertASN1toPEM from '../../../helpers/convertASN1toPEM';
+import convertX509CertToPEM from '../../../helpers/convertX509CertToPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
 import MetadataService from '../../../metadata/metadataService';
@@ -177,7 +177,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   // Pick a leaf AIK certificate of the x5c array and parse it.
-  const leafCertPEM = convertASN1toPEM(x5c[0]);
+  const leafCertPEM = convertX509CertToPEM(x5c[0]);
   const leafCertInfo = getCertificateInfo(leafCertPEM);
   const { basicConstraintsCA, version, subject, notAfter, notBefore } = leafCertInfo;
 

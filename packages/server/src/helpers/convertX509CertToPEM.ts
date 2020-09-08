@@ -2,12 +2,12 @@ import base64url from 'base64url';
 import type { Base64URLString } from '@simplewebauthn/typescript-types';
 
 /**
- * Convert binary certificate or public key to an OpenSSL-compatible PEM text format.
+ * Convert X.509 certificate to an OpenSSL-compatible PEM text format.
  *
  * @param buffer - Cert or PubKey buffer
  * @return PEM
  */
-export default function convertASN1toPEM(pkBuffer: Buffer | Base64URLString): string {
+export default function convertX509CertToPEM(pkBuffer: Buffer | Base64URLString): string {
   let buffer: Buffer;
   if (typeof pkBuffer === 'string') {
     buffer = base64url.toBuffer(pkBuffer);

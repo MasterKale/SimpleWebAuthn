@@ -11,7 +11,7 @@ import convertCOSEtoPKCS, {
 } from '../../helpers/convertCOSEtoPKCS';
 import { FIDO_METADATA_ATTESTATION_TYPES } from '../../helpers/constants';
 import toHash from '../../helpers/toHash';
-import convertASN1toPEM from '../../helpers/convertASN1toPEM';
+import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
 import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
@@ -48,7 +48,7 @@ export default async function verifyAttestationPacked(options: Options): Promise
   const pkcsPublicKey = convertCOSEtoPKCS(credentialPublicKey);
 
   if (x5c) {
-    const leafCert = convertASN1toPEM(x5c[0]);
+    const leafCert = convertX509CertToPEM(x5c[0]);
     const { subject, basicConstraintsCA, version, notBefore, notAfter } = getCertificateInfo(
       leafCert,
     );
