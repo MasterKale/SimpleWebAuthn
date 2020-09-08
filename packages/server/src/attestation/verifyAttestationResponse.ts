@@ -6,7 +6,7 @@ import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
-import convertCOSEtoPKCS, { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
