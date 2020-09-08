@@ -3,9 +3,6 @@ import type { Base64URLString } from '@simplewebauthn/typescript-types';
 
 /**
  * Convert X.509 certificate to an OpenSSL-compatible PEM text format.
- *
- * @param buffer - Cert or PubKey buffer
- * @return PEM
  */
 export default function convertX509CertToPEM(certBuffer: Buffer | Base64URLString): string {
   let buffer: Buffer;
