@@ -7,13 +7,11 @@ import convertX509CertToPEM from './convertX509CertToPEM';
 
 export default function convertPublicKeyToPEM(publicKey: string): string {
   const publicKeyBuffer = base64url.toBuffer(publicKey);
-  console.log(publicKeyBuffer.toString('hex'));
 
   let struct;
   try {
     struct = cbor.decodeAllSync(publicKeyBuffer)[0];
   } catch (err) {
-    console.warn('Caught error when trying to decode public key, might be an old public key');
     /**
      * Catching an error here means we're probably converting an "old" EC2 public key that was
      * saved before we started returning the full credentialPublicKey from an attestation.
