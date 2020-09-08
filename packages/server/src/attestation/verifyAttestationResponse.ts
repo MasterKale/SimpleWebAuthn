@@ -211,12 +211,10 @@ export default async function verifyAttestationResponse(
   if (toReturn.verified) {
     toReturn.userVerified = flags.uv;
 
-    const publicKey = convertCOSEtoPKCS(credentialPublicKey);
-
     toReturn.authenticatorInfo = {
       fmt,
       counter,
-      base64PublicKey: base64url.encode(publicKey),
+      base64PublicKey: base64url.encode(credentialPublicKey),
       base64CredentialID: base64url.encode(credentialID),
     };
   }
