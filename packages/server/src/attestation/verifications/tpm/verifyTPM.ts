@@ -297,13 +297,32 @@ function getTcgAtTpmValues(
   let tcgAtTpmVersion: string | undefined;
 
   /**
-   * Iterate through the following structure:
+   * Iterate through the following potential structures:
    *
+   * (Good, follows the spec)
+   * https://trustedcomputinggroup.org/wp-content/uploads/TCG_IWG_EKCredentialProfile_v2p3_r2_pub.pdf (page 33)
    * Name [
    *   RelativeDistinguishedName [
    *     AttributeTypeAndValue { type, value }
    *   ]
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *   ]
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *   ]
    * ]
+   *
+   * (Bad, does not follow the spec)
+   * Name [
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *     AttributeTypeAndValue { type, value }
+   *     AttributeTypeAndValue { type, value }
+   *   ]
+   * ]
+   *
+   * Both structures have been seen in the wild and need to be supported
    */
   root.forEach(relName => {
     relName.forEach(attr => {
