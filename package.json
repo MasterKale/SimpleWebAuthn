@@ -11,11 +11,7 @@
     "build:server": "lerna bootstrap --scope=@simplewebauthn/server"
   },
   "devDependencies": {
-    "@types/cbor": "^5.0.1",
-    "@types/elliptic": "^6.4.12",
     "@types/jest": "^25.2.3",
-    "@types/jsrsasign": "^8.0.5",
-    "@types/node-rsa": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
     "eslint": "^7.8.1",
@@ -30,7 +26,7 @@
     "ts-jest": "^25.5.1",
     "ts-node": "^8.10.2",
     "ttypescript": "^1.5.12",
-    "typedoc": "^0.17.0-3",
+    "typedoc": "0.17.0-3",
     "typescript": "^3.9.7",
     "typescript-transform-paths": "^1.1.15"
   },

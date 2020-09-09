@@ -46,7 +46,11 @@
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
   "devDependencies": {
+    "@types/cbor": "^5.0.1",
+    "@types/elliptic": "^6.4.12",
+    "@types/jsrsasign": "^8.0.5",
     "@types/jwk-to-pem": "^2.0.0",
-    "@types/node-fetch": "^2.5.7"
+    "@types/node-fetch": "^2.5.7",
+    "@types/node-rsa": "^1.0.0"
   }
 }
