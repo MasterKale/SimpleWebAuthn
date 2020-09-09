@@ -5,7 +5,7 @@ import {
   SubjectAlternativeName,
   id_ce_extKeyUsage,
   ExtendedKeyUsage,
-  RelativeDistinguishedName,
+  Name,
 } from '@peculiar/asn1-x509';
 
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
@@ -238,7 +238,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   const { tcgAtTpmManufacturer, tcgAtTpmModel, tcgAtTpmVersion } = getTcgAtTpmValues(
-    subjectAltNamePresent[0].directoryName[0],
+    subjectAltNamePresent[0].directoryName,
   );
 
   if (!tcgAtTpmManufacturer || !tcgAtTpmModel || !tcgAtTpmVersion) {
@@ -282,7 +282,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
  * Contain logic for pulling TPM-specific values out of subjectAlternativeName extension
  */
 function getTcgAtTpmValues(
-  root: RelativeDistinguishedName,
+  root: Name,
 ): {
   tcgAtTpmManufacturer?: string;
   tcgAtTpmModel?: string;
@@ -296,14 +296,25 @@ function getTcgAtTpmValues(
   let tcgAtTpmModel: string | undefined;
   let tcgAtTpmVersion: string | undefined;
 
-  root.forEach(attr => {
-    if (attr.type === oidManufacturer) {
-      tcgAtTpmManufacturer = attr.value.toString();
-    } else if (attr.type === oidModel) {
-      tcgAtTpmModel = attr.value.toString();
-    } else if (attr.type === oidVersion) {
-      tcgAtTpmVersion = attr.value.toString();
-    }
+  /**
+   * Iterate through the following structure:
+   *
+   * Name [
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *   ]
+   * ]
+   */
+  root.forEach(relName => {
+    relName.forEach(attr => {
+      if (attr.type === oidManufacturer) {
+        tcgAtTpmManufacturer = attr.value.toString();
+      } else if (attr.type === oidModel) {
+        tcgAtTpmModel = attr.value.toString();
+      } else if (attr.type === oidVersion) {
+        tcgAtTpmVersion = attr.value.toString();
+      }
+    });
   });
 
   return {
