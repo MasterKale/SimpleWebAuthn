@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.9.0 - The one that knows RSA from EC2
+
+**Packages:**
+
+- @simplewebauthn/browser@0.9.0
+- @simplewebauthn/server@0.9.0
+- @simplewebauthn/typescript-types@0.9.0
+
+**Changes:**
+
+- **[server]** Add support for attestations and assertions containing RSA public keys.
+- **[browser]** Version sync.
+- **[typescript-types]** Version sync.
+
+### Breaking Changes
+
+- **[server]** `authenticatorInfo.base64PublicKey` returned by `verifyAttestationResponse()` is now the entire public key buffer instead of a pared down form of it (it's still returned base64url-encoded). This helps ensure support for existing public keys, as well as future public key formats that may be introduced in the future. **Public keys previously returned by this method must be upgraded via [this "upgrader" script](https://gist.github.com/MasterKale/175cb210b097632d7cd03fd409e2dfb3) to work with future assertions.**
+- **[server]** The `serviceName` argument for `generateAttestationOptions()` has been renamed to `rpName`. This brings it in line with the existing `rpID` argument and maps more obviously to its respective property within the returned options.
+
 ## v0.8.2
 
 **Packages:**
