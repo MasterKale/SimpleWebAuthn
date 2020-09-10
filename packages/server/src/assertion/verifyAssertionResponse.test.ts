@@ -232,7 +232,7 @@ const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator = {
   publicKey:
-    'BIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A18WGeA6hPmnab0HAViUYVRkwTNcN77QBf_RR0dv3lIvQ',
+    'pQECAyYgASFYIIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A1Ilgg8WGeA6hPmnab0HAViUYVRkwTNcN77QBf_RR0dv3lIvQ',
   credentialID:
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   counter: 143,
@@ -257,7 +257,7 @@ const assertionFirstTimeUsedChallenge = base64url.encode('totallyUniqueValueEver
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
 const authenticatorFirstTimeUsed = {
   publicKey:
-    'BGmaxR4mBbukc2QhtW2ldhAAd555r-ljlGQN8MbcTnPP9CyUlE-0AB2fbzZbNgBvJuRa7r6o2jPphOmtyNPR_kY',
+    'pQECAyYgASFYIGmaxR4mBbukc2QhtW2ldhAAd555r-ljlGQN8MbcTnPPIlgg9CyUlE-0AB2fbzZbNgBvJuRa7r6o2jPphOmtyNPR_kY',
   credentialID:
     'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   counter: 0,
