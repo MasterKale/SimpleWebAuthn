@@ -177,7 +177,7 @@ test('should throw an error if user verification is required but user was not ve
 });
 
 // TODO: Get a real TPM assertion in here
-test.skip('should verify Windows 10 TPM assertion', () => {
+test.skip('should verify TPM assertion', () => {
   const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBc3NlcnRpb24';
   jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
   const verification = verifyAssertionResponse({
