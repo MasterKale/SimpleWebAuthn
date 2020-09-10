@@ -7,7 +7,7 @@ import base64url from 'base64url';
 import generateChallenge from '../helpers/generateChallenge';
 
 type Options = {
-  serviceName: string;
+  rpName: string;
   rpID: string;
   userID: string;
   userName: string;
@@ -73,7 +73,7 @@ const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id
  *
  * **Options:**
  *
- * @param serviceName Friendly user-visible website name
+ * @param rpName User-visible, "friendly" website/service name
  * @param rpID Valid domain name (after `https://`)
  * @param userID User's website-specific unique ID
  * @param userName User's website-specific username (email, etc...)
@@ -94,7 +94,7 @@ export default function generateAttestationOptions(
   options: Options,
 ): PublicKeyCredentialCreationOptionsJSON {
   const {
-    serviceName,
+    rpName,
     rpID,
     userID,
     userName,
@@ -120,7 +120,7 @@ export default function generateAttestationOptions(
   return {
     challenge: base64url.encode(challenge),
     rp: {
-      name: serviceName,
+      name: rpName,
       id: rpID,
     },
     user: {
