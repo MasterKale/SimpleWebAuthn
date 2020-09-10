@@ -3,7 +3,7 @@ jest.mock('../helpers/generateChallenge');
 import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
-  const serviceName = 'SimpleWebAuthn';
+  const rpName = 'SimpleWebAuthn';
   const rpID = 'not.real';
   const challenge = 'totallyrandomvalue';
   const userID = '1234';
@@ -12,7 +12,7 @@ test('should generate credential request options suitable for sending via JSON',
   const attestationType = 'indirect';
 
   const options = generateAttestationOptions({
-    serviceName,
+    rpName,
     rpID,
     challenge,
     userID,
@@ -25,7 +25,7 @@ test('should generate credential request options suitable for sending via JSON',
     // Challenge, base64url-encoded
     challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
     rp: {
-      name: serviceName,
+      name: rpName,
       id: rpID,
     },
     user: {
@@ -56,7 +56,7 @@ test('should generate credential request options suitable for sending via JSON',
 
 test('should map excluded credential IDs if specified', () => {
   const options = generateAttestationOptions({
-    serviceName: 'SimpleWebAuthn',
+    rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
     userID: '1234',
@@ -75,7 +75,7 @@ test('should map excluded credential IDs if specified', () => {
 
 test('defaults to 60 seconds if no timeout is specified', () => {
   const options = generateAttestationOptions({
-    serviceName: 'SimpleWebAuthn',
+    rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
     userID: '1234',
@@ -87,7 +87,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
 
 test('defaults to none attestation if no attestation type is specified', () => {
   const options = generateAttestationOptions({
-    serviceName: 'SimpleWebAuthn',
+    rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
     userID: '1234',
@@ -99,7 +99,7 @@ test('defaults to none attestation if no attestation type is specified', () => {
 
 test('should set authenticatorSelection if specified', () => {
   const options = generateAttestationOptions({
-    serviceName: 'SimpleWebAuthn',
+    rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
     userID: '1234',
@@ -120,7 +120,7 @@ test('should set authenticatorSelection if specified', () => {
 
 test('should set extensions if specified', () => {
   const options = generateAttestationOptions({
-    serviceName: 'SimpleWebAuthn',
+    rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
     userID: '1234',
@@ -136,7 +136,7 @@ test('should set extensions if specified', () => {
 test('should generate a challenge if one is not provided', () => {
   const options = generateAttestationOptions({
     rpID: 'not.real',
-    serviceName: 'SimpleWebAuthn',
+    rpName: 'SimpleWebAuthn',
     userID: '1234',
     userName: 'usernameHere',
   });
@@ -148,7 +148,7 @@ test('should generate a challenge if one is not provided', () => {
 test('should use custom supported algorithm IDs as-is when provided', () => {
   const options = generateAttestationOptions({
     rpID: 'not.real',
-    serviceName: 'SimpleWebAuthn',
+    rpName: 'SimpleWebAuthn',
     userID: '1234',
     userName: 'usernameHere',
     supportedAlgorithmIDs: [-7, -8, -65535],
