@@ -5,14 +5,14 @@ import {
   SubjectAlternativeName,
   id_ce_extKeyUsage,
   ExtendedKeyUsage,
-  RelativeDistinguishedName,
+  Name,
 } from '@peculiar/asn1-x509';
 
 import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
-import convertASN1toPEM from '../../../helpers/convertASN1toPEM';
+import convertX509CertToPEM from '../../../helpers/convertX509CertToPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
 import MetadataService from '../../../metadata/metadataService';
@@ -177,7 +177,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   // Pick a leaf AIK certificate of the x5c array and parse it.
-  const leafCertPEM = convertASN1toPEM(x5c[0]);
+  const leafCertPEM = convertX509CertToPEM(x5c[0]);
   const leafCertInfo = getCertificateInfo(leafCertPEM);
   const { basicConstraintsCA, version, subject, notAfter, notBefore } = leafCertInfo;
 
@@ -238,7 +238,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   const { tcgAtTpmManufacturer, tcgAtTpmModel, tcgAtTpmVersion } = getTcgAtTpmValues(
-    subjectAltNamePresent[0].directoryName[0],
+    subjectAltNamePresent[0].directoryName,
   );
 
   if (!tcgAtTpmManufacturer || !tcgAtTpmModel || !tcgAtTpmVersion) {
@@ -282,7 +282,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
  * Contain logic for pulling TPM-specific values out of subjectAlternativeName extension
  */
 function getTcgAtTpmValues(
-  root: RelativeDistinguishedName,
+  root: Name,
 ): {
   tcgAtTpmManufacturer?: string;
   tcgAtTpmModel?: string;
@@ -296,14 +296,44 @@ function getTcgAtTpmValues(
   let tcgAtTpmModel: string | undefined;
   let tcgAtTpmVersion: string | undefined;
 
-  root.forEach(attr => {
-    if (attr.type === oidManufacturer) {
-      tcgAtTpmManufacturer = attr.value.toString();
-    } else if (attr.type === oidModel) {
-      tcgAtTpmModel = attr.value.toString();
-    } else if (attr.type === oidVersion) {
-      tcgAtTpmVersion = attr.value.toString();
-    }
+  /**
+   * Iterate through the following potential structures:
+   *
+   * (Good, follows the spec)
+   * https://trustedcomputinggroup.org/wp-content/uploads/TCG_IWG_EKCredentialProfile_v2p3_r2_pub.pdf (page 33)
+   * Name [
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *   ]
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *   ]
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *   ]
+   * ]
+   *
+   * (Bad, does not follow the spec)
+   * Name [
+   *   RelativeDistinguishedName [
+   *     AttributeTypeAndValue { type, value }
+   *     AttributeTypeAndValue { type, value }
+   *     AttributeTypeAndValue { type, value }
+   *   ]
+   * ]
+   *
+   * Both structures have been seen in the wild and need to be supported
+   */
+  root.forEach(relName => {
+    relName.forEach(attr => {
+      if (attr.type === oidManufacturer) {
+        tcgAtTpmManufacturer = attr.value.toString();
+      } else if (attr.type === oidModel) {
+        tcgAtTpmModel = attr.value.toString();
+      } else if (attr.type === oidVersion) {
+        tcgAtTpmVersion = attr.value.toString();
+      }
+    });
   });
 
   return {

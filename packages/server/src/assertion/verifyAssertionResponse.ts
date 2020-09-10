@@ -3,7 +3,7 @@ import { AssertionCredentialJSON, AuthenticatorDevice } from '@simplewebauthn/ty
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import toHash from '../helpers/toHash';
-import convertASN1toPEM from '../helpers/convertASN1toPEM';
+import convertPublicKeyToPEM from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
@@ -139,7 +139,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
 
-  const publicKey = convertASN1toPEM(base64url.toBuffer(authenticator.publicKey));
+  const publicKey = convertPublicKeyToPEM(authenticator.publicKey);
   const signature = base64url.toBuffer(response.signature);
 
   if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {

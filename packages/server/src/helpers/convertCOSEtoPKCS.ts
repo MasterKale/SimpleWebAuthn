@@ -3,27 +3,8 @@ import type { SigningSchemeHash } from 'node-rsa';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
- *
- * @param cosePublicKey COSE-encoded public key
- * @return RAW PKCS encoded public key
  */
 export default function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
-  /*
-    +------+-------+-------+---------+----------------------------------+
-    | name | key   | label | type    | description                      |
-    |      | type  |       |         |                                  |
-    +------+-------+-------+---------+----------------------------------+
-    | crv  | 2     | -1    | int /   | EC Curve identifier - Taken from |
-    |      |       |       | tstr    | the COSE Curves registry         |
-    |      |       |       |         |                                  |
-    | x    | 2     | -2    | bstr    | X Coordinate                     |
-    |      |       |       |         |                                  |
-    | y    | 2     | -3    | bstr /  | Y Coordinate                     |
-    |      |       |       | bool    |                                  |
-    |      |       |       |         |                                  |
-    | d    | 2     | -4    | bstr    | Private key                      |
-    +------+-------+-------+---------+----------------------------------+
-  */
   const struct: COSEPublicKey = cbor.decodeFirstSync(cosePublicKey);
 
   const tag = Buffer.from([0x04]);

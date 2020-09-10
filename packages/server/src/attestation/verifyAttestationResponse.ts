@@ -6,7 +6,7 @@ import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
-import convertCOSEtoPKCS, { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
@@ -211,12 +211,10 @@ export default async function verifyAttestationResponse(
   if (toReturn.verified) {
     toReturn.userVerified = flags.uv;
 
-    const publicKey = convertCOSEtoPKCS(credentialPublicKey);
-
     toReturn.authenticatorInfo = {
       fmt,
       counter,
-      base64PublicKey: base64url.encode(publicKey),
+      base64PublicKey: base64url.encode(credentialPublicKey),
       base64CredentialID: base64url.encode(credentialID),
     };
   }

@@ -6,7 +6,7 @@ import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
-import convertASN1toPEM from '../../helpers/convertASN1toPEM';
+import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
 import MetadataService from '../../metadata/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
@@ -81,7 +81,7 @@ export default async function verifyAttestationAndroidSafetyNet(
   /**
    * START Verify Header
    */
-  const leafCert = convertASN1toPEM(HEADER.x5c[0]);
+  const leafCert = convertX509CertToPEM(HEADER.x5c[0]);
   const leafCertInfo = getCertificateInfo(leafCert);
 
   const { subject } = leafCertInfo;
@@ -103,7 +103,7 @@ export default async function verifyAttestationAndroidSafetyNet(
     }
   } else {
     // Validate certificate path using a fixed global root cert
-    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertASN1toPEM);
+    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertX509CertToPEM);
 
     try {
       await validateCertificatePath(path);

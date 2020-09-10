@@ -6,7 +6,7 @@ import base64url from 'base64url';
 import { FIDO_AUTHENTICATOR_STATUS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
-import convertASN1toPEM from '../helpers/convertASN1toPEM';
+import convertX509CertToPEM from '../helpers/convertX509CertToPEM';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 
 import parseJWT from './parseJWT';
@@ -212,7 +212,7 @@ class MetadataService {
       throw new Error(`Latest TOC no. "${payload.no}" is not greater than previous ${no}`);
     }
 
-    let fullCertPath = header.x5c.map(convertASN1toPEM);
+    let fullCertPath = header.x5c.map(convertX509CertToPEM);
     if (rootCertURL.length > 0) {
       // Download FIDO the root certificate and append it to the TOC certs
       const respFIDORootCert = await fetch(rootCertURL);

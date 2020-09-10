@@ -1,7 +1,7 @@
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
-import convertASN1toPEM from '../../helpers/convertASN1toPEM';
+import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
 import verifySignature from '../../helpers/verifySignature';
 
 type Options = {
@@ -53,7 +53,7 @@ export default function verifyAttestationFIDOU2F(options: Options): boolean {
     throw new Error(`AAGUID "${aaguidToHex}" was not expected value`);
   }
 
-  const publicKeyCertPEM = convertASN1toPEM(x5c[0]);
+  const leafCertPEM = convertX509CertToPEM(x5c[0]);
 
-  return verifySignature(sig, signatureBase, publicKeyCertPEM);
+  return verifySignature(sig, signatureBase, leafCertPEM);
 }
