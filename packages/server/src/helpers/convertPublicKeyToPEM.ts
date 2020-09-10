@@ -3,7 +3,6 @@ import jwkToPem from 'jwk-to-pem';
 import base64url from 'base64url';
 
 import { COSEKEYS, COSEKTY, COSECRV } from './convertCOSEtoPKCS';
-import convertX509CertToPEM from './convertX509CertToPEM';
 
 export default function convertPublicKeyToPEM(publicKey: string): string {
   const publicKeyBuffer = base64url.toBuffer(publicKey);
@@ -12,29 +11,7 @@ export default function convertPublicKeyToPEM(publicKey: string): string {
   try {
     struct = cbor.decodeAllSync(publicKeyBuffer)[0];
   } catch (err) {
-    /**
-     * Catching an error here means we're probably converting an "old" EC2 public key that was
-     * saved before we started returning the full credentialPublicKey from an attestation.
-     *
-     * We're playing things a little fast and loose by naively converting it to PEM format in a way
-     * that is consistent with how it used to be constructed.
-     *
-     * BTW this is in here to try and prevent better RSA support from breaking existing deployments.
-     * It is strongly recommended that this be deprecated in a future release...
-     */
-    let oldPubKeyPEM = convertX509CertToPEM(
-      Buffer.concat([
-        // Assumes EC keyType with P-256 algorithm
-        Buffer.from('3059301306072a8648ce3d020106082a8648ce3d030107034200', 'hex'),
-        publicKeyBuffer,
-      ]),
-    );
-
-    // Replace "-----BEGIN CERTIFICATE-----" with "-----BEGIN PUBLIC KEY-----" (so we can reuse
-    // the method)
-    oldPubKeyPEM = oldPubKeyPEM.replace(/CERTIFICATE/gi, 'PUBLIC KEY');
-
-    return oldPubKeyPEM;
+    throw new Error(`Error decoding public key while converting to PEM: ${err.message}`);
   }
 
   const kty = struct.get(COSEKEYS.kty);
