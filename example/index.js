@@ -118,7 +118,7 @@ app.get('/generate-attestation-options', (req, res) => {
   } = user;
 
   const options = generateAttestationOptions({
-    serviceName: 'SimpleWebAuthn Example',
+    rpName: 'SimpleWebAuthn Example',
     rpID,
     userID: loggedInUserId,
     userName: username,

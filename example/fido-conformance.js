@@ -16,7 +16,7 @@ const {
  */
 const fidoConformanceRouter = express.Router();
 
-const serviceName = 'FIDO Conformance Test';
+const rpName = 'FIDO Conformance Test';
 const rpID = 'localhost';
 const origin = 'https://localhost';
 const fidoRouteSuffix = '/fido';
@@ -116,7 +116,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
   const { devices } = user;
 
   const opts = generateAttestationOptions({
-    serviceName,
+    rpName,
     rpID,
     userID: username,
     userName: username,
