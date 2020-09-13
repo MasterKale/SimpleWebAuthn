@@ -20,6 +20,7 @@ export enum ATTESTATION_FORMATS {
   ANDROID_SAFETYNET = 'android-safetynet',
   ANDROID_KEY = 'android-key',
   TPM = 'tpm',
+  APPLE = 'apple',
   NONE = 'none',
 }
 
