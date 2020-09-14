@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.9.1
+
+**Packages:**
+
+- @simplewebauthn/server@0.9.1
+
+**Changes:**
+
+- **[server]** Third-party package security update
+
 ## v0.9.0 - The one that knows RSA from EC2
 
 **Packages:**
