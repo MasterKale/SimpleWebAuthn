@@ -110,8 +110,9 @@ export type AuthenticatorDevice = {
 export type Base64URLString = string;
 
 /**
- * AuthenticatorAttestationResponse in lib.dom.d.ts is outdated. Maintain an augmented version here
- * so we can implement additional properties as the WebAuthn spec evolves.
+ * AuthenticatorAttestationResponse in TypeScript's DOM lib is outdated (up through v3.9.7).
+ * Maintain an augmented version here so we can implement additional properties as the WebAuthn
+ * spec evolves.
  *
  * See https://www.w3.org/TR/webauthn-2/#iface-authenticatorattestationresponse
  *
