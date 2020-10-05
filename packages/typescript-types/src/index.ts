@@ -38,7 +38,7 @@ export interface PublicKeyCredentialUserEntityJSON
  * The value returned from navigator.credentials.create()
  */
 export interface AttestationCredential extends PublicKeyCredential {
-  response: AuthenticatorAttestationResponse;
+  response: AuthenticatorAttestationResponseFuture;
 }
 
 /**
@@ -73,7 +73,7 @@ export interface AssertionCredentialJSON
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
  */
 export interface AuthenticatorAttestationResponseJSON
-  extends Omit<AuthenticatorAttestationResponse, 'clientDataJSON' | 'attestationObject'> {
+  extends Omit<AuthenticatorAttestationResponseFuture, 'clientDataJSON' | 'attestationObject'> {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
 }
