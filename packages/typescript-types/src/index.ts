@@ -49,6 +49,7 @@ export interface AttestationCredentialJSON
   extends Omit<AttestationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
+  transports?: AuthenticatorTransport[];
 }
 
 /**
