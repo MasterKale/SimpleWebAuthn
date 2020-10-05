@@ -43,7 +43,7 @@ export default async function startAttestation(
   const { id, rawId, response, type } = credential;
 
   // Convert values to base64 to make it easier to send back to the server
-  return {
+  const credentialJSON: AttestationCredentialJSON = {
     id,
     rawId: bufferToBase64URLString(rawId),
     response: {
@@ -52,4 +52,13 @@ export default async function startAttestation(
     },
     type,
   };
+
+  /**
+   * Include the authenticator's transports if the browser supports querying for them
+   */
+  if (typeof response.getTransports === 'function') {
+    credentialJSON.transports = response.getTransports();
+  }
+
+  return credentialJSON;
 }
