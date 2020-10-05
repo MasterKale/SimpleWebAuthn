@@ -61,7 +61,9 @@ test('should map excluded credential IDs if specified', () => {
     challenge: 'totallyrandomvalue',
     userID: '1234',
     userName: 'usernameHere',
-    excludedCredentialIDs: ['someIDhere'],
+    excludeCredentials: [
+      { id: 'someIDhere', type: 'public-key', transports: ['usb', 'ble', 'nfc', 'internal'] },
+    ],
   });
 
   expect(options.excludeCredentials).toEqual([
