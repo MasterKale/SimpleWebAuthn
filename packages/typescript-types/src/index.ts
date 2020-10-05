@@ -7,9 +7,8 @@
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.create(...) in the browser.
  */
-export interface PublicKeyCredentialCreationOptionsJSON extends Omit<
-PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
-> {
+export interface PublicKeyCredentialCreationOptionsJSON
+  extends Omit<PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'> {
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64URLString;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
@@ -19,22 +18,19 @@ PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'
  * A variant of PublicKeyCredentialRequestOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.get(...) in the browser.
  */
-export interface PublicKeyCredentialRequestOptionsJSON extends Omit<
-PublicKeyCredentialRequestOptions, 'challenge' |'allowCredentials'
-> {
+export interface PublicKeyCredentialRequestOptionsJSON
+  extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
   challenge: Base64URLString;
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
 }
 
-export interface PublicKeyCredentialDescriptorJSON extends Omit<
-PublicKeyCredentialDescriptor, 'id'
-> {
+export interface PublicKeyCredentialDescriptorJSON
+  extends Omit<PublicKeyCredentialDescriptor, 'id'> {
   id: Base64URLString;
 }
 
-export interface PublicKeyCredentialUserEntityJSON extends Omit <
-PublicKeyCredentialUserEntity, 'id'
-> {
+export interface PublicKeyCredentialUserEntityJSON
+  extends Omit<PublicKeyCredentialUserEntity, 'id'> {
   id: Base64URLString;
 }
 
@@ -111,3 +107,18 @@ export type AuthenticatorDevice = {
  * An attempt to communicate that this isn't just any string, but a Base64URL-encoded string
  */
 export type Base64URLString = string;
+
+/**
+ * AuthenticatorAttestationResponse in lib.dom.d.ts is outdated. Maintain an augmented version here
+ * so we can implement additional properties as the WebAuthn spec evolves.
+ *
+ * See https://www.w3.org/TR/webauthn-2/#iface-authenticatorattestationresponse
+ *
+ * Properties marked optional are not supported in all browsers.
+ */
+export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
+  getTransports?: () => AuthenticatorTransport[];
+  getAuthenticatorData?: () => ArrayBuffer;
+  getPublicKey?: () => ArrayBuffer;
+  getPublicKeyAlgorithm?: () => COSEAlgorithmIdentifier[];
+}
