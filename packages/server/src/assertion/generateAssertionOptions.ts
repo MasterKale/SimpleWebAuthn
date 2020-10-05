@@ -9,7 +9,6 @@ import generateChallenge from '../helpers/generateChallenge';
 type Options = {
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
   challenge?: string | Buffer;
-  suggestedTransports?: AuthenticatorTransport[];
   timeout?: number;
   userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;
