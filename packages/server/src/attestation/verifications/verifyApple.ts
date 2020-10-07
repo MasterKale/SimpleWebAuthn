@@ -62,8 +62,6 @@ export default async function verifyApple(options: Options): Promise<boolean> {
   const extNonce = Buffer.from(extCertNonce.extnValue).slice(6);
 
   if (!nonce.equals(extNonce)) {
-    console.log('nonce:', nonce.toString('hex'));
-    console.log('extNonce:', extNonce.toString('hex'));
     throw new Error(`credCert nonce was not expected value (Apple)`);
   }
 
