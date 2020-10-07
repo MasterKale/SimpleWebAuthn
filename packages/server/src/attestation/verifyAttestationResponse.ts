@@ -14,6 +14,7 @@ import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
+import verifyApple from './verifications/verifyApple';
 
 type Options = {
   credential: AttestationCredentialJSON;
@@ -192,6 +193,13 @@ export default async function verifyAttestationResponse(
       authData,
       credentialPublicKey,
       clientDataHash,
+    });
+  } else if (fmt === ATTESTATION_FORMATS.APPLE) {
+    verified = await verifyApple({
+      attStmt,
+      authData,
+      clientDataHash,
+      credentialPublicKey,
     });
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
     if (Object.keys(attStmt).length > 0) {
