@@ -195,7 +195,12 @@ export default async function verifyAttestationResponse(
       clientDataHash,
     });
   } else if (fmt === ATTESTATION_FORMATS.APPLE) {
-    verified = await verifyApple();
+    verified = await verifyApple({
+      attStmt,
+      authData,
+      clientDataHash,
+      credentialPublicKey,
+    });
   } else if (fmt === ATTESTATION_FORMATS.NONE) {
     if (Object.keys(attStmt).length > 0) {
       throw new Error('None attestation had unexpected attestation statement');
