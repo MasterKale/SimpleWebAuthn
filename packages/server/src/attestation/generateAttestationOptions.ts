@@ -1,6 +1,6 @@
 import type {
   PublicKeyCredentialCreationOptionsJSON,
-  Base64URLString,
+  PublicKeyCredentialDescriptorJSON,
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
 
@@ -15,8 +15,7 @@ type Options = {
   userDisplayName?: string;
   timeout?: number;
   attestationType?: AttestationConveyancePreference;
-  excludedCredentialIDs?: Base64URLString[];
-  suggestedTransports?: AuthenticatorTransport[];
+  excludeCredentials?: PublicKeyCredentialDescriptorJSON[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
   extensions?: AuthenticationExtensionsClientInputs;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
@@ -81,9 +80,8 @@ const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id
  * @param userDisplayName User's actual name
  * @param timeout How long (in ms) the user can take to complete attestation
  * @param attestationType Specific attestation statement
- * @param excludedCredentialIDs Array of base64url-encoded authenticator IDs registered by the
- * user so the user can't register the same credential multiple times
- * @param suggestedTransports Suggested types of authenticators for attestation
+ * @param excludeCredentials Authenticators registered by the user so the user can't register the
+ * same credential multiple times
  * @param authenticatorSelection Advanced criteria for restricting the types of authenticators that
  * may be used
  * @param extensions Additional plugins the authenticator or browser should use during attestation
@@ -102,8 +100,7 @@ export default function generateAttestationOptions(
     userDisplayName = userName,
     timeout = 60000,
     attestationType = 'none',
-    excludedCredentialIDs = [],
-    suggestedTransports = ['usb', 'ble', 'nfc', 'internal'],
+    excludeCredentials = [],
     authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
     supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
@@ -131,11 +128,7 @@ export default function generateAttestationOptions(
     pubKeyCredParams,
     timeout,
     attestation: attestationType,
-    excludeCredentials: excludedCredentialIDs.map(id => ({
-      id,
-      type: 'public-key',
-      transports: suggestedTransports,
-    })),
+    excludeCredentials,
     authenticatorSelection,
     extensions,
   };
