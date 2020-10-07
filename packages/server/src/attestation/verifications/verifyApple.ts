@@ -52,7 +52,14 @@ export default async function verifyApple(options: Options): Promise<boolean> {
 
   const nonceToHash = Buffer.concat([authData, clientDataHash]);
   const nonce = toHash(nonceToHash, 'SHA256');
-  const extNonce = Buffer.from(extCertNonce.extnValue);
+  /**
+   * Ignore the first six ASN.1 structure bytes that define the nonce as an OCTET STRING. Should
+   * trim off <Buffer 30 24 a1 22 04 20>
+   *
+   * TODO: Try and get @peculiar (GitHub) to add a schema for "1.2.840.113635.100.8.2" when we
+   * find out where it's defined (doesn't seem to be publicly documented at the moment...)
+   */
+  const extNonce = Buffer.from(extCertNonce.extnValue).slice(6);
 
   if (!nonce.equals(extNonce)) {
     console.log('nonce:', nonce.toString('hex'));
