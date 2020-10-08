@@ -22,6 +22,7 @@
 
 - **[server]** Add support for "apple" attestations to support iOS Face ID and Touch ID
 - **[server] [browser]** Enable specifying transports per credential for `allowCredentials` and `excludeCredentials`
+- **[browser]** Return authenticator's transports (when available) as `transports` in response from `startAttestation()`
 - **[typescript-types]** Add new `AuthenticatorAttestationResponseFuture` type for better typing of credential response methods (`getTransports()`, `getAuthenticatorData()`, etc...)
 
 ### Breaking Changes
