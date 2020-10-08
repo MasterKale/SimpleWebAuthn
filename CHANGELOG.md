@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.10.1
+
+**Packages:**
+
+- @simplewebauthn/server@0.10.1
+
+**Changes:**
+
+- **[server]** Pin third-party package versions
+
 ## v0.10.0 - The one you can use your face with
 
 **Packages:**
