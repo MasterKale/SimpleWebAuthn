@@ -124,7 +124,11 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
     attestationType: attestation,
     authenticatorSelection,
     extensions,
-    excludedCredentialIDs: devices.map(dev => dev.credentialID),
+    excludeCredentials: devices.map(dev => ({
+      id: dev.credentialID,
+      type: 'public-key',
+      transports: ['usb', 'ble', 'nfc', 'internal'],
+    })),
   });
 
   user.currentChallenge = opts.challenge;
@@ -199,7 +203,11 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
   const opts = generateAssertionOptions({
     extensions,
     userVerification,
-    allowedCredentialIDs: devices.map(dev => dev.credentialID),
+    allowCredentials: devices.map(dev => ({
+      id: dev.credentialID,
+      type: 'public-key',
+      transports: ['usb', 'ble', 'nfc', 'internal'],
+    })),
   });
 
   user.currentChallenge = opts.challenge;

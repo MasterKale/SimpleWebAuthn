@@ -123,14 +123,18 @@ app.get('/generate-attestation-options', (req, res) => {
     userID: loggedInUserId,
     userName: username,
     timeout: 60000,
-    attestationType: 'direct',
+    attestationType: 'indirect',
     /**
      * Passing in a user's list of already-registered authenticator IDs here prevents users from
      * registering the same device multiple times. The authenticator will simply throw an error in
      * the browser if it's asked to perform an attestation when one of these ID's already resides
      * on it.
      */
-    excludedCredentialIDs: devices.map(dev => dev.credentialID),
+    excludeCredentials: devices.map(dev => ({
+      id: dev.credentialID,
+      type: 'public-key',
+      transports: ['usb', 'ble', 'nfc', 'internal'],
+    })),
     /**
      * The optional authenticatorSelection property allows for specifying more constraints around
      * the types of authenticators that users to can use for attestation
@@ -201,7 +205,11 @@ app.get('/generate-assertion-options', (req, res) => {
 
   const options = generateAssertionOptions({
     timeout: 60000,
-    allowedCredentialIDs: user.devices.map(data => data.credentialID),
+    allowCredentials: user.devices.map(dev => ({
+      id: dev.credentialID,
+      type: 'public-key',
+      transports: ['usb', 'ble', 'nfc', 'internal'],
+    })),
     /**
      * This optional value controls whether or not the authenticator needs be able to uniquely
      * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
