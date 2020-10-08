@@ -36,6 +36,7 @@ module.exports = {
       componentsOptions: {
         InjectAsComment: {
           tag: 'Version: {version} - {date}',
+          multiLineCommentType: true,
         },
       },
     }),
