@@ -1,5 +1,59 @@
 # Changelog
 
+## v0.10.0 - The one you can use your face with
+
+**Packages:**
+
+- @simplewebauthn/browser@0.10.0
+- @simplewebauthn/server@0.10.0
+- @simplewebauthn/typescript-types@0.10.0
+
+**Changes:**
+
+- **[server]** Add support for "apple" attestations to support iOS Face ID and Touch ID
+- **[server] [browser]** Enable specifying transports per credential for `allowCredentials` and `excludeCredentials`
+- **[typescript-types]** Add new `AuthenticatorAttestationResponseFuture` type for better typing of credential response methods (`getTransports()`, `getAuthenticatorData()`, etc...)
+
+### Breaking Changes
+
+- **[server]** Existing implementations of `generateAttestationOptions()` and `generateAssertionOptions()` must be updated to specify credentials with their own transports:
+
+**generateAttestationOptions()**
+```js
+// OLD
+const options = generateAttestationOptions({
+  excludedCredentialIDs: devices.map(dev => dev.credentialID),
+  suggestedTransports: ['usb', 'ble', 'nfc', 'internal'],
+});
+
+// NEW
+const options = generateAttestationOptions({
+  excludeCredentials: devices.map(dev => ({
+    id: dev.credentialID,
+    type: 'public-key',
+    transports: dev.transports,
+  })),
+});
+```
+
+**generateAssertionOptions()**
+```js
+// OLD
+const options = generateAssertionOptions({
+  allowedCredentialIDs: user.devices.map(dev => dev.credentialID),
+  suggestedTransports: ['usb', 'ble', 'nfc', 'internal'],
+});
+
+// NEW
+const options = generateAssertionOptions({
+  allowCredentials: devices.map(dev => ({
+    id: dev.credentialID,
+    type: 'public-key',
+    transports: dev.transports,
+  })),
+});
+```
+
 ## v0.9.1
 
 **Packages:**
