@@ -45,7 +45,7 @@ try {
 /**
  * Initialize MetadataService with Conformance Testing-specific statements.
  */
-fetch('https://fidoalliance.co.nz/mds/getEndpoints', {
+fetch('https://mds.certinfra.fidoalliance.org/getEndpoints', {
   method: 'POST',
   body: JSON.stringify({ endpoint: `${origin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
@@ -55,7 +55,7 @@ fetch('https://fidoalliance.co.nz/mds/getEndpoints', {
     const routes = json.result;
     const mdsServers = routes.map(url => ({
       url,
-      rootCertURL: 'https://fidoalliance.co.nz/mds/pki/MDSROOT.crt',
+      rootCertURL: 'https://mds.certinfra.fidoalliance.org/pki/MDSROOT.crt',
       metadataURLSuffix: '',
     }));
 
