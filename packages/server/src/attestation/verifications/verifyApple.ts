@@ -59,7 +59,7 @@ export default async function verifyApple(options: Options): Promise<boolean> {
    * TODO: Try and get @peculiar (GitHub) to add a schema for "1.2.840.113635.100.8.2" when we
    * find out where it's defined (doesn't seem to be publicly documented at the moment...)
    */
-  const extNonce = Buffer.from(extCertNonce.extnValue).slice(6);
+  const extNonce = Buffer.from(extCertNonce.extnValue.buffer).slice(6);
 
   if (!nonce.equals(extNonce)) {
     throw new Error(`credCert nonce was not expected value (Apple)`);
