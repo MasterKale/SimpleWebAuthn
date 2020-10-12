@@ -32,9 +32,9 @@
     "node"
   ],
   "dependencies": {
-    "@peculiar/asn1-android": "2.0.8",
-    "@peculiar/asn1-schema": "2.0.8",
-    "@peculiar/asn1-x509": "2.0.10",
+    "@peculiar/asn1-android": "2.0.23",
+    "@peculiar/asn1-schema": "2.0.23",
+    "@peculiar/asn1-x509": "2.0.23",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "3.0.1",
     "cbor": "5.0.2",
