@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.10.2
+
+**Packages:**
+
+- @simplewebauthn/server@0.10.2
+
+**Changes:**
+
+- **[server]** Update ASN.1 parsing libraries to latest releases
+
 ## v0.10.1
 
 **Packages:**
