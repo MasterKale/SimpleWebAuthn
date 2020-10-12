@@ -61,7 +61,7 @@ export default async function verifyAttestationAndroidKey(options: Options): Pro
   // Verify extKeyStore values
   const { attestationChallenge, teeEnforced, softwareEnforced } = parsedExtKeyStore;
 
-  if (!Buffer.from(attestationChallenge).equals(clientDataHash)) {
+  if (!Buffer.from(attestationChallenge.buffer).equals(clientDataHash)) {
     throw new Error('Attestation challenge was not equal to client data hash (AndroidKey)');
   }
 
