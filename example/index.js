@@ -215,6 +215,7 @@ app.get('/generate-assertion-options', (req, res) => {
      * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
      */
     userVerification: 'preferred',
+    rpID,
   });
 
   /**
