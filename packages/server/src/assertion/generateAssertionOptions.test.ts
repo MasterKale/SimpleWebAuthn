@@ -109,3 +109,15 @@ test('should generate a challenge if one is not provided', () => {
   // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
   expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });
+
+test('should set rpId if specified', () => {
+  const rpID = 'simplewebauthn.dev';
+
+  const opts = generateAssertionOptions({
+    allowCredentials: [],
+    rpID,
+  });
+
+  expect(opts.rpId).toBeDefined();
+  expect(opts.rpId).toEqual(rpID);
+});
