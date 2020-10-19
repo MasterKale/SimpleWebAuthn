@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.10.3
+
+**Packages:**
+
+- @simplewebauthn/server@0.10.3
+
+**Changes:**
+
+- **[server]** Add optional `rpID` argument to `generateAssertionOptions()`
+
 ## v0.10.2
 
 **Packages:**
