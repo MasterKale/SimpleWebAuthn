@@ -12,6 +12,7 @@ type Options = {
   timeout?: number;
   userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;
+  rpID?: string;
 };
 
 /**
@@ -24,6 +25,7 @@ type Options = {
  * @param userVerification Set to `'discouraged'` when asserting as part of a 2FA flow, otherwise
  * set to `'preferred'` or `'required'` as desired.
  * @param extensions Additional plugins the authenticator or browser should use during assertion
+ * @param rpID Valid domain name (after `https://`)
  */
 export default function generateAssertionOptions(
   options: Options,
@@ -34,6 +36,7 @@ export default function generateAssertionOptions(
     timeout = 60000,
     userVerification,
     extensions,
+    rpID,
   } = options;
 
   return {
@@ -42,5 +45,6 @@ export default function generateAssertionOptions(
     timeout,
     userVerification,
     extensions,
+    rpId: rpID,
   };
 }
