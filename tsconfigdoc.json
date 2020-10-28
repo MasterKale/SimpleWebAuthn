@@ -17,6 +17,6 @@
     "name": "@SimpleWebAuthn",
     "excludeExternals": true,
     "excludePrivate": true,
-	"plugin": ["./typedoc-plugin-external-module-name"]
+    "plugin": ["./typedoc-plugin-external-module-name"]
   }
 }
