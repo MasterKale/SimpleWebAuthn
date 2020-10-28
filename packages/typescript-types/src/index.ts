@@ -1,7 +1,6 @@
 /**
  * @packageDocumentation
  * @module @simplewebauthn/typescript-types
- * @preferred
  */
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
