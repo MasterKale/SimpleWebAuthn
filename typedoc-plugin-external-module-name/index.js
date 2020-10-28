@@ -10,8 +10,10 @@ exports.load = function (host) {
     /** @type {import("typedoc").ProjectReflection} */
     const project = context.project;
 
-    for (const mod of project.children.filter(child => child.kind === ReflectionKind.Module)) {
-      const tag = mod.comment?.getTag('module');
+    for (const mod of (project.children || []).filter(
+      child => child.kind === ReflectionKind.Module,
+    )) {
+      const tag = mod.comment ? mod.comment.getTag('module') : void 0;
       if (!tag) continue;
       mod.name = tag.text;
       mod.comment.removeTags('module');
