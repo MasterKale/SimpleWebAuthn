@@ -32,17 +32,17 @@
     "node"
   ],
   "dependencies": {
-    "@peculiar/asn1-android": "2.0.23",
-    "@peculiar/asn1-schema": "2.0.23",
-    "@peculiar/asn1-x509": "2.0.23",
+    "@peculiar/asn1-android": "^2.0.25",
+    "@peculiar/asn1-schema": "^2.0.25",
+    "@peculiar/asn1-x509": "^2.0.25",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
-    "base64url": "3.0.1",
+    "base64url": "^3.0.1",
     "cbor": "5.0.2",
-    "elliptic": "6.5.3",
-    "jsrsasign": "8.0.20",
-    "jwk-to-pem": "2.0.4",
-    "node-fetch": "2.6.0",
-    "node-rsa": "1.1.1"
+    "elliptic": "^6.5.3",
+    "jsrsasign": "^8.0.20",
+    "jwk-to-pem": "^2.0.4",
+    "node-fetch": "^2.6.0",
+    "node-rsa": "^1.1.1"
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
   "devDependencies": {
