@@ -10,7 +10,7 @@ test('should return true when browser supports WebAuthn', () => {
 });
 
 test('should return false when browser does not support WebAuthn', () => {
-  delete window.PublicKeyCredential;
+  delete (window as any).PublicKeyCredential;
   expect(supportsWebauthn()).toBe(false);
 });
 
