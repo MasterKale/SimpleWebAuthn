@@ -1,6 +1,11 @@
 import type {
+  AttestationConveyancePreference,
+  AuthenticationExtensionsClientInputs,
+  AuthenticatorSelectionCriteria,
+  COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialDescriptorJSON,
+  PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
 

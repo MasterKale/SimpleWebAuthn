@@ -1,5 +1,8 @@
 import base64url from 'base64url';
-import { AttestationCredentialJSON } from '@simplewebauthn/typescript-types';
+import {
+  AttestationCredentialJSON,
+  COSEAlgorithmIdentifier,
+} from '@simplewebauthn/typescript-types';
 
 import decodeAttestationObject, { ATTESTATION_FORMATS } from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
