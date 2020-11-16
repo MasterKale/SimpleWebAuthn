@@ -236,7 +236,7 @@ app.post('/verify-assertion', (req, res) => {
 
   let dbAuthenticator;
   // "Query the DB" here for an authenticator matching `credentialID`
-  for (let dev of user.devices) {
+  for (const dev of user.devices) {
     if (dev.credentialID === body.id) {
       dbAuthenticator = dev;
       break;
