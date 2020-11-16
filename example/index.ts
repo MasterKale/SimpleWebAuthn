@@ -40,7 +40,7 @@ app.use(express.json());
  * represents the expected URL from which an attestation or assertion occurs.
  */
 const rpID = 'localhost';
-const origin = `https://${rpID}`;
+const expectedOrigin = `https://${rpID}`;
 /**
  * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that
  * performs an attestation or assertion. The user ID you specify here should be your internal,
