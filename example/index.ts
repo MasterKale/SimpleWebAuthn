@@ -5,19 +5,20 @@
  * The webpages served from ./public use @simplewebauthn/browser.
  */
 
-const https = require('https');
-const fs = require('fs');
+import https from 'https';
+import fs from 'fs';
 
-const express = require('express');
+import express from 'express';
 
-const {
+import {
   // Registration ("Attestation")
   generateAttestationOptions,
   verifyAttestationResponse,
   // Login ("Assertion")
   generateAssertionOptions,
   verifyAssertionResponse,
-} = require('@simplewebauthn/server');
+} from '@simplewebauthn/server';
+import type { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
 
 const app = express();
 const host = '0.0.0.0';
@@ -81,7 +82,14 @@ const loggedInUserId = 'internalUserId';
  * authenticator credential IDs to pass into `generateAssertionOptions()`, from which one is
  * expected to generate an assertion response.
  */
-const inMemoryUserDeviceDB = {
+interface LoggedInUser {
+  id: string;
+  username: string;
+  devices: AuthenticatorDevice[];
+  currentChallenge?: string;
+}
+
+const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
   [loggedInUserId]: {
     id: loggedInUserId,
     username: `user@${rpID}`,
@@ -165,8 +173,8 @@ app.post('/verify-attestation', async (req, res) => {
   try {
     verification = await verifyAttestationResponse({
       credential: body,
-      expectedChallenge,
-      expectedOrigin: origin,
+      expectedChallenge: `${expectedChallenge}`,
+      expectedOrigin,
       expectedRPID: rpID,
     });
   } catch (error) {
@@ -176,7 +184,7 @@ app.post('/verify-attestation', async (req, res) => {
 
   const { verified, authenticatorInfo } = verification;
 
-  if (verified) {
+  if (verified && authenticatorInfo) {
     const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
 
     const existingDevice = user.devices.find(device => device.credentialID === base64CredentialID);
@@ -244,15 +252,15 @@ app.post('/verify-assertion', (req, res) => {
   }
 
   if (!dbAuthenticator) {
-    throw new Error('could not find authenticator matching', body.id);
+    throw new Error(`could not find authenticator matching ${body.id}`);
   }
 
   let verification;
   try {
     verification = verifyAssertionResponse({
       credential: body,
-      expectedChallenge,
-      expectedOrigin: origin,
+      expectedChallenge: `${expectedChallenge}`,
+      expectedOrigin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
     });
