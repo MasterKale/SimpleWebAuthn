@@ -5,42 +5,52 @@
  * The webpages served from ./public use @simplewebauthn/browser.
  */
 
-const https = require('https');
-const fs = require('fs');
+import https from 'https';
+import fs from 'fs';
 
-const express = require('express');
+import express from 'express';
+import dotenv from 'dotenv';
 
-const {
+dotenv.config();
+
+import {
   // Registration ("Attestation")
   generateAttestationOptions,
   verifyAttestationResponse,
   // Login ("Assertion")
   generateAssertionOptions,
   verifyAssertionResponse,
-} = require('@simplewebauthn/server');
+} from '@simplewebauthn/server';
+
+import { LoggedInUser } from './example-server';
 
 const app = express();
 const host = '0.0.0.0';
 const port = 443;
 
+const { ENABLE_CONFORMANCE } = process.env;
+
 app.use(express.static('./public/'));
 app.use(express.json());
 
 /**
- * If the words "metadata statements" mean anything to you, you'll want to check out this file. It
+ * If the words "metadata statements" mean anything to you, you'll want to enable this route. It
  * contains an example of a more complex deployment of SimpleWebAuthn with support enabled for the
  * FIDO Metadata Service. This enables greater control over the types of authenticators that can
  * interact with the Rely Party (a.k.a. "RP", a.k.a. "this server").
  */
-// const { fidoRouteSuffix, fidoConformanceRouter } = require('./fido-conformance');
-// app.use(fidoRouteSuffix, fidoConformanceRouter);
+if (ENABLE_CONFORMANCE === 'true') {
+  import('./fido-conformance').then(({ fidoRouteSuffix, fidoConformanceRouter }) => {
+    app.use(fidoRouteSuffix, fidoConformanceRouter);
+  });
+}
 
 /**
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
  * represents the expected URL from which an attestation or assertion occurs.
  */
 const rpID = 'localhost';
-const origin = `https://${rpID}`;
+const expectedOrigin = `https://${rpID}`;
 /**
  * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that
  * performs an attestation or assertion. The user ID you specify here should be your internal,
@@ -51,37 +61,7 @@ const origin = `https://${rpID}`;
  */
 const loggedInUserId = 'internalUserId';
 
-/**
- * You'll need a database to store a few things:
- *
- * 1. Users
- *
- * You'll need to be able to associate attestation and assertions challenges, and authenticators to
- * a specific user
- *
- * 2. Challenges
- *
- * The totally-random-unique-every-time values you pass into every execution of
- * `generateAttestationOptions()` or `generateAssertionOptions()` MUST be stored until
- * `verifyAttestationResponse()` or `verifyAssertionResponse()` (respectively) is called to verify
- * that the response contains the signed challenge.
- *
- * These values only need to be persisted for `timeout` number of milliseconds (see the `generate`
- * methods and their optional `timeout` parameter)
- *
- * 3. Authenticator Devices
- *
- * After an attestation, you'll need to store three things about the authenticator:
- *
- * - Base64-encoded "Credential ID" (varchar)
- * - Base64-encoded "Public Key" (varchar)
- * - Counter (int)
- *
- * Each authenticator must also be associated to a user so that you can generate a list of
- * authenticator credential IDs to pass into `generateAssertionOptions()`, from which one is
- * expected to generate an assertion response.
- */
-const inMemoryUserDeviceDB = {
+const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
   [loggedInUserId]: {
     id: loggedInUserId,
     username: `user@${rpID}`,
@@ -165,8 +145,8 @@ app.post('/verify-attestation', async (req, res) => {
   try {
     verification = await verifyAttestationResponse({
       credential: body,
-      expectedChallenge,
-      expectedOrigin: origin,
+      expectedChallenge: `${expectedChallenge}`,
+      expectedOrigin,
       expectedRPID: rpID,
     });
   } catch (error) {
@@ -176,7 +156,7 @@ app.post('/verify-attestation', async (req, res) => {
 
   const { verified, authenticatorInfo } = verification;
 
-  if (verified) {
+  if (verified && authenticatorInfo) {
     const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
 
     const existingDevice = user.devices.find(device => device.credentialID === base64CredentialID);
@@ -236,7 +216,7 @@ app.post('/verify-assertion', (req, res) => {
 
   let dbAuthenticator;
   // "Query the DB" here for an authenticator matching `credentialID`
-  for (let dev of user.devices) {
+  for (const dev of user.devices) {
     if (dev.credentialID === body.id) {
       dbAuthenticator = dev;
       break;
@@ -244,15 +224,15 @@ app.post('/verify-assertion', (req, res) => {
   }
 
   if (!dbAuthenticator) {
-    throw new Error('could not find authenticator matching', body.id);
+    throw new Error(`could not find authenticator matching ${body.id}`);
   }
 
   let verification;
   try {
     verification = verifyAssertionResponse({
       credential: body,
-      expectedChallenge,
-      expectedOrigin: origin,
+      expectedChallenge: `${expectedChallenge}`,
+      expectedOrigin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
     });
@@ -283,5 +263,5 @@ https
     app,
   )
   .listen(port, host, () => {
-    console.log(`🚀 Server ready at https://${host}:${port}`);
+    console.log(`🚀 Server ready at https://${rpID} (${host}:${port})`);
   });
