@@ -6,7 +6,8 @@ import type { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
  * 1. Users
  *
  * You'll need to be able to associate attestation and assertions challenges, and authenticators to
- * a specific user
+ * a specific user. See `LoggedInUser` below for an idea of the minimum amount of info you'll need to
+ * track for a specific user during these flows.
  *
  * 2. Challenges
  *
