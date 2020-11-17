@@ -9,6 +9,9 @@ import https from 'https';
 import fs from 'fs';
 
 import express from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 import {
   // Registration ("Attestation")
@@ -25,17 +28,22 @@ const app = express();
 const host = '0.0.0.0';
 const port = 443;
 
+const { ENABLE_CONFORMANCE } = process.env;
+
 app.use(express.static('./public/'));
 app.use(express.json());
 
 /**
- * If the words "metadata statements" mean anything to you, you'll want to check out this file. It
+ * If the words "metadata statements" mean anything to you, you'll want to enable this route. It
  * contains an example of a more complex deployment of SimpleWebAuthn with support enabled for the
  * FIDO Metadata Service. This enables greater control over the types of authenticators that can
  * interact with the Rely Party (a.k.a. "RP", a.k.a. "this server").
  */
-// const { fidoRouteSuffix, fidoConformanceRouter } = require('./fido-conformance');
-// app.use(fidoRouteSuffix, fidoConformanceRouter);
+if (ENABLE_CONFORMANCE === 'true') {
+  import('./fido-conformance').then(({ fidoRouteSuffix, fidoConformanceRouter }) => {
+    app.use(fidoRouteSuffix, fidoConformanceRouter);
+  });
+}
 
 /**
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
