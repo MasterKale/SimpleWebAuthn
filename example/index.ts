@@ -263,5 +263,5 @@ https
     app,
   )
   .listen(port, host, () => {
-    console.log(`🚀 Server ready at https://${host}:${port}`);
+    console.log(`🚀 Server ready at https://${rpID} (${host}:${port})`);
   });
