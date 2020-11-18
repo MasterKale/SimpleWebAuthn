@@ -6,9 +6,6 @@
       "@simplewebauthn/*": ["packages/*/src"]
     }
   },
-  "exclude": [
-    "example"
-  ],
   "typedocOptions": {
     "out": "docs",
     "entryPoints": [
