@@ -15,7 +15,7 @@ import { MetadataStatement } from '@simplewebauthn/server/dist/metadata/metadata
 import { LoggedInUser } from './example-server';
 
 interface LoggedInFIDOUser extends LoggedInUser {
-  currentAssertionUserVerification?: 'discouraged' | 'preferred' | 'required' | undefined;
+  currentAssertionUserVerification?: UserVerificationRequirement;
 }
 
 /**
