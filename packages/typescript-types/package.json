@@ -17,6 +17,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
+    "extract-dom-types": "ts-node extract-dom-types.ts",
     "prepublish": "npm run build"
   },
   "keywords": [
