@@ -16,7 +16,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && npm run extract-dom-types && tsc",
     "extract-dom-types": "ts-node extract-dom-types.ts",
     "prepublish": "npm run build"
   },
