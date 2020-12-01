@@ -1,5 +1,9 @@
 import base64url from 'base64url';
-import { AssertionCredentialJSON, AuthenticatorDevice } from '@simplewebauthn/typescript-types';
+import {
+  AssertionCredentialJSON,
+  AuthenticatorDevice,
+  UserVerificationRequirement,
+} from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import toHash from '../helpers/toHash';

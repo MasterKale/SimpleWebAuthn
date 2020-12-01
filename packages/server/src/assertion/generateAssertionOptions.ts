@@ -1,6 +1,8 @@
 import type {
+  AuthenticationExtensionsClientInputs,
   PublicKeyCredentialRequestOptionsJSON,
   PublicKeyCredentialDescriptorJSON,
+  UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
 
