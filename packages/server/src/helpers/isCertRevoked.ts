@@ -24,15 +24,15 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
   const certSerialHex = cert.getSerialNumberHex();
 
   // Check to see if we've got cached info for the cert's CA
-  let certAuthKeyID: { kid: string } | null = null;
+  let certAuthKeyID: { kid: { hex: string } } | null = null;
   try {
-    certAuthKeyID = cert.getExtAuthorityKeyIdentifier();
+    certAuthKeyID = cert.getExtAuthorityKeyIdentifier() as { kid: { hex: string } } | null;
   } catch (err) {
     return false;
   }
 
   if (certAuthKeyID) {
-    const cached = cacheRevokedCerts[certAuthKeyID.kid];
+    const cached = cacheRevokedCerts[certAuthKeyID.kid.hex];
     if (cached) {
       const now = new Date();
       // If there's a nextUpdate then make sure we're before it
@@ -88,7 +88,7 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
 
     // Cache the results
     if (certAuthKeyID) {
-      cacheRevokedCerts[certAuthKeyID.kid] = newCached;
+      cacheRevokedCerts[certAuthKeyID.kid.hex] = newCached;
     }
 
     return newCached.revokedCerts.indexOf(certSerialHex) >= 0;

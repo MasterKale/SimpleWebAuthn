@@ -1,11 +1,12 @@
-import cbor from 'cbor';
 import type { SigningSchemeHash } from 'node-rsa';
+import { COSEAlgorithmIdentifier } from '@simplewebauthn/typescript-types';
+import { decodeCborFirst } from './decodeCbor';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
  */
 export default function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
-  const struct: COSEPublicKey = cbor.decodeFirstSync(cosePublicKey);
+  const struct: COSEPublicKey = decodeCborFirst(cosePublicKey);
 
   const tag = Buffer.from([0x04]);
   const x = struct.get(COSEKEYS.x);

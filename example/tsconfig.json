@@ -1,22 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2018",
-    "lib": [
-      "ES2018"
-    ],
+    "lib": ["ES2018", "DOM"],
     "module": "commonjs",
     "esModuleInterop": true,
     "declaration": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "outDir": "dist"
   },
   "exclude": [
     "node_modules",
-    "example",
-    "**/*.test.ts",
-    "**/setupTests.ts",
-    "**/__mocks__/*",
     "**/dist/*"
   ]
 }

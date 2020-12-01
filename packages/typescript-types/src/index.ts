@@ -2,6 +2,21 @@
  * @packageDocumentation
  * @module @simplewebauthn/typescript-types
  */
+
+import type {
+  AuthenticatorAssertionResponse,
+  AuthenticatorAttestationResponse,
+  AuthenticatorTransport,
+  COSEAlgorithmIdentifier,
+  PublicKeyCredential,
+  PublicKeyCredentialCreationOptions,
+  PublicKeyCredentialDescriptor,
+  PublicKeyCredentialRequestOptions,
+  PublicKeyCredentialUserEntity,
+} from './dom';
+
+export * from './dom';
+
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.create(...) in the browser.

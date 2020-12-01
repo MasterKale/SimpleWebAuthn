@@ -1,6 +1,10 @@
 {
-  "extends": "./tsconfig",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "lib": [
+      "ES2018",
+      "DOM"
+    ],
     "baseUrl": ".",
     "paths": {
       "@simplewebauthn/*": ["packages/*/src"]
