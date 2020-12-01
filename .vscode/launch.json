@@ -5,17 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
+      "type": "pwa-node",
+      "name": "Launch Example Server",
       "request": "launch",
-      "name": "Launch Program",
+      "runtimeArgs": [
+        "run-script",
+        "start"
+      ],
+      "runtimeExecutable": "npm",
       "skipFiles": [
         "<node_internals>/**"
       ],
       "cwd": "${workspaceFolder}/example",
-      "program": "${workspaceFolder}/example/index.js",
-      "outFiles": [
-        "${workspaceFolder}/**/*.js"
-      ]
     }
   ]
 }
