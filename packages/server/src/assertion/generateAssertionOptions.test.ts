@@ -95,13 +95,11 @@ test('should set extensions if specified', () => {
 
 test('should generate a challenge if one is not provided', () => {
   const opts = {
-    challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
       { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
     ],
   };
-  delete opts.challenge;
 
   // @ts-ignore 2345
   const options = generateAssertionOptions(opts);
