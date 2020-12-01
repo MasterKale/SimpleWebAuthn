@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.10.4
+
+**Packages:**
+
+- @simplewebauthn/browser@0.10.4
+- @simplewebauthn/server@0.10.4
+- @simplewebauthn/typescript-types@0.10.4
+
+**Changes:**
+
+- **[server]** Unpin dependency versions
+- **[server]** Upgrade dependencies and devDependencies
+- **[typescript-types]** Pull in TypeScript DOM lib types on build
+- **[docs]** Upgrade TypeDoc for better API docs
+
 ## v0.10.3
 
 **Packages:**
