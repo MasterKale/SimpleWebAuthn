@@ -23,7 +23,7 @@ You can find in-depth documentation on this package here: https://simplewebauthn
 
 ## Supported Attestation Formats
 
-SimpleWebAuthn supports [all six WebAuthn attestation formats](https://w3c.github.io/webauthn/#sctn-defined-attestation-formats), including:
+SimpleWebAuthn supports [all current WebAuthn attestation formats](https://w3c.github.io/webauthn/#sctn-defined-attestation-formats), including:
 
 - **Packed**
 - **TPM**
@@ -31,3 +31,4 @@ SimpleWebAuthn supports [all six WebAuthn attestation formats](https://w3c.githu
 - **Android SafetyNet**
 - **FIDO U2F**
 - **None**
+- **Apple**
