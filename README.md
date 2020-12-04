@@ -49,3 +49,9 @@ Running Jest in watch mode for a specific project requires the use of `lerna exe
 ```sh
 $> npx lerna exec npm run test:watch --scope=@simplewebauthn/server
 ```
+
+Dev on the server package with jest watch target
+
+```sh
+$> npm run dev:server aFileNameHere.js
+```

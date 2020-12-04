@@ -39,6 +39,12 @@ const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
   timeout: 1,
 };
 
+// Without allow credentials
+const goodOpts3: PublicKeyCredentialRequestOptionsJSON = {
+  challenge: bufferToBase64URLString(toUint8Array('fizz')),
+  timeout: 1,
+};
+
 beforeEach(() => {
   mockNavigatorGet.mockReset();
   mockSupportsWebauthn.mockReset();
@@ -59,15 +65,20 @@ test('should convert options before passing to navigator.credentials.get(...)', 
     },
   );
 
-  await startAssertion(goodOpts1);
+  const checkWithOpts = async (opts: PublicKeyCredentialRequestOptionsJSON) => {
+    await startAssertion(opts);
 
-  const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
-  const credId = argsPublicKey.allowCredentials[0].id;
+    const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
+    const credId = argsPublicKey.allowCredentials[0].id;
 
-  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
-  // Make sure the credential ID is an ArrayBuffer with a length of 64
-  expect(credId instanceof ArrayBuffer).toEqual(true);
-  expect(credId.byteLength).toEqual(64);
+    expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
+    // Make sure the credential ID is an ArrayBuffer with a length of 64
+    expect(credId instanceof ArrayBuffer).toEqual(true);
+    expect(credId.byteLength).toEqual(64);
+  };
+
+  await checkWithOpts(goodOpts1);
+  await checkWithOpts(goodOpts3);
 
   done();
 });

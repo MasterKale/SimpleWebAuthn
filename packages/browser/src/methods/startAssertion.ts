@@ -25,7 +25,12 @@ export default async function startAssertion(
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...requestOptionsJSON,
     challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
-    allowCredentials: requestOptionsJSON.allowCredentials.map(toPublicKeyCredentialDescriptor),
+    // We need to avoid passing empty array to avoid blocking retrieval
+    // of public key
+    allowCredentials:
+      requestOptionsJSON.allowCredentials?.length === 0
+        ? undefined
+        : requestOptionsJSON.allowCredentials?.map(toPublicKeyCredentialDescriptor),
   };
 
   // Wait for the user to complete assertion

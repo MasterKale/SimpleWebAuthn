@@ -65,6 +65,25 @@ test('should not set userVerification if not specified', () => {
   expect(options.userVerification).toEqual(undefined);
 });
 
+test('should not set allowCredentials if not specified', () => {
+  const options = generateAssertionOptions({ rpID: 'test' });
+
+  expect(options.allowCredentials).toEqual(undefined);
+});
+
+test('should generate without params', () => {
+  const options = generateAssertionOptions();
+  const { challenge, ...otherFields } = options;
+  expect(otherFields).toEqual({
+    allowCredentials: undefined,
+    extensions: undefined,
+    rpId: undefined,
+    timeout: 60000,
+    userVerification: undefined,
+  });
+  expect(typeof challenge).toEqual('string');
+});
+
 test('should set userVerification if specified', () => {
   const options = generateAssertionOptions({
     challenge: 'totallyrandomvalue',
