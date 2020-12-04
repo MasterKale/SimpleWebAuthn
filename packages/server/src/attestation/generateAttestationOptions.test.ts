@@ -1,5 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
+import verifyChallenge from '../helpers/verifyChallenge';
 import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -161,4 +162,23 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
     { alg: -8, type: 'public-key' },
     { alg: -65535, type: 'public-key' },
   ]);
+});
+
+test('should set signedChallenge if serverSecret specified', () => {
+  const serverSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
+
+  const opts = generateAttestationOptions({
+    rpID: 'not.real',
+    origin: 'test',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    serverSecret,
+  });
+
+  const verifiedChallenge = verifyChallenge(opts.signedChallenge, serverSecret);
+  expect(opts.signedChallenge).toBeDefined();
+  expect(verifiedChallenge.challenge).toEqual(opts.challenge);
+  expect(verifiedChallenge.origin).toEqual('test');
+  expect(verifiedChallenge.rpID).toEqual('not.real');
 });

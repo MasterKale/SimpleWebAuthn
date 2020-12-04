@@ -4,6 +4,7 @@ import verifyAssertionResponse from './verifyAssertionResponse';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
+import signChallenge from '../helpers/signChallenge';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -24,6 +25,22 @@ test('should verify an assertion response', () => {
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
+test('should verify an assertion response with signedChallenge', () => {
+  const serverSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
+
+  const verification = verifyAssertionResponse({
+    credential: assertionResponse,
+    signedChallenge: signChallenge(
+      { challenge: assertionChallenge, rpID: 'dev.dontneeda.pw', origin: assertionOrigin },
+      serverSecret,
+    ) as string,
+    serverSecret,
     authenticator: authenticator,
   });
 

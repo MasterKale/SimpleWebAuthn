@@ -1,4 +1,6 @@
 jest.mock('../helpers/generateChallenge');
+import { verify } from 'jsonwebtoken';
+import verifyChallenge from '../helpers/verifyChallenge';
 
 import generateAssertionOptions from './generateAssertionOptions';
 
@@ -118,4 +120,21 @@ test('should set rpId if specified', () => {
 
   expect(opts.rpId).toBeDefined();
   expect(opts.rpId).toEqual(rpID);
+});
+
+test('should set signedChallenge if serverSecret specified', () => {
+  const serverSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
+
+  const opts = generateAssertionOptions({
+    allowCredentials: [],
+    serverSecret,
+    rpID: 'test',
+    origin: 'test',
+  });
+
+  expect(opts.signedChallenge).toBeDefined();
+  const verifiedChallenge = verifyChallenge(opts.signedChallenge, serverSecret);
+  expect(verifiedChallenge.challenge).toEqual(opts.challenge);
+  expect(verifiedChallenge.rpID).toEqual(opts.rpId);
+  expect(verifiedChallenge.origin).toEqual('test');
 });

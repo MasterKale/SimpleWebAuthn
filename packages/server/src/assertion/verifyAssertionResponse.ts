@@ -11,15 +11,27 @@ import convertPublicKeyToPEM from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
+import verifyChallenge from '../helpers/verifyChallenge';
 
 type Options = {
   credential: AssertionCredentialJSON;
-  expectedChallenge: string;
+  expectedChallenge?: string;
   expectedOrigin: string;
   expectedRPID: string;
   authenticator: AuthenticatorDevice;
   fidoUserVerification?: UserVerificationRequirement;
 };
+
+interface OptionsWithSignedChallenge
+  extends Omit<Options, 'expectedChallenge' | 'expectedOrigin' | 'expectedRPID'> {
+  signedChallenge: string;
+  serverSecret: string;
+}
+
+export default function verifyAssertionResponse(options: Options): VerifiedAssertion;
+export default function verifyAssertionResponse(
+  options: OptionsWithSignedChallenge,
+): VerifiedAssertion;
 
 /**
  * Verify that the user has legitimately completed the login process
@@ -28,7 +40,9 @@ type Options = {
  *
  * @param credential Authenticator credential returned by browser's `startAssertion()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
- * `generateAssertionOptions()`
+ * `generateAssertionOptions()` if serverSecret not used
+ * @param signedChallenge Server signed challenge sent back from the device originally emitted by the generateAssertionOptions
+ * ONLY if serverSecret was used in generateAssertionOptions (allow to avoid storing challenge into the DB)
  * @param expectedOrigin Website URL that the attestation should have occurred on
  * @param expectedRPID RP ID that was specified in the attestation options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
@@ -36,15 +50,25 @@ type Options = {
  * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
  * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
-export default function verifyAssertionResponse(options: Options): VerifiedAssertion {
-  const {
-    credential,
-    expectedChallenge,
-    expectedOrigin,
-    expectedRPID,
-    authenticator,
-    fidoUserVerification,
-  } = options;
+export default function verifyAssertionResponse(
+  options: Options | OptionsWithSignedChallenge,
+): VerifiedAssertion {
+  const { credential, authenticator, fidoUserVerification } = options;
+
+  let { expectedChallenge, expectedOrigin, expectedRPID } = options as Options;
+
+  const { serverSecret, signedChallenge } = options as OptionsWithSignedChallenge;
+
+  if (!expectedChallenge && !(serverSecret && signedChallenge))
+    throw new Error('You need to provided challenge OR signedChallenge and serverSecret');
+
+  if (serverSecret && signedChallenge) {
+    const signedChallengePayload = verifyChallenge(signedChallenge, serverSecret);
+    expectedChallenge = signedChallengePayload.challenge;
+    expectedOrigin = signedChallengePayload.origin;
+    expectedRPID = signedChallengePayload.rpID;
+  }
+
   const { id, rawId, type: credentialType, response } = credential;
 
   // Ensure credential specified an ID

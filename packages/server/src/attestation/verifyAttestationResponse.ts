@@ -18,15 +18,30 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
+import verifyChallenge from '../helpers/verifyChallenge';
 
-type Options = {
+interface Options {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string;
   expectedRPID?: string;
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
-};
+}
+
+interface OptionsWithSignedChallenge
+  extends Omit<Options, 'expectedChallenge' | 'expectedRPID' | 'expectedOrigin'> {
+  signedChallenge: string;
+  serverSecret: string;
+}
+
+export default async function verifyAttestationResponse(
+  options: Options,
+): Promise<VerifiedAttestation>;
+
+export default async function verifyAttestationResponse(
+  options: OptionsWithSignedChallenge,
+): Promise<VerifiedAttestation>;
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -44,16 +59,27 @@ type Options = {
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export default async function verifyAttestationResponse(
-  options: Options,
+  options: Options | OptionsWithSignedChallenge,
 ): Promise<VerifiedAttestation> {
   const {
     credential,
-    expectedChallenge,
-    expectedOrigin,
-    expectedRPID,
     requireUserVerification = false,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
+
+  let { expectedChallenge, expectedRPID, expectedOrigin } = options as Options;
+
+  const { serverSecret, signedChallenge } = options as OptionsWithSignedChallenge;
+  if (!expectedChallenge && !(serverSecret && signedChallenge))
+    throw new Error('You need to provided challenge OR signedChallenge and serverSecret');
+
+  if (serverSecret && signedChallenge) {
+    const signedChallengePayload = verifyChallenge(signedChallenge, serverSecret);
+    expectedChallenge = signedChallengePayload.challenge;
+    expectedOrigin = signedChallengePayload.origin;
+    expectedRPID = signedChallengePayload.rpID;
+  }
+
   const { id, rawId, type: credentialType, response } = credential;
 
   // Ensure credential specified an ID

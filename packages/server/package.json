@@ -39,6 +39,7 @@
     "base64url": "^3.0.1",
     "cbor": "^5.1.0",
     "elliptic": "^6.5.3",
+    "jsonwebtoken": "^8.5.1",
     "jsrsasign": "^10.0.5",
     "jwk-to-pem": "^2.0.4",
     "node-fetch": "^2.6.0",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@types/cbor": "^5.0.1",
     "@types/elliptic": "^6.4.12",
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/jsrsasign": "^8.0.8",
     "@types/jwk-to-pem": "^2.0.0",
     "@types/node-fetch": "^2.5.7",
