@@ -14,7 +14,7 @@ import {
 } from '../attestation/testHelper';
 const strongSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
 
-const goodBaseOptions = { secret: strongSecret, origin: 'test.test', rpID: 'test' };
+const goodBaseOptions = { secretOrPrivateKey: strongSecret, origin: 'test.test', rpID: 'test' };
 
 test('should throw on weak secret', () => {
   try {

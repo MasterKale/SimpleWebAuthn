@@ -1,8 +1,10 @@
 import { sign, verify } from 'jsonwebtoken';
 import BaseAdapter, { assertIO, verifyAssertIO, attestIO, verifyAttestIO } from './BaseAdapter';
 
+type JwtAlgorithms = 'HS256' | 'RS256' | 'HS512' | 'RS512';
 interface JWTChallengeAdapterConstructorOptions {
-  secret: string;
+  secretOrPrivateKey: string;
+  jwtAlgorithm?: JwtAlgorithms;
   jwtExpiration?: string;
   rpID: string;
   origin: string;
@@ -20,18 +22,20 @@ export default class JWTChallengeAdapter extends BaseAdapter {
   jwtExpiration = '2m';
   key = 'JWTChallengeAdapter';
   options: JWTChallengeAdapterConstructorOptions;
+  jwtAlgorithm: JwtAlgorithms = 'HS256';
 
   constructor(options: JWTChallengeAdapterConstructorOptions) {
     super();
-    const { secret, jwtExpiration } = options;
+    const { secretOrPrivateKey, jwtExpiration, jwtAlgorithm } = options;
     this.options = options;
-    if (secret && secret.length < this.recommendedSecretLength) {
+    if (secretOrPrivateKey && secretOrPrivateKey.length < this.recommendedSecretLength) {
       throw new Error(
         `jwt secret seems too weak please use a secret with more than ${this.recommendedSecretLength} chars`,
       );
     }
-    this.secret = secret;
+    this.secret = secretOrPrivateKey;
     if (jwtExpiration) this.jwtExpiration = jwtExpiration;
+    if (jwtAlgorithm) this.jwtAlgorithm = jwtAlgorithm;
   }
 
   assert(opts: assertIO): assertIO {
@@ -49,7 +53,7 @@ export default class JWTChallengeAdapter extends BaseAdapter {
         origin: this.options.origin,
       } as SignChallengePayload,
       this.secret,
-      { expiresIn: this.jwtExpiration },
+      { expiresIn: this.jwtExpiration, algorithm: this.jwtAlgorithm },
     );
   }
 
@@ -57,7 +61,9 @@ export default class JWTChallengeAdapter extends BaseAdapter {
     const response = opts.credential.adapters?.[this.key];
     if (!response) super.throwMissingKey();
 
-    const signedChallengePayload = verify(response, this.secret) as SignChallengePayload;
+    const signedChallengePayload = verify(response, this.secret, {
+      algorithms: [this.jwtAlgorithm],
+    }) as SignChallengePayload;
     opts.expectedChallenge = signedChallengePayload.challenge;
     opts.expectedOrigin = signedChallengePayload.origin;
     opts.expectedRPID = signedChallengePayload.rpID;
