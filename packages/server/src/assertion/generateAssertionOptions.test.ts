@@ -1,7 +1,6 @@
 jest.mock('../helpers/generateChallenge');
-import { verify } from 'jsonwebtoken';
-import verifyChallenge from '../helpers/verifyChallenge';
 
+import BaseAdapter from '../adapters/BaseAdapter';
 import generateAssertionOptions from './generateAssertionOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -122,19 +121,16 @@ test('should set rpId if specified', () => {
   expect(opts.rpId).toEqual(rpID);
 });
 
-test('should set signedChallenge if serverSecret specified', () => {
-  const serverSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
-
-  const opts = generateAssertionOptions({
-    allowCredentials: [],
-    serverSecret,
-    rpID: 'test',
-    origin: 'test',
+test('should use adapters if provided', () => {
+  BaseAdapter.prototype.assert = jest.fn();
+  const options = generateAssertionOptions({
+    challenge: 'totallyrandomvalue',
+    adapters: [new BaseAdapter(), new BaseAdapter()],
+    allowCredentials: [
+      { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
+      { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
+    ],
   });
 
-  expect(opts.signedChallenge).toBeDefined();
-  const verifiedChallenge = verifyChallenge(opts.signedChallenge, serverSecret);
-  expect(verifiedChallenge.challenge).toEqual(opts.challenge);
-  expect(verifiedChallenge.rpID).toEqual(opts.rpId);
-  expect(verifiedChallenge.origin).toEqual('test');
+  expect(BaseAdapter.prototype.assert).toHaveBeenNthCalledWith(2, options);
 });

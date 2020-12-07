@@ -4,7 +4,13 @@ import verifyAssertionResponse from './verifyAssertionResponse';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
-import signChallenge from '../helpers/signChallenge';
+import {
+  assertionResponse,
+  assertionOrigin,
+  assertionChallenge,
+  authenticator,
+  assertionRPID,
+} from './testHelper';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -24,23 +30,7 @@ test('should verify an assertion response', () => {
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
-    expectedRPID: 'dev.dontneeda.pw',
-    authenticator: authenticator,
-  });
-
-  expect(verification.verified).toEqual(true);
-});
-
-test('should verify an assertion response with signedChallenge', () => {
-  const serverSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
-
-  const verification = verifyAssertionResponse({
-    credential: assertionResponse,
-    signedChallenge: signChallenge(
-      { challenge: assertionChallenge, rpID: 'dev.dontneeda.pw', origin: assertionOrigin },
-      serverSecret,
-    ) as string,
-    serverSecret,
+    expectedRPID: assertionRPID,
     authenticator: authenticator,
   });
 
@@ -52,7 +42,7 @@ test('should return authenticator info after verification', () => {
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
-    expectedRPID: 'dev.dontneeda.pw',
+    expectedRPID: assertionRPID,
     authenticator: authenticator,
   });
 
@@ -66,7 +56,7 @@ test('should throw when response challenge is not expected value', () => {
       credential: assertionResponse,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://different.address',
-      expectedRPID: 'dev.dontneeda.pw',
+      expectedRPID: assertionRPID,
       authenticator: authenticator,
     });
   }).toThrow(/assertion challenge/i);
@@ -78,7 +68,7 @@ test('should throw when response origin is not expected value', () => {
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: 'https://different.address',
-      expectedRPID: 'dev.dontneeda.pw',
+      expectedRPID: assertionRPID,
       authenticator: authenticator,
     });
   }).toThrow(/assertion origin/i);
@@ -97,7 +87,7 @@ test('should throw when assertion type is not webauthn.create', () => {
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
-      expectedRPID: 'dev.dontneeda.pw',
+      expectedRPID: assertionRPID,
       authenticator: authenticator,
     });
   }).toThrow(/assertion type/i);
@@ -105,7 +95,7 @@ test('should throw when assertion type is not webauthn.create', () => {
 
 test('should throw error if user was not present', () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: toHash(Buffer.from(assertionRPID, 'ascii')),
     flags: 0,
   });
 
@@ -114,7 +104,7 @@ test('should throw error if user was not present', () => {
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
-      expectedRPID: 'dev.dontneeda.pw',
+      expectedRPID: assertionRPID,
       authenticator: authenticator,
     });
   }).toThrow(/not present/i);
@@ -133,7 +123,7 @@ test('should throw error if previous counter value is not less than in response'
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
-      expectedRPID: 'dev.dontneeda.pw',
+      expectedRPID: assertionRPID,
       authenticator: badDevice,
     });
   }).toThrow(/counter value/i);
@@ -150,7 +140,7 @@ test('should throw error if assertion RP ID is unexpected value', () => {
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
-      expectedRPID: 'dev.dontneeda.pw',
+      expectedRPID: assertionRPID,
       authenticator: authenticator,
     });
   }).toThrow(/rp id/i);
@@ -161,7 +151,7 @@ test('should not compare counters if both are 0', () => {
     credential: assertionFirstTimeUsedResponse,
     expectedChallenge: assertionFirstTimeUsedChallenge,
     expectedOrigin: assertionFirstTimeUsedOrigin,
-    expectedRPID: 'dev.dontneeda.pw',
+    expectedRPID: assertionRPID,
     authenticator: authenticatorFirstTimeUsed,
   });
 
@@ -186,7 +176,7 @@ test('should throw an error if user verification is required but user was not ve
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
-      expectedRPID: 'dev.dontneeda.pw',
+      expectedRPID: assertionRPID,
       authenticator: authenticator,
       fidoUserVerification: 'required',
     });
@@ -213,7 +203,7 @@ test.skip('should verify TPM assertion', () => {
     },
     expectedChallenge,
     expectedOrigin: assertionOrigin,
-    expectedRPID: 'dev.dontneeda.pw',
+    expectedRPID: assertionRPID,
     authenticator: {
       publicKey: 'BAEAAQ',
       credentialID: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
@@ -223,37 +213,6 @@ test.skip('should verify TPM assertion', () => {
 
   expect(verification.verified).toEqual(true);
 });
-
-/**
- * Assertion examples below
- */
-
-const assertionResponse = {
-  id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
-  rawId: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
-  response: {
-    authenticatorData: 'PdxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KABAAAAkA==',
-    clientDataJSON:
-      'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sVWFXMWwiLCJj' +
-      'bGllbnRFeHRlbnNpb25zIjp7fSwiaGFzaEFsZ29yaXRobSI6IlNIQS0yNTYiLCJvcmlnaW4iOiJodHRwczovL2Rldi5k' +
-      'b250bmVlZGEucHciLCJ0eXBlIjoid2ViYXV0aG4uZ2V0In0=',
-    signature:
-      'MEUCIQDYXBOpCWSWq2Ll4558GJKD2RoWg958lvJSB_GdeokxogIgWuEVQ7ee6AswQY0OsuQ6y8Ks6' +
-      'jhd45bDx92wjXKs900=',
-  },
-  getClientExtensionResults: () => ({}),
-  type: 'public-key',
-};
-const assertionChallenge = base64url.encode('totallyUniqueValueEveryTime');
-const assertionOrigin = 'https://dev.dontneeda.pw';
-
-const authenticator = {
-  publicKey:
-    'pQECAyYgASFYIIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A1Ilgg8WGeA6hPmnab0HAViUYVRkwTNcN77QBf_RR0dv3lIvQ',
-  credentialID:
-    'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
-  counter: 143,
-};
 
 /**
  * Represented a device that's being used on the website for the first time

@@ -6,31 +6,10 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialDescriptorJSON,
   PublicKeyCredentialParameters,
-  PublicKeyCredentialCreationOptionsJSONWithSignedChallenge,
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
-import signChallenge from '../helpers/signChallenge';
 import generateChallenge from '../helpers/generateChallenge';
-
-interface Options {
-  rpName: string;
-  rpID: string;
-  userID: string;
-  userName: string;
-  challenge?: string | Buffer;
-  userDisplayName?: string;
-  timeout?: number;
-  attestationType?: AttestationConveyancePreference;
-  excludeCredentials?: PublicKeyCredentialDescriptorJSON[];
-  authenticatorSelection?: AuthenticatorSelectionCriteria;
-  extensions?: AuthenticationExtensionsClientInputs;
-  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
-}
-
-interface OptionsWithServerSecret extends Options {
-  origin: string;
-  serverSecret: string;
-}
+import { GenerateAttestationOptions } from './options';
 
 /**
  * Supported crypto algo identifiers
@@ -79,12 +58,9 @@ const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
 const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id => id !== -65535);
 
 export default function generateAttestationOptions(
-  options: Options,
+  options: GenerateAttestationOptions,
 ): PublicKeyCredentialCreationOptionsJSON;
 
-export default function generateAttestationOptions(
-  options: OptionsWithServerSecret,
-): PublicKeyCredentialCreationOptionsJSONWithSignedChallenge;
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
  *
@@ -109,10 +85,8 @@ export default function generateAttestationOptions(
  * to avoid storing the challenge into your DB, and enable stateless challenge validation
  */
 export default function generateAttestationOptions(
-  options: OptionsWithServerSecret | Options,
-):
-  | PublicKeyCredentialCreationOptionsJSON
-  | PublicKeyCredentialCreationOptionsJSONWithSignedChallenge {
+  options: GenerateAttestationOptions,
+): PublicKeyCredentialCreationOptionsJSON {
   const {
     rpName,
     rpID,
@@ -126,9 +100,7 @@ export default function generateAttestationOptions(
     authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
     supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
-    serverSecret,
-    origin,
-  } = options as OptionsWithServerSecret;
+  } = options;
 
   /**
    * Prepare pubKeyCredParams from the array of algorithm ID's
@@ -141,7 +113,6 @@ export default function generateAttestationOptions(
   const base64Challenge = base64url.encode(challenge);
   return {
     challenge: base64Challenge,
-    signedChallenge: signChallenge({ challenge: base64Challenge, rpID, origin }, serverSecret),
     rp: {
       name: rpName,
       id: rpID,

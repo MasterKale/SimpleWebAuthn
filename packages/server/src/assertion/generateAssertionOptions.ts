@@ -1,37 +1,8 @@
-import type {
-  AuthenticationExtensionsClientInputs,
-  PublicKeyCredentialRequestOptionsJSON,
-  PublicKeyCredentialRequestOptionsJSONWithSignedChallenge,
-  PublicKeyCredentialDescriptorJSON,
-  UserVerificationRequirement,
-} from '@simplewebauthn/typescript-types';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
-import signChallenge from '../helpers/signChallenge';
+import { GenerateAssertionOptions } from './options';
 
 import generateChallenge from '../helpers/generateChallenge';
-
-interface Options {
-  allowCredentials: PublicKeyCredentialDescriptorJSON[];
-  challenge?: string | Buffer;
-  timeout?: number;
-  userVerification?: UserVerificationRequirement;
-  extensions?: AuthenticationExtensionsClientInputs;
-  rpID?: string;
-}
-
-interface OptionsWithServerSecret extends Omit<Options, 'rpID'> {
-  serverSecret: string;
-  rpID: string;
-  origin: string;
-}
-
-export default function generateAssertionOptions(
-  options: Options,
-): PublicKeyCredentialRequestOptionsJSON;
-
-export default function generateAssertionOptions(
-  options: OptionsWithServerSecret,
-): PublicKeyCredentialRequestOptionsJSONWithSignedChallenge;
 
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
@@ -48,10 +19,8 @@ export default function generateAssertionOptions(
  * to avoid storing the challenge into your DB, and enable stateless challenge validation
  */
 export default function generateAssertionOptions(
-  options: OptionsWithServerSecret | Options,
-):
-  | PublicKeyCredentialRequestOptionsJSON
-  | PublicKeyCredentialRequestOptionsJSONWithSignedChallenge {
+  options: GenerateAssertionOptions,
+): PublicKeyCredentialRequestOptionsJSON {
   const {
     allowCredentials,
     challenge = generateChallenge(),
@@ -59,18 +28,25 @@ export default function generateAssertionOptions(
     userVerification,
     extensions,
     rpID,
-    serverSecret,
-    origin,
-  } = options as OptionsWithServerSecret;
+    adapters,
+  } = options;
 
   const base64Challenge = base64url.encode(challenge);
-  return {
+
+  const response = {
     challenge: base64Challenge,
-    signedChallenge: signChallenge({ challenge: base64Challenge, rpID, origin }, serverSecret),
+    adapters: {},
     allowCredentials,
     timeout,
     userVerification,
     extensions,
     rpId: rpID,
   };
+
+  if (!adapters) return response;
+
+  return adapters.reduce<PublicKeyCredentialRequestOptionsJSON>(
+    (acc, adapter) => adapter.assert(acc),
+    response,
+  );
 }

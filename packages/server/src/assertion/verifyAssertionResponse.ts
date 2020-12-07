@@ -1,9 +1,4 @@
 import base64url from 'base64url';
-import {
-  AssertionCredentialJSON,
-  AuthenticatorDevice,
-  UserVerificationRequirement,
-} from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import toHash from '../helpers/toHash';
@@ -11,27 +6,7 @@ import convertPublicKeyToPEM from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
-import verifyChallenge from '../helpers/verifyChallenge';
-
-type Options = {
-  credential: AssertionCredentialJSON;
-  expectedChallenge?: string;
-  expectedOrigin: string;
-  expectedRPID: string;
-  authenticator: AuthenticatorDevice;
-  fidoUserVerification?: UserVerificationRequirement;
-};
-
-interface OptionsWithSignedChallenge
-  extends Omit<Options, 'expectedChallenge' | 'expectedOrigin' | 'expectedRPID'> {
-  signedChallenge: string;
-  serverSecret: string;
-}
-
-export default function verifyAssertionResponse(options: Options): VerifiedAssertion;
-export default function verifyAssertionResponse(
-  options: OptionsWithSignedChallenge,
-): VerifiedAssertion;
+import { VerifyAssertionOptions } from './options';
 
 /**
  * Verify that the user has legitimately completed the login process
@@ -51,23 +26,23 @@ export default function verifyAssertionResponse(
  * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
 export default function verifyAssertionResponse(
-  options: Options | OptionsWithSignedChallenge,
+  options: VerifyAssertionOptions,
 ): VerifiedAssertion {
-  const { credential, authenticator, fidoUserVerification } = options;
-
-  let { expectedChallenge, expectedOrigin, expectedRPID } = options as Options;
-
-  const { serverSecret, signedChallenge } = options as OptionsWithSignedChallenge;
-
-  if (!expectedChallenge && !(serverSecret && signedChallenge))
-    throw new Error('You need to provided challenge OR signedChallenge and serverSecret');
-
-  if (serverSecret && signedChallenge) {
-    const signedChallengePayload = verifyChallenge(signedChallenge, serverSecret);
-    expectedChallenge = signedChallengePayload.challenge;
-    expectedOrigin = signedChallengePayload.origin;
-    expectedRPID = signedChallengePayload.rpID;
+  if (options.adapters) {
+    options = options.adapters.reduce((acc, adapter) => adapter.verifyAssert(acc), options);
   }
+  const {
+    credential,
+    authenticator,
+    fidoUserVerification,
+    expectedChallenge,
+    expectedOrigin,
+    expectedRPID,
+  } = options;
+
+  if (!expectedRPID) throw new Error('Missing expectedRPID check options/adapters');
+  if (!expectedOrigin) throw new Error('Missing expectedOrigin check options/adapters');
+  if (!expectedChallenge) throw new Error('Missing expectedChallenge check options/adapters');
 
   const { id, rawId, type: credentialType, response } = credential;
 

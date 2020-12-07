@@ -1,8 +1,4 @@
 import base64url from 'base64url';
-import {
-  AttestationCredentialJSON,
-  COSEAlgorithmIdentifier,
-} from '@simplewebauthn/typescript-types';
 
 import decodeAttestationObject, { ATTESTATION_FORMATS } from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -18,30 +14,7 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
-import verifyChallenge from '../helpers/verifyChallenge';
-
-interface Options {
-  credential: AttestationCredentialJSON;
-  expectedChallenge: string;
-  expectedOrigin: string;
-  expectedRPID?: string;
-  requireUserVerification?: boolean;
-  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
-}
-
-interface OptionsWithSignedChallenge
-  extends Omit<Options, 'expectedChallenge' | 'expectedRPID' | 'expectedOrigin'> {
-  signedChallenge: string;
-  serverSecret: string;
-}
-
-export default async function verifyAttestationResponse(
-  options: Options,
-): Promise<VerifiedAttestation>;
-
-export default async function verifyAttestationResponse(
-  options: OptionsWithSignedChallenge,
-): Promise<VerifiedAttestation>;
+import { VerifyAttestationOptions } from './options';
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -59,26 +32,16 @@ export default async function verifyAttestationResponse(
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export default async function verifyAttestationResponse(
-  options: Options | OptionsWithSignedChallenge,
+  options: VerifyAttestationOptions,
 ): Promise<VerifiedAttestation> {
   const {
     credential,
     requireUserVerification = false,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
+    expectedChallenge,
+    expectedRPID,
+    expectedOrigin,
   } = options;
-
-  let { expectedChallenge, expectedRPID, expectedOrigin } = options as Options;
-
-  const { serverSecret, signedChallenge } = options as OptionsWithSignedChallenge;
-  if (!expectedChallenge && !(serverSecret && signedChallenge))
-    throw new Error('You need to provided challenge OR signedChallenge and serverSecret');
-
-  if (serverSecret && signedChallenge) {
-    const signedChallengePayload = verifyChallenge(signedChallenge, serverSecret);
-    expectedChallenge = signedChallengePayload.challenge;
-    expectedOrigin = signedChallengePayload.origin;
-    expectedRPID = signedChallengePayload.rpID;
-  }
 
   const { id, rawId, type: credentialType, response } = credential;
 
