@@ -45,6 +45,12 @@ const goodOpts3: PublicKeyCredentialRequestOptionsJSON = {
   timeout: 1,
 };
 
+const goodOpts4: PublicKeyCredentialRequestOptionsJSON = {
+  challenge: bufferToBase64URLString(toUint8Array('fizz')),
+  timeout: 1,
+  allowCredentials: [],
+};
+
 beforeEach(() => {
   mockNavigatorGet.mockReset();
   mockSupportsWebauthn.mockReset();
@@ -65,22 +71,42 @@ test('should convert options before passing to navigator.credentials.get(...)', 
     },
   );
 
-  const checkWithOpts = async (opts: PublicKeyCredentialRequestOptionsJSON) => {
-    await startAssertion(opts);
+  await startAssertion(goodOpts1);
 
-    const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
-    const credId = argsPublicKey.allowCredentials[0].id;
+  const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
+  const credId = argsPublicKey.allowCredentials[0].id;
 
-    expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
-    // Make sure the credential ID is an ArrayBuffer with a length of 64
-    expect(credId instanceof ArrayBuffer).toEqual(true);
-    expect(credId.byteLength).toEqual(64);
-  };
-
-  await checkWithOpts(goodOpts1);
-  await checkWithOpts(goodOpts3);
+  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
+  // Make sure the credential ID is an ArrayBuffer with a length of 64
+  expect(credId instanceof ArrayBuffer).toEqual(true);
+  expect(credId.byteLength).toEqual(64);
 
   done();
+});
+
+test('should support optional allowCredential', async () => {
+  mockSupportsWebauthn.mockReturnValue(true);
+
+  // Stub out a response so the method won't throw
+  mockNavigatorGet.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({
+          response: {},
+          getClientExtensionResults: () => ({}),
+        });
+      });
+    },
+  );
+
+  await startAssertion(goodOpts3);
+  let allowCredentials = mockNavigatorGet.mock.calls[0][0].allowCredentials;
+  expect(allowCredentials).toEqual(undefined);
+
+  // Should convert empty array to undefined
+  await startAssertion(goodOpts4);
+  allowCredentials = mockNavigatorGet.mock.calls[1][0].allowCredentials;
+  expect(allowCredentials).toEqual(undefined);
 });
 
 test('should return base64url-encoded response values', async done => {
