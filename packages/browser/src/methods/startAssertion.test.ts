@@ -39,18 +39,6 @@ const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
   timeout: 1,
 };
 
-// Without allow credentials
-const goodOpts3: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(toUint8Array('fizz')),
-  timeout: 1,
-};
-
-const goodOpts4: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(toUint8Array('fizz')),
-  timeout: 1,
-  allowCredentials: [],
-};
-
 beforeEach(() => {
   mockNavigatorGet.mockReset();
   mockSupportsWebauthn.mockReset();
@@ -99,14 +87,35 @@ test('should support optional allowCredential', async () => {
     },
   );
 
-  await startAssertion(goodOpts3);
-  let allowCredentials = mockNavigatorGet.mock.calls[0][0].allowCredentials;
-  expect(allowCredentials).toEqual(undefined);
+  await startAssertion({
+    challenge: bufferToBase64URLString(toUint8Array('fizz')),
+    timeout: 1,
+  });
 
-  // Should convert empty array to undefined
-  await startAssertion(goodOpts4);
-  allowCredentials = mockNavigatorGet.mock.calls[1][0].allowCredentials;
-  expect(allowCredentials).toEqual(undefined);
+  expect(mockNavigatorGet.mock.calls[0][0].allowCredentials).toEqual(undefined);
+});
+
+test('should convert allow allowCredential to undefined when empty', async () => {
+  mockSupportsWebauthn.mockReturnValue(true);
+
+  // Stub out a response so the method won't throw
+  mockNavigatorGet.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({
+          response: {},
+          getClientExtensionResults: () => ({}),
+        });
+      });
+    },
+  );
+
+  await startAssertion({
+    challenge: bufferToBase64URLString(toUint8Array('fizz')),
+    timeout: 1,
+    allowCredentials: [],
+  });
+  expect(mockNavigatorGet.mock.calls[0][0].allowCredentials).toEqual(undefined);
 });
 
 test('should return base64url-encoded response values', async done => {

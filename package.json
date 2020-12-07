@@ -8,7 +8,9 @@
     "test": "lerna run test",
     "build:types": "lerna bootstrap --scope=@simplewebauthn/typescript-types",
     "build:browser": "lerna bootstrap --scope=@simplewebauthn/browser",
-    "build:server": "lerna bootstrap --scope=@simplewebauthn/server"
+    "build:server": "lerna bootstrap --scope=@simplewebauthn/server",
+    "dev:server": "lerna exec npm run test:watch --scope=@simplewebauthn/server",
+    "dev:browser": "lerna exec npm run test:watch --scope=@simplewebauthn/browser"
   },
   "devDependencies": {
     "@simplewebauthn/typescript-types": "^0.10.0",
