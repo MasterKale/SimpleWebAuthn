@@ -36,6 +36,8 @@ export interface PublicKeyCredentialRequestOptionsJSON
   extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
   challenge: Base64URLString;
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adapters?: { [adapterName: string]: any };
 }
 
 export interface PublicKeyCredentialDescriptorJSON
@@ -80,6 +82,8 @@ export interface AssertionCredential extends PublicKeyCredential {
 export interface AssertionCredentialJSON
   extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adapters?: { [adapterName: string]: any };
   response: AuthenticatorAssertionResponseJSON;
 }
 
