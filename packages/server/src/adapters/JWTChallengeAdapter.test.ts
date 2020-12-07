@@ -27,11 +27,26 @@ test('should throw on weak secret', () => {
   expect(adapter.secret).toEqual(strongSecret);
 });
 
-test('should handle JWT expiration', () => {
-  expect(new JWTChallengeAdapter(goodBaseOptions).jwtExpiration).toEqual('2m');
+test('should have default jwt options', () => {
+  expect(new JWTChallengeAdapter(goodBaseOptions).jwtOptions).toEqual({
+    verify: { algorithms: ['HS256'] },
+    sign: { algorithm: 'HS256', expiresIn: '2m' },
+  });
+});
+
+test('should handle JWT options', () => {
   expect(
-    new JWTChallengeAdapter({ ...goodBaseOptions, jwtExpiration: '6m' }).jwtExpiration,
-  ).toEqual('6m');
+    new JWTChallengeAdapter({
+      ...goodBaseOptions,
+      jwtOptions: {
+        verify: { algorithms: ['RS512'] },
+        sign: { algorithm: 'RS512', expiresIn: '10m' },
+      },
+    }).jwtOptions,
+  ).toEqual({
+    verify: { algorithms: ['RS512'] },
+    sign: { algorithm: 'RS512', expiresIn: '10m' },
+  });
 });
 
 test('should assert', () => {

@@ -1,11 +1,13 @@
-import { sign, verify } from 'jsonwebtoken';
+import { sign, verify, VerifyOptions, SignOptions } from 'jsonwebtoken';
 import BaseAdapter, { assertIO, verifyAssertIO, attestIO, verifyAttestIO } from './BaseAdapter';
 
-type JwtAlgorithms = 'HS256' | 'RS256' | 'HS512' | 'RS512';
+interface JwtOptions {
+  verify: VerifyOptions;
+  sign: SignOptions;
+}
 interface JWTChallengeAdapterConstructorOptions {
   secretOrPrivateKey: string;
-  jwtAlgorithm?: JwtAlgorithms;
-  jwtExpiration?: string;
+  jwtOptions?: JwtOptions;
   rpID: string;
   origin: string;
 }
@@ -19,14 +21,16 @@ export interface SignChallengePayload {
 export default class JWTChallengeAdapter extends BaseAdapter {
   secret: string;
   recommendedSecretLength = 64;
-  jwtExpiration = '2m';
   key = 'JWTChallengeAdapter';
+  jwtOptions: JwtOptions = {
+    verify: { algorithms: ['HS256'] },
+    sign: { algorithm: 'HS256', expiresIn: '2m' },
+  };
   options: JWTChallengeAdapterConstructorOptions;
-  jwtAlgorithm: JwtAlgorithms = 'HS256';
 
   constructor(options: JWTChallengeAdapterConstructorOptions) {
     super();
-    const { secretOrPrivateKey, jwtExpiration, jwtAlgorithm } = options;
+    const { secretOrPrivateKey, jwtOptions } = options;
     this.options = options;
     if (secretOrPrivateKey && secretOrPrivateKey.length < this.recommendedSecretLength) {
       throw new Error(
@@ -34,8 +38,7 @@ export default class JWTChallengeAdapter extends BaseAdapter {
       );
     }
     this.secret = secretOrPrivateKey;
-    if (jwtExpiration) this.jwtExpiration = jwtExpiration;
-    if (jwtAlgorithm) this.jwtAlgorithm = jwtAlgorithm;
+    if (jwtOptions) this.jwtOptions = jwtOptions;
   }
 
   assert(opts: assertIO): assertIO {
@@ -53,7 +56,7 @@ export default class JWTChallengeAdapter extends BaseAdapter {
         origin: this.options.origin,
       } as SignChallengePayload,
       this.secret,
-      { expiresIn: this.jwtExpiration, algorithm: this.jwtAlgorithm },
+      { expiresIn: '2m', ...this.jwtOptions.sign },
     );
   }
 
@@ -61,9 +64,11 @@ export default class JWTChallengeAdapter extends BaseAdapter {
     const response = opts.credential.adapters?.[this.key];
     if (!response) super.throwMissingKey();
 
-    const signedChallengePayload = verify(response, this.secret, {
-      algorithms: [this.jwtAlgorithm],
-    }) as SignChallengePayload;
+    const signedChallengePayload = verify(
+      response,
+      this.secret,
+      this.jwtOptions.verify,
+    ) as SignChallengePayload;
     opts.expectedChallenge = signedChallengePayload.challenge;
     opts.expectedOrigin = signedChallengePayload.origin;
     opts.expectedRPID = signedChallengePayload.rpID;
