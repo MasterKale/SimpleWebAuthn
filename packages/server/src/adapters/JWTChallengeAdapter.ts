@@ -1,10 +1,10 @@
 import { sign, verify } from 'jsonwebtoken';
-import BaseAdapter, { assertIO, verifyAssertIO } from './BaseAdapter';
+import BaseAdapter, { assertIO, verifyAssertIO, attestIO, verifyAttestIO } from './BaseAdapter';
 
 interface JWTChallengeAdapterConstructorOptions {
   secret: string;
   jwtExpiration?: string;
-  rpID?: string;
+  rpID: string;
   origin: string;
 }
 
@@ -35,22 +35,25 @@ export default class JWTChallengeAdapter extends BaseAdapter {
   }
 
   assert(opts: assertIO): assertIO {
-    const rpID = opts.rpId || this.options.rpID;
-    if (!rpID) throw new Error('You need to at least provide rpID on adapter');
-    const origin = this.options.origin;
-
-    if (!opts.adapters) opts.adapters = {};
-
-    opts.adapters[this.key] = sign(
-      { challenge: opts.challenge, rpID, origin } as SignChallengePayload,
-      this.secret,
-      { expiresIn: this.jwtExpiration },
-    );
-
+    this.signChallenge(opts);
     return opts;
   }
 
-  verifyAssert(opts: verifyAssertIO): verifyAssertIO {
+  signChallenge(opts: assertIO | attestIO): void {
+    if (!opts.adapters) opts.adapters = {};
+
+    opts.adapters[this.key] = sign(
+      {
+        challenge: opts.challenge,
+        rpID: this.options.rpID,
+        origin: this.options.origin,
+      } as SignChallengePayload,
+      this.secret,
+      { expiresIn: this.jwtExpiration },
+    );
+  }
+
+  verifyChallenge(opts: verifyAssertIO | verifyAttestIO): void {
     const response = opts.credential.adapters?.[this.key];
     if (!response) super.throwMissingKey();
 
@@ -58,6 +61,20 @@ export default class JWTChallengeAdapter extends BaseAdapter {
     opts.expectedChallenge = signedChallengePayload.challenge;
     opts.expectedOrigin = signedChallengePayload.origin;
     opts.expectedRPID = signedChallengePayload.rpID;
+  }
+
+  verifyAssert(opts: verifyAssertIO): verifyAssertIO {
+    this.verifyChallenge(opts);
+    return opts;
+  }
+
+  attest(opts: attestIO): attestIO {
+    this.signChallenge(opts);
+    return opts;
+  }
+
+  verifyAttest(opts: verifyAttestIO): verifyAttestIO {
+    this.verifyChallenge(opts);
     return opts;
   }
 }

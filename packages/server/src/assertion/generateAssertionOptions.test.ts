@@ -122,7 +122,7 @@ test('should set rpId if specified', () => {
 });
 
 test('should use adapters if provided', () => {
-  BaseAdapter.prototype.assert = jest.fn();
+  BaseAdapter.prototype.assert = jest.fn().mockImplementation(o => o);
   const options = generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     adapters: [new BaseAdapter(), new BaseAdapter()],

@@ -9,7 +9,7 @@ import {
 import BaseAdapter from 'adapters/BaseAdapter';
 
 export interface GenerateAttestationOptions {
-  adapters: BaseAdapter[];
+  adapters?: BaseAdapter[];
   rpName: string;
   rpID: string;
   userID: string;
@@ -25,10 +25,10 @@ export interface GenerateAttestationOptions {
 }
 
 export interface VerifyAttestationOptions {
-  adapters: BaseAdapter[];
+  adapters?: BaseAdapter[];
   credential: AttestationCredentialJSON;
-  expectedChallenge: string;
-  expectedOrigin: string;
+  expectedChallenge?: string;
+  expectedOrigin?: string;
   expectedRPID?: string;
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];

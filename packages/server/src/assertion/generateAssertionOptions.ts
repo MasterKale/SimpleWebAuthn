@@ -35,7 +35,6 @@ export default function generateAssertionOptions(
 
   const response = {
     challenge: base64Challenge,
-    adapters: {},
     allowCredentials,
     timeout,
     userVerification,

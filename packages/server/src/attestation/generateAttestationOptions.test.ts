@@ -1,6 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
-import verifyChallenge from '../helpers/verifyChallenge';
+import BaseAdapter from '../adapters/BaseAdapter';
 import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -164,21 +164,16 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
   ]);
 });
 
-test('should set signedChallenge if serverSecret specified', () => {
-  const serverSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
-
-  const opts = generateAttestationOptions({
+test('should use adapters if provided', () => {
+  BaseAdapter.prototype.attest = jest.fn().mockImplementation(o => o);
+  const options = generateAttestationOptions({
     rpID: 'not.real',
-    origin: 'test',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
     userName: 'usernameHere',
-    serverSecret,
+    adapters: [new BaseAdapter(), new BaseAdapter()],
+    supportedAlgorithmIDs: [-7, -8, -65535],
   });
 
-  const verifiedChallenge = verifyChallenge(opts.signedChallenge, serverSecret);
-  expect(opts.signedChallenge).toBeDefined();
-  expect(verifiedChallenge.challenge).toEqual(opts.challenge);
-  expect(verifiedChallenge.origin).toEqual('test');
-  expect(verifiedChallenge.rpID).toEqual('not.real');
+  expect(BaseAdapter.prototype.attest).toHaveBeenNthCalledWith(2, options);
 });

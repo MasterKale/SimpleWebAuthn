@@ -9,8 +9,8 @@ import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey
 
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
-import signChallenge from '../helpers/signChallenge';
 import toHash from '../helpers/toHash';
+import BaseAdapter from '../adapters/BaseAdapter';
 
 let mockDecodeAttestation: jest.SpyInstance;
 let mockDecodeClientData: jest.SpyInstance;
@@ -40,32 +40,6 @@ test('should verify FIDO U2F attestation', async () => {
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
-  });
-
-  expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('fido-u2f');
-  expect(verification.authenticatorInfo?.counter).toEqual(0);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
-  );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
-  );
-});
-
-test('should verify FIDO U2F attestation with signedChallenge', async () => {
-  const serverSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
-  const verification = await verifyAttestationResponse({
-    credential: attestationFIDOU2F,
-    signedChallenge: signChallenge(
-      {
-        challenge: attestationFIDOU2FChallenge,
-        rpID: 'dev.dontneeda.pw',
-        origin: 'https://dev.dontneeda.pw',
-      },
-      serverSecret,
-    ) as string,
-    serverSecret,
   });
 
   expect(verification.verified).toEqual(true);
@@ -463,6 +437,21 @@ test('should validate Android-Key response', async () => {
   expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
     'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
   );
+});
+
+test('should use adapters if provided', async () => {
+  BaseAdapter.prototype.verifyAttest = jest.fn().mockImplementation(o => o);
+  const opts = {
+    credential: attestationFIDOU2F,
+    expectedChallenge: attestationFIDOU2FChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+    adapters: [new BaseAdapter(), new BaseAdapter()],
+  };
+
+  await verifyAttestationResponse(opts);
+
+  expect(BaseAdapter.prototype.verifyAttest).toHaveBeenNthCalledWith(2, opts);
 });
 
 /**

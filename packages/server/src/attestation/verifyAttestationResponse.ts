@@ -34,6 +34,9 @@ import { VerifyAttestationOptions } from './options';
 export default async function verifyAttestationResponse(
   options: VerifyAttestationOptions,
 ): Promise<VerifiedAttestation> {
+  if (options.adapters) {
+    options = options.adapters.reduce((acc, adapter) => adapter.verifyAttest(acc), options);
+  }
   const {
     credential,
     requireUserVerification = false,
@@ -42,6 +45,10 @@ export default async function verifyAttestationResponse(
     expectedRPID,
     expectedOrigin,
   } = options;
+
+  if (!expectedRPID) throw new Error('Missing expectedRPID check options/adapters');
+  if (!expectedOrigin) throw new Error('Missing expectedOrigin check options/adapters');
+  if (!expectedChallenge) throw new Error('Missing expectedChallenge check options/adapters');
 
   const { id, rawId, type: credentialType, response } = credential;
 

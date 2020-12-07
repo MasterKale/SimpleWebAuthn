@@ -26,6 +26,8 @@ export interface PublicKeyCredentialCreationOptionsJSON
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64URLString;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adapters?: { [adapterName: string]: any };
 }
 
 /**
@@ -66,6 +68,8 @@ export interface AttestationCredentialJSON
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
   transports?: AuthenticatorTransport[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  adapters?: { [adapterName: string]: any };
 }
 
 /**

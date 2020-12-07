@@ -1,10 +1,7 @@
 import type {
-  AttestationConveyancePreference,
-  AuthenticationExtensionsClientInputs,
   AuthenticatorSelectionCriteria,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialDescriptorJSON,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
@@ -57,10 +54,6 @@ const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
  */
 const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id => id !== -65535);
 
-export default function generateAttestationOptions(
-  options: GenerateAttestationOptions,
-): PublicKeyCredentialCreationOptionsJSON;
-
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
  *
@@ -100,6 +93,7 @@ export default function generateAttestationOptions(
     authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
     supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
+    adapters,
   } = options;
 
   /**
@@ -111,7 +105,7 @@ export default function generateAttestationOptions(
   }));
 
   const base64Challenge = base64url.encode(challenge);
-  return {
+  const response = {
     challenge: base64Challenge,
     rp: {
       name: rpName,
@@ -129,4 +123,11 @@ export default function generateAttestationOptions(
     authenticatorSelection,
     extensions,
   };
+
+  if (!adapters) return response;
+
+  return adapters.reduce<PublicKeyCredentialCreationOptionsJSON>(
+    (acc, adapter) => adapter.attest(acc),
+    response,
+  );
 }
