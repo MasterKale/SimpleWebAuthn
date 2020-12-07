@@ -45,6 +45,7 @@ export default async function startAttestation(
   // Convert values to base64 to make it easier to send back to the server
   const credentialJSON: AttestationCredentialJSON = {
     id,
+    adapters: creationOptionsJSON.adapters,
     rawId: bufferToBase64URLString(rawId),
     response: {
       attestationObject: bufferToBase64URLString(response.attestationObject),

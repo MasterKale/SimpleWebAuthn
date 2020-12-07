@@ -45,6 +45,7 @@ export default async function startAssertion(
   // Convert values to base64 to make it easier to send back to the server
   return {
     id,
+    adapters: requestOptionsJSON.adapters,
     rawId: bufferToBase64URLString(rawId),
     response: {
       authenticatorData: bufferToBase64URLString(response.authenticatorData),
