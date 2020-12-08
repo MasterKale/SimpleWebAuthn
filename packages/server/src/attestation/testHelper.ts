@@ -1,3 +1,4 @@
+import { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
 
 export const attestationCredential = {
@@ -19,9 +20,32 @@ export const attestationOrigin = 'https://dev.dontneeda.pw';
 export const attestationRPID = 'dev.dontneeda.pw';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const getAttestationOptions = () => ({
+export const getVerifyAttestOptions = () => ({
   credential: attestationCredential,
   expectedChallenge: attestationChallenge,
   expectedOrigin: attestationOrigin,
   expectedRPID: attestationRPID,
 });
+
+export const getAttestResponse = () =>
+  ({
+    // Challenge, base64url-encoded
+    challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
+    rp: {
+      name: 'test',
+      id: 'test',
+    },
+    user: {
+      id: 'test',
+      name: 'tstd',
+      displayName: 'test',
+    },
+    pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
+    timeout: 60000,
+    attestation: 'indirect',
+    excludeCredentials: [],
+    authenticatorSelection: {
+      requireResidentKey: false,
+      userVerification: 'preferred',
+    },
+  } as PublicKeyCredentialCreationOptionsJSON);

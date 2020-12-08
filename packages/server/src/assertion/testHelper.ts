@@ -33,10 +33,17 @@ export const authenticator = {
   counter: 143,
 };
 
-export const getAssertionOptions = () => ({
+export const getVerifyAssertOptions = () => ({
   credential: assertionResponse,
   expectedChallenge: assertionChallenge,
   expectedOrigin: assertionOrigin,
   expectedRPID: assertionRPID,
   authenticator: authenticator,
+});
+
+export const getAssertResponse = () => ({
+  challenge: 'totallyrandomvalue',
+  allowCredentials: [],
+  rpId: 'test',
+  adapters: {},
 });

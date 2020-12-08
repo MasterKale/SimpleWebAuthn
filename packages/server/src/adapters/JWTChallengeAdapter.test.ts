@@ -1,7 +1,8 @@
 import { verify } from 'jsonwebtoken';
 import JWTChallengeAdapter, { SignChallengePayload } from './JWTChallengeAdapter';
 import {
-  getAssertionOptions,
+  getVerifyAssertOptions,
+  getAssertResponse,
   assertionChallenge,
   assertionOrigin,
   assertionRPID,
@@ -10,7 +11,8 @@ import {
   attestationChallenge,
   attestationOrigin,
   attestationRPID,
-  getAttestationOptions,
+  getAttestResponse,
+  getVerifyAttestOptions,
 } from '../attestation/testHelper';
 const strongSecret = '17hMcXI0AvkM7f4OWxBPwRE30D6HnoFBHAJT8Wt6AnbOh0Y9X2sXERpXaavEVEDH';
 
@@ -52,12 +54,7 @@ test('should handle JWT options', () => {
 test('should assert', () => {
   const adapter = new JWTChallengeAdapter(goodBaseOptions);
 
-  const response = adapter.assert({
-    challenge: 'totallyrandomvalue',
-    allowCredentials: [],
-    rpId: 'test',
-    adapters: {},
-  });
+  const response = adapter.assert(getAssertResponse());
 
   expect(response.adapters?.[adapter.key]).toBeDefined();
 
@@ -77,7 +74,7 @@ test('should verify assert', () => {
     origin: assertionOrigin,
     rpID: assertionRPID,
   });
-  const opts1 = getAssertionOptions();
+  const opts1 = getVerifyAssertOptions();
   // @ts-ignore
   opts1.credential.adapters = undefined;
 
@@ -94,7 +91,7 @@ test('should verify assert', () => {
     adapters: {},
   });
 
-  const opts2 = getAssertionOptions();
+  const opts2 = getVerifyAssertOptions();
   opts2.credential.adapters = assertResponse.adapters as any;
 
   const response = adapter.verifyAssert(opts2);
@@ -106,27 +103,7 @@ test('should verify assert', () => {
 test('should attest', () => {
   const adapter = new JWTChallengeAdapter(goodBaseOptions);
 
-  const response = adapter.attest({
-    // Challenge, base64url-encoded
-    challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
-    rp: {
-      name: 'test',
-      id: 'test',
-    },
-    user: {
-      id: 'test',
-      name: 'tstd',
-      displayName: 'test',
-    },
-    pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
-    timeout: 60000,
-    attestation: 'indirect',
-    excludeCredentials: [],
-    authenticatorSelection: {
-      requireResidentKey: false,
-      userVerification: 'preferred',
-    },
-  });
+  const response = adapter.attest(getAttestResponse());
 
   expect(response.adapters?.[adapter.key]).toBeDefined();
 
@@ -146,7 +123,7 @@ test('should verify attest', () => {
     origin: attestationOrigin,
     rpID: attestationRPID,
   });
-  const opts1 = getAttestationOptions();
+  const opts1 = getVerifyAttestOptions();
   // @ts-ignore
   opts1.credential.adapters = undefined;
 
@@ -178,7 +155,7 @@ test('should verify attest', () => {
     },
   });
 
-  const opts2 = getAttestationOptions();
+  const opts2 = getVerifyAttestOptions();
   opts2.credential.adapters = attestResponse.adapters as any;
 
   const response = adapter.verifyAttest(opts2);
