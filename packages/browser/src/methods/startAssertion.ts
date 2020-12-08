@@ -21,11 +21,18 @@ export default async function startAssertion(
     throw new Error('WebAuthn is not supported in this browser');
   }
 
+  // We need to avoid passing empty array to avoid blocking retrieval
+  // of public key
+  let allowCredentials;
+  if (requestOptionsJSON.allowCredentials?.length !== 0) {
+    allowCredentials = requestOptionsJSON.allowCredentials?.map(toPublicKeyCredentialDescriptor);
+  }
+
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...requestOptionsJSON,
     challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
-    allowCredentials: requestOptionsJSON.allowCredentials.map(toPublicKeyCredentialDescriptor),
+    allowCredentials,
   };
 
   // Wait for the user to complete assertion

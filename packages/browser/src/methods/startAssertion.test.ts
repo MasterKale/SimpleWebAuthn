@@ -72,6 +72,52 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   done();
 });
 
+test('should support optional allowCredential', async () => {
+  mockSupportsWebauthn.mockReturnValue(true);
+
+  // Stub out a response so the method won't throw
+  mockNavigatorGet.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({
+          response: {},
+          getClientExtensionResults: () => ({}),
+        });
+      });
+    },
+  );
+
+  await startAssertion({
+    challenge: bufferToBase64URLString(toUint8Array('fizz')),
+    timeout: 1,
+  });
+
+  expect(mockNavigatorGet.mock.calls[0][0].allowCredentials).toEqual(undefined);
+});
+
+test('should convert allow allowCredential to undefined when empty', async () => {
+  mockSupportsWebauthn.mockReturnValue(true);
+
+  // Stub out a response so the method won't throw
+  mockNavigatorGet.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({
+          response: {},
+          getClientExtensionResults: () => ({}),
+        });
+      });
+    },
+  );
+
+  await startAssertion({
+    challenge: bufferToBase64URLString(toUint8Array('fizz')),
+    timeout: 1,
+    allowCredentials: [],
+  });
+  expect(mockNavigatorGet.mock.calls[0][0].allowCredentials).toEqual(undefined);
+});
+
 test('should return base64url-encoded response values', async done => {
   mockSupportsWebauthn.mockReturnValue(true);
 

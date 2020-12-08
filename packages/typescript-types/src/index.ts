@@ -35,7 +35,7 @@ export interface PublicKeyCredentialCreationOptionsJSON
 export interface PublicKeyCredentialRequestOptionsJSON
   extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
   challenge: Base64URLString;
-  allowCredentials: PublicKeyCredentialDescriptorJSON[];
+  allowCredentials?: PublicKeyCredentialDescriptorJSON[];
 }
 
 export interface PublicKeyCredentialDescriptorJSON
