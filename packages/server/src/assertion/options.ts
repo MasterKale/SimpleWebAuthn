@@ -5,13 +5,13 @@ import {
   PublicKeyCredentialDescriptorJSON,
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
-import BaseAdapter from '../adapters/BaseAdapter';
+import EmptyAdapter from '../adapters/EmptyAdapter';
 
 export interface GenerateAssertionOptions {
   allowCredentials: PublicKeyCredentialDescriptorJSON[];
   challenge?: string | Buffer;
   timeout?: number;
-  adapters?: BaseAdapter[];
+  adapters?: EmptyAdapter[];
   userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;
   rpID?: string;
@@ -22,7 +22,7 @@ export type VerifyAssertionOptions = {
   expectedChallenge?: string;
   expectedOrigin?: string;
   expectedRPID?: string;
-  adapters?: BaseAdapter[];
+  adapters?: EmptyAdapter[];
   authenticator: AuthenticatorDevice;
   fidoUserVerification?: UserVerificationRequirement;
 };

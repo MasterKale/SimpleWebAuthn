@@ -10,7 +10,7 @@ import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
 import toHash from '../helpers/toHash';
-import BaseAdapter from '../adapters/BaseAdapter';
+import EmptyAdapter from '../adapters/EmptyAdapter';
 
 let mockDecodeAttestation: jest.SpyInstance;
 let mockDecodeClientData: jest.SpyInstance;
@@ -440,18 +440,18 @@ test('should validate Android-Key response', async () => {
 });
 
 test('should use adapters if provided', async () => {
-  BaseAdapter.prototype.verifyAttest = jest.fn().mockImplementation(o => o);
+  EmptyAdapter.prototype.verifyAttest = jest.fn().mockImplementation(o => o);
   const opts = {
     credential: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
-    adapters: [new BaseAdapter(), new BaseAdapter()],
+    adapters: [new EmptyAdapter(), new EmptyAdapter()],
   };
 
   await verifyAttestationResponse(opts);
 
-  expect(BaseAdapter.prototype.verifyAttest).toHaveBeenNthCalledWith(2, opts);
+  expect(EmptyAdapter.prototype.verifyAttest).toHaveBeenNthCalledWith(2, opts);
 });
 
 /**

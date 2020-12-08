@@ -11,7 +11,7 @@ import {
   authenticator,
   assertionRPID,
 } from './testHelper';
-import BaseAdapter from '../adapters/BaseAdapter';
+import EmptyAdapter from '../adapters/EmptyAdapter';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -185,19 +185,19 @@ test('should throw an error if user verification is required but user was not ve
 });
 
 test('should use adapters if provided', () => {
-  BaseAdapter.prototype.verifyAssert = jest.fn().mockImplementation(o => o);
+  EmptyAdapter.prototype.verifyAssert = jest.fn().mockImplementation(o => o);
   const opts = {
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: assertionRPID,
     authenticator: authenticator,
-    adapters: [new BaseAdapter(), new BaseAdapter()],
+    adapters: [new EmptyAdapter(), new EmptyAdapter()],
   };
 
   verifyAssertionResponse(opts);
 
-  expect(BaseAdapter.prototype.verifyAssert).toHaveBeenNthCalledWith(2, opts);
+  expect(EmptyAdapter.prototype.verifyAssert).toHaveBeenNthCalledWith(2, opts);
 });
 
 // TODO: Get a real TPM assertion in here

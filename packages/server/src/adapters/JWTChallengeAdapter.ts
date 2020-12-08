@@ -1,5 +1,5 @@
 import { sign, verify, VerifyOptions, SignOptions } from 'jsonwebtoken';
-import BaseAdapter, { assertIO, verifyAssertIO, attestIO, verifyAttestIO } from './BaseAdapter';
+import EmptyAdapter, { assertIO, verifyAssertIO, attestIO, verifyAttestIO } from './Adapter';
 
 interface JwtOptions {
   verify: VerifyOptions;
@@ -18,7 +18,7 @@ export interface SignChallengePayload {
   origin: string;
 }
 
-export default class JWTChallengeAdapter extends BaseAdapter {
+export default class JWTChallengeAdapter extends EmptyAdapter {
   secret: string;
   recommendedSecretLength = 64;
   key = 'JWTChallengeAdapter';

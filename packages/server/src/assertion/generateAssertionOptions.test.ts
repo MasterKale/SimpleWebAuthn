@@ -1,6 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
-import BaseAdapter from '../adapters/BaseAdapter';
+import EmptyAdapter from '../adapters/EmptyAdapter';
 import generateAssertionOptions from './generateAssertionOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -122,15 +122,15 @@ test('should set rpId if specified', () => {
 });
 
 test('should use adapters if provided', () => {
-  BaseAdapter.prototype.assert = jest.fn().mockImplementation(o => o);
+  EmptyAdapter.prototype.assert = jest.fn().mockImplementation(o => o);
   const options = generateAssertionOptions({
     challenge: 'totallyrandomvalue',
-    adapters: [new BaseAdapter(), new BaseAdapter()],
+    adapters: [new EmptyAdapter(), new EmptyAdapter()],
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
       { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
     ],
   });
 
-  expect(BaseAdapter.prototype.assert).toHaveBeenNthCalledWith(2, options);
+  expect(EmptyAdapter.prototype.assert).toHaveBeenNthCalledWith(2, options);
 });

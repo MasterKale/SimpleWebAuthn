@@ -18,5 +18,6 @@ test('should export method `verifyAssertionResponse`', () => {
 
 test('should export Adapters ', () => {
   expect(index.Adapters.JWTChallengeAdapter).toBeDefined();
-  expect(index.Adapters.BaseAdapter).toBeDefined();
+  expect(index.Adapters.EmptyAdapter).toBeDefined();
+  expect(index.Adapters.Adapter).toBeDefined();
 });

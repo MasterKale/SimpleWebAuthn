@@ -1,6 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
-import BaseAdapter from '../adapters/BaseAdapter';
+import EmptyAdapter from '../adapters/EmptyAdapter';
 import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
@@ -165,15 +165,15 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
 });
 
 test('should use adapters if provided', () => {
-  BaseAdapter.prototype.attest = jest.fn().mockImplementation(o => o);
+  EmptyAdapter.prototype.attest = jest.fn().mockImplementation(o => o);
   const options = generateAttestationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
     userName: 'usernameHere',
-    adapters: [new BaseAdapter(), new BaseAdapter()],
+    adapters: [new EmptyAdapter(), new EmptyAdapter()],
     supportedAlgorithmIDs: [-7, -8, -65535],
   });
 
-  expect(BaseAdapter.prototype.attest).toHaveBeenNthCalledWith(2, options);
+  expect(EmptyAdapter.prototype.attest).toHaveBeenNthCalledWith(2, options);
 });
