@@ -23,7 +23,7 @@ export default abstract class Adapter {
    */
   assert(
     assertResponse: PublicKeyCredentialRequestOptionsJSON,
-  ): PublicKeyCredentialRequestOptionsJSON {
+  ): PublicKeyCredentialRequestOptionsJSON | Promise<PublicKeyCredentialRequestOptionsJSON> {
     return assertResponse;
   }
 
@@ -35,7 +35,9 @@ export default abstract class Adapter {
    * Modify the input options of verify assertion before running the assertion verification
    * @param verifyAssertionOptions options of verify assertion
    */
-  verifyAssert(verifyAssertionOptions: VerifyAssertionOptions): VerifyAssertionOptions {
+  verifyAssert(
+    verifyAssertionOptions: VerifyAssertionOptions,
+  ): VerifyAssertionOptions | Promise<VerifyAssertionOptions> {
     return verifyAssertionOptions;
   }
 
@@ -45,7 +47,7 @@ export default abstract class Adapter {
    */
   attest(
     attestResponse: PublicKeyCredentialCreationOptionsJSON,
-  ): PublicKeyCredentialCreationOptionsJSON {
+  ): PublicKeyCredentialCreationOptionsJSON | Promise<PublicKeyCredentialCreationOptionsJSON> {
     return attestResponse;
   }
 
@@ -53,7 +55,9 @@ export default abstract class Adapter {
    * Modify the input options of verify attestation before running the attestation verification
    * @param verifyAttestationOptions options of verify attestation
    */
-  verifyAttest(verifyAttestationOptions: VerifyAttestationOptions): VerifyAttestationOptions {
+  verifyAttest(
+    verifyAttestationOptions: VerifyAttestationOptions,
+  ): VerifyAttestationOptions | Promise<VerifyAttestationOptions> {
     return verifyAttestationOptions;
   }
 }

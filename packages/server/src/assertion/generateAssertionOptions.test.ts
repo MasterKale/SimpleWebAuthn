@@ -3,10 +3,10 @@ jest.mock('../helpers/generateChallenge');
 import EmptyAdapter from '../adapters/EmptyAdapter';
 import generateAssertionOptions from './generateAssertionOptions';
 
-test('should generate credential request options suitable for sending via JSON', () => {
+test('should generate credential request options suitable for sending via JSON', async () => {
   const challenge = 'totallyrandomvalue';
 
-  const options = generateAssertionOptions({
+  const options = await generateAssertionOptions({
     allowCredentials: [
       {
         id: Buffer.from('1234', 'ascii').toString('base64'),
@@ -42,8 +42,8 @@ test('should generate credential request options suitable for sending via JSON',
   });
 });
 
-test('defaults to 60 seconds if no timeout is specified', () => {
-  const options = generateAssertionOptions({
+test('defaults to 60 seconds if no timeout is specified', async () => {
+  const options = await generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
@@ -54,8 +54,8 @@ test('defaults to 60 seconds if no timeout is specified', () => {
   expect(options.timeout).toEqual(60000);
 });
 
-test('should not set userVerification if not specified', () => {
-  const options = generateAssertionOptions({
+test('should not set userVerification if not specified', async () => {
+  const options = await generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
@@ -66,8 +66,8 @@ test('should not set userVerification if not specified', () => {
   expect(options.userVerification).toEqual(undefined);
 });
 
-test('should set userVerification if specified', () => {
-  const options = generateAssertionOptions({
+test('should set userVerification if specified', async () => {
+  const options = await generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
@@ -79,8 +79,8 @@ test('should set userVerification if specified', () => {
   expect(options.userVerification).toEqual('required');
 });
 
-test('should set extensions if specified', () => {
-  const options = generateAssertionOptions({
+test('should set extensions if specified', async () => {
+  const options = await generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
@@ -94,7 +94,7 @@ test('should set extensions if specified', () => {
   });
 });
 
-test('should generate a challenge if one is not provided', () => {
+test('should generate a challenge if one is not provided', async () => {
   const opts = {
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
@@ -103,16 +103,16 @@ test('should generate a challenge if one is not provided', () => {
   };
 
   // @ts-ignore 2345
-  const options = generateAssertionOptions(opts);
+  const options = await generateAssertionOptions(opts);
 
   // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
   expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });
 
-test('should set rpId if specified', () => {
+test('should set rpId if specified', async () => {
   const rpID = 'simplewebauthn.dev';
 
-  const opts = generateAssertionOptions({
+  const opts = await generateAssertionOptions({
     allowCredentials: [],
     rpID,
   });
@@ -121,9 +121,9 @@ test('should set rpId if specified', () => {
   expect(opts.rpId).toEqual(rpID);
 });
 
-test('should use adapters if provided', () => {
+test('should use adapters if provided', async () => {
   EmptyAdapter.prototype.assert = jest.fn().mockImplementation(o => o);
-  const options = generateAssertionOptions({
+  const options = await generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     adapters: [new EmptyAdapter(), new EmptyAdapter()],
     allowCredentials: [

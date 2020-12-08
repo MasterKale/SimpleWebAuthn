@@ -3,7 +3,7 @@ jest.mock('../helpers/generateChallenge');
 import EmptyAdapter from '../adapters/EmptyAdapter';
 import generateAttestationOptions from './generateAttestationOptions';
 
-test('should generate credential request options suitable for sending via JSON', () => {
+test('should generate credential request options suitable for sending via JSON', async () => {
   const rpName = 'SimpleWebAuthn';
   const rpID = 'not.real';
   const challenge = 'totallyrandomvalue';
@@ -12,7 +12,7 @@ test('should generate credential request options suitable for sending via JSON',
   const timeout = 1;
   const attestationType = 'indirect';
 
-  const options = generateAttestationOptions({
+  const options = await generateAttestationOptions({
     rpName,
     rpID,
     challenge,
@@ -55,8 +55,8 @@ test('should generate credential request options suitable for sending via JSON',
   });
 });
 
-test('should map excluded credential IDs if specified', () => {
-  const options = generateAttestationOptions({
+test('should map excluded credential IDs if specified', async () => {
+  const options = await generateAttestationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -76,8 +76,8 @@ test('should map excluded credential IDs if specified', () => {
   ]);
 });
 
-test('defaults to 60 seconds if no timeout is specified', () => {
-  const options = generateAttestationOptions({
+test('defaults to 60 seconds if no timeout is specified', async () => {
+  const options = await generateAttestationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -88,8 +88,8 @@ test('defaults to 60 seconds if no timeout is specified', () => {
   expect(options.timeout).toEqual(60000);
 });
 
-test('defaults to none attestation if no attestation type is specified', () => {
-  const options = generateAttestationOptions({
+test('defaults to none attestation if no attestation type is specified', async () => {
+  const options = await generateAttestationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -100,8 +100,8 @@ test('defaults to none attestation if no attestation type is specified', () => {
   expect(options.attestation).toEqual('none');
 });
 
-test('should set authenticatorSelection if specified', () => {
-  const options = generateAttestationOptions({
+test('should set authenticatorSelection if specified', async () => {
+  const options = await generateAttestationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -121,8 +121,8 @@ test('should set authenticatorSelection if specified', () => {
   });
 });
 
-test('should set extensions if specified', () => {
-  const options = generateAttestationOptions({
+test('should set extensions if specified', async () => {
+  const options = await generateAttestationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -136,8 +136,8 @@ test('should set extensions if specified', () => {
   });
 });
 
-test('should generate a challenge if one is not provided', () => {
-  const options = generateAttestationOptions({
+test('should generate a challenge if one is not provided', async () => {
+  const options = await generateAttestationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -148,8 +148,8 @@ test('should generate a challenge if one is not provided', () => {
   expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
 });
 
-test('should use custom supported algorithm IDs as-is when provided', () => {
-  const options = generateAttestationOptions({
+test('should use custom supported algorithm IDs as-is when provided', async () => {
+  const options = await generateAttestationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -164,9 +164,9 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
   ]);
 });
 
-test('should use adapters if provided', () => {
+test('should use adapters if provided', async () => {
   EmptyAdapter.prototype.attest = jest.fn().mockImplementation(o => o);
-  const options = generateAttestationOptions({
+  const options = await generateAttestationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',

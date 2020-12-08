@@ -7,6 +7,7 @@ import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
 import { VerifyAssertionOptions } from './options';
+import reducePromise from '../helpers/reducePromise';
 
 /**
  * Verify that the user has legitimately completed the login process
@@ -25,11 +26,15 @@ import { VerifyAssertionOptions } from './options';
  * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
  * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
-export default function verifyAssertionResponse(
+export default async function verifyAssertionResponse(
   options: VerifyAssertionOptions,
-): VerifiedAssertion {
+): Promise<VerifiedAssertion> {
   if (options.adapters) {
-    options = options.adapters.reduce((acc, adapter) => adapter.verifyAssert(acc), options);
+    options = await reducePromise(
+      options.adapters,
+      (acc, adapter) => adapter.verifyAssert(acc),
+      options,
+    );
   }
   const {
     credential,

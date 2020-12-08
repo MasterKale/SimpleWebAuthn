@@ -15,6 +15,8 @@ import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
 import { VerifyAttestationOptions } from './options';
+import reducePromise from '../helpers/reducePromise';
+import { Adapter } from 'adapters';
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -35,7 +37,11 @@ export default async function verifyAttestationResponse(
   options: VerifyAttestationOptions,
 ): Promise<VerifiedAttestation> {
   if (options.adapters) {
-    options = options.adapters.reduce((acc, adapter) => adapter.verifyAttest(acc), options);
+    options = await reducePromise<Adapter, VerifyAttestationOptions>(
+      options.adapters,
+      (acc, adapter) => adapter.verifyAttest(acc),
+      options,
+    );
   }
   const {
     credential,

@@ -3,6 +3,8 @@ import base64url from 'base64url';
 import { GenerateAssertionOptions } from './options';
 
 import generateChallenge from '../helpers/generateChallenge';
+import reducePromise from '../helpers/reducePromise';
+import { Adapter } from 'adapters';
 
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
@@ -18,9 +20,9 @@ import generateChallenge from '../helpers/generateChallenge';
  * @param serverSecret A global random string with at least 64 chars (from env vars for example)
  * to avoid storing the challenge into your DB, and enable stateless challenge validation
  */
-export default function generateAssertionOptions(
+export default async function generateAssertionOptions(
   options: GenerateAssertionOptions,
-): PublicKeyCredentialRequestOptionsJSON {
+): Promise<PublicKeyCredentialRequestOptionsJSON> {
   const {
     allowCredentials,
     challenge = generateChallenge(),
@@ -44,7 +46,8 @@ export default function generateAssertionOptions(
 
   if (!adapters) return response;
 
-  return adapters.reduce<PublicKeyCredentialRequestOptionsJSON>(
+  return reducePromise<Adapter, PublicKeyCredentialRequestOptionsJSON>(
+    adapters,
     (acc, adapter) => adapter.assert(acc),
     response,
   );

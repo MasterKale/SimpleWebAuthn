@@ -4,7 +4,9 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
+import { Adapter } from 'adapters';
 import base64url from 'base64url';
+import reducePromise from '../helpers/reducePromise';
 import generateChallenge from '../helpers/generateChallenge';
 import { GenerateAttestationOptions } from './options';
 
@@ -77,9 +79,9 @@ const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id
  *  * @param serverSecret A global random string with at least 64 chars (from env vars for example)
  * to avoid storing the challenge into your DB, and enable stateless challenge validation
  */
-export default function generateAttestationOptions(
+export default async function generateAttestationOptions(
   options: GenerateAttestationOptions,
-): PublicKeyCredentialCreationOptionsJSON {
+): Promise<PublicKeyCredentialCreationOptionsJSON> {
   const {
     rpName,
     rpID,
@@ -126,7 +128,8 @@ export default function generateAttestationOptions(
 
   if (!adapters) return response;
 
-  return adapters.reduce<PublicKeyCredentialCreationOptionsJSON>(
+  return reducePromise<Adapter, PublicKeyCredentialCreationOptionsJSON>(
+    adapters,
     (acc, adapter) => adapter.attest(acc),
     response,
   );

@@ -26,8 +26,8 @@ afterEach(() => {
   mockParseAuthData.mockRestore();
 });
 
-test('should verify an assertion response', () => {
-  const verification = verifyAssertionResponse({
+test('should verify an assertion response', async () => {
+  const verification = await verifyAssertionResponse({
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
@@ -38,8 +38,8 @@ test('should verify an assertion response', () => {
   expect(verification.verified).toEqual(true);
 });
 
-test('should return authenticator info after verification', () => {
-  const verification = verifyAssertionResponse({
+test('should return authenticator info after verification', async () => {
+  const verification = await verifyAssertionResponse({
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
@@ -51,28 +51,28 @@ test('should return authenticator info after verification', () => {
   expect(verification.authenticatorInfo.base64CredentialID).toEqual(authenticator.credentialID);
 });
 
-test('should throw when response challenge is not expected value', () => {
-  expect(() => {
+test('should throw when response challenge is not expected value', async () => {
+  expect(() =>
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://different.address',
       expectedRPID: assertionRPID,
       authenticator: authenticator,
-    });
-  }).toThrow(/assertion challenge/i);
+    }),
+  ).rejects.toThrow(/assertion challenge/i);
 });
 
 test('should throw when response origin is not expected value', () => {
-  expect(() => {
+  expect(() =>
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: 'https://different.address',
       expectedRPID: assertionRPID,
       authenticator: authenticator,
-    });
-  }).toThrow(/assertion origin/i);
+    }),
+  ).rejects.toThrow(/assertion origin/i);
 });
 
 test('should throw when assertion type is not webauthn.create', () => {
@@ -83,15 +83,15 @@ test('should throw when assertion type is not webauthn.create', () => {
     challenge: assertionChallenge,
   });
 
-  expect(() => {
+  expect(async () =>
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: assertionRPID,
       authenticator: authenticator,
-    });
-  }).toThrow(/assertion type/i);
+    }),
+  ).rejects.toThrow(/assertion type/i);
 });
 
 test('should throw error if user was not present', () => {
@@ -100,15 +100,15 @@ test('should throw error if user was not present', () => {
     flags: 0,
   });
 
-  expect(() => {
+  expect(() =>
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: assertionRPID,
       authenticator: authenticator,
-    });
-  }).toThrow(/not present/i);
+    }),
+  ).rejects.toThrow(/not present/i);
 });
 
 test('should throw error if previous counter value is not less than in response', () => {
@@ -119,15 +119,15 @@ test('should throw error if previous counter value is not less than in response'
     counter: badCounter,
   };
 
-  expect(() => {
+  expect(() =>
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: assertionRPID,
       authenticator: badDevice,
-    });
-  }).toThrow(/counter value/i);
+    }),
+  ).rejects.toThrow(/counter value/i);
 });
 
 test('should throw error if assertion RP ID is unexpected value', () => {
@@ -136,19 +136,19 @@ test('should throw error if assertion RP ID is unexpected value', () => {
     flags: 0,
   });
 
-  expect(() => {
+  expect(() =>
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: assertionRPID,
       authenticator: authenticator,
-    });
-  }).toThrow(/rp id/i);
+    }),
+  ).rejects.toThrow(/rp id/i);
 });
 
-test('should not compare counters if both are 0', () => {
-  const verification = verifyAssertionResponse({
+test('should not compare counters if both are 0', async () => {
+  const verification = await verifyAssertionResponse({
     credential: assertionFirstTimeUsedResponse,
     expectedChallenge: assertionFirstTimeUsedChallenge,
     expectedOrigin: assertionFirstTimeUsedOrigin,
@@ -172,7 +172,7 @@ test('should throw an error if user verification is required but user was not ve
     },
   });
 
-  expect(() => {
+  expect(() =>
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
@@ -180,11 +180,11 @@ test('should throw an error if user verification is required but user was not ve
       expectedRPID: assertionRPID,
       authenticator: authenticator,
       fidoUserVerification: 'required',
-    });
-  }).toThrow(/user could not be verified/i);
+    }),
+  ).rejects.toThrow(/user could not be verified/i);
 });
 
-test('should use adapters if provided', () => {
+test('should use adapters if provided', async () => {
   EmptyAdapter.prototype.verifyAssert = jest.fn().mockImplementation(o => o);
   const opts = {
     credential: assertionResponse,
@@ -195,16 +195,16 @@ test('should use adapters if provided', () => {
     adapters: [new EmptyAdapter(), new EmptyAdapter()],
   };
 
-  verifyAssertionResponse(opts);
+  await verifyAssertionResponse(opts);
 
   expect(EmptyAdapter.prototype.verifyAssert).toHaveBeenNthCalledWith(2, opts);
 });
 
 // TODO: Get a real TPM assertion in here
-test.skip('should verify TPM assertion', () => {
+test.skip('should verify TPM assertion', async () => {
   const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBc3NlcnRpb24';
   jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
-  const verification = verifyAssertionResponse({
+  const verification = await verifyAssertionResponse({
     credential: {
       id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
       rawId: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',

@@ -1,6 +1,7 @@
+import Adapter from './Adapter';
 import { assertIO, verifyAssertIO, attestIO, verifyAttestIO } from './Adapter';
 
-export default class EmptyAdapter {
+export default class EmptyAdapter extends Adapter {
   key = 'EmptyAdapter';
 
   assert(response: assertIO): assertIO {

@@ -6,10 +6,10 @@ import {
   COSEAlgorithmIdentifier,
   PublicKeyCredentialDescriptorJSON,
 } from '@simplewebauthn/typescript-types';
-import EmptyAdapter from 'adapters/EmptyAdapter';
+import Adapter from 'adapters/Adapter';
 
 export interface GenerateAttestationOptions {
-  adapters?: EmptyAdapter[];
+  adapters?: Adapter[];
   rpName: string;
   rpID: string;
   userID: string;
@@ -25,7 +25,7 @@ export interface GenerateAttestationOptions {
 }
 
 export interface VerifyAttestationOptions {
-  adapters?: EmptyAdapter[];
+  adapters?: Adapter[];
   credential: AttestationCredentialJSON;
   expectedChallenge?: string;
   expectedOrigin?: string;
