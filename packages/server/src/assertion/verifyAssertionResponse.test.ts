@@ -51,8 +51,8 @@ test('should return authenticator info after verification', async () => {
   expect(verification.authenticatorInfo.base64CredentialID).toEqual(authenticator.credentialID);
 });
 
-test('should throw when response challenge is not expected value', async () => {
-  expect(() =>
+test('should throw when response challenge is not expected value', () => {
+  return expect(
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: 'shouldhavebeenthisvalue',
@@ -64,7 +64,7 @@ test('should throw when response challenge is not expected value', async () => {
 });
 
 test('should throw when response origin is not expected value', () => {
-  expect(() =>
+  return expect(
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
@@ -83,7 +83,7 @@ test('should throw when assertion type is not webauthn.create', () => {
     challenge: assertionChallenge,
   });
 
-  expect(async () =>
+  return expect(
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
@@ -100,7 +100,7 @@ test('should throw error if user was not present', () => {
     flags: 0,
   });
 
-  expect(() =>
+  return expect(
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
@@ -119,7 +119,7 @@ test('should throw error if previous counter value is not less than in response'
     counter: badCounter,
   };
 
-  expect(() =>
+  return expect(
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
@@ -136,7 +136,7 @@ test('should throw error if assertion RP ID is unexpected value', () => {
     flags: 0,
   });
 
-  expect(() =>
+  return expect(
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
@@ -172,7 +172,7 @@ test('should throw an error if user verification is required but user was not ve
     },
   });
 
-  expect(() =>
+  return expect(
     verifyAssertionResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
