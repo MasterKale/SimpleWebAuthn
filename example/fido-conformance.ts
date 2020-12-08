@@ -102,7 +102,7 @@ let loggedInUsername: string | undefined = undefined;
 /**
  * [FIDO2] Server Tests > MakeCredential Request
  */
-fidoConformanceRouter.post('/attestation/options', (req, res) => {
+fidoConformanceRouter.post('/attestation/options', async (req, res) => {
   const { body } = req;
   const { username, displayName, authenticatorSelection, attestation, extensions } = body;
 
@@ -122,7 +122,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
 
   const { devices } = user;
 
-  const opts = generateAttestationOptions({
+  const opts = await generateAttestationOptions({
     rpName,
     rpID,
     userID: username,
@@ -197,7 +197,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
 /**
  * [FIDO2] Server Tests > GetAssertion Request
  */
-fidoConformanceRouter.post('/assertion/options', (req, res) => {
+fidoConformanceRouter.post('/assertion/options', async (req, res) => {
   const { body } = req;
   const { username, userVerification, extensions } = body;
 
@@ -207,7 +207,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
 
   const { devices } = user;
 
-  const opts = generateAssertionOptions({
+  const opts = await generateAssertionOptions({
     extensions,
     userVerification,
     allowCredentials: devices.map(dev => ({
@@ -227,7 +227,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
   });
 });
 
-fidoConformanceRouter.post('/assertion/result', (req, res) => {
+fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const { body } = req;
   const { id } = body;
 
@@ -245,7 +245,7 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAssertionResponse({
+    verification = await verifyAssertionResponse({
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin: origin,

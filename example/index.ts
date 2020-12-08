@@ -86,7 +86,7 @@ const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
 /**
  * Registration (a.k.a. "Attestation")
  */
-app.get('/generate-attestation-options', (req, res) => {
+app.get('/generate-attestation-options', async (req, res) => {
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
   const {
@@ -97,7 +97,7 @@ app.get('/generate-attestation-options', (req, res) => {
     devices,
   } = user;
 
-  const options = generateAttestationOptions({
+  const options = await generateAttestationOptions({
     rpName: 'SimpleWebAuthn Example',
     rpID,
     userID: loggedInUserId,
@@ -179,11 +179,11 @@ app.post('/verify-attestation', async (req, res) => {
 /**
  * Login (a.k.a. "Assertion")
  */
-app.get('/generate-assertion-options', (req, res) => {
+app.get('/generate-assertion-options', async (req, res) => {
   // You need to know the user by this point
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
-  const options = generateAssertionOptions({
+  const options = await generateAssertionOptions({
     timeout: 60000,
     allowCredentials: user.devices.map(dev => ({
       id: dev.credentialID,
@@ -207,7 +207,7 @@ app.get('/generate-assertion-options', (req, res) => {
   res.send(options);
 });
 
-app.post('/verify-assertion', (req, res) => {
+app.post('/verify-assertion', async (req, res) => {
   const { body } = req;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
@@ -229,7 +229,7 @@ app.post('/verify-assertion', (req, res) => {
 
   let verification;
   try {
-    verification = verifyAssertionResponse({
+    verification = await verifyAssertionResponse({
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
