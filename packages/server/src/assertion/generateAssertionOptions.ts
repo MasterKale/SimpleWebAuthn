@@ -4,7 +4,7 @@ import { GenerateAssertionOptions } from './options';
 
 import generateChallenge from '../helpers/generateChallenge';
 import reducePromise from '../helpers/reducePromise';
-import { Adapter } from 'adapters';
+import Adapter from 'adapters/Adapter';
 
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"

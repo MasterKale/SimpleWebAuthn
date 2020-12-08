@@ -16,7 +16,7 @@ import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
 import { VerifyAttestationOptions } from './options';
 import reducePromise from '../helpers/reducePromise';
-import { Adapter } from 'adapters';
+import Adapter from 'adapters/Adapter';
 
 /**
  * Verify that the user has legitimately completed the registration process

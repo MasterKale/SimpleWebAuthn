@@ -4,7 +4,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
-import { Adapter } from 'adapters';
+import Adapter from 'adapters/Adapter';
 import base64url from 'base64url';
 import reducePromise from '../helpers/reducePromise';
 import generateChallenge from '../helpers/generateChallenge';
