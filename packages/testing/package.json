@@ -1,0 +1,28 @@
+{
+  "name": "@simplewebauthn/testing",
+  "version": "0.10.5",
+  "description": "Sample WebAuthn values for testing projects leveraging SimpleWebAuthn.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Matthew Miller <matthew@millerti.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+    "directory": "packages/testing"
+  },
+  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/testing#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "typescript",
+    "webauthn",
+    "fido",
+    "types"
+  ]
+}
