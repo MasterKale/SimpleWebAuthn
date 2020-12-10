@@ -20,7 +20,8 @@ type Options = {
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
  *
- * @param allowCredentials Authenticators previously registered by the user, if any. If undefined the client will ask the user which credential they want to use
+ * @param allowCredentials Authenticators previously registered by the user, if any. If undefined
+ * the client will ask the user which credential they want to use
  * @param challenge Random value the authenticator needs to sign and pass back
  * user for assertion
  * @param timeout How long (in ms) the user can take to complete assertion
