@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.10.5
+
+**Packages:**
+
+- @simplewebauthn/browser@0.10.5
+- @simplewebauthn/server@0.10.5
+- @simplewebauthn/typescript-types@0.10.5
+
+**Changes:**
+
+- **[server]** Make `allowCredentials` in `generateAssertionOptions()` optional
+- **[server]** Support calling `generateAssertionOptions()` without any options
+- **[browser]** Ignore "empty" values for `allowCredentials` before starting assertion
+- **[typescript-types]** Unpin dependency versions
+
 ## v0.10.4
 
 **Packages:**
