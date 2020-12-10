@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/typescript-types",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "description": "TypeScript types used by the @simplewebauthn series of libraries",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
