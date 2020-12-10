@@ -52,7 +52,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
 
     // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
     const firstDecoded = decodeCborFirst(intBuffer);
-    const firstEncoded = Buffer.from(cbor.encode(firstDecoded));
+    const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
     credentialPublicKey = firstEncoded;
     intBuffer = intBuffer.slice(firstEncoded.byteLength);
   }
@@ -60,7 +60,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
   let extensionsDataBuffer: Buffer | undefined = undefined;
   if (flags.ed) {
     const firstDecoded = decodeCborFirst(intBuffer);
-    const firstEncoded = Buffer.from(cbor.encode(firstDecoded));
+    const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
     extensionsDataBuffer = firstEncoded;
     intBuffer = intBuffer.slice(firstEncoded.byteLength);
   }
