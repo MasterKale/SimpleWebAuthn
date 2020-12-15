@@ -17,7 +17,15 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "npm test -- --coverage"
+  },
+  "dependencies": {
+    "@simplewebauthn/typescript-types": "file:../typescript-types",
+    "@simplewebauthn/server": "file:../server",
+    "base64url": "^3.0.1"
   },
   "keywords": [
     "typescript",

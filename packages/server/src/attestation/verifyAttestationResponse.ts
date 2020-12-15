@@ -19,7 +19,7 @@ import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
 
-type Options = {
+export type VerifyAttestationResponseOptions = {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string;
@@ -44,7 +44,7 @@ type Options = {
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export default async function verifyAttestationResponse(
-  options: Options,
+  options: VerifyAttestationResponseOptions,
 ): Promise<VerifiedAttestation> {
   const {
     credential,
