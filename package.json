@@ -2,7 +2,7 @@
   "name": "simplewebauthn-monorepo",
   "private": true,
   "scripts": {
-    "bootstrap": "npm run build:types && npm run build:testing && npm run build:browser && npm run build:server",
+    "bootstrap": "npm run build:types && npm run build:browser && npm run build:server && npm run build:testing",
     "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/",
     "docs": "npm run bootstrap && typedoc --tsconfig tsconfigdoc.json",
     "test": "lerna run test",
