@@ -21,6 +21,10 @@ import {
   generateAssertionOptions,
   verifyAssertionResponse,
 } from '@simplewebauthn/server';
+import type {
+  AttestationCredentialJSON,
+  AuthenticatorDevice,
+} from '@simplewebauthn/typescript-types';
 
 import { LoggedInUser } from './example-server';
 
@@ -65,15 +69,7 @@ const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
   [loggedInUserId]: {
     id: loggedInUserId,
     username: `user@${rpID}`,
-    devices: [
-      /**
-       * {
-       *   credentialID: string,
-       *   publicKey: string,
-       *   counter: number,
-       * }
-       */
-    ],
+    devices: [],
     /**
      * A simple way of storing a user's current challenge being signed by attestation or assertion.
      * It should be expired after `timeout` milliseconds (optional argument for `generate` methods,
@@ -135,7 +131,7 @@ app.get('/generate-attestation-options', (req, res) => {
 });
 
 app.post('/verify-attestation', async (req, res) => {
-  const { body } = req;
+  const body: AttestationCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
@@ -165,11 +161,12 @@ app.post('/verify-attestation', async (req, res) => {
       /**
        * Add the returned device to the user's list of devices
        */
-      user.devices.push({
+      const newDevice: AuthenticatorDevice = {
         publicKey: base64PublicKey,
         credentialID: base64CredentialID,
         counter,
-      });
+      };
+      user.devices.push(newDevice);
     }
   }
 
