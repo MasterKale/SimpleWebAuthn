@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.10.6
+
+**Packages:**
+
+- @simplewebauthn/browser@0.10.6
+- @simplewebauthn/server@0.10.6
+- @simplewebauthn/testing@0.10.6
+
+**Changes:**
+
+- **[browser]** Refactor `toUint8Array()` for easier testing when integrated
+- **[server]** Fix an unexpected build issue
+- **[testing]** Publish package (stub)
+
 ## v0.10.5
 
 **Packages:**
