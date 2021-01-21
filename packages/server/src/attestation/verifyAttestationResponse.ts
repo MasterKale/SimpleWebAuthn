@@ -126,8 +126,8 @@ export default async function verifyAttestationResponse(
     } else {
       // Go through each expected RP ID and try to find one that matches
       const foundMatch = expectedRPID.some(expected => {
-        const expectedIDHash = toHash(Buffer.from(expected, 'ascii'));
-        return rpIdHash.equals(expectedIDHash);
+        const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
+        return rpIdHash.equals(expectedRPIDHash);
       });
 
       if (!foundMatch) {
