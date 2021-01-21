@@ -116,6 +116,8 @@ export type AuthenticatorDevice = {
   credentialID: Base64URLString;
   // Number of times this device is expected to have been used
   counter: number;
+  // From browser's `startAttestation()` -> AttestationCredentialJSON.transports (API L2 and up)
+  transports?: AuthenticatorTransport[];
 };
 
 /**

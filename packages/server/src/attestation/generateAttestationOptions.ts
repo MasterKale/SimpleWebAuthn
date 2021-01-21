@@ -119,6 +119,18 @@ export default function generateAttestationOptions(
     type: 'public-key',
   }));
 
+  /**
+   * "Relying Parties SHOULD set [requireResidentKey] to true if, and only if, residentKey is set
+   * to "required""
+   *
+   * See https://www.w3.org/TR/webauthn-2/#dom-authenticatorselectioncriteria-requireresidentkey
+   */
+  if (authenticatorSelection.residentKey === 'required') {
+    authenticatorSelection.requireResidentKey = true;
+  } else {
+    authenticatorSelection.requireResidentKey = false;
+  }
+
   return {
     challenge: base64url.encode(challenge),
     rp: {
