@@ -438,6 +438,28 @@ test('should validate Android-Key response', async () => {
   );
 });
 
+test('should support multiple possible origins', async () => {
+  const verification = await verifyAttestationResponse({
+    credential: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: ['https://dev.dontneeda.pw', 'https://different.address'],
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toBe(true);
+});
+
+test('should throw an error if origin not in list of expected origins', async () => {
+  await expect(
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: ['https://different.address'],
+      expectedRPID: 'dev.dontneeda.pw',
+    }),
+  ).rejects.toThrow(/unexpected attestation origin/i);
+});
+
 /**
  * Various Attestations Below
  */

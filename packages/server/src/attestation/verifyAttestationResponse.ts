@@ -22,7 +22,7 @@ import verifyApple from './verifications/verifyApple';
 type Options = {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
-  expectedOrigin: string;
+  expectedOrigin: string | string[];
   expectedRPID?: string;
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
@@ -88,8 +88,16 @@ export default async function verifyAttestationResponse(
   }
 
   // Check that the origin is our site
-  if (origin !== expectedOrigin) {
-    throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
+  if (Array.isArray(expectedOrigin)) {
+    if (!expectedOrigin.includes(origin)) {
+      throw new Error(
+        `Unexpected attestation origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+      );
+    }
+  } else {
+    if (origin !== expectedOrigin) {
+      throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
+    }
   }
 
   if (tokenBinding) {

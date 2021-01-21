@@ -15,7 +15,7 @@ import isBase64URLString from '../helpers/isBase64URLString';
 type Options = {
   credential: AssertionCredentialJSON;
   expectedChallenge: string;
-  expectedOrigin: string;
+  expectedOrigin: string | string[];
   expectedRPID: string;
   authenticator: AuthenticatorDevice;
   fidoUserVerification?: UserVerificationRequirement;
@@ -87,8 +87,16 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   }
 
   // Check that the origin is our site
-  if (origin !== expectedOrigin) {
-    throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
+  if (Array.isArray(expectedOrigin)) {
+    if (!expectedOrigin.includes(origin)) {
+      throw new Error(
+        `Unexpected assertion origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+      );
+    }
+  } else {
+    if (origin !== expectedOrigin) {
+      throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
+    }
   }
 
   if (!isBase64URLString(response.authenticatorData)) {

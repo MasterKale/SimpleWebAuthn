@@ -207,6 +207,30 @@ test.skip('should verify TPM assertion', () => {
   expect(verification.verified).toEqual(true);
 });
 
+test('should support multiple possible origins', () => {
+  const verification = verifyAssertionResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: ['https://simplewebauthn.dev', assertionOrigin],
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
+test('should throw an error if origin not in list of expected origins', async () => {
+  expect(() => {
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: ['https://simplewebauthn.dev', 'https://fizz.buzz'],
+      expectedRPID: 'dev.dontneeda.pw',
+      authenticator: authenticator,
+    });
+  }).toThrow(/unexpected assertion origin/i);
+});
+
 /**
  * Assertion examples below
  */
