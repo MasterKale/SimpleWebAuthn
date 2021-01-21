@@ -22,8 +22,8 @@ import verifyApple from './verifications/verifyApple';
 type Options = {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
-  expectedOrigin: string;
-  expectedRPID?: string;
+  expectedOrigin: string | string[];
+  expectedRPID?: string | string[];
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
@@ -36,8 +36,8 @@ type Options = {
  * @param credential Authenticator credential returned by browser's `startAttestation()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
  * `generateAttestationOptions()`
- * @param expectedOrigin Website URL that the attestation should have occurred on
- * @param expectedRPID RP ID that was specified in the attestation options
+ * @param expectedOrigin Website URL (or array of URLs) that the attestation should have occurred on
+ * @param expectedRPID RP ID (or array of IDs) that was specified in the attestation options
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
@@ -88,8 +88,16 @@ export default async function verifyAttestationResponse(
   }
 
   // Check that the origin is our site
-  if (origin !== expectedOrigin) {
-    throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
+  if (Array.isArray(expectedOrigin)) {
+    if (!expectedOrigin.includes(origin)) {
+      throw new Error(
+        `Unexpected attestation origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+      );
+    }
+  } else {
+    if (origin !== expectedOrigin) {
+      throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
+    }
   }
 
   if (tokenBinding) {
@@ -110,9 +118,21 @@ export default async function verifyAttestationResponse(
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
-    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-    if (!rpIdHash.equals(expectedRPIDHash)) {
-      throw new Error(`Unexpected RP ID hash`);
+    if (typeof expectedRPID === 'string') {
+      const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+      if (!rpIdHash.equals(expectedRPIDHash)) {
+        throw new Error(`Unexpected RP ID hash`);
+      }
+    } else {
+      // Go through each expected RP ID and try to find one that matches
+      const foundMatch = expectedRPID.some(expected => {
+        const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
+        return rpIdHash.equals(expectedRPIDHash);
+      });
+
+      if (!foundMatch) {
+        throw new Error(`Unexpected RP ID hash`);
+      }
     }
   }
 

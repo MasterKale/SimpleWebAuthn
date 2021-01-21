@@ -438,6 +438,50 @@ test('should validate Android-Key response', async () => {
   );
 });
 
+test('should support multiple possible origins', async () => {
+  const verification = await verifyAttestationResponse({
+    credential: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: ['https://dev.dontneeda.pw', 'https://different.address'],
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.verified).toBe(true);
+});
+
+test('should throw an error if origin not in list of expected origins', async () => {
+  await expect(
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: ['https://different.address'],
+      expectedRPID: 'dev.dontneeda.pw',
+    }),
+  ).rejects.toThrow(/unexpected attestation origin/i);
+});
+
+test('should support multiple possible RP IDs', async () => {
+  const verification = await verifyAttestationResponse({
+    credential: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: ['dev.dontneeda.pw', 'simplewebauthn.dev'],
+  });
+
+  expect(verification.verified).toBe(true);
+});
+
+test('should throw an error if RP ID not in list of possible RP IDs', async () => {
+  await expect(
+    verifyAttestationResponse({
+      credential: attestationNone,
+      expectedChallenge: attestationNoneChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: ['simplewebauthn.dev'],
+    }),
+  ).rejects.toThrow(/unexpected rp id/i);
+});
+
 /**
  * Various Attestations Below
  */

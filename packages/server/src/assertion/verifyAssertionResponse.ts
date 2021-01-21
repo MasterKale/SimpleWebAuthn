@@ -15,8 +15,8 @@ import isBase64URLString from '../helpers/isBase64URLString';
 type Options = {
   credential: AssertionCredentialJSON;
   expectedChallenge: string;
-  expectedOrigin: string;
-  expectedRPID: string;
+  expectedOrigin: string | string[];
+  expectedRPID: string | string[];
   authenticator: AuthenticatorDevice;
   fidoUserVerification?: UserVerificationRequirement;
 };
@@ -29,8 +29,8 @@ type Options = {
  * @param credential Authenticator credential returned by browser's `startAssertion()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
  * `generateAssertionOptions()`
- * @param expectedOrigin Website URL that the attestation should have occurred on
- * @param expectedRPID RP ID that was specified in the attestation options
+ * @param expectedOrigin Website URL (or array of URLs) that the attestation should have occurred on
+ * @param expectedRPID RP ID (or array of IDs) that was specified in the attestation options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
  * @param fidoUserVerification (Optional) The value specified for `userVerification` when calling
  * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
@@ -87,8 +87,16 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   }
 
   // Check that the origin is our site
-  if (origin !== expectedOrigin) {
-    throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
+  if (Array.isArray(expectedOrigin)) {
+    if (!expectedOrigin.includes(origin)) {
+      throw new Error(
+        `Unexpected assertion origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+      );
+    }
+  } else {
+    if (origin !== expectedOrigin) {
+      throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
+    }
   }
 
   if (!isBase64URLString(response.authenticatorData)) {
@@ -118,9 +126,21 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   const { rpIdHash, flags, counter } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
-  const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-  if (!rpIdHash.equals(expectedRPIDHash)) {
-    throw new Error(`Unexpected RP ID hash`);
+  if (typeof expectedRPID === 'string') {
+    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+    if (!rpIdHash.equals(expectedRPIDHash)) {
+      throw new Error(`Unexpected RP ID hash`);
+    }
+  } else {
+    // Go through each expected RP ID and try to find one that matches
+    const foundMatch = expectedRPID.some(expected => {
+      const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
+      return rpIdHash.equals(expectedRPIDHash);
+    });
+
+    if (!foundMatch) {
+      throw new Error(`Unexpected RP ID hash`);
+    }
   }
 
   // Enforce user verification if required
