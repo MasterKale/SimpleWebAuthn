@@ -29,8 +29,8 @@ type Options = {
  * @param credential Authenticator credential returned by browser's `startAssertion()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
  * `generateAssertionOptions()`
- * @param expectedOrigin Website URL that the attestation should have occurred on
- * @param expectedRPID RP ID that was specified in the attestation options
+ * @param expectedOrigin Website URL (or array of URLs) that the attestation should have occurred on
+ * @param expectedRPID RP ID (or array of IDs) that was specified in the attestation options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
  * @param fidoUserVerification (Optional) The value specified for `userVerification` when calling
  * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.

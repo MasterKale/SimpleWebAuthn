@@ -37,8 +37,8 @@ type Options = {
  * @param credential Authenticator credential returned by browser's `startAttestation()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
  * `generateAttestationOptions()`
- * @param expectedOrigin Website URL that the attestation should have occurred on
- * @param expectedRPID RP ID that was specified in the attestation options
+ * @param expectedOrigin Website URL (or array of URLs) that the attestation should have occurred on
+ * @param expectedRPID RP ID (or array of IDs) that was specified in the attestation options
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
