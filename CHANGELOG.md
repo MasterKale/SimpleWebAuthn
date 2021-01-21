@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.0.0 - The one that gets things out of "Beta"
+
+**Packages:**
+
+- @simplewebauthn/browser@1.0.0
+- @simplewebauthn/server@1.0.0
+- @simplewebauthn/testing@1.0.0
+- @simplewebauthn/typescript-types@1.0.0
+
+**Changes:**
+
+- **[server]** Add support for multiple expected origins and RP IDs in `verifyAttestationResponse()` and `verifyAssertionResponse()`
+- **[server]** Update `generateAttestationOptions()`  to force legacy `authenticatorSelection.requireResidentKey` to `true` when `authenticatorSelection.residentKey` is `"required"` (as per L2 of the WebAuthn spec)
+- **[typescript-types]** Update `AuthenticatorDevice` type with optional `transports` property
+- **[browser]** Version sync
+- **[testing]** Version sync
+
+### Breaking Changes
+
+There are no breaking changes in this release. Several recent minor changes presented an opportunity to release a "v1.0". I'd received enough positive feedback about SimpleWebAuthn and noticed growing usage which granted me the confidence to take advantage of this opportunity.
+
+And perhaps this will give the project more legitimacy in the eyes of larger organizations wishing to use it but waiting for the libraries to "get out of beta"...
+
 ## v0.10.6
 
 **Packages:**
