@@ -18,7 +18,6 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
-import e from 'express';
 
 type Options = {
   credential: AttestationCredentialJSON;
