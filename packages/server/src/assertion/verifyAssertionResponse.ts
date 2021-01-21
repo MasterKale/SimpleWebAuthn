@@ -16,7 +16,7 @@ type Options = {
   credential: AssertionCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
-  expectedRPID: string;
+  expectedRPID: string | string[];
   authenticator: AuthenticatorDevice;
   fidoUserVerification?: UserVerificationRequirement;
 };
@@ -126,9 +126,21 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   const { rpIdHash, flags, counter } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
-  const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-  if (!rpIdHash.equals(expectedRPIDHash)) {
-    throw new Error(`Unexpected RP ID hash`);
+  if (typeof expectedRPID === 'string') {
+    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+    if (!rpIdHash.equals(expectedRPIDHash)) {
+      throw new Error(`Unexpected RP ID hash`);
+    }
+  } else {
+    // Go through each expected RP ID and try to find one that matches
+    const foundMatch = expectedRPID.some(expected => {
+      const expectedIDHash = toHash(Buffer.from(expected, 'ascii'));
+      return rpIdHash.equals(expectedIDHash);
+    });
+
+    if (!foundMatch) {
+      throw new Error(`Unexpected RP ID hash`);
+    }
   }
 
   // Enforce user verification if required

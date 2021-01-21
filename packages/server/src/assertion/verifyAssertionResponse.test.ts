@@ -231,6 +231,30 @@ test('should throw an error if origin not in list of expected origins', async ()
   }).toThrow(/unexpected assertion origin/i);
 });
 
+test('should support multiple possible RP IDs', async () => {
+  const verification = verifyAssertionResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: ['dev.dontneeda.pw', 'simplewebauthn.dev'],
+    authenticator: authenticator,
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
+test('should throw an error if RP ID not in list of possible RP IDs', async () => {
+  expect(() => {
+    verifyAssertionResponse({
+      credential: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: assertionOrigin,
+      expectedRPID: ['simplewebauthn.dev'],
+      authenticator: authenticator,
+    });
+  }).toThrow(/unexpected rp id/i);
+});
+
 /**
  * Assertion examples below
  */

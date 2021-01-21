@@ -18,12 +18,13 @@ import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
+import e from 'express';
 
 type Options = {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
-  expectedRPID?: string;
+  expectedRPID?: string | string[];
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
@@ -118,9 +119,21 @@ export default async function verifyAttestationResponse(
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
-    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-    if (!rpIdHash.equals(expectedRPIDHash)) {
-      throw new Error(`Unexpected RP ID hash`);
+    if (typeof expectedRPID === 'string') {
+      const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+      if (!rpIdHash.equals(expectedRPIDHash)) {
+        throw new Error(`Unexpected RP ID hash`);
+      }
+    } else {
+      // Go through each expected RP ID and try to find one that matches
+      const foundMatch = expectedRPID.some(expected => {
+        const expectedIDHash = toHash(Buffer.from(expected, 'ascii'));
+        return rpIdHash.equals(expectedIDHash);
+      });
+
+      if (!foundMatch) {
+        throw new Error(`Unexpected RP ID hash`);
+      }
     }
   }
 
