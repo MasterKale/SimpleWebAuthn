@@ -152,10 +152,7 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
 export interface CredentialCreationExtensionsInputJSON {
   appidExclude?: string;
   uvm?: boolean;
-  credProps?: {
-    first: Base64URLString;
-    second?: Base64URLString;
-  };
+  credProps?: boolean;
   prf?: {
     eval?: {
       first: Base64URLString;
