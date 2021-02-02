@@ -246,7 +246,7 @@ export default async function verifyAttestationResponse(
       aaguid: convertAAGUIDToString(aaguid),
       credentialPublicKey,
       credentialID,
-      credentialType: type,
+      credentialType,
       userVerified: flags.uv,
       rawAttestationObject: response.attestationObject,
     };
