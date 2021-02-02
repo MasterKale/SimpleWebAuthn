@@ -178,7 +178,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
 
-  const publicKey = convertPublicKeyToPEM(authenticator.publicKey);
+  const publicKey = convertPublicKeyToPEM(authenticator.credentialPublicKey);
   const signature = base64url.toBuffer(response.signature);
 
   if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
