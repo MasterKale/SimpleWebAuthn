@@ -243,7 +243,7 @@ export default async function verifyAttestationResponse(
   if (toReturn.verified) {
     toReturn.userVerified = flags.uv;
 
-    toReturn.authenticatorInfo = {
+    toReturn.attestationInfo = {
       fmt,
       counter,
       aaguid: convertAAGUIDToString(aaguid),
@@ -273,7 +273,7 @@ export default async function verifyAttestationResponse(
 export type VerifiedAttestation = {
   verified: boolean;
   userVerified: boolean;
-  authenticatorInfo?: {
+  attestationInfo?: {
     fmt: ATTESTATION_FORMATS;
     counter: number;
     aaguid: string;
