@@ -121,7 +121,7 @@ export type AuthenticatorDevice = {
   // From browser's `startAttestation()` -> AttestationCredentialJSON.transports (API L2 and up)
   transports?: AuthenticatorTransport[];
   // If desired, store the original value of response.attestationObject for later scrutiny
-  attestationObject?: Base64URLString;
+  attestationObject?: Buffer;
 };
 
 /**

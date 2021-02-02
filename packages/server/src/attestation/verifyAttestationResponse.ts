@@ -111,8 +111,9 @@ export default async function verifyAttestationResponse(
     }
   }
 
-  const attestationObject = decodeAttestationObject(response.attestationObject);
-  const { fmt, authData, attStmt } = attestationObject;
+  const attestationObject = base64url.toBuffer(response.attestationObject);
+  const decodedAttestationObject = decodeAttestationObject(attestationObject);
+  const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
   const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
@@ -248,7 +249,7 @@ export default async function verifyAttestationResponse(
       credentialID,
       credentialType,
       userVerified: flags.uv,
-      attestationObject: response.attestationObject,
+      attestationObject,
     };
   }
 
@@ -279,6 +280,6 @@ export type VerifiedAttestation = {
     credentialID: Buffer;
     credentialType: string;
     userVerified: boolean;
-    attestationObject: string;
+    attestationObject: Buffer;
   };
 };
