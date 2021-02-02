@@ -24,6 +24,7 @@ import {
 import type {
   AttestationCredentialJSON,
   AuthenticatorDevice,
+  AssertionCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 
 import { LoggedInUser } from './example-server';
@@ -205,7 +206,7 @@ app.get('/generate-assertion-options', (req, res) => {
 });
 
 app.post('/verify-assertion', (req, res) => {
-  const { body } = req;
+  const body: AssertionCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
