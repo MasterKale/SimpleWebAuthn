@@ -248,7 +248,7 @@ export default async function verifyAttestationResponse(
       credentialID,
       credentialType,
       userVerified: flags.uv,
-      rawAttestationObject: response.attestationObject,
+      attestationObject: response.attestationObject,
     };
   }
 
@@ -279,6 +279,6 @@ export type VerifiedAttestation = {
     credentialID: Buffer;
     credentialType: string;
     userVerified: boolean;
-    rawAttestationObject: string;
+    attestationObject: string;
   };
 };
