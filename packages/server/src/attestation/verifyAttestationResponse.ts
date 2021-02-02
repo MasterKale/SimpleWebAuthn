@@ -10,6 +10,7 @@ import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
@@ -245,8 +246,10 @@ export default async function verifyAttestationResponse(
     toReturn.authenticatorInfo = {
       fmt,
       counter,
+      aaguid: convertAAGUIDToString(aaguid),
       base64PublicKey: base64url.encode(credentialPublicKey),
       base64CredentialID: base64url.encode(credentialID),
+      credentialType: type,
     };
   }
 
@@ -273,7 +276,9 @@ export type VerifiedAttestation = {
   authenticatorInfo?: {
     fmt: ATTESTATION_FORMATS;
     counter: number;
+    aaguid: string;
     base64PublicKey: string;
     base64CredentialID: string;
+    credentialType: string;
   };
 };
