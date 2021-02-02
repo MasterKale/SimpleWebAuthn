@@ -247,8 +247,8 @@ export default async function verifyAttestationResponse(
       fmt,
       counter,
       aaguid: convertAAGUIDToString(aaguid),
-      base64PublicKey: base64url.encode(credentialPublicKey),
-      base64CredentialID: base64url.encode(credentialID),
+      credentialPublicKey,
+      credentialID,
       credentialType: type,
     };
   }
@@ -277,8 +277,8 @@ export type VerifiedAttestation = {
     fmt: ATTESTATION_FORMATS;
     counter: number;
     aaguid: string;
-    base64PublicKey: string;
-    base64CredentialID: string;
+    credentialPublicKey: Buffer;
+    credentialID: Buffer;
     credentialType: string;
   };
 };
