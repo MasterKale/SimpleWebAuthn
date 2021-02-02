@@ -10,11 +10,11 @@ import type {
 import base64url from 'base64url';
 
 import generateChallenge from '../helpers/generateChallenge';
+import generateUserHandle from '../helpers/generateUserHandle';
 
 type Options = {
   rpName: string;
   rpID: string;
-  userID: string;
   userName: string;
   challenge?: string | Buffer;
   userDisplayName?: string;
@@ -79,7 +79,6 @@ const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id
  *
  * @param rpName User-visible, "friendly" website/service name
  * @param rpID Valid domain name (after `https://`)
- * @param userID User's website-specific unique ID
  * @param userName User's website-specific username (email, etc...)
  * @param challenge Random value the authenticator needs to sign and pass back
  * @param userDisplayName User's actual name
@@ -99,7 +98,6 @@ export default function generateAttestationOptions(
   const {
     rpName,
     rpID,
-    userID,
     userName,
     challenge = generateChallenge(),
     userDisplayName = userName,
@@ -131,6 +129,9 @@ export default function generateAttestationOptions(
     authenticatorSelection.requireResidentKey = false;
   }
 
+  // Generate a new, random ID for better privacy
+  const userHandle = generateUserHandle();
+
   return {
     challenge: base64url.encode(challenge),
     rp: {
@@ -138,7 +139,7 @@ export default function generateAttestationOptions(
       id: rpID,
     },
     user: {
-      id: userID,
+      id: base64url.encode(userHandle),
       name: userName,
       displayName: userDisplayName,
     },
