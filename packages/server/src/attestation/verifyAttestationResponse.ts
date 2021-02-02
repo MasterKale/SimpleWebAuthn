@@ -237,12 +237,9 @@ export default async function verifyAttestationResponse(
 
   const toReturn: VerifiedAttestation = {
     verified,
-    userVerified: flags.uv,
   };
 
   if (toReturn.verified) {
-    toReturn.userVerified = flags.uv;
-
     toReturn.attestationInfo = {
       fmt,
       counter,
@@ -250,6 +247,7 @@ export default async function verifyAttestationResponse(
       credentialPublicKey,
       credentialID,
       credentialType: type,
+      userVerified: flags.uv,
     };
   }
 
@@ -272,7 +270,6 @@ export default async function verifyAttestationResponse(
  */
 export type VerifiedAttestation = {
   verified: boolean;
-  userVerified: boolean;
   attestationInfo?: {
     fmt: ATTESTATION_FORMATS;
     counter: number;
@@ -280,5 +277,6 @@ export type VerifiedAttestation = {
     credentialPublicKey: Buffer;
     credentialID: Buffer;
     credentialType: string;
+    userVerified: boolean;
   };
 };
