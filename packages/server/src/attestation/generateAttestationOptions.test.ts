@@ -4,6 +4,21 @@ import base64url from 'base64url';
 
 import generateAttestationOptions from './generateAttestationOptions';
 
+import * as generateUserHandle from '../helpers/generateUserHandle';
+
+let mockGenerateUserHandle: jest.SpyInstance;
+const mockUserHandle = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+
+beforeEach(() => {
+  mockGenerateUserHandle = jest
+    .spyOn(generateUserHandle, 'default')
+    .mockReturnValue(mockUserHandle);
+});
+
+afterEach(() => {
+  mockGenerateUserHandle.mockRestore();
+});
+
 test('should generate credential request options suitable for sending via JSON', () => {
   const rpName = 'SimpleWebAuthn';
   const rpID = 'not.real';
@@ -158,4 +173,22 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
     { alg: -8, type: 'public-key' },
     { alg: -65535, type: 'public-key' },
   ]);
+});
+
+test('should generate a new userHandle each time', () => {
+  mockGenerateUserHandle.mockRestore();
+
+  const opts1 = generateAttestationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userName: 'usernamehere',
+  });
+
+  const opts2 = generateAttestationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userName: 'usernamehere',
+  });
+
+  expect(opts1.user.id).not.toEqual(opts2.user.id);
 });
