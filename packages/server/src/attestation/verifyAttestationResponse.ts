@@ -260,15 +260,17 @@ export default async function verifyAttestationResponse(
  * Result of attestation verification
  *
  * @param verified If the assertion response could be verified
- * @param userVerified Whether the user was uniquely identified during attestation
- * @param authenticatorInfo.fmt Type of attestation
- * @param authenticatorInfo.counter The number of times the authenticator reported it has been used.
+ * @param attestationInfo.fmt Type of attestation
+ * @param attestationInfo.counter The number of times the authenticator reported it has been used.
  * Should be kept in a DB for later reference to help prevent replay attacks
- * @param authenticatorInfo.base64PublicKey Base64URL-encoded ArrayBuffer containing the
- * authenticator's public key. **Should be kept in a DB for later reference!**
- * @param authenticatorInfo.base64CredentialID Base64URL-encoded ArrayBuffer containing the
- * authenticator's credential ID for the public key above. **Should be kept in a DB for later
- * reference!**
+ * @param attestationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
+ * authenticator
+ * @param attestationInfo.credentialPublicKey The credential's public key
+ * @param attestationInfo.credentialID The credential's credential ID for the public key above
+ * @param attestationInfo.credentialType The type of the credential returned by the browser
+ * @param attestationInfo.userVerified Whether the user was uniquely identified during attestation
+ * @param attestationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
+ * the authenticator
  */
 export type VerifiedAttestation = {
   verified: boolean;
