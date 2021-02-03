@@ -4,7 +4,6 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import supportsWebauthn from '../helpers/supportsWebauthn';
-import toUint8Array from '../helpers/toUint8Array';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
 import startAssertion from './startAssertion';
@@ -21,7 +20,7 @@ const mockUserHandle = 'mockUserHandle';
 
 // With ASCII challenge
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(toUint8Array('fizz')),
+  challenge: bufferToBase64URLString(Buffer.from('fizz', 'ascii')),
   allowCredentials: [
     {
       id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
@@ -34,7 +33,7 @@ const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
 
 // With UTF-8 challenge
 const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(toUint8Array('やれやれだぜ')),
+  challenge: bufferToBase64URLString(Buffer.from('やれやれだぜ', 'utf-8')),
   allowCredentials: [],
   timeout: 1,
 };
@@ -88,7 +87,7 @@ test('should support optional allowCredential', async () => {
   );
 
   await startAssertion({
-    challenge: bufferToBase64URLString(toUint8Array('fizz')),
+    challenge: bufferToBase64URLString(Buffer.from('fizz', 'ascii')),
     timeout: 1,
   });
 
@@ -111,7 +110,7 @@ test('should convert allow allowCredential to undefined when empty', async () =>
   );
 
   await startAssertion({
-    challenge: bufferToBase64URLString(toUint8Array('fizz')),
+    challenge: bufferToBase64URLString(Buffer.from('fizz', 'ascii')),
     timeout: 1,
     allowCredentials: [],
   });

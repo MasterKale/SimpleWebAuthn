@@ -3,7 +3,6 @@ import {
   PublicKeyCredentialCreationOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
-import toUint8Array from '../helpers/toUint8Array';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
@@ -18,7 +17,7 @@ const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';
 
 const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
-  challenge: bufferToBase64URLString(toUint8Array('fizz')),
+  challenge: bufferToBase64URLString(Buffer.from('fizz', 'ascii')),
   attestation: 'direct',
   pubKeyCredParams: [
     {
@@ -69,7 +68,7 @@ test('should convert options before passing to navigator.credentials.create(...)
 
   // Make sure challenge and user.id are converted to Buffers
   expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
-  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(new Uint8Array([53, 54, 55, 56]));
+  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(new Uint8Array([231, 174, 252]));
 
   // Confirm construction of excludeCredentials array
   expect(credId instanceof ArrayBuffer).toEqual(true);
@@ -88,7 +87,7 @@ test('should return base64url-encoded response values', async done => {
       return new Promise(resolve => {
         resolve({
           id: 'foobar',
-          rawId: toUint8Array('foobar'),
+          rawId: Buffer.from('foobar', 'ascii'),
           response: {
             attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
             clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
