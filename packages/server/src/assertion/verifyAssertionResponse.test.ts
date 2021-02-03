@@ -40,8 +40,8 @@ test('should return authenticator info after verification', () => {
     authenticator: authenticator,
   });
 
-  expect(verification.authenticatorInfo.newCounter).toEqual(144);
-  expect(verification.authenticatorInfo.credentialID).toEqual(authenticator.credentialID);
+  expect(verification.assertionInfo.newCounter).toEqual(144);
+  expect(verification.assertionInfo.credentialID).toEqual(authenticator.credentialID);
 });
 
 test('should throw when response challenge is not expected value', () => {

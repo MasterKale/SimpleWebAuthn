@@ -193,7 +193,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
-    authenticatorInfo: {
+    assertionInfo: {
       newCounter: counter,
       credentialID: authenticator.credentialID,
     },
@@ -215,7 +215,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
  */
 export type VerifiedAssertion = {
   verified: boolean;
-  authenticatorInfo: {
+  assertionInfo: {
     credentialID: Buffer;
     newCounter: number;
   };
