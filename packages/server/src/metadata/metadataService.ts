@@ -8,6 +8,7 @@ import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertX509CertToPEM from '../helpers/convertX509CertToPEM';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+import { log } from '../helpers/logging';
 
 import parseJWT from './parseJWT';
 
@@ -63,7 +64,7 @@ class MetadataService {
 
     const { mdsServers, statements } = opts;
 
-    this.state = SERVICE_STATE.REFRESHING;
+    this.setState(SERVICE_STATE.REFRESHING);
 
     // If metadata statements are provided, load them into the cache first
     if (statements?.length) {
@@ -102,7 +103,7 @@ class MetadataService {
       }
     }
 
-    this.state = SERVICE_STATE.READY;
+    this.setState(SERVICE_STATE.READY);
   }
 
   /**
@@ -142,10 +143,10 @@ class MetadataService {
       const now = new Date();
       if (now > mds.nextUpdate) {
         try {
-          this.state = SERVICE_STATE.REFRESHING;
+          this.setState(SERVICE_STATE.REFRESHING);
           await this.downloadTOC(mds);
         } finally {
-          this.state = SERVICE_STATE.READY;
+          this.setState(SERVICE_STATE.READY);
         }
       }
     }
@@ -308,6 +309,21 @@ class MetadataService {
     });
 
     return readyPromise;
+  }
+
+  /**
+   * Report service status on change
+   */
+  private setState(newState: SERVICE_STATE) {
+    this.state = newState;
+
+    if (newState === SERVICE_STATE.DISABLED) {
+      log('MetadataService is DISABLED');
+    } else if (newState === SERVICE_STATE.REFRESHING) {
+      log('MetadataService is REFRESHING');
+    } else if (newState === SERVICE_STATE.READY) {
+      log('MetadataService is READY');
+    }
   }
 }
 
