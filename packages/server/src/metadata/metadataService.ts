@@ -87,6 +87,8 @@ class MetadataService {
 
     // If MDS servers are provided, then process them and add their statements to the cache
     if (mdsServers?.length) {
+      const currentCacheCount = Object.keys(this.statementCache).length;
+
       for (const server of mdsServers) {
         try {
           await this.downloadTOC({
@@ -99,8 +101,14 @@ class MetadataService {
           });
         } catch (err) {
           // Notify of the error and move on
+          log('warning', `Could not download TOC from ${server.url}:`, err);
         }
       }
+
+      const newCacheCount = Object.keys(this.statementCache).length;
+      const cacheDiff = newCacheCount - currentCacheCount;
+
+      log('info', `Downloaded ${cacheDiff} statements from ${mdsServers.length} metadata servers`);
     }
 
     this.setState(SERVICE_STATE.READY);
