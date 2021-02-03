@@ -1,12 +1,13 @@
 jest.mock('../helpers/generateChallenge');
 
+import base64url from 'base64url';
+
 import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
   const rpName = 'SimpleWebAuthn';
   const rpID = 'not.real';
   const challenge = 'totallyrandomvalue';
-  const userID = '1234';
   const userName = 'usernameHere';
   const timeout = 1;
   const attestationType = 'indirect';
@@ -15,7 +16,6 @@ test('should generate credential request options suitable for sending via JSON',
     rpName,
     rpID,
     challenge,
-    userID,
     userName,
     timeout,
     attestationType,
@@ -29,7 +29,7 @@ test('should generate credential request options suitable for sending via JSON',
       id: rpID,
     },
     user: {
-      id: userID,
+      id: 'AQIDBAUGBwgJCgsMDQ4PEA',
       name: userName,
       displayName: userName,
     },
@@ -59,16 +59,19 @@ test('should map excluded credential IDs if specified', () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
     excludeCredentials: [
-      { id: 'someIDhere', type: 'public-key', transports: ['usb', 'ble', 'nfc', 'internal'] },
+      {
+        id: base64url.toBuffer('c29tZUlEaGVyZQ'),
+        type: 'public-key',
+        transports: ['usb', 'ble', 'nfc', 'internal'],
+      },
     ],
   });
 
   expect(options.excludeCredentials).toEqual([
     {
-      id: 'someIDhere',
+      id: 'c29tZUlEaGVyZQ',
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     },
@@ -80,7 +83,6 @@ test('defaults to 60 seconds if no timeout is specified', () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -92,7 +94,6 @@ test('defaults to none attestation if no attestation type is specified', () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -104,7 +105,6 @@ test('should set authenticatorSelection if specified', () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
     authenticatorSelection: {
       authenticatorAttachment: 'cross-platform',
@@ -125,7 +125,6 @@ test('should set extensions if specified', () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
     extensions: { appid: 'simplewebauthn' },
   });
@@ -139,7 +138,6 @@ test('should generate a challenge if one is not provided', () => {
   const options = generateAttestationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -151,7 +149,6 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
   const options = generateAttestationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     supportedAlgorithmIDs: [-7, -8, -65535],
   });

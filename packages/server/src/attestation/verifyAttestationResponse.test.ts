@@ -42,13 +42,17 @@ test('should verify FIDO U2F attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('fido-u2f');
-  expect(verification.authenticatorInfo?.counter).toEqual(0);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
+  expect(verification.attestationInfo?.fmt).toEqual('fido-u2f');
+  expect(verification.attestationInfo?.counter).toEqual(0);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer(
+      'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
+    ),
   );
 });
 
@@ -61,14 +65,18 @@ test('should verify Packed (EC2) attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('packed');
-  expect(verification.authenticatorInfo?.counter).toEqual(1589874425);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pQECAyYgASFYIEoxVVqK-oIGmqoDEyO4KjmMx5R2HeMM4LQQXh8sE01PIlggtzuuoMN5fWnAIuuXdlfshOGu1k3ApBUtDJ8eKiuo_6c',
+  expect(verification.attestationInfo?.fmt).toEqual('packed');
+  expect(verification.attestationInfo?.counter).toEqual(1589874425);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pQECAyYgASFYIEoxVVqK-oIGmqoDEyO4KjmMx5R2HeMM4LQQXh8sE01PIlggtzuuoMN5fWnAIuuXdlfshOGu1k3ApBUtDJ8eKiuo_6c',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
-      'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer(
+      'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
+        'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
+    ),
   );
 });
 
@@ -81,13 +89,17 @@ test('should verify Packed (X5C) attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('packed');
-  expect(verification.authenticatorInfo?.counter).toEqual(28);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pQECAyYgASFYIGwlsYCNyRb4AD9cyTw6cH5VS-uzflmmO1UldGGe9eIaIlggvadzKD8p6wKLjgYfxRxldjCMGRV0YyM13osWbKIPrF8',
+  expect(verification.attestationInfo?.fmt).toEqual('packed');
+  expect(verification.attestationInfo?.counter).toEqual(28);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pQECAyYgASFYIGwlsYCNyRb4AD9cyTw6cH5VS-uzflmmO1UldGGe9eIaIlggvadzKD8p6wKLjgYfxRxldjCMGRV0YyM13osWbKIPrF8',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer(
+      '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
+    ),
   );
 });
 
@@ -100,13 +112,17 @@ test('should verify None attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('none');
-  expect(verification.authenticatorInfo?.counter).toEqual(0);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
+  expect(verification.attestationInfo?.fmt).toEqual('none');
+  expect(verification.attestationInfo?.counter).toEqual(0);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer(
+      'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
+    ),
   );
 });
 
@@ -130,13 +146,15 @@ test('should verify None attestation w/RSA public key', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('none');
-  expect(verification.authenticatorInfo?.counter).toEqual(0);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pAEDAzkBACBZAQDxfpXrj0ba_AH30JJ_-W7BHSOPugOD8aEDdNBKc1gjB9AmV3FPl2aL0fwiOMKtM_byI24qXb2FzcyjC7HUVkHRtzkAQnahXckI4wY_01koaY6iwXuIE3Ya0Zjs2iZyz6u4G_abGnWdObqa_kHxc3CHR7Xy5MDkAkKyX6TqU0tgHZcEhDd_Lb5ONJDwg4wvKlZBtZYElfMuZ6lonoRZ7qR_81rGkDZyFaxp6RlyvzEbo4ijeIaHQylqCz-oFm03ifZMOfRHYuF4uTjJDRH-g4BW1f3rdi7DTHk1hJnIw1IyL_VFIQ9NifkAguYjNCySCUNpYli2eMrPhAu5dYJFFjINIUMBAAE',
+  expect(verification.attestationInfo?.fmt).toEqual('none');
+  expect(verification.attestationInfo?.counter).toEqual(0);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pAEDAzkBACBZAQDxfpXrj0ba_AH30JJ_-W7BHSOPugOD8aEDdNBKc1gjB9AmV3FPl2aL0fwiOMKtM_byI24qXb2FzcyjC7HUVkHRtzkAQnahXckI4wY_01koaY6iwXuIE3Ya0Zjs2iZyz6u4G_abGnWdObqa_kHxc3CHR7Xy5MDkAkKyX6TqU0tgHZcEhDd_Lb5ONJDwg4wvKlZBtZYElfMuZ6lonoRZ7qR_81rGkDZyFaxp6RlyvzEbo4ijeIaHQylqCz-oFm03ifZMOfRHYuF4uTjJDRH-g4BW1f3rdi7DTHk1hJnIw1IyL_VFIQ9NifkAguYjNCySCUNpYli2eMrPhAu5dYJFFjINIUMBAAE',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
   );
 });
 
@@ -186,7 +204,9 @@ test('should throw when attestation type is not webauthn.create', async () => {
 test('should throw if an unexpected attestation format is specified', async () => {
   const fmt = 'fizzbuzz';
 
-  const realAtteObj = decodeAttestationObject.default(attestationNone.response.attestationObject);
+  const realAtteObj = decodeAttestationObject.default(
+    base64url.toBuffer(attestationNone.response.attestationObject),
+  );
 
   mockDecodeAttestation.mockReturnValue({
     ...realAtteObj,
@@ -205,7 +225,9 @@ test('should throw if an unexpected attestation format is specified', async () =
 });
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
-  const { authData } = decodeAttestationObject.default(attestationNone.response.attestationObject);
+  const { authData } = decodeAttestationObject.default(
+    base64url.toBuffer(attestationNone.response.attestationObject),
+  );
   const actualAuthData = parseAuthenticatorData.default(authData);
 
   mockParseAuthData.mockReturnValue({
@@ -325,7 +347,7 @@ test('should not include authenticator info if not verified', async () => {
   });
 
   expect(verification.verified).toBe(false);
-  expect(verification.authenticatorInfo).toBeUndefined();
+  expect(verification.attestationInfo).toBeUndefined();
 });
 
 test('should throw an error if user verification is required but user was not verified', async () => {
@@ -368,13 +390,15 @@ test('should validate TPM RSA response (SHA256)', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('tpm');
-  expect(verification.authenticatorInfo?.counter).toEqual(30);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pAEDAzkBACBZAQCtxzw59Wsl8xWP97wPTu2TSDlushwshL8GedHAHO1R62m3nNy21hCLJlQabfLepRUQ_v9mq3PCmV81tBSqtRGU5_YlK0R2yeu756SnT39c6hKC3PBPt_xdjL_ccz4H_73DunfB63QZOtdeAsswV7WPLqMARofuM-LQ_LHnNguCypDcxhADuUqQtogfwZsknTVIPxzGcfqnQ7ERF9D9AOWIQ8YjOsTi_B2zS8SOySKIFUGwwYcPG7DiCE-QJcI-fpydRDnEq6UxbkYgB7XK4BlmPKlwuXkBDX9egl_Ma4B7W2WJvYbKevu6Z8Kc5y-OITpNVDYKbBK3qKyh4yIUpB1NIUMBAAE',
+  expect(verification.attestationInfo?.fmt).toEqual('tpm');
+  expect(verification.attestationInfo?.counter).toEqual(30);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pAEDAzkBACBZAQCtxzw59Wsl8xWP97wPTu2TSDlushwshL8GedHAHO1R62m3nNy21hCLJlQabfLepRUQ_v9mq3PCmV81tBSqtRGU5_YlK0R2yeu756SnT39c6hKC3PBPt_xdjL_ccz4H_73DunfB63QZOtdeAsswV7WPLqMARofuM-LQ_LHnNguCypDcxhADuUqQtogfwZsknTVIPxzGcfqnQ7ERF9D9AOWIQ8YjOsTi_B2zS8SOySKIFUGwwYcPG7DiCE-QJcI-fpydRDnEq6UxbkYgB7XK4BlmPKlwuXkBDX9egl_Ma4B7W2WJvYbKevu6Z8Kc5y-OITpNVDYKbBK3qKyh4yIUpB1NIUMBAAE',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
   );
 });
 
@@ -398,13 +422,15 @@ test('should validate TPM RSA response (SHA1)', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('tpm');
-  expect(verification.authenticatorInfo?.counter).toEqual(97);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pAEDAzn__iBZAQCzl_wD24PZ5z-po2FrwoQVdd13got_CkL8p4B_NvJBC5OwAYKDilii_wj-0CA8ManbpSInx9Tdnz6t91OhudwUT0-W_BHSLK_MqFcjZWrR5LYVmVpz1EgH3DrOTra4AlogEq2D2CYktPrPe7joE-oT3vAYXK8vzQDLRyaxI_Z1qS4KLlLCdajW8PGpw1YRjMDw6s69GZU8mXkgNPMCUh1TZ1bnCvJTO9fnmLjDjqdQGRU4bWo8tFjCL8g1-2WD_2n0-twt6n-Uox5VnR1dQJG4awMlanBCkGGpOb3WBDQ8K10YJJ2evPhJKGJahBvu2Dxmq6pLCAXCv0ma3EHj-PmDIUMBAAE',
+  expect(verification.attestationInfo?.fmt).toEqual('tpm');
+  expect(verification.attestationInfo?.counter).toEqual(97);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pAEDAzn__iBZAQCzl_wD24PZ5z-po2FrwoQVdd13got_CkL8p4B_NvJBC5OwAYKDilii_wj-0CA8ManbpSInx9Tdnz6t91OhudwUT0-W_BHSLK_MqFcjZWrR5LYVmVpz1EgH3DrOTra4AlogEq2D2CYktPrPe7joE-oT3vAYXK8vzQDLRyaxI_Z1qS4KLlLCdajW8PGpw1YRjMDw6s69GZU8mXkgNPMCUh1TZ1bnCvJTO9fnmLjDjqdQGRU4bWo8tFjCL8g1-2WD_2n0-twt6n-Uox5VnR1dQJG4awMlanBCkGGpOb3WBDQ8K10YJJ2evPhJKGJahBvu2Dxmq6pLCAXCv0ma3EHj-PmDIUMBAAE',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
   );
 });
 
@@ -428,13 +454,15 @@ test('should validate Android-Key response', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.authenticatorInfo?.fmt).toEqual('android-key');
-  expect(verification.authenticatorInfo?.counter).toEqual(108);
-  expect(verification.authenticatorInfo?.base64PublicKey).toEqual(
-    'pQECAyYgASFYIEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239oIlgg6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
+  expect(verification.attestationInfo?.fmt).toEqual('android-key');
+  expect(verification.attestationInfo?.counter).toEqual(108);
+  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+    base64url.toBuffer(
+      'pQECAyYgASFYIEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239oIlgg6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
+    ),
   );
-  expect(verification.authenticatorInfo?.base64CredentialID).toEqual(
-    'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+  expect(verification.attestationInfo?.credentialID).toEqual(
+    base64url.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
   );
 });
 

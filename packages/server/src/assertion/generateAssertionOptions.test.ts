@@ -8,12 +8,12 @@ test('should generate credential request options suitable for sending via JSON',
   const options = generateAssertionOptions({
     allowCredentials: [
       {
-        id: Buffer.from('1234', 'ascii').toString('base64'),
+        id: Buffer.from('1234', 'ascii'),
         type: 'public-key',
         transports: ['usb', 'nfc'],
       },
       {
-        id: Buffer.from('5678', 'ascii').toString('base64'),
+        id: Buffer.from('5678', 'ascii'),
         type: 'public-key',
         transports: ['internal'],
       },
@@ -27,12 +27,12 @@ test('should generate credential request options suitable for sending via JSON',
     challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
     allowCredentials: [
       {
-        id: 'MTIzNA==',
+        id: 'MTIzNA',
         type: 'public-key',
         transports: ['usb', 'nfc'],
       },
       {
-        id: 'NTY3OA==',
+        id: 'NTY3OA',
         type: 'public-key',
         transports: ['internal'],
       },
@@ -45,8 +45,8 @@ test('defaults to 60 seconds if no timeout is specified', () => {
   const options = generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
+      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
+      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
     ],
   });
 
@@ -57,8 +57,8 @@ test('should not set userVerification if not specified', () => {
   const options = generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
+      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
+      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
     ],
   });
 
@@ -88,8 +88,8 @@ test('should set userVerification if specified', () => {
   const options = generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
+      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
+      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
     ],
     userVerification: 'required',
   });
@@ -101,8 +101,8 @@ test('should set extensions if specified', () => {
   const options = generateAssertionOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
+      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
+      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
     ],
     extensions: { appid: 'simplewebauthn' },
   });
@@ -115,8 +115,8 @@ test('should set extensions if specified', () => {
 test('should generate a challenge if one is not provided', () => {
   const opts = {
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii').toString('base64'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii').toString('base64'), type: 'public-key' },
+      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
+      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
     ],
   };
 
