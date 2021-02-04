@@ -54,6 +54,12 @@ test('should verify FIDO U2F attestation', async () => {
       'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
     ),
   );
+  expect(verification.attestationInfo?.aaguid).toEqual('00000000-0000-0000-0000-000000000000');
+  expect(verification.attestationInfo?.credentialType).toEqual('public-key');
+  expect(verification.attestationInfo?.userVerified).toEqual(false);
+  expect(verification.attestationInfo?.attestationObject).toEqual(
+    base64url.toBuffer(attestationFIDOU2F.response.attestationObject),
+  );
 });
 
 test('should verify Packed (EC2) attestation', async () => {
