@@ -69,7 +69,7 @@ test('should convert options before passing to navigator.credentials.create(...)
 
   // Make sure challenge and user.id are converted to Buffers
   expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
-  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(new Uint8Array([231, 174, 252]));
+  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(new Uint8Array([53, 54, 55, 56]));
 
   // Confirm construction of excludeCredentials array
   expect(credId instanceof ArrayBuffer).toEqual(true);
