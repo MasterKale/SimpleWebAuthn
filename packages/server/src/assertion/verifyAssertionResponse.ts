@@ -107,23 +107,8 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
     throw new Error('Credential response signature was not a base64url string');
   }
 
-  if (response.userHandle) {
-    if (typeof response.userHandle !== 'string') {
-      throw new Error('Credential response userHandle was not a string');
-    }
-
-    /**
-     * Check that the userHandle returned by the authenticator matches the RP's expected handle
-     * for this credential
-     */
-    const userHandleBuffer = base64url.toBuffer(response.userHandle);
-
-    if (!userHandleBuffer.equals(authenticator.userHandle)) {
-      const expectedHandle = base64url.encode(authenticator.userHandle);
-      throw new Error(
-        `Unexpected response userHandle "${response.userHandle}", expected ${expectedHandle}`,
-      );
-    }
+  if (response.userHandle && typeof response.userHandle !== 'string') {
+    throw new Error('Credential response userHandle was not a string');
   }
 
   if (tokenBinding) {
