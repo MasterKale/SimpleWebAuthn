@@ -8,7 +8,8 @@ import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertX509CertToPEM from '../helpers/convertX509CertToPEM';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
-import { log } from '../helpers/logging';
+// TODO: Re-enable this once we figure out logging
+// import { log } from '../helpers/logging';
 
 import parseJWT from './parseJWT';
 
@@ -87,7 +88,8 @@ class MetadataService {
 
     // If MDS servers are provided, then process them and add their statements to the cache
     if (mdsServers?.length) {
-      const currentCacheCount = Object.keys(this.statementCache).length;
+      // TODO: Re-enable this once we figure out logging
+      // const currentCacheCount = Object.keys(this.statementCache).length;
 
       for (const server of mdsServers) {
         try {
@@ -101,14 +103,15 @@ class MetadataService {
           });
         } catch (err) {
           // Notify of the error and move on
-          log('warning', `Could not download TOC from ${server.url}:`, err);
+          // TODO: Re-enable this once we figure out logging
+          // log('warning', `Could not download TOC from ${server.url}:`, err);
         }
       }
 
-      const newCacheCount = Object.keys(this.statementCache).length;
-      const cacheDiff = newCacheCount - currentCacheCount;
-
-      log('info', `Downloaded ${cacheDiff} statements from ${mdsServers.length} metadata servers`);
+      // TODO: Re-enable this once we figure out logging
+      // const newCacheCount = Object.keys(this.statementCache).length;
+      // const cacheDiff = newCacheCount - currentCacheCount;
+      // log('info', `Downloaded ${cacheDiff} statements from ${mdsServers.length} metadata servers`);
     }
 
     this.setState(SERVICE_STATE.READY);
@@ -326,11 +329,14 @@ class MetadataService {
     this.state = newState;
 
     if (newState === SERVICE_STATE.DISABLED) {
-      log('MetadataService is DISABLED');
+      // TODO: Re-enable this once we figure out logging
+      // log('MetadataService is DISABLED');
     } else if (newState === SERVICE_STATE.REFRESHING) {
-      log('MetadataService is REFRESHING');
+      // TODO: Re-enable this once we figure out logging
+      // log('MetadataService is REFRESHING');
     } else if (newState === SERVICE_STATE.READY) {
-      log('MetadataService is READY');
+      // TODO: Re-enable this once we figure out logging
+      // log('MetadataService is READY');
     }
   }
 }
