@@ -202,7 +202,6 @@ test.skip('should verify TPM assertion', () => {
       credentialPublicKey: base64url.toBuffer('BAEAAQ'),
       credentialID: base64url.toBuffer('YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME'),
       counter: 0,
-      userHandle: Buffer.from('randomID', 'ascii'),
     },
   });
 
@@ -288,7 +287,6 @@ const authenticator: AuthenticatorDevice = {
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   ),
   counter: 143,
-  userHandle: Buffer.from('randomID', 'ascii'),
 };
 
 /**
@@ -316,5 +314,4 @@ const authenticatorFirstTimeUsed: AuthenticatorDevice = {
     'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   ),
   counter: 0,
-  userHandle: Buffer.from('randomID', 'ascii'),
 };
