@@ -116,12 +116,8 @@ export type AuthenticatorDevice = {
   credentialID: Buffer;
   // Number of times this authenticator is expected to have been used
   counter: number;
-  // The random Buffer generated as user.id in attestation options
-  userHandle?: Buffer;
   // From browser's `startAttestation()` -> AttestationCredentialJSON.transports (API L2 and up)
   transports?: AuthenticatorTransport[];
-  // If desired, store the original value of response.attestationObject for later scrutiny
-  attestationObject?: Buffer;
 };
 
 /**
