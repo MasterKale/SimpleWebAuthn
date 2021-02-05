@@ -1,6 +1,8 @@
 import {
   AssertionCredential,
   PublicKeyCredentialRequestOptionsJSON,
+  AuthenticationExtensionsClientInputs,
+  AuthenticationExtensionsClientOutputs,
 } from '@simplewebauthn/typescript-types';
 
 import supportsWebauthn from '../helpers/supportsWebauthn';
@@ -40,13 +42,6 @@ const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
 };
 
 beforeEach(() => {
-  mockNavigatorGet.mockReset();
-  mockSupportsWebauthn.mockReset();
-});
-
-test('should convert options before passing to navigator.credentials.get(...)', async done => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
   // Stub out a response so the method won't throw
   mockNavigatorGet.mockImplementation(
     (): Promise<any> => {
@@ -59,6 +54,15 @@ test('should convert options before passing to navigator.credentials.get(...)', 
     },
   );
 
+  mockSupportsWebauthn.mockReturnValue(true);
+});
+
+afterEach(() => {
+  mockNavigatorGet.mockReset();
+  mockSupportsWebauthn.mockReset();
+});
+
+test('should convert options before passing to navigator.credentials.get(...)', async done => {
   await startAssertion(goodOpts1);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
@@ -73,20 +77,6 @@ test('should convert options before passing to navigator.credentials.get(...)', 
 });
 
 test('should support optional allowCredential', async () => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
-  // Stub out a response so the method won't throw
-  mockNavigatorGet.mockImplementation(
-    (): Promise<any> => {
-      return new Promise(resolve => {
-        resolve({
-          response: {},
-          getClientExtensionResults: () => ({}),
-        });
-      });
-    },
-  );
-
   await startAssertion({
     challenge: bufferToBase64URLString(toUint8Array('fizz')),
     timeout: 1,
@@ -96,20 +86,6 @@ test('should support optional allowCredential', async () => {
 });
 
 test('should convert allow allowCredential to undefined when empty', async () => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
-  // Stub out a response so the method won't throw
-  mockNavigatorGet.mockImplementation(
-    (): Promise<any> => {
-      return new Promise(resolve => {
-        resolve({
-          response: {},
-          getClientExtensionResults: () => ({}),
-        });
-      });
-    },
-  );
-
   await startAssertion({
     challenge: bufferToBase64URLString(toUint8Array('fizz')),
     timeout: 1,
@@ -119,8 +95,6 @@ test('should convert allow allowCredential to undefined when empty', async () =>
 });
 
 test('should return base64url-encoded response values', async done => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
   mockNavigatorGet.mockImplementation(
     (): Promise<AssertionCredential> => {
       return new Promise(resolve => {
@@ -162,8 +136,6 @@ test("should throw error if WebAuthn isn't supported", async done => {
 });
 
 test('should throw error if assertion is cancelled for some reason', async done => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
   mockNavigatorGet.mockImplementation(
     (): Promise<null> => {
       return new Promise(resolve => {
@@ -178,20 +150,6 @@ test('should throw error if assertion is cancelled for some reason', async done 
 });
 
 test('should handle UTF-8 challenges', async done => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
-  // Stub out a response so the method won't throw
-  mockNavigatorGet.mockImplementation(
-    (): Promise<any> => {
-      return new Promise(resolve => {
-        resolve({
-          response: {},
-          getClientExtensionResults: () => ({}),
-        });
-      });
-    },
-  );
-
   await startAssertion(goodOpts2UTF8);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
@@ -218,6 +176,69 @@ test('should handle UTF-8 challenges', async done => {
       156,
     ]),
   );
+
+  done();
+});
+
+test('should send extensions to authenticator if present in options', async done => {
+  const extensions: AuthenticationExtensionsClientInputs = {
+    credProps: true,
+    appid: 'appidHere',
+    uvm: true,
+    appidExclude: 'appidExcludeHere',
+  };
+  const optsWithExts: PublicKeyCredentialRequestOptionsJSON = {
+    ...goodOpts1,
+    extensions,
+  };
+  await startAssertion(optsWithExts);
+
+  const argsExtensions = mockNavigatorGet.mock.calls[0][0].publicKey.extensions;
+
+  expect(argsExtensions).toEqual(extensions);
+
+  done();
+});
+
+test('should not set any extensions if not present in options', async done => {
+  await startAssertion(goodOpts1);
+
+  const argsExtensions = mockNavigatorGet.mock.calls[0][0].publicKey.extensions;
+
+  expect(argsExtensions).toEqual(undefined);
+
+  done();
+});
+
+test('should include extension results', async done => {
+  const extResults: AuthenticationExtensionsClientOutputs = {
+    appid: true,
+    credProps: {
+      rk: true,
+    },
+  };
+
+  // Mock extension return values from authenticator
+  mockNavigatorGet.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({ response: {}, getClientExtensionResults: () => extResults });
+      });
+    },
+  );
+
+  // Extensions aren't present in this object, but it doesn't matter since we're faking the response
+  const response = await startAssertion(goodOpts1);
+
+  expect(response.clientExtensionResults).toEqual(extResults);
+
+  done();
+});
+
+test('should include extension results when no extensions specified', async done => {
+  const response = await startAssertion(goodOpts1);
+
+  expect(response.clientExtensionResults).toEqual({});
 
   done();
 });
