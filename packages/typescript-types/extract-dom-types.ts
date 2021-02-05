@@ -22,6 +22,7 @@ const types = [
   'AuthenticatorAttestationResponse',
   'AuthenticatorTransport',
   'AuthenticationExtensionsClientInputs',
+  'AuthenticationExtensionsClientOutputs',
   'AuthenticatorSelectionCriteria',
   'COSEAlgorithmIdentifier',
   'PublicKeyCredential',
