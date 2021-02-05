@@ -10,6 +10,7 @@ import fs from 'fs';
 
 import express from 'express';
 import dotenv from 'dotenv';
+import base64url from 'base64url';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ import {
 } from '@simplewebauthn/server';
 import type {
   AttestationCredentialJSON,
+  AssertionCredentialJSON,
   AuthenticatorDevice,
 } from '@simplewebauthn/typescript-types';
 
@@ -150,20 +152,20 @@ app.post('/verify-attestation', async (req, res) => {
     return res.status(400).send({ error: error.message });
   }
 
-  const { verified, authenticatorInfo } = verification;
+  const { verified, attestationInfo } = verification;
 
-  if (verified && authenticatorInfo) {
-    const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
+  if (verified && attestationInfo) {
+    const { credentialPublicKey, credentialID, counter } = attestationInfo;
 
-    const existingDevice = user.devices.find(device => device.credentialID === base64CredentialID);
+    const existingDevice = user.devices.find(device => device.credentialID === credentialID);
 
     if (!existingDevice) {
       /**
        * Add the returned device to the user's list of devices
        */
       const newDevice: AuthenticatorDevice = {
-        publicKey: base64PublicKey,
-        credentialID: base64CredentialID,
+        credentialPublicKey,
+        credentialID,
         counter,
       };
       user.devices.push(newDevice);
@@ -205,16 +207,17 @@ app.get('/generate-assertion-options', (req, res) => {
 });
 
 app.post('/verify-assertion', (req, res) => {
-  const { body } = req;
+  const body: AssertionCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
   const expectedChallenge = user.currentChallenge;
 
   let dbAuthenticator;
+  const bodyCredIDBuffer = base64url.toBuffer(body.rawId);
   // "Query the DB" here for an authenticator matching `credentialID`
   for (const dev of user.devices) {
-    if (dev.credentialID === body.id) {
+    if (dev.credentialID.equals(bodyCredIDBuffer)) {
       dbAuthenticator = dev;
       break;
     }
@@ -238,11 +241,11 @@ app.post('/verify-assertion', (req, res) => {
     return res.status(400).send({ error: error.message });
   }
 
-  const { verified, authenticatorInfo } = verification;
+  const { verified, assertionInfo } = verification;
 
   if (verified) {
     // Update the authenticator's counter in the DB to the newest count in the assertion
-    dbAuthenticator.counter = authenticatorInfo.counter;
+    dbAuthenticator.counter = assertionInfo.newCounter;
   }
 
   res.send({ verified });

@@ -2,6 +2,7 @@
 import fs from 'fs';
 import express from 'express';
 import fetch from 'node-fetch';
+import base64url from 'base64url';
 
 import {
   generateAttestationOptions,
@@ -10,6 +11,10 @@ import {
   verifyAssertionResponse,
   MetadataService,
 } from '@simplewebauthn/server';
+import {
+  AssertionCredentialJSON,
+  AttestationCredentialJSON,
+} from '@simplewebauthn/typescript-types';
 import { MetadataStatement } from '@simplewebauthn/server/dist/metadata/metadataService';
 
 import { LoggedInUser } from './example-server';
@@ -151,7 +156,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
  * [FIDO2] Server Tests > MakeCredential Response
  */
 fidoConformanceRouter.post('/attestation/result', async (req, res) => {
-  const { body } = req;
+  const body: AttestationCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
 
@@ -169,20 +174,20 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
     return res.status(400).send({ errorMessage: error.message });
   }
 
-  const { verified, authenticatorInfo } = verification;
+  const { verified, attestationInfo } = verification;
 
-  if (verified && authenticatorInfo) {
-    const { base64PublicKey, base64CredentialID, counter } = authenticatorInfo;
+  if (verified && attestationInfo) {
+    const { credentialPublicKey, credentialID, counter } = attestationInfo;
 
-    const existingDevice = user.devices.find(device => device.credentialID === base64CredentialID);
+    const existingDevice = user.devices.find(device => device.credentialID === credentialID);
 
     if (!existingDevice) {
       /**
        * Add the returned device to the user's list of devices
        */
       user.devices.push({
-        publicKey: base64PublicKey,
-        credentialID: base64CredentialID,
+        credentialPublicKey,
+        credentialID,
         counter,
       });
     }
@@ -228,7 +233,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
 });
 
 fidoConformanceRouter.post('/assertion/result', (req, res) => {
-  const { body } = req;
+  const body: AssertionCredentialJSON = req.body;
   const { id } = body;
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
@@ -237,7 +242,8 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
   const expectedChallenge = user.currentChallenge;
   const userVerification = user.currentAssertionUserVerification;
 
-  const existingDevice = user.devices.find(device => device.credentialID === id);
+  const credIDBuffer = base64url.toBuffer(id);
+  const existingDevice = user.devices.find(device => device.credentialID.equals(credIDBuffer));
 
   if (!existingDevice) {
     throw new Error(`Could not find device matching ${id}`);
@@ -258,12 +264,10 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
     return res.status(400).send({ errorMessage: error.message });
   }
 
-  const { verified, authenticatorInfo } = verification;
+  const { verified, assertionInfo } = verification;
 
   if (verified) {
-    const { counter } = authenticatorInfo;
-
-    existingDevice.counter = counter;
+    existingDevice.counter = assertionInfo.newCounter;
   }
 
   return res.send({
