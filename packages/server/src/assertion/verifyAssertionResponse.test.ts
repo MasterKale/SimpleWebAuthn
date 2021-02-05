@@ -4,6 +4,7 @@ import verifyAssertionResponse from './verifyAssertionResponse';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
+import { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -39,8 +40,8 @@ test('should return authenticator info after verification', () => {
     authenticator: authenticator,
   });
 
-  expect(verification.authenticatorInfo.counter).toEqual(144);
-  expect(verification.authenticatorInfo.base64CredentialID).toEqual(authenticator.credentialID);
+  expect(verification.assertionInfo.newCounter).toEqual(144);
+  expect(verification.assertionInfo.credentialID).toEqual(authenticator.credentialID);
 });
 
 test('should throw when response challenge is not expected value', () => {
@@ -198,8 +199,8 @@ test.skip('should verify TPM assertion', () => {
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: {
-      publicKey: 'BAEAAQ',
-      credentialID: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
+      credentialPublicKey: base64url.toBuffer('BAEAAQ'),
+      credentialID: base64url.toBuffer('YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME'),
       counter: 0,
     },
   });
@@ -278,11 +279,13 @@ const assertionResponse = {
 const assertionChallenge = base64url.encode('totallyUniqueValueEveryTime');
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
-const authenticator = {
-  publicKey:
+const authenticator: AuthenticatorDevice = {
+  credentialPublicKey: base64url.toBuffer(
     'pQECAyYgASFYIIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A1Ilgg8WGeA6hPmnab0HAViUYVRkwTNcN77QBf_RR0dv3lIvQ',
-  credentialID:
+  ),
+  credentialID: base64url.toBuffer(
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
+  ),
   counter: 143,
 };
 
@@ -303,10 +306,12 @@ const assertionFirstTimeUsedResponse = {
 };
 const assertionFirstTimeUsedChallenge = base64url.encode('totallyUniqueValueEveryAssertion');
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
-const authenticatorFirstTimeUsed = {
-  publicKey:
+const authenticatorFirstTimeUsed: AuthenticatorDevice = {
+  credentialPublicKey: base64url.toBuffer(
     'pQECAyYgASFYIGmaxR4mBbukc2QhtW2ldhAAd555r-ljlGQN8MbcTnPPIlgg9CyUlE-0AB2fbzZbNgBvJuRa7r6o2jPphOmtyNPR_kY',
-  credentialID:
+  ),
+  credentialID: base64url.toBuffer(
     'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
+  ),
   counter: 0,
 };

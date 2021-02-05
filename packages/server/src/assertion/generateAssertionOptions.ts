@@ -1,7 +1,7 @@
 import type {
   AuthenticationExtensionsClientInputs,
   PublicKeyCredentialRequestOptionsJSON,
-  PublicKeyCredentialDescriptorJSON,
+  PublicKeyCredentialDescriptor,
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
@@ -9,7 +9,7 @@ import base64url from 'base64url';
 import generateChallenge from '../helpers/generateChallenge';
 
 type Options = {
-  allowCredentials?: PublicKeyCredentialDescriptorJSON[];
+  allowCredentials?: PublicKeyCredentialDescriptor[];
   challenge?: string | Buffer;
   timeout?: number;
   userVerification?: UserVerificationRequirement;
@@ -44,7 +44,10 @@ export default function generateAssertionOptions(
 
   return {
     challenge: base64url.encode(challenge),
-    allowCredentials,
+    allowCredentials: allowCredentials?.map(cred => ({
+      ...cred,
+      id: base64url.encode(cred.id as Buffer),
+    })),
     timeout,
     userVerification,
     extensions,

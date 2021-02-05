@@ -4,12 +4,13 @@ import {
   COSEAlgorithmIdentifier,
 } from '@simplewebauthn/typescript-types';
 
-import decodeAttestationObject, { ATTESTATION_FORMATS } from '../helpers/decodeAttestationObject';
+import decodeAttestationObject, { ATTESTATION_FORMAT } from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
@@ -110,8 +111,9 @@ export default async function verifyAttestationResponse(
     }
   }
 
-  const attestationObject = decodeAttestationObject(response.attestationObject);
-  const { fmt, authData, attStmt } = attestationObject;
+  const attestationObject = base64url.toBuffer(response.attestationObject);
+  const decodedAttestationObject = decodeAttestationObject(attestationObject);
+  const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
   const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
@@ -177,7 +179,7 @@ export default async function verifyAttestationResponse(
    * Verification can only be performed when attestation = 'direct'
    */
   let verified = false;
-  if (fmt === ATTESTATION_FORMATS.FIDO_U2F) {
+  if (fmt === ATTESTATION_FORMAT.FIDO_U2F) {
     verified = verifyFIDOU2F({
       attStmt,
       clientDataHash,
@@ -186,7 +188,7 @@ export default async function verifyAttestationResponse(
       rpIdHash,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMATS.PACKED) {
+  } else if (fmt === ATTESTATION_FORMAT.PACKED) {
     verified = await verifyPacked({
       attStmt,
       authData,
@@ -194,14 +196,14 @@ export default async function verifyAttestationResponse(
       credentialPublicKey,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMATS.ANDROID_SAFETYNET) {
+  } else if (fmt === ATTESTATION_FORMAT.ANDROID_SAFETYNET) {
     verified = await verifyAndroidSafetynet({
       attStmt,
       authData,
       clientDataHash,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMATS.ANDROID_KEY) {
+  } else if (fmt === ATTESTATION_FORMAT.ANDROID_KEY) {
     verified = await verifyAndroidKey({
       attStmt,
       authData,
@@ -209,7 +211,7 @@ export default async function verifyAttestationResponse(
       credentialPublicKey,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMATS.TPM) {
+  } else if (fmt === ATTESTATION_FORMAT.TPM) {
     verified = await verifyTPM({
       aaguid,
       attStmt,
@@ -217,14 +219,14 @@ export default async function verifyAttestationResponse(
       credentialPublicKey,
       clientDataHash,
     });
-  } else if (fmt === ATTESTATION_FORMATS.APPLE) {
+  } else if (fmt === ATTESTATION_FORMAT.APPLE) {
     verified = await verifyApple({
       attStmt,
       authData,
       clientDataHash,
       credentialPublicKey,
     });
-  } else if (fmt === ATTESTATION_FORMATS.NONE) {
+  } else if (fmt === ATTESTATION_FORMAT.NONE) {
     if (Object.keys(attStmt).length > 0) {
       throw new Error('None attestation had unexpected attestation statement');
     }
@@ -236,17 +238,18 @@ export default async function verifyAttestationResponse(
 
   const toReturn: VerifiedAttestation = {
     verified,
-    userVerified: flags.uv,
   };
 
   if (toReturn.verified) {
-    toReturn.userVerified = flags.uv;
-
-    toReturn.authenticatorInfo = {
+    toReturn.attestationInfo = {
       fmt,
       counter,
-      base64PublicKey: base64url.encode(credentialPublicKey),
-      base64CredentialID: base64url.encode(credentialID),
+      aaguid: convertAAGUIDToString(aaguid),
+      credentialPublicKey,
+      credentialID,
+      credentialType,
+      userVerified: flags.uv,
+      attestationObject,
     };
   }
 
@@ -257,23 +260,28 @@ export default async function verifyAttestationResponse(
  * Result of attestation verification
  *
  * @param verified If the assertion response could be verified
- * @param userVerified Whether the user was uniquely identified during attestation
- * @param authenticatorInfo.fmt Type of attestation
- * @param authenticatorInfo.counter The number of times the authenticator reported it has been used.
+ * @param attestationInfo.fmt Type of attestation
+ * @param attestationInfo.counter The number of times the authenticator reported it has been used.
  * Should be kept in a DB for later reference to help prevent replay attacks
- * @param authenticatorInfo.base64PublicKey Base64URL-encoded ArrayBuffer containing the
- * authenticator's public key. **Should be kept in a DB for later reference!**
- * @param authenticatorInfo.base64CredentialID Base64URL-encoded ArrayBuffer containing the
- * authenticator's credential ID for the public key above. **Should be kept in a DB for later
- * reference!**
+ * @param attestationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
+ * authenticator
+ * @param attestationInfo.credentialPublicKey The credential's public key
+ * @param attestationInfo.credentialID The credential's credential ID for the public key above
+ * @param attestationInfo.credentialType The type of the credential returned by the browser
+ * @param attestationInfo.userVerified Whether the user was uniquely identified during attestation
+ * @param attestationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
+ * the authenticator
  */
 export type VerifiedAttestation = {
   verified: boolean;
-  userVerified: boolean;
-  authenticatorInfo?: {
-    fmt: ATTESTATION_FORMATS;
+  attestationInfo?: {
+    fmt: ATTESTATION_FORMAT;
     counter: number;
-    base64PublicKey: string;
-    base64CredentialID: string;
+    aaguid: string;
+    credentialPublicKey: Buffer;
+    credentialID: Buffer;
+    credentialType: string;
+    userVerified: boolean;
+    attestationObject: Buffer;
   };
 };

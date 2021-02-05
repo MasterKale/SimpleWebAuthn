@@ -15,7 +15,7 @@ let aaguid: Buffer;
 
 beforeEach(() => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
-  const decodedAttestationObject = decodeAttestationObject(attestationObject);
+  const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
 
   authData = decodedAttestationObject.authData;
   attStmt = decodedAttestationObject.attStmt;

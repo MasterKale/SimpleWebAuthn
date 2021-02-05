@@ -62,13 +62,17 @@ test('should map excluded credential IDs if specified', () => {
     userID: '1234',
     userName: 'usernameHere',
     excludeCredentials: [
-      { id: 'someIDhere', type: 'public-key', transports: ['usb', 'ble', 'nfc', 'internal'] },
+      {
+        id: Buffer.from('someIDhere', 'ascii'),
+        type: 'public-key',
+        transports: ['usb', 'ble', 'nfc', 'internal'],
+      },
     ],
   });
 
   expect(options.excludeCredentials).toEqual([
     {
-      id: 'someIDhere',
+      id: 'c29tZUlEaGVyZQ',
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     },

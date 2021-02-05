@@ -163,7 +163,7 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
 
-  const publicKey = convertPublicKeyToPEM(authenticator.publicKey);
+  const publicKey = convertPublicKeyToPEM(authenticator.credentialPublicKey);
   const signature = base64url.toBuffer(response.signature);
 
   if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
@@ -178,9 +178,9 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
-    authenticatorInfo: {
-      counter,
-      base64CredentialID: credential.id,
+    assertionInfo: {
+      newCounter: counter,
+      credentialID: authenticator.credentialID,
     },
   };
 
@@ -191,16 +191,17 @@ export default function verifyAssertionResponse(options: Options): VerifiedAsser
  * Result of assertion verification
  *
  * @param verified If the assertion response could be verified
- * @param authenticatorInfo.base64CredentialID The ID of the authenticator used during assertion.
+ * @param assertionInfo.credentialID The ID of the authenticator used during assertion.
  * Should be used to identify which DB authenticator entry needs its `counter` updated to the value
  * below
- * @param authenticatorInfo.counter The number of times the authenticator identified above reported
- * it has been used. **Should be kept in a DB for later reference to help prevent replay attacks!**
+ * @param assertionInfo.newCounter The number of times the authenticator identified above
+ * reported it has been used. **Should be kept in a DB for later reference to help prevent replay
+ * attacks!**
  */
 export type VerifiedAssertion = {
   verified: boolean;
-  authenticatorInfo: {
-    counter: number;
-    base64CredentialID: string;
+  assertionInfo: {
+    credentialID: Buffer;
+    newCounter: number;
   };
 };

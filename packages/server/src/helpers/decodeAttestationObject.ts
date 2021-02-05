@@ -6,15 +6,12 @@ import cbor from 'cbor';
  *
  * @param base64AttestationObject Base64URL-encoded Attestation Object
  */
-export default function decodeAttestationObject(
-  base64AttestationObject: string,
-): AttestationObject {
-  const toBuffer = base64url.toBuffer(base64AttestationObject);
-  const toCBOR: AttestationObject = cbor.decodeAllSync(toBuffer)[0];
+export default function decodeAttestationObject(attestationObject: Buffer): AttestationObject {
+  const toCBOR: AttestationObject = cbor.decodeAllSync(attestationObject)[0];
   return toCBOR;
 }
 
-export enum ATTESTATION_FORMATS {
+export enum ATTESTATION_FORMAT {
   FIDO_U2F = 'fido-u2f',
   PACKED = 'packed',
   ANDROID_SAFETYNET = 'android-safetynet',
@@ -25,7 +22,7 @@ export enum ATTESTATION_FORMATS {
 }
 
 export type AttestationObject = {
-  fmt: ATTESTATION_FORMATS;
+  fmt: ATTESTATION_FORMAT;
   attStmt: AttestationStatement;
   authData: Buffer;
 };

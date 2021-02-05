@@ -8,6 +8,8 @@ import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertX509CertToPEM from '../helpers/convertX509CertToPEM';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+// TODO: Re-enable this once we figure out logging
+// import { log } from '../helpers/logging';
 
 import parseJWT from './parseJWT';
 
@@ -63,7 +65,7 @@ class MetadataService {
 
     const { mdsServers, statements } = opts;
 
-    this.state = SERVICE_STATE.REFRESHING;
+    this.setState(SERVICE_STATE.REFRESHING);
 
     // If metadata statements are provided, load them into the cache first
     if (statements?.length) {
@@ -86,6 +88,9 @@ class MetadataService {
 
     // If MDS servers are provided, then process them and add their statements to the cache
     if (mdsServers?.length) {
+      // TODO: Re-enable this once we figure out logging
+      // const currentCacheCount = Object.keys(this.statementCache).length;
+
       for (const server of mdsServers) {
         try {
           await this.downloadTOC({
@@ -98,11 +103,18 @@ class MetadataService {
           });
         } catch (err) {
           // Notify of the error and move on
+          // TODO: Re-enable this once we figure out logging
+          // log('warning', `Could not download TOC from ${server.url}:`, err);
         }
       }
+
+      // TODO: Re-enable this once we figure out logging
+      // const newCacheCount = Object.keys(this.statementCache).length;
+      // const cacheDiff = newCacheCount - currentCacheCount;
+      // log('info', `Downloaded ${cacheDiff} statements from ${mdsServers.length} metadata servers`);
     }
 
-    this.state = SERVICE_STATE.READY;
+    this.setState(SERVICE_STATE.READY);
   }
 
   /**
@@ -142,10 +154,10 @@ class MetadataService {
       const now = new Date();
       if (now > mds.nextUpdate) {
         try {
-          this.state = SERVICE_STATE.REFRESHING;
+          this.setState(SERVICE_STATE.REFRESHING);
           await this.downloadTOC(mds);
         } finally {
-          this.state = SERVICE_STATE.READY;
+          this.setState(SERVICE_STATE.READY);
         }
       }
     }
@@ -308,6 +320,24 @@ class MetadataService {
     });
 
     return readyPromise;
+  }
+
+  /**
+   * Report service status on change
+   */
+  private setState(newState: SERVICE_STATE) {
+    this.state = newState;
+
+    if (newState === SERVICE_STATE.DISABLED) {
+      // TODO: Re-enable this once we figure out logging
+      // log('MetadataService is DISABLED');
+    } else if (newState === SERVICE_STATE.REFRESHING) {
+      // TODO: Re-enable this once we figure out logging
+      // log('MetadataService is REFRESHING');
+    } else if (newState === SERVICE_STATE.READY) {
+      // TODO: Re-enable this once we figure out logging
+      // log('MetadataService is READY');
+    }
   }
 }
 

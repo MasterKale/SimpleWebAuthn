@@ -1,15 +1,12 @@
 import cbor from 'cbor';
 import jwkToPem from 'jwk-to-pem';
-import base64url from 'base64url';
 
 import { COSEKEYS, COSEKTY, COSECRV } from './convertCOSEtoPKCS';
 
-export default function convertPublicKeyToPEM(publicKey: string): string {
-  const publicKeyBuffer = base64url.toBuffer(publicKey);
-
+export default function convertPublicKeyToPEM(publicKey: Buffer): string {
   let struct;
   try {
-    struct = cbor.decodeAllSync(publicKeyBuffer)[0];
+    struct = cbor.decodeAllSync(publicKey)[0];
   } catch (err) {
     throw new Error(`Error decoding public key while converting to PEM: ${err.message}`);
   }
