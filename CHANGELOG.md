@@ -1,5 +1,163 @@
 # Changelog
 
+## v2.0.0 - The one with -less and more Buffers
+
+This major release includes improvements intended to make it easier to support **passwordless** and **usernameless** WebAuthn flows. Additional information returned from attestation verification can be used by RP's to further scrutinize the attestation now or in the future.
+
+I also made the decision to reduce the amount of encoding from Buffer to Base64URL and decoding from Base64URL to Buffer throughout the library. Verification methods now return raw **Buffers** so that RP's are free to store and retrieve these values as they see fit without the library imposing any kind of encoding overhead that may complicate storage in a database, etc...
+
+**Packages:**
+
+- @simplewebauthn/server@2.0.0
+- @simplewebauthn/typescript-types@2.0.0
+- @simplewebauthn/browser@2.0.0
+- @simplewebauthn/testing@2.0.0
+
+**Changes:**
+
+- **[server]** See **Breaking Changes** below.
+- **[typescript-types]** See **Breaking Changes** below
+- **[browser]** Version sync
+- **[testing]** Version sync
+
+### Breaking Changes
+
+- **[server]** The method **`verifyAttestationResponse()`** now returns a different data structure with additional information that RP's can use to more easily support passwordless and usernameless WebAuthn flows.
+  - Additionally, `Buffer` values are now returned in place of previously-base64url-encoded values. This is intended to offer more flexibility in how these values are persisted without imposing an encoding scheme that may introduce undesirable overhead.
+
+Before:
+
+```ts
+type VerifiedAttestation = {
+  verified: boolean;
+  userVerified: boolean;
+  authenticatorInfo?: {
+    fmt: ATTESTATION_FORMAT;
+    counter: number;
+    base64PublicKey: string;
+    base64CredentialID: string;
+  };
+};
+```
+
+After:
+
+```ts
+type VerifiedAttestation = {
+  verified: boolean;
+  attestationInfo?: {
+    fmt: ATTESTATION_FORMAT;
+    counter: number;
+    aaguid: string;
+    credentialPublicKey: Buffer;
+    credentialID: Buffer;
+    credentialType: string;
+    userVerified: boolean;
+    attestationObject: Buffer;
+  };
+};
+```
+
+- **[server]** The method **`verifyAssertionResponse()`** now returns a different data structure to align with changes made to `verifyAttestationResponse()`.
+
+Before:
+
+```ts
+type VerifiedAssertion = {
+  verified: boolean;
+  authenticatorInfo: {
+    counter: number;
+    base64CredentialID: string;
+  };
+};
+```
+
+After:
+
+```ts
+type VerifiedAssertion = {
+  verified: boolean;
+  assertionInfo: {
+    credentialID: Buffer;
+    newCounter: number;
+  };
+};
+```
+
+- **[server]** The `excludeCredentials` argument in **`generateAttestationOptions()`** now expects a `Buffer` type for a credential's `id` property. Previously `id` needed to be a `string`. Existing credential IDs stored in base64url encoding can be easily converted to Buffer with a library like `base64url`:
+
+Before:
+```ts
+const options = generateAttestationOptions({
+  // ...
+  excludeCredentials: [{
+    id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+    // ...
+  }],
+  // ...
+})
+```
+
+After:
+```ts
+const options = generateAttestationOptions({
+  // ...
+  excludeCredentials: [{
+    id: base64url.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
+    // ...
+  }],
+  // ...
+})
+```
+
+- **[server]** The `allowCredentials` argument in **`generateAssertionOptions()`** now expects a `Buffer` type for a credential's `id` property. Previously `id` needed to be a `string`. Existing credential IDs stored in base64url encoding can be easily converted to Buffer with a library like `base64url`:
+
+Before:
+```ts
+const options = generateAssertionOptions({
+  // ...
+  allowCredentials: [{
+    id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
+    // ...
+  }],
+  // ...
+})
+```
+
+After:
+```ts
+const options = generateAssertionOptions({
+  // ...
+  allowCredentials: [{
+    id: base64url.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
+    // ...
+  }],
+  // ...
+})
+```
+
+- **[typescript-types]** The `AuthenticatorDevice` type has been updated to expect `Buffer`'s for credential data. Naming of its properties have also been updated to help maintain consistency with naming in the WebAuthn spec:
+
+Before:
+```ts
+type AuthenticatorDevice = {
+  publicKey: Base64URLString;
+  credentialID: Base64URLString;
+  counter: number;
+  transports?: AuthenticatorTransport[];
+}
+```
+
+After:
+```ts
+type AuthenticatorDevice = {
+  credentialPublicKey: Buffer;
+  credentialID: Buffer;
+  counter: number;
+  transports?: AuthenticatorTransport[];
+}
+```
+
 ## v1.0.0 - The one that gets things out of "Beta"
 
 **Packages:**
