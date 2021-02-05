@@ -51,7 +51,7 @@ export default async function startAttestation(
       clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
     },
     type,
-    // clientExtensionResults: credential.getClientExtensionResults(),
+    clientExtensionResults: credential.getClientExtensionResults(),
   };
 
   /**
