@@ -15,7 +15,10 @@
 		{
 			"type": "npm",
 			"script": "build:browser",
-			"group": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
 			"problemMatcher": [],
 			"label": "npm: build:browser",
 			"detail": "lerna bootstrap --scope=@simplewebauthn/browser"
