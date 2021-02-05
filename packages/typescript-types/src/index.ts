@@ -13,6 +13,8 @@ import type {
   PublicKeyCredentialDescriptor,
   PublicKeyCredentialRequestOptions,
   PublicKeyCredentialUserEntity,
+  AuthenticationExtensionsClientInputs,
+  AuthenticationExtensionsClientOutputs,
 } from './dom';
 
 export * from './dom';
@@ -26,7 +28,7 @@ export interface PublicKeyCredentialCreationOptionsJSON
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64URLString;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
-  extensions?: CredentialCreationExtensionsInputJSON;
+  extensions?: AuthenticationExtensionsClientInputs;
 }
 
 /**
@@ -37,7 +39,7 @@ export interface PublicKeyCredentialRequestOptionsJSON
   extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
   challenge: Base64URLString;
   allowCredentials?: PublicKeyCredentialDescriptorJSON[];
-  extensions?: CredentialRequestExtensionsInputJSON;
+  extensions?: AuthenticationExtensionsClientInputs;
 }
 
 export interface PublicKeyCredentialDescriptorJSON
@@ -66,7 +68,7 @@ export interface AttestationCredentialJSON
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
   transports?: AuthenticatorTransport[];
-  clientExtensionResults?: CredentialCreationExtensionsOutputJSON;
+  clientExtensionResults?: AuthenticationExtensionsClientOutputs;
 }
 
 /**
@@ -84,7 +86,7 @@ export interface AssertionCredentialJSON
   extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
-  clientExtensionResults?: CredentialRequestExtensionsOutputJSON;
+  clientExtensionResults?: AuthenticationExtensionsClientOutputs;
 }
 
 /**
