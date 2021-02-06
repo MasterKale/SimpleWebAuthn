@@ -67,8 +67,8 @@ export interface AttestationCredentialJSON
   extends Omit<AttestationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
+  clientExtensionResults: AuthenticationExtensionsClientOutputs;
   transports?: AuthenticatorTransport[];
-  clientExtensionResults?: AuthenticationExtensionsClientOutputs;
 }
 
 /**
@@ -86,7 +86,7 @@ export interface AssertionCredentialJSON
   extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
-  clientExtensionResults?: AuthenticationExtensionsClientOutputs;
+  clientExtensionResults: AuthenticationExtensionsClientOutputs;
 }
 
 /**
