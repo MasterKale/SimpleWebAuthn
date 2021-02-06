@@ -15,6 +15,7 @@ test('should verify Apple attestation', async () => {
           'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiaDV4U3lJUk14MklRUHIxbVFrNkdEOThYU1FPQkhnTUhWcEpJa01WOU5rYyIsIm9yaWdpbiI6Imh0dHBzOi8vZGV2LmRvbnRuZWVkYS5wdyJ9',
       },
       type: 'public-key',
+      clientExtensionResults: {},
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',

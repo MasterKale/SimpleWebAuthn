@@ -10,6 +10,7 @@ import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
 import toHash from '../helpers/toHash';
+import { AttestationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 let mockDecodeAttestation: jest.SpyInstance;
 let mockDecodeClientData: jest.SpyInstance;
@@ -145,6 +146,7 @@ test('should verify None attestation w/RSA public key', async () => {
           'eyJjaGFsbGVuZ2UiOiJwWVozVlgyeWI4ZFM5eXBsTnhKQ2hpWGhQR0JrOGdaelRBeUoyaVU1eDFrIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
       },
       type: 'public-key',
+      clientExtensionResults: {},
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -389,6 +391,7 @@ test('should validate TPM RSA response (SHA256)', async () => {
           'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiIzYTA3Y2Y4NS1lN2I2LTQ0N2YtODI3MC1iMjU0MzNmNjAxOGUiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
       },
       type: 'public-key',
+      clientExtensionResults: {},
     },
     expectedChallenge: expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -421,6 +424,7 @@ test('should validate TPM RSA response (SHA1)', async () => {
           'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiJmNGU4ZDg3Yi1kMzYzLTQ3Y2MtYWI0ZC0xYTg0NjQ3YmYyNDUiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
       },
       type: 'public-key',
+      clientExtensionResults: {},
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -453,6 +457,7 @@ test('should validate Android-Key response', async () => {
           'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiIxNGUwZDFiNi05YzM2LTQ4NDktYWVlYy1lYTY0Njc2NDQ5ZWYiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
       },
       type: 'public-key',
+      clientExtensionResults: {},
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -520,7 +525,7 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
  * Various Attestations Below
  */
 
-const attestationFIDOU2F = {
+const attestationFIDOU2F: AttestationCredentialJSON = {
   id: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   rawId: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   response: {
@@ -529,12 +534,12 @@ const attestationFIDOU2F = {
     clientDataJSON:
       'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sQmRIUmxjM1JoZEdsdmJnIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
   },
-  getClientExtensionResults: () => ({}),
+  clientExtensionResults: {},
   type: 'public-key',
 };
 const attestationFIDOU2FChallenge = base64url.encode('totallyUniqueValueEveryAttestation');
 
-const attestationPacked = {
+const attestationPacked: AttestationCredentialJSON = {
   id: 'bbb',
   rawId: 'bbb',
   response: {
@@ -550,12 +555,12 @@ const attestationPacked = {
       'a3M1U0UwIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0' +
       'ZSJ9',
   },
-  getClientExtensionResults: () => ({}),
+  clientExtensionResults: {},
   type: 'public-key',
 };
 const attestationPackedChallenge = base64url.encode('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
 
-const attestationPackedX5C = {
+const attestationPackedX5C: AttestationCredentialJSON = {
   // TODO: Grab these from another iPhone attestation
   id: 'aaa',
   rawId: 'aaa',
@@ -581,12 +586,12 @@ const attestationPackedX5C = {
       'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhG' +
       'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0=',
   },
-  getClientExtensionResults: () => ({}),
+  clientExtensionResults: {},
   type: 'public-key',
 };
 const attestationPackedX5CChallenge = base64url.encode('totallyUniqueValueEveryTime');
 
-const attestationNone = {
+const attestationNone: AttestationCredentialJSON = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   rawId: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   response: {
@@ -600,7 +605,7 @@ const attestationNone = {
       'VURBd1NEQndOV2Q0YURKZmRUVmZVRU0wVG1WWloyUSIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
       'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9',
   },
-  getClientExtensionResults: () => ({}),
+  clientExtensionResults: {},
   type: 'public-key',
 };
 const attestationNoneChallenge = base64url.encode('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');
