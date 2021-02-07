@@ -1,5 +1,7 @@
 import {
   AttestationCredential,
+  AuthenticationExtensionsClientInputs,
+  AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialCreationOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
@@ -46,22 +48,24 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
 };
 
 beforeEach(() => {
+  // Stub out a response so the method won't throw
+  mockNavigatorCreate.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({ response: {}, getClientExtensionResults: () => ({}) });
+      });
+    },
+  );
+
+  mockSupportsWebauthn.mockReturnValue(true);
+});
+
+afterEach(() => {
   mockNavigatorCreate.mockReset();
   mockSupportsWebauthn.mockReset();
 });
 
 test('should convert options before passing to navigator.credentials.create(...)', async done => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
-  // Stub out a response so the method won't throw
-  mockNavigatorCreate.mockImplementation(
-    (): Promise<any> => {
-      return new Promise(resolve => {
-        resolve({ response: {} });
-      });
-    },
-  );
-
   await startAttestation(goodOpts1);
 
   const argsPublicKey = mockNavigatorCreate.mock.calls[0][0].publicKey;
@@ -81,8 +85,6 @@ test('should convert options before passing to navigator.credentials.create(...)
 });
 
 test('should return base64url-encoded response values', async done => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
   mockNavigatorCreate.mockImplementation(
     (): Promise<AttestationCredential> => {
       return new Promise(resolve => {
@@ -120,8 +122,6 @@ test("should throw error if WebAuthn isn't supported", async done => {
 });
 
 test('should throw error if attestation is cancelled for some reason', async done => {
-  mockSupportsWebauthn.mockReturnValue(true);
-
   mockNavigatorCreate.mockImplementation(
     (): Promise<null> => {
       return new Promise(resolve => {
@@ -131,6 +131,69 @@ test('should throw error if attestation is cancelled for some reason', async don
   );
 
   await expect(startAttestation(goodOpts1)).rejects.toThrow('Attestation was not completed');
+
+  done();
+});
+
+test('should send extensions to authenticator if present in options', async done => {
+  const extensions: AuthenticationExtensionsClientInputs = {
+    credProps: true,
+    appid: 'appidHere',
+    uvm: true,
+    appidExclude: 'appidExcludeHere',
+  };
+  const optsWithExts: PublicKeyCredentialCreationOptionsJSON = {
+    ...goodOpts1,
+    extensions,
+  };
+  await startAttestation(optsWithExts);
+
+  const argsExtensions = mockNavigatorCreate.mock.calls[0][0].publicKey.extensions;
+
+  expect(argsExtensions).toEqual(extensions);
+
+  done();
+});
+
+test('should not set any extensions if not present in options', async done => {
+  await startAttestation(goodOpts1);
+
+  const argsExtensions = mockNavigatorCreate.mock.calls[0][0].publicKey.extensions;
+
+  expect(argsExtensions).toEqual(undefined);
+
+  done();
+});
+
+test('should include extension results', async done => {
+  const extResults: AuthenticationExtensionsClientOutputs = {
+    appid: true,
+    credProps: {
+      rk: true,
+    },
+  };
+
+  // Mock extension return values from authenticator
+  mockNavigatorCreate.mockImplementation(
+    (): Promise<any> => {
+      return new Promise(resolve => {
+        resolve({ response: {}, getClientExtensionResults: () => extResults });
+      });
+    },
+  );
+
+  // Extensions aren't present in this object, but it doesn't matter since we're faking the response
+  const response = await startAttestation(goodOpts1);
+
+  expect(response.clientExtensionResults).toEqual(extResults);
+
+  done();
+});
+
+test('should include extension results when no extensions specified', async done => {
+  const response = await startAttestation(goodOpts1);
+
+  expect(response.clientExtensionResults).toEqual({});
 
   done();
 });

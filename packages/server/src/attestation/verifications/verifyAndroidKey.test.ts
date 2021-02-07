@@ -15,6 +15,7 @@ test('should verify Android KeyStore response', async () => {
           'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiI0YWI3ZGZkMS1hNjk1LTQ3NzctOTg1Zi1hZDI5OTM4MjhlOTkiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
       },
       type: 'public-key',
+      clientExtensionResults: {},
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',

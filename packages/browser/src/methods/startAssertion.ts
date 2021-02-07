@@ -60,5 +60,6 @@ export default async function startAssertion(
       userHandle,
     },
     type,
+    clientExtensionResults: credential.getClientExtensionResults(),
   };
 }

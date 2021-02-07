@@ -1,6 +1,7 @@
 const path = require('path');
 const WebpackAutoInject = require('webpack-auto-inject-version');
 
+const packageJSON = require('./package.json');
 const outputPath = path.resolve(__dirname, 'dist');
 
 module.exports = {
@@ -28,7 +29,7 @@ module.exports = {
   },
   plugins: [
     new WebpackAutoInject({
-      SHORT: '@webauthentine/browser',
+      SHORT: packageJSON.name,
       PACKAGE_JSON_INDENT: 2,
       components: {
         AutoIncreaseVersion: false,
@@ -36,6 +37,7 @@ module.exports = {
       componentsOptions: {
         InjectAsComment: {
           tag: 'Version: {version} - {date}',
+          multiLineCommentType: true,
         },
       },
     }),
