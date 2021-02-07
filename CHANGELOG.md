@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.1.0
+
+**Packages:**
+
+- @simplewebauthn/browser@2.1.0
+- @simplewebauthn/server@2.1.0
+- @simplewebauthn/typescript-types@2.1.0
+
+**Changes:**
+
+- **[browser]** **`startAttestation()`** and **`startAssertion()`** now include extension results as `clientExtensionResults` in their return value
+- **[typescript-types]** Updated **`PublicKeyCredentialCreationOptionsJSON`** and **`PublicKeyCredentialRequestOptionsJSON`** types with new optional `extensions` property to support specifying WebAuthn extensions when calling `generateAttestationOptions()` and `generateAssertionOptions()`
+- **[typescript-types]** Updated **`AttestationCredentialJSON`** and **`AssertionCredentialJSON`** types with new `clientExtensionResults` properties to contain output from WebAuthn's `credential.getClientExtensionResults()`
+- **[server]** Version sync
+
 ## v2.0.0 - The one with -less and more Buffers
 
 This major release includes improvements intended to make it easier to support **passwordless** and **usernameless** WebAuthn flows. Additional information returned from attestation verification can be used by RP's to further scrutinize the attestation now or in the future.
