@@ -147,7 +147,8 @@ app.post('/verify-attestation', async (req, res) => {
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
-    });  } catch (error) {
+    });
+  } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
   }
