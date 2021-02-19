@@ -8,7 +8,7 @@ import base64url from 'base64url';
 
 import generateChallenge from '../helpers/generateChallenge';
 
-export type GenerateAssertionOptions = {
+export type GenerateAssertionOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptor[];
   challenge?: string | Buffer;
   timeout?: number;
@@ -31,7 +31,7 @@ export type GenerateAssertionOptions = {
  * @param rpID Valid domain name (after `https://`)
  */
 export default function generateAssertionOptions(
-  options: GenerateAssertionOptions = {},
+  options: GenerateAssertionOptionsOpts = {},
 ): PublicKeyCredentialRequestOptionsJSON {
   const {
     allowCredentials,
