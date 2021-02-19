@@ -20,7 +20,7 @@ import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
 
-type Options = {
+export type VerifyAttestationOptions = {
   credential: AttestationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
@@ -44,8 +44,8 @@ type Options = {
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export default async function verifyAttestationResponse(
-  options: Options,
+export async function verifyAttestationResponse(
+  options: VerifyAttestationOptions,
 ): Promise<VerifiedAttestation> {
   const {
     credential,

@@ -1,6 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
-import generateAssertionOptions from './generateAssertionOptions';
+import { generateAssertionOptions } from './generateAssertionOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
   const challenge = 'totallyrandomvalue';

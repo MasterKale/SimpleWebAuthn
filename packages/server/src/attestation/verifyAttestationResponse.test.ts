@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import verifyAttestationResponse from './verifyAttestationResponse';
+import { verifyAttestationResponse }from './verifyAttestationResponse';
 
 import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
