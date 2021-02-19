@@ -2,10 +2,10 @@
  * @packageDocumentation
  * @module @simplewebauthn/server
  */
-import generateAttestationOptions from './attestation/generateAttestationOptions';
-import generateAssertionOptions from './assertion/generateAssertionOptions';
-import verifyAttestationResponse from './attestation/verifyAttestationResponse';
-import verifyAssertionResponse from './assertion/verifyAssertionResponse';
+import generateAttestationOptions, { GenerateAttestationOptions } from './attestation/generateAttestationOptions';
+import generateAssertionOptions, { GenerateAssertionOptions } from './assertion/generateAssertionOptions';
+import verifyAttestationResponse, { VerifiedAttestation, VerifyAttestationOptions } from './attestation/verifyAttestationResponse';
+import verifyAssertionResponse, { VerifiedAssertion, VerifyAssertionOptions } from './assertion/verifyAssertionResponse';
 import MetadataService from './metadata/metadataService';
 
 export {
@@ -13,5 +13,11 @@ export {
   verifyAttestationResponse,
   generateAssertionOptions,
   verifyAssertionResponse,
+  GenerateAttestationOptions,
+  GenerateAssertionOptions,
+  VerifyAttestationOptions,
+  VerifyAssertionOptions,
+  VerifiedAttestation,
+  VerifiedAssertion,
   MetadataService,
 };

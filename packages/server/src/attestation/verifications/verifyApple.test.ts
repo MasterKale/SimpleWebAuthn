@@ -1,4 +1,4 @@
-import verifyAttestationResponsefrom '../verifyAttestationResponse';
+import verifyAttestationResponse from '../verifyAttestationResponse';
 import base64url from 'base64url';
 
 test('should verify Apple attestation', async () => {
