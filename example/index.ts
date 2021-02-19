@@ -21,16 +21,12 @@ import {
   // Login ("Assertion")
   generateAssertionOptions,
   verifyAssertionResponse,
-  GenerateAttestationOptionsOpts,
-  VerifyAttestationResponseOptions,
-  VerifiedAttestation,
 } from '@simplewebauthn/server';
 
 import type {
   AttestationCredentialJSON,
   AssertionCredentialJSON,
   AuthenticatorDevice,
-  PublicKeyCredentialCreationOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
 import { LoggedInUser } from './example-server';
@@ -99,7 +95,8 @@ app.get('/generate-attestation-options', (req, res) => {
     username,
     devices,
   } = user;
-  const attesOptions: GenerateAttestationOptionsOpts = {
+
+  const options = generateAttestationOptions({
     rpName: 'SimpleWebAuthn Example',
     rpID,
     userID: loggedInUserId,
@@ -125,8 +122,7 @@ app.get('/generate-attestation-options', (req, res) => {
       userVerification: 'preferred',
       requireResidentKey: false,
     },
-  };
-  const options: PublicKeyCredentialCreationOptionsJSON = generateAttestationOptions(attesOptions);
+  });
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
@@ -143,15 +139,15 @@ app.post('/verify-attestation', async (req, res) => {
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
   const expectedChallenge = user.currentChallenge;
-  const verifyOptions: VerifyAttestationResponseOptions = {
-    credential: body,
-    expectedChallenge: `${expectedChallenge}`,
-    expectedOrigin,
-    expectedRPID: rpID,
-  };
-  let verification: VerifiedAttestation;
+
+  let verification;
   try {
-    verification = await verifyAttestationResponse(verifyOptions);
+    verification = await verifyAttestationResponse({
+      credential: body,
+      expectedChallenge: `${expectedChallenge}`,
+      expectedOrigin,
+      expectedRPID: rpID,
+    });
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
