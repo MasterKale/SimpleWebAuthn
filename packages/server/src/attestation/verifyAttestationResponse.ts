@@ -44,7 +44,7 @@ export type VerifyAttestationOptions = {
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export async function verifyAttestationResponse(
+export default async function verifyAttestationResponse(
   options: VerifyAttestationOptions,
 ): Promise<VerifiedAttestation> {
   const {

@@ -1,6 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
-import { generateAttestationOptions } from './generateAttestationOptions';
+import generateAttestationOptions from './generateAttestationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
   const rpName = 'SimpleWebAuthn';

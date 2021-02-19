@@ -36,7 +36,7 @@ export type VerifyAssertionOptions = {
  * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
  * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
-export function verifyAssertionResponse(options: VerifyAssertionOptions): VerifiedAssertion {
+export default function verifyAssertionResponse(options: VerifyAssertionOptions): VerifiedAssertion {
   const {
     credential,
     expectedChallenge,

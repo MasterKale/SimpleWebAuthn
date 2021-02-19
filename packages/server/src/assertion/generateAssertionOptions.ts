@@ -30,7 +30,7 @@ export type GenerateAssertionOptions = {
  * @param extensions Additional plugins the authenticator or browser should use during assertion
  * @param rpID Valid domain name (after `https://`)
  */
-export function generateAssertionOptions(
+export default function generateAssertionOptions(
   options: GenerateAssertionOptions = {},
 ): PublicKeyCredentialRequestOptionsJSON {
   const {

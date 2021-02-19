@@ -1,5 +1,5 @@
 import base64url from 'base64url';
-import { verifyAssertionResponse} from './verifyAssertionResponse';
+import verifyAssertionResponse from './verifyAssertionResponse';
 
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
