@@ -26,7 +26,7 @@ import {
 import type {
   AttestationCredentialJSON,
   AssertionCredentialJSON,
-  AuthenticatorDevice, 
+  AuthenticatorDevice,
 } from '@simplewebauthn/typescript-types';
 
 import { LoggedInUser } from './example-server';
@@ -141,15 +141,13 @@ app.post('/verify-attestation', async (req, res) => {
   const expectedChallenge = user.currentChallenge;
 
   let verification;
-  const options: VerifyAttestationOptions = {
-    credential: body,
-    expectedChallenge: `${expectedChallenge}`,
-    expectedOrigin,
-    expectedRPID: rpID,
-  };
   try {
-    verification = await verifyAttestationResponse();
-  } catch (error) {
+    verification = await verifyAttestationResponse({
+      credential: body,
+      expectedChallenge: `${expectedChallenge}`,
+      expectedOrigin,
+      expectedRPID: rpID,
+    });  } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
   }
