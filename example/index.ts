@@ -20,13 +20,17 @@ import {
   verifyAttestationResponse,
   // Login ("Assertion")
   generateAssertionOptions,
+  GenerateAttestationOptionsOpts,
   verifyAssertionResponse,
+  VerifyAttestationResponseOpts,
+  VerifiedAttestation,
 } from '@simplewebauthn/server';
 
 import type {
   AttestationCredentialJSON,
   AssertionCredentialJSON,
   AuthenticatorDevice,
+  PublicKeyCredentialCreationOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
 import { LoggedInUser } from './example-server';
@@ -95,8 +99,7 @@ app.get('/generate-attestation-options', (req, res) => {
     username,
     devices,
   } = user;
-
-  const options = generateAttestationOptions({
+  const generateAttestationOptionsOpts: GenerateAttestationOptionsOpts = {
     rpName: 'SimpleWebAuthn Example',
     rpID,
     userID: loggedInUserId,
@@ -122,7 +125,8 @@ app.get('/generate-attestation-options', (req, res) => {
       userVerification: 'preferred',
       requireResidentKey: false,
     },
-  });
+  };
+  const options: PublicKeyCredentialCreationOptionsJSON = generateAttestationOptions(generateAttestationOptionsOpts);
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
@@ -139,15 +143,15 @@ app.post('/verify-attestation', async (req, res) => {
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
   const expectedChallenge = user.currentChallenge;
-
-  let verification;
+  const verifyAttestationResponseOptions: VerifyAttestationResponseOpts = {
+    credential: body,
+    expectedChallenge: `${expectedChallenge}`,
+    expectedOrigin,
+    expectedRPID: rpID,
+  };
+  let verification: VerifiedAttestation;
   try {
-    verification = await verifyAttestationResponse({
-      credential: body,
-      expectedChallenge: `${expectedChallenge}`,
-      expectedOrigin,
-      expectedRPID: rpID,
-    });
+    verification = await verifyAttestationResponse(verifyAttestationResponseOptions);
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
@@ -228,7 +232,7 @@ app.post('/verify-assertion', (req, res) => {
     throw new Error(`could not find authenticator matching ${body.id}`);
   }
 
-  let verification;
+  let verification: VerifyAssertionResponseOpts;
   try {
     verification = verifyAssertionResponse({
       credential: body,
