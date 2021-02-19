@@ -7,6 +7,7 @@ test('should export method `generateAttestationOptions`', () => {
 test('should export method `verifyAttestationResponse`', () => {
   expect(index.verifyAttestationResponse).toBeDefined();
 });
+
 test('should export method `generateAssertionOptions`', () => {
   expect(index.generateAssertionOptions).toBeDefined();
 });
