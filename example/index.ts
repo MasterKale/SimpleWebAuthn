@@ -22,6 +22,14 @@ import {
   generateAssertionOptions,
   verifyAssertionResponse,
 } from '@simplewebauthn/server';
+import type {
+  GenerateAttestationOptionsOpts,
+  GenerateAssertionOptionsOpts,
+  VerifyAttestationResponseOpts,
+  VerifyAssertionResponseOpts,
+  VerifiedAttestation,
+  VerifiedAssertion,
+} from '@simplewebauthn/server';
 
 import type {
   AttestationCredentialJSON,
@@ -96,7 +104,7 @@ app.get('/generate-attestation-options', (req, res) => {
     devices,
   } = user;
 
-  const options = generateAttestationOptions({
+  const opts: GenerateAttestationOptionsOpts = {
     rpName: 'SimpleWebAuthn Example',
     rpID,
     userID: loggedInUserId,
@@ -122,7 +130,9 @@ app.get('/generate-attestation-options', (req, res) => {
       userVerification: 'preferred',
       requireResidentKey: false,
     },
-  });
+  };
+
+  const options = generateAttestationOptions(opts);
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
@@ -140,14 +150,15 @@ app.post('/verify-attestation', async (req, res) => {
 
   const expectedChallenge = user.currentChallenge;
 
-  let verification;
+  let verification: VerifiedAttestation;
   try {
-    verification = await verifyAttestationResponse({
+    const opts: VerifyAttestationResponseOpts = {
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
-    });
+    };
+    verification = await verifyAttestationResponse(opts);
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
@@ -183,7 +194,7 @@ app.get('/generate-assertion-options', (req, res) => {
   // You need to know the user by this point
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
-  const options = generateAssertionOptions({
+  const opts: GenerateAssertionOptionsOpts = {
     timeout: 60000,
     allowCredentials: user.devices.map(dev => ({
       id: dev.credentialID,
@@ -196,7 +207,9 @@ app.get('/generate-assertion-options', (req, res) => {
      */
     userVerification: 'preferred',
     rpID,
-  });
+  };
+
+  const options = generateAssertionOptions(opts);
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
@@ -228,15 +241,16 @@ app.post('/verify-assertion', (req, res) => {
     throw new Error(`could not find authenticator matching ${body.id}`);
   }
 
-  let verification;
+  let verification: VerifiedAssertion;
   try {
-    verification = verifyAssertionResponse({
+    const opts: VerifyAssertionResponseOpts = {
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
-    });
+    };
+    verification = verifyAssertionResponse(opts);
   } catch (error) {
     console.error(error);
     return res.status(400).send({ error: error.message });
