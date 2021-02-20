@@ -12,7 +12,7 @@ import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
 
-type Options = {
+export type VerifyAssertionResponseOpts = {
   credential: AssertionCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
@@ -36,7 +36,7 @@ type Options = {
  * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
  * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
-export default function verifyAssertionResponse(options: Options): VerifiedAssertion {
+export default function verifyAssertionResponse(options: VerifyAssertionResponseOpts): VerifiedAssertion {
   const {
     credential,
     expectedChallenge,

@@ -22,6 +22,7 @@ import {
   generateAssertionOptions,
   verifyAssertionResponse,
 } from '@simplewebauthn/server';
+
 import type {
   AttestationCredentialJSON,
   AssertionCredentialJSON,

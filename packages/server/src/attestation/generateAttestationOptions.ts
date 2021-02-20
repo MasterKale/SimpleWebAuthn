@@ -11,7 +11,7 @@ import base64url from 'base64url';
 
 import generateChallenge from '../helpers/generateChallenge';
 
-type Options = {
+export type GenerateAttestationOptionsOpts = {
   rpName: string;
   rpID: string;
   userID: string;
@@ -94,7 +94,7 @@ const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export default function generateAttestationOptions(
-  options: Options,
+  options: GenerateAttestationOptionsOpts,
 ): PublicKeyCredentialCreationOptionsJSON {
   const {
     rpName,

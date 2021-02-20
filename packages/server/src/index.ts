@@ -15,3 +15,17 @@ export {
   verifyAssertionResponse,
   MetadataService,
 };
+
+import type { GenerateAttestationOptionsOpts } from './attestation/generateAttestationOptions';
+import type { GenerateAssertionOptionsOpts } from './assertion/generateAssertionOptions';
+import type { VerifiedAttestation, VerifyAttestationResponseOpts } from './attestation/verifyAttestationResponse';
+import type { VerifiedAssertion, VerifyAssertionResponseOpts } from './assertion/verifyAssertionResponse';
+
+export type {
+  GenerateAttestationOptionsOpts,
+  GenerateAssertionOptionsOpts,
+  VerifyAttestationResponseOpts,
+  VerifyAssertionResponseOpts,
+  VerifiedAttestation,
+  VerifiedAssertion,
+}
