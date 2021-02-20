@@ -1,5 +1,27 @@
 # Changelog
 
+## v2.2.0
+
+**Packages:**
+
+- @simplewebauthn/server@2.2.0
+
+**Changes:**
+
+- **[server]** Export more TypeScript types for options and verification method inputs and outputs:
+
+```ts
+// Newly exported types
+import type {
+  GenerateAttestationOptionsOpts,
+  GenerateAssertionOptionsOpts,
+  VerifyAttestationResponseOpts,
+  VerifyAssertionResponseOpts,
+  VerifiedAttestation,
+  VerifiedAssertion,
+} from '@simplewebauthn/server';
+```
+
 ## v2.1.0
 
 **Packages:**
