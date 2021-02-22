@@ -6,7 +6,8 @@ import { COSEKEYS, COSEKTY, COSECRV } from './convertCOSEtoPKCS';
 export default function convertPublicKeyToPEM(publicKey: Buffer): string {
   let struct;
   try {
-    struct = cbor.decodeAllSync(publicKey)[0];
+    const pkBuffer = Buffer.from(publicKey);
+    struct = cbor.decodeAllSync(pkBuffer)[0];
   } catch (err) {
     throw new Error(`Error decoding public key while converting to PEM: ${err.message}`);
   }
