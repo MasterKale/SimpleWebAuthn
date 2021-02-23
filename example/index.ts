@@ -6,6 +6,7 @@
  */
 
 import https from 'https';
+import http from 'http';
 import fs from 'fs';
 
 import express from 'express';
@@ -40,10 +41,8 @@ import type {
 import { LoggedInUser } from './example-server';
 
 const app = express();
-const host = '0.0.0.0';
-const port = 443;
 
-const { ENABLE_CONFORMANCE } = process.env;
+const { ENABLE_CONFORMANCE, ENABLE_HTTPS } = process.env;
 
 app.use(express.static('./public/'));
 app.use(express.json());
@@ -65,7 +64,11 @@ if (ENABLE_CONFORMANCE === 'true') {
  * represents the expected URL from which an attestation or assertion occurs.
  */
 const rpID = 'localhost';
-const expectedOrigin = `https://${rpID}`;
+// This value is set at the bottom of page as part of server initialization (the empty string is
+// to appease TypeScript until we determine the expected origin based on whether or not HTTPS
+// support is enabled)
+let expectedOrigin = '';
+
 /**
  * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that
  * performs an attestation or assertion. The user ID you specify here should be your internal,
@@ -266,17 +269,31 @@ app.post('/verify-assertion', (req, res) => {
   res.send({ verified });
 });
 
-https
-  .createServer(
-    {
-      /**
-       * WebAuthn can only be run from https:// URLs. See the README on how to generate this SSL cert and key pair using mkcert
-       */
-      key: fs.readFileSync(`./${rpID}.key`),
-      cert: fs.readFileSync(`./${rpID}.crt`),
-    },
-    app,
-  )
-  .listen(port, host, () => {
-    console.log(`🚀 Server ready at https://${rpID} (${host}:${port})`);
+if (ENABLE_HTTPS) {
+  const host = '0.0.0.0';
+  const port = 443;
+  expectedOrigin = `https://${rpID}`;
+
+  https
+    .createServer(
+      {
+        /**
+         * See the README on how to generate this SSL cert and key pair using mkcert
+         */
+        key: fs.readFileSync(`./${rpID}.key`),
+        cert: fs.readFileSync(`./${rpID}.crt`),
+      },
+      app,
+    )
+    .listen(port, host, () => {
+      console.log(`🚀 Server ready at ${expectedOrigin} (${host}:${port})`);
+    });
+} else {
+  const host = '127.0.0.1';
+  const port = 8000;
+  expectedOrigin = `http://localhost:${port}`;
+
+  http.createServer(app).listen(port, host, () => {
+    console.log(`🚀 Server ready at ${expectedOrigin} (${host}:${port})`);
   });
+}
