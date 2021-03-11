@@ -63,11 +63,11 @@ if (ENABLE_CONFORMANCE === 'true') {
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
  * represents the expected URL from which an attestation or assertion occurs.
  */
-const rpID = 'localhost';
+export const rpID = 'localhost';
 // This value is set at the bottom of page as part of server initialization (the empty string is
 // to appease TypeScript until we determine the expected origin based on whether or not HTTPS
 // support is enabled)
-let expectedOrigin = '';
+export let expectedOrigin = '';
 
 /**
  * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that

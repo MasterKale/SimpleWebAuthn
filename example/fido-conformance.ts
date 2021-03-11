@@ -17,6 +17,7 @@ import {
 } from '@simplewebauthn/typescript-types';
 import { MetadataStatement } from '@simplewebauthn/server/dist/metadata/metadataService';
 
+import { rpID, expectedOrigin } from './index';
 import { LoggedInUser } from './example-server';
 
 interface LoggedInFIDOUser extends LoggedInUser {
@@ -30,8 +31,6 @@ export const fidoConformanceRouter = express.Router();
 export const fidoRouteSuffix = '/fido';
 
 const rpName = 'FIDO Conformance Test';
-const rpID = 'localhost';
-const origin = 'https://localhost';
 
 /**
  * Load JSON metadata statements provided by the Conformance Tools
@@ -59,7 +58,7 @@ try {
  */
 fetch('https://mds.certinfra.fidoalliance.org/getEndpoints', {
   method: 'POST',
-  body: JSON.stringify({ endpoint: `${origin}${fidoRouteSuffix}` }),
+  body: JSON.stringify({ endpoint: `${expectedOrigin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
 })
   .then(resp => resp.json())
@@ -167,7 +166,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
     verification = await verifyAttestationResponse({
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
-      expectedOrigin: origin,
+      expectedOrigin,
     });
   } catch (error) {
     console.error(`RP - attestation: ${error.message}`);
@@ -254,7 +253,7 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
     verification = verifyAssertionResponse({
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
-      expectedOrigin: origin,
+      expectedOrigin,
       expectedRPID: rpID,
       authenticator: existingDevice,
       fidoUserVerification: userVerification,
