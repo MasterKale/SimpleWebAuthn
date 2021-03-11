@@ -4,3 +4,4 @@ coverage/
 *.test.ts
 *.config.js
 setupTests.ts
+tsconfig.json
