@@ -18,8 +18,14 @@ export {
 
 import type { GenerateAttestationOptionsOpts } from './attestation/generateAttestationOptions';
 import type { GenerateAssertionOptionsOpts } from './assertion/generateAssertionOptions';
-import type { VerifiedAttestation, VerifyAttestationResponseOpts } from './attestation/verifyAttestationResponse';
-import type { VerifiedAssertion, VerifyAssertionResponseOpts } from './assertion/verifyAssertionResponse';
+import type {
+  VerifiedAttestation,
+  VerifyAttestationResponseOpts,
+} from './attestation/verifyAttestationResponse';
+import type {
+  VerifiedAssertion,
+  VerifyAssertionResponseOpts,
+} from './assertion/verifyAssertionResponse';
 
 export type {
   GenerateAttestationOptionsOpts,
@@ -28,4 +34,4 @@ export type {
   VerifyAssertionResponseOpts,
   VerifiedAttestation,
   VerifiedAssertion,
-}
+};
