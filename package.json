@@ -32,12 +32,9 @@
     "ts-jest": "^26.4.4",
     "ts-morph": "^9.0.0",
     "ts-node": "^8.10.2",
-    "ttypescript": "^1.5.12",
     "typedoc": "^0.20.20",
-    "typescript": "^4.0.5",
-    "typescript-transform-paths": "^1.1.15"
+    "typescript": "^4.0.5"
   },
-  "dependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
