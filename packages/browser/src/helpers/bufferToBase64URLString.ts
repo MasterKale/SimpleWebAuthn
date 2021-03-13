@@ -14,8 +14,5 @@ export default function bufferToBase64URLString(buffer: ArrayBuffer): string {
 
   const base64String = btoa(str);
 
-  return base64String
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+  return base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
