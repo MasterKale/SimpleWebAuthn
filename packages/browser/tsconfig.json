@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "ES5",
+    "downlevelIteration": true,
     "lib": [
       "ES2018",
       "DOM"
