@@ -1,4 +1,7 @@
-import { X509, zulutodate } from 'jsrsasign';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// `ASN1HEX` exists in the lib but not in its typings
+// @ts-ignore 2305
+import { X509, zulutodate, ASN1HEX } from 'jsrsasign';
 
 export type CertificateInfo = {
   issuer: { [key: string]: string };
@@ -61,7 +64,32 @@ export default function getCertificateInfo(pemCertificate: string): CertificateI
   });
 
   const { version } = subjectCert as x5cCertificate;
-  const basicConstraintsCA = !!subjectCert.getExtBasicConstraints()?.cA;
+  let basicConstraintsCA = false;
+  try {
+    // TODO: Simplify this when jsrsasign gets updated (see note below). Ideally this is all the
+    // logic we need to determine `basicConstraintsCA`
+    basicConstraintsCA = !!subjectCert.getExtBasicConstraints()?.cA;
+  } catch (err) {
+    /**
+     * This is a workaround till jsrsasign's X509.getExtBasicConstraints() can recognize this
+     * legitimate value. See verifyPacked.test.ts for more context.
+     */
+    // Example error message: "hExtV parse error: 3003010100"
+    if (`${err.message}`.indexOf('3003010100') >= 0) {
+      const basicConstraintsInfo = subjectCert.getExtInfo('basicConstraints');
+
+      if (typeof basicConstraintsInfo === 'object' && basicConstraintsInfo.vidx) {
+        const hExtV = ASN1HEX.getTLV(subjectCert.hex, basicConstraintsInfo.vidx);
+        if (hExtV === '3003010100') {
+          basicConstraintsCA = false;
+        } else {
+          throw err;
+        }
+      }
+    } else {
+      throw err;
+    }
+  }
 
   return {
     issuer,
