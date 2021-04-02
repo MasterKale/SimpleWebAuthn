@@ -6,6 +6,12 @@
       "DOM"
     ],
     "baseUrl": "./src",
-    "outDir": "./dist"
-  }
+    "outDir": "./dist/types",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+  },
+  "include": [
+    "./src/index.ts"
+  ]
 }
