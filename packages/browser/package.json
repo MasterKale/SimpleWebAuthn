@@ -6,7 +6,7 @@
   "exports": {
     "import": "./dist/esm/index.js"
   },
-  "types": "dist/index.d.ts",
+  "types": "./dist/types/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
   "repository": {
