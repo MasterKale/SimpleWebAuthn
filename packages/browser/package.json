@@ -21,6 +21,8 @@
   "scripts": {
     "build": "rimraf dist && webpack",
     "build:esm": "cross-env BABEL_ENV=esmUnbundled babel src --extensions '.ts' --out-dir 'dist/esm' --source-maps",
+    "build:bundles": "cross-env BABEL_ENV=esmBundled rollup -c",
+    "build:declarations": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "npm test -- --coverage",
