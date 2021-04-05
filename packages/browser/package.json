@@ -34,11 +34,6 @@
     "umd"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.13.14",
-    "@babel/core": "^7.13.14",
-    "@babel/preset-env": "^7.13.12",
-    "@babel/preset-typescript": "^7.13.0",
-    "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-typescript": "^8.2.1",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
