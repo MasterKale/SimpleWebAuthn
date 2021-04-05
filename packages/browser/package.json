@@ -20,6 +20,8 @@
   },
   "scripts": {
     "build": "npm-run-all -l clean -p build:esm build:bundles build:declarations",
+    "build:es2018": "tsc -p tsconfig.json",
+    "build:es5": "tsc -p tsconfig.es5.json",
     "build:esm": "cross-env BABEL_ENV=esmUnbundled babel src --extensions '.ts' --out-dir 'dist/esm' --source-maps",
     "build:bundles": "cross-env BABEL_ENV=esmBundled rollup -c",
     "build:declarations": "tsc",

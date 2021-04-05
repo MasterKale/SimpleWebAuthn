@@ -1,17 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "ES2018",
+    "module": "ES2020",
+    "moduleResolution": "node",
     "lib": [
       "ES2018",
       "DOM"
     ],
     "baseUrl": "./src",
-    "outDir": "./dist/types",
+    "outDir": "./dist/esm2018",
     "declaration": true,
-    "emitDeclarationOnly": true,
-    "declarationMap": true,
-  },
-  "include": [
-    "./src/index.ts"
-  ]
+    "declarationDir": "./dist/types"
+  }
 }
