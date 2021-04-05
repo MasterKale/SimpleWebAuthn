@@ -35,7 +35,6 @@
   ],
   "devDependencies": {
     "@rollup/plugin-commonjs": "^18.0.0",
-    "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.2.1",
     "@rollup/plugin-typescript": "^8.2.1",
     "@simplewebauthn/typescript-types": "file:../typescript-types",

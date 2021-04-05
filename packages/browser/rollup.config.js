@@ -2,7 +2,6 @@ import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import json from '@rollup/plugin-json';
 import versionInjector from 'rollup-plugin-version-injector';
 
 export default {
@@ -19,7 +18,6 @@ export default {
     typescript({ tsconfig: './tsconfig.es5.json' }),
     commonjs({ extensions: ['.js', '.ts'] }),
     nodeResolve({ mainFields: ['jsnext:main', 'module', 'main'] }),
-    json(),
     versionInjector({
       injectInComments: {
         fileRegexp: /\.(js)$/,
