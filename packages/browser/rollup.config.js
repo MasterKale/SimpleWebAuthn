@@ -1,40 +1,26 @@
-import commonjs from '@rollup/plugin-commonjs';
-import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
+import * as typescript from '@rollup/plugin-typescript';
+import * as commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
+import * as json from '@rollup/plugin-json';
 import versionInjector from 'rollup-plugin-version-injector';
 
 export default {
   input: 'src/index.ts',
-  // input: 'dist/es5/index.js',
   output: [
-    // {
-    //   file: 'dist/bundles/bundle.esm.js',
-    //   format: 'esm',
-    //   sourcemap: true,
-    // },
-    // {
-    //   file: 'dist/bundles/bundle.esm.min.js',
-    //   format: 'esm',
-    //   sourcemap: true,
-    //   plugins: [terser()],
-    // },
-    // {
-    //   file: 'dist/bundles/bundle.umd.js',
-    //   format: 'umd',
-    //   name: 'SimpleWebAuthnBrowser',
-    //   sourcemap: true,
-    // },
     {
       file: 'dist/bundles/bundle.umd.min.js',
       format: 'umd',
       name: 'SimpleWebAuthnBrowser',
-      plugins: [terser()],
       sourcemap: true,
+      plugins: [terser()]
     },
   ],
   plugins: [
     typescript({ tsconfig: './tsconfig.es5.json' }),
+    commonjs({ extensions: [ '.js', '.ts' ] }),
+    nodeResolve({ mainFields: [ 'jsnext:main', 'module', 'main' ] }),
+    json(),
     versionInjector({
       injectInComments: {
         fileRegexp: /\.(js)$/,
