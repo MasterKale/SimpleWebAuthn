@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2018",
-    "module": "ESNext",
+    "module": "ES2020",
     "moduleResolution": "node",
     "lib": [
       "ES2018",
@@ -12,11 +12,17 @@
     "outDir": "./dist/es2018",
     "declaration": true,
     "declarationDir": "./dist/types",
-    "declarationMap": true
+    "declarationMap": false,
+    "removeComments": true,
+    "sourceMap": false,
+    "experimentalDecorators": true
   },
-  "include": ["./src/**/*.ts"],
+  "include": [
+    "./src/**/*.ts"
+  ],
   "exclude": [
     "./src/**/*.test.ts",
     "./src/setupTests.ts",
+    "./src/**/__mocks__"
   ]
 }

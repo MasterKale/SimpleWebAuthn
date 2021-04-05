@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES5",
-    "module": "ESNext",
+    "module": "COMMONJS",
     "moduleResolution": "node",
     "lib": [
       "ES5",
@@ -11,13 +11,18 @@
     "baseUrl": "./src",
     "outDir": "./dist/es5",
     "declaration": false,
-    "declarationDir": null,
     "declarationMap": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "experimentalDecorators": true
   },
-  "include": ["./src/**/*.ts"],
+  "include": [
+    "./src/**/*.ts"
+  ],
   "exclude": [
     "./src/**/*.test.ts",
     "./src/setupTests.ts",
+    "./src/**/__mocks__"
   ]
 }

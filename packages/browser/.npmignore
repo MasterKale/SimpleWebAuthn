@@ -2,6 +2,6 @@ src
 node_modules
 coverage
 .gitignore
-tsconfig.json
+tsconfig.*
 *.config.js
 __mocks__
