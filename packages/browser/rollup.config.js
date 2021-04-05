@@ -35,6 +35,7 @@ export default {
   ],
   plugins: [
     typescript({ tsconfig: './tsconfig.es5.json' }),
+    commonjs({ extensions: ['.ts'] }),
     versionInjector({
       injectInComments: {
         fileRegexp: /\.(js)$/,
