@@ -9,13 +9,13 @@
       "DOM"
     ],
     "baseUrl": "./src",
-    "outDir": "./dist/es5",
     "declaration": false,
     "declarationMap": false,
     "downlevelIteration": true,
     "removeComments": true,
     "sourceMap": false,
-    "experimentalDecorators": true
+    "importHelpers": true,
+    "noEmit": true
   },
   "include": [
     "./src/**/*.ts"

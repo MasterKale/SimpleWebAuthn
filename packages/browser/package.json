@@ -2,8 +2,8 @@
   "name": "@simplewebauthn/browser",
   "version": "2.1.0",
   "description": "SimpleWebAuthn for Browsers",
-  "main": "dist/es2018/index.js",
-  "browser": "dist/es5/index.js",
+  "main": "dist/bundles/index.es2018.js",
+  "browser": "dist/bundles/index.es5.js",
   "types": "dist/types/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
@@ -17,10 +17,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm-run-all -l clean -p build:es2018 build:es5 -s build:bundles",
-    "build:es2018": "tsc -p tsconfig.json",
-    "build:es5": "tsc -p tsconfig.es5.json",
-    "build:bundles": "rollup -c",
+    "build": "npm-run-all -l clean -p build:es2018 build:es5",
+    "build:es2018": "rollup -c",
+    "build:es5": "rollup -c rollup.config.es5.js",
     "clean": "rimraf dist",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -33,6 +32,9 @@
     "fido",
     "umd"
   ],
+  "peerDependencies": {
+    "tslib": "^2.2.0"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-node-resolve": "^11.2.1",
@@ -41,7 +43,8 @@
     "npm-run-all": "^4.1.5",
     "rollup": "^2.44.0",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-version-injector": "^1.3.2"
+    "rollup-plugin-version-injector": "^1.3.2",
+    "tslib": "^2.2.0"
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }

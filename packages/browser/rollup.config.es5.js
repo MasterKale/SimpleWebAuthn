@@ -1,17 +1,32 @@
 import typescript from '@rollup/plugin-typescript';
+import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
+import { terser } from 'rollup-plugin-terser';
 import versionInjector from 'rollup-plugin-version-injector';
 
 export default {
   input: 'src/index.ts',
-  output: {
-    dir: 'dist',
-    format: 'esm',
-    entryFileNames: 'bundles/[name].es2018.js',
-    preferConst: true,
-  },
+  output: [
+    {
+      dir: 'dist',
+      format: 'cjs',
+      entryFileNames: 'bundles/[name].es5.js',
+      exports: 'auto',
+    },
+    {
+      dir: 'dist',
+      format: 'umd',
+      name: 'SimpleWebAuthnBrowser',
+      entryFileNames: 'bundles/[name].umd.min.js',
+      plugins: [terser()],
+      globals: {
+        tslib: 'tslib',
+      },
+    },
+  ],
   plugins: [
-    typescript({ tsconfig: './tsconfig.json' }),
+    typescript({ tsconfig: './tsconfig.es5.json' }),
+    commonjs({ extensions: ['.ts'] }),
     nodeResolve(),
     versionInjector({
       injectInComments: {
@@ -22,4 +37,5 @@ export default {
       },
     }),
   ],
+  external: ['tslib'],
 };

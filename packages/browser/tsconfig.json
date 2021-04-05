@@ -9,13 +9,12 @@
       "DOM"
     ],
     "baseUrl": "./src",
-    "outDir": "./dist/es2018",
     "declaration": true,
     "declarationDir": "./dist/types",
     "declarationMap": false,
     "removeComments": true,
     "sourceMap": false,
-    "experimentalDecorators": true
+    "noEmit": true,
   },
   "include": [
     "./src/**/*.ts"
