@@ -1,23 +1,16 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES5",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "CommonJS",
     "lib": [
       "ES5",
       "DOM"
     ],
-    "baseUrl": "./src",
     "outDir": "./dist/es5",
     "declaration": false,
     "declarationDir": null,
     "declarationMap": false,
     "downlevelIteration": true
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": [
-    "./src/**/*.test.ts",
-    "./src/setupTests.ts",
-  ]
 }
