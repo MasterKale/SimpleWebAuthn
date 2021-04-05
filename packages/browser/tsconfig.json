@@ -2,15 +2,21 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2018",
-    "module": "ES2020",
+    "module": "ESNext",
     "moduleResolution": "node",
     "lib": [
       "ES2018",
       "DOM"
     ],
     "baseUrl": "./src",
-    "outDir": "./dist/esm2018",
+    "outDir": "./dist/es2018",
     "declaration": true,
-    "declarationDir": "./dist/types"
-  }
+    "declarationDir": "./dist/types",
+    "declarationMap": true
+  },
+  "include": ["./src/**/*.ts"],
+  "exclude": [
+    "./src/**/*.test.ts",
+    "./src/setupTests.ts",
+  ]
 }
