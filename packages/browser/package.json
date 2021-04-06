@@ -17,9 +17,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm-run-all -l clean -p build:es2018 build:es5 -s build:bundles",
-    "build:es2018": "tsc -p tsconfig.json",
-    "build:es5": "tsc -p tsconfig.es5.json",
+    "build": "npm-run-all -l clean -s build:bundles",
     "build:bundles": "rollup -c",
     "clean": "rimraf dist",
     "test": "jest",
@@ -33,6 +31,9 @@
     "fido",
     "umd"
   ],
+  "peerDependencies": {
+    "tslib": "^2.2.0"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-typescript": "^8.2.1",
@@ -40,7 +41,8 @@
     "npm-run-all": "^4.1.5",
     "rollup": "^2.44.0",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-version-injector": "^1.3.2"
+    "rollup-plugin-version-injector": "^1.3.2",
+    "tslib": "^2.2.0"
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }

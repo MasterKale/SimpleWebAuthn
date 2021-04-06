@@ -9,10 +9,12 @@
       "DOM"
     ],
     "baseUrl": "./src",
-    "outDir": "./dist/es2018",
     "declaration": true,
     "declarationDir": "./dist/types",
-    "declarationMap": true
+    "declarationMap": false,
+    "removeComments": true,
+    "sourceMap": false,
+    "noEmit": true,
   },
   "include": [
     "./src/**/*.ts"
@@ -20,6 +22,6 @@
   "exclude": [
     "./src/**/*.test.ts",
     "./src/setupTests.ts",
-    "./src/**/__mocks__/*.ts"
+    "./src/**/__mocks__"
   ]
 }

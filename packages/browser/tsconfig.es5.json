@@ -2,15 +2,28 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "target": "ES5",
-    "module": "CommonJS",
+    "module": "COMMONJS",
+    "moduleResolution": "node",
     "lib": [
       "ES5",
       "DOM"
     ],
-    "outDir": "./dist/es5",
+    "baseUrl": "./src",
     "declaration": false,
     "declarationDir": null,
     "declarationMap": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "importHelpers": true,
+    "noEmit": true
   },
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "./src/**/*.test.ts",
+    "./src/setupTests.ts",
+    "./src/**/__mocks__"
+  ]
 }
