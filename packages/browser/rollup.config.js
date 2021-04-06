@@ -32,8 +32,20 @@ const cleanTslibCommentInUMDBundleTargetingES5 = () => {
   };
 };
 
+const swanVersionInjector = versionInjector({
+  injectInComments: {
+    fileRegexp: /\.(js)$/,
+    // [@simplewebauthn/browser]  Version: 2.1.0 - Saturday, February 6th, 2021, 4:10:31 PM
+    tag: '[@simplewebauthn/browser]  Version: {version} - {date}',
+    dateFormat: 'dddd, mmmm dS, yyyy, h:MM:ss TT',
+  },
+});
+
 /**
- * Rollup configuration to generate all bundles in ES2018, ES5 and types
+ * Rollup configuration to generate the following:
+ * - ES2018 bundle
+ * - ES5 bundle
+ * - Type declarations
  */
 export default [
   {
@@ -53,18 +65,7 @@ export default [
         plugins: [terser()],
       },
     ],
-    plugins: [
-      typescript({ tsconfig: './tsconfig.json' }),
-      nodeResolve(),
-      versionInjector({
-        injectInComments: {
-          fileRegexp: /\.(js)$/,
-          // [@simplewebauthn/browser]  Version: 2.1.0 - Saturday, February 6th, 2021, 4:10:31 PM
-          tag: '[@simplewebauthn/browser]  Version: {version} - {date}',
-          dateFormat: 'dddd, mmmm dS, yyyy, h:MM:ss TT',
-        },
-      }),
-    ],
+    plugins: [typescript({ tsconfig: './tsconfig.json' }), nodeResolve(), swanVersionInjector],
   },
   {
     input: 'src/index.ts',
@@ -78,14 +79,7 @@ export default [
       typescript({ tsconfig: './tsconfig.es5.json' }),
       commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
-      versionInjector({
-        injectInComments: {
-          fileRegexp: /\.(js)$/,
-          // [@simplewebauthn/browser]  Version: 2.1.0 - Saturday, February 6th, 2021, 4:10:31 PM
-          tag: '[@simplewebauthn/browser]  Version: {version} - {date}',
-          dateFormat: 'dddd, mmmm dS, yyyy, h:MM:ss TT',
-        },
-      }),
+      swanVersionInjector,
     ],
     external: ['tslib'],
   },
@@ -102,14 +96,7 @@ export default [
       typescript({ tsconfig: './tsconfig.es5.json' }),
       commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
-      versionInjector({
-        injectInComments: {
-          fileRegexp: /\.(js)$/,
-          // [@simplewebauthn/browser]  Version: 2.1.0 - Saturday, February 6th, 2021, 4:10:31 PM
-          tag: '[@simplewebauthn/browser]  Version: {version} - {date}',
-          dateFormat: 'dddd, mmmm dS, yyyy, h:MM:ss TT',
-        },
-      }),
+      swanVersionInjector,
     ],
   },
 ];
