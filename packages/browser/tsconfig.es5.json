@@ -10,6 +10,7 @@
     ],
     "baseUrl": "./src",
     "declaration": false,
+    "declarationDir": null,
     "declarationMap": false,
     "downlevelIteration": true,
     "removeComments": true,

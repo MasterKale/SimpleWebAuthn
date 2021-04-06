@@ -2,8 +2,8 @@
   "name": "@simplewebauthn/browser",
   "version": "2.1.0",
   "description": "SimpleWebAuthn for Browsers",
-  "main": "dist/bundles/index.es2018.js",
-  "browser": "dist/bundles/index.es5.js",
+  "main": "dist/es2018/index.js",
+  "browser": "dist/es5/index.js",
   "types": "dist/types/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
@@ -17,9 +17,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm-run-all -l clean -p build:es2018 build:es5",
-    "build:es2018": "rollup -c",
-    "build:es5": "rollup -c rollup.config.es5.js",
+    "build": "npm-run-all -l clean -s build:bundles",
+    "build:bundles": "rollup -c",
     "clean": "rimraf dist",
     "test": "jest",
     "test:watch": "jest --watch",
