@@ -2,7 +2,7 @@ import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
-import versionInjector from 'rollup-plugin-version-injector';
+// import versionInjector from 'rollup-plugin-version-injector';
 
 /**
  * Rollup plugin to clean `tslib` comment in `UMD` bundle targeting `ES5`
@@ -32,14 +32,23 @@ const cleanTslibCommentInUMDBundleTargetingES5 = () => {
   };
 };
 
-const swanVersionInjector = versionInjector({
-  injectInComments: {
-    fileRegexp: /\.(js)$/,
-    // [@simplewebauthn/browser]  Version: 2.1.0 - Saturday, February 6th, 2021, 4:10:31 PM
-    tag: '[@simplewebauthn/browser]  Version: {version} - {date}',
-    dateFormat: 'dddd, mmmm dS, yyyy, h:MM:ss TT',
-  },
-});
+/**
+ * Re-enable version injection when this gets resolved:
+ *
+ * https://github.com/djhouseknecht/rollup-plugin-version-injector/issues/22
+ *
+ * To avoid a repeat of the first half of this:
+ *
+ * https://github.com/MasterKale/SimpleWebAuthn/issues/56
+ */
+// const swanVersionInjector = versionInjector({
+//   injectInComments: {
+//     fileRegexp: /\.(js)$/,
+//     // [@simplewebauthn/browser]  Version: 2.1.0 - Saturday, February 6th, 2021, 4:10:31 PM
+//     tag: '[@simplewebauthn/browser]  Version: {version} - {date}',
+//     dateFormat: 'dddd, mmmm dS, yyyy, h:MM:ss TT',
+//   },
+// });
 
 /**
  * Rollup configuration to generate the following:
@@ -65,7 +74,11 @@ export default [
         plugins: [terser()],
       },
     ],
-    plugins: [typescript({ tsconfig: './tsconfig.json' }), nodeResolve(), swanVersionInjector],
+    plugins: [
+      typescript({ tsconfig: './tsconfig.json' }),
+      nodeResolve(),
+      // swanVersionInjector,
+    ],
   },
   {
     input: 'src/index.ts',
@@ -79,7 +92,7 @@ export default [
       typescript({ tsconfig: './tsconfig.es5.json' }),
       commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
-      swanVersionInjector,
+      // swanVersionInjector,
     ],
     external: ['tslib'],
   },
@@ -96,7 +109,7 @@ export default [
       typescript({ tsconfig: './tsconfig.es5.json' }),
       commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
-      swanVersionInjector,
+      // swanVersionInjector,
     ],
   },
 ];
