@@ -28,9 +28,7 @@ npm install @simplewebauthn/browser
 
 ### UMD
 
-This package can also be installed via **unpkg** by including the following script in your page's `<head>` element.
-
-The library's methods will be available on the global `SimpleWebAuthnBrowser` object.
+This package can also be installed via **unpkg** by including the following script in your page's `<head>` element. The library's methods will be available on the global **`SimpleWebAuthnBrowser`** object.
 
 > NOTE: The only difference between the two packages below is that the ES5 bundle includes TypeScript's `tslib` runtime code. This adds some bundle size overhead, but _does_ enable use of `supportsWebAuthn()` in older browsers to show appropriate UI when WebAuthn is unavailable.
 
@@ -45,7 +43,7 @@ If you only need to support modern browsers, include the `ES2018` version:
 
 #### ES5
 
-If you need to support WebAuthn feature detection in old browsers like IE11, include the `ES5` version:
+If you need to support WebAuthn feature detection in deprecated browsers like IE11 and Edge Legacy, include the `ES5` version:
 
 ```html
 
@@ -58,7 +56,7 @@ You can find in-depth documentation on this package here: https://simplewebauthn
 
 ## Building for Production
 
-Two unbundled versions of this library are offered: `ES2018` and `ES5`.
+Two unbundled versions of this library are offered for your convenience, one targeting `ES2018` and a second targeting `ES5`.
 
 ### ES2018
 
@@ -66,20 +64,22 @@ The `ES2018` version is suitable for use when only **modern browsers** need to b
 
 ### ES5
 
-The `ES5` version can also be used in both TypeScript and JavaScript codebases. However, you will need to ensure that your bundler pulls in the ES5 version of the library when building your application.
+The `ES5` version can also be used in both TypeScript and JavaScript codebases. However, you will need to ensure that your bundler pulls in the ES5 version of the library when building your application!
 
-You will also need to ensure that the `tslib` dependency gets pulled into your build artifact. If you are authoring your application in TypeScript then this package will be **automatically** included. If your application is written in Javascript then you will need to install this package **manually** by adding it to `dependencies` in your project's **package. json**:
+You will also need to ensure that the `tslib` dependency gets pulled into your build artifact:
+
+- If you are authoring your application in TypeScript then this package will be **automatically** included so long as your **tsconfig.json** sets `"target": "ES5"`.
+- If your application is written in Javascript then you will need to install this package **manually** by adding it to `dependencies` in your project's **package. json**:
 
 ```sh
 $> npm install tslib
 ```
 
-> NOTE: Please consult `peerDependencies` in @simplewebauthn/browser's **package.json** for the specific package version to install.
 #### Webpack support
 
-If you are using `Webpack` to build your application, you must make sure that you have as `target` the `web` value which is the **default one** and nothing else will have to be done but if you have changed it, you will therefore have to indicate which files must be resolved as indicated [here](https://webpack.js.org/configuration/resolve/#resolvemainfields)
+If your Webpack config's `"target"` is set to `"web"` ([the default value](https://webpack.js.org/configuration/target/)) then you're done - Webpack will pull in the ES5 build from the `"browser"` property in @simplewebauthn/browser's **package.json**.
 
-The `ES5` version of this library is defined in the `browser` entry of the `package.json` which gives the following configuration to put in your `webpack.config` file:
+If you've set a different value for `"target"`, though, then you'll need to indicate additional files for WebPack to resolve via the [`"resolve.mainFields"`](https://webpack.js.org/configuration/resolve/#resolvemainfields) property in your Webpack config:
 
 ```js
 module.exports = {
@@ -90,13 +90,11 @@ module.exports = {
 };
 ```
 
-You can add all the other values you want but the most important is to have the value `browser` first to be sure that the `ES5` version of this library is taken into account.
+`'browser'` must come first in the list to ensure that the `ES5` version of this library is bundled. Additional values can be added afterwards as needed.
 
 #### Rollup support
 
-If you are using `Rollup` to build your application, you must use the `@rollup/plugin-node-resolve` [plugin](https://github.com/rollup/rollup-plugin-node-resolve#usage) to resolve the dependency to the correct format of this library.
-
-The `ES5` version of this library is defined in the `browser` entry of the `package.json` which gives the following configuration to put in your `rollup.config` file:
+The [`@rollup/plugin-node-resolve`](https://github.com/rollup/rollup-plugin-node-resolve#usage) plugin can be added to your Rollup config to read in the `browser` entry from @simplewebauthn/browser's **package.json**:
 
 ```js
 // rollup.config.js
@@ -112,4 +110,4 @@ export default {
 }
 ```
 
-You can add all the other values you want but the most important is to have the value `browser` first to be sure that the `ES5` version of this library is taken into account.
+`'browser'` must come first in the list to ensure that the `ES5` version of this library is bundled. Additional values can be added afterwards as needed.
