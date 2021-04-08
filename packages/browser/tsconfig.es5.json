@@ -1,20 +1,22 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "ES2018",
-    "module": "ES2020",
+    "target": "ES5",
+    "module": "COMMONJS",
     "moduleResolution": "node",
     "lib": [
-      "ES2018",
+      "ES5",
       "DOM"
     ],
     "baseUrl": "./src",
-    "declaration": true,
-    "declarationDir": "./dist/types",
+    "declaration": false,
+    "declarationDir": null,
     "declarationMap": false,
+    "downlevelIteration": true,
     "removeComments": true,
     "sourceMap": false,
-    "noEmit": true,
+    "importHelpers": true,
+    "noEmit": true
   },
   "include": [
     "./src/**/*.ts"
