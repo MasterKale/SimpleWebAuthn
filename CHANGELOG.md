@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.2.1
+
+**Packges:**
+
+- @simplewebauthn/browser@2.2.1
+- @simplewebauthn/server@2.2.1
+
+**Changes:**
+
+- **[browser]** Adds support for older browsers (IE10/IE11, Edge Legacy, etc...) with additional build artifacts targeting ES5
+  - See updated "Installation" and "Building for Production" sections of the [README.md](https://github.com/MasterKale/SimpleWebAuthn/blob/master/packages/browser/README.md)
+- **[server]** Internal code cleanup
+
 ## v2.2.0
 
 **Packages:**
