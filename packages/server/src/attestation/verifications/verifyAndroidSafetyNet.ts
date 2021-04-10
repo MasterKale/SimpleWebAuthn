@@ -81,8 +81,8 @@ export default async function verifyAttestationAndroidSafetyNet(
   /**
    * START Verify Header
    */
-  const leafCert = convertX509CertToPEM(HEADER.x5c[0]);
-  const leafCertInfo = getCertificateInfo(leafCert);
+  const leafCertBuffer = base64url.toBuffer(HEADER.x5c[0]);
+  const leafCertInfo = getCertificateInfo(leafCertBuffer);
 
   const { subject } = leafCertInfo;
 
@@ -121,7 +121,8 @@ export default async function verifyAttestationAndroidSafetyNet(
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCert);
+  const leafCertPEM = convertX509CertToPEM(leafCertBuffer);
+  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCertPEM);
   /**
    * END Verify Signature
    */

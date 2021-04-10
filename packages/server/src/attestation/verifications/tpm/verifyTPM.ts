@@ -177,8 +177,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   // Pick a leaf AIK certificate of the x5c array and parse it.
-  const leafCertPEM = convertX509CertToPEM(x5c[0]);
-  const leafCertInfo = getCertificateInfo(leafCertPEM);
+  const leafCertInfo = getCertificateInfo(x5c[0]);
   const { basicConstraintsCA, version, subject, notAfter, notBefore } = leafCertInfo;
 
   if (basicConstraintsCA) {
@@ -186,7 +185,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
   }
 
   // Check that certificate is of version 3 (value must be set to 2).
-  if (version !== 3) {
+  if (version !== 2) {
     throw new Error('Certificate version was not `3` (ASN.1 value of 2) (TPM)');
   }
 
@@ -275,6 +274,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
 
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // In the wise words of Yuriy Ackermann: "Get Martini friend, you are done!"
+  const leafCertPEM = convertX509CertToPEM(x5c[0]);
   return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
 }
 

@@ -50,7 +50,7 @@ export default async function verifyAttestationPacked(options: Options): Promise
   if (x5c) {
     const leafCert = convertX509CertToPEM(x5c[0]);
     const { subject, basicConstraintsCA, version, notBefore, notAfter } = getCertificateInfo(
-      leafCert,
+      x5c[0],
     );
 
     const { OU, CN, O, C } = subject;
@@ -75,7 +75,7 @@ export default async function verifyAttestationPacked(options: Options): Promise
       throw new Error('Certificate basic constraints CA was not `false` (Packed|Full)');
     }
 
-    if (version !== 3) {
+    if (version !== 2) {
       throw new Error('Certificate version was not `3` (ASN.1 value of 2) (Packed|Full)');
     }
 
