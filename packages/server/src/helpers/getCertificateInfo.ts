@@ -1,74 +1,80 @@
-import { X509, zulutodate } from 'jsrsasign';
+import { AsnParser } from '@peculiar/asn1-schema';
+import { Certificate, BasicConstraints, id_ce_basicConstraints } from '@peculiar/asn1-x509';
 
 export type CertificateInfo = {
-  issuer: { [key: string]: string };
-  subject: { [key: string]: string };
+  issuer: Issuer;
+  subject: Subject;
   version: number;
   basicConstraintsCA: boolean;
   notBefore: Date;
   notAfter: Date;
 };
 
-type ExtInfo = {
-  critical: boolean;
-  oid: string;
-  vidx: number;
+type Issuer = {
+  C?: string;
+  O?: string;
+  OU?: string;
+  CN?: string;
 };
 
-interface x5cCertificate extends jsrsasign.X509 {
-  version: number;
-  foffset: number;
-  aExtInfo: ExtInfo[];
-}
+type Subject = {
+  C?: string;
+  O?: string;
+  OU?: string;
+  CN?: string;
+};
+
+const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
+  '2.5.4.6': 'C',
+  '2.5.4.10': 'O',
+  '2.5.4.11': 'OU',
+  '2.5.4.3': 'CN',
+};
 
 /**
  * Extract PEM certificate info
  *
  * @param pemCertificate Result from call to `convertASN1toPEM(x5c[0])`
  */
-export default function getCertificateInfo(pemCertificate: string): CertificateInfo {
-  const subjectCert = new X509();
-  subjectCert.readCertPEM(pemCertificate);
+export default function getCertificateInfo(leafCertBuffer: Buffer): CertificateInfo {
+  const asnx509 = AsnParser.parse(leafCertBuffer, Certificate);
+  const parsedCert = asnx509.tbsCertificate;
 
-  // Break apart the Issuer
-  const issuerString = subjectCert.getIssuerString();
-  const issuerParts = issuerString.slice(1).split('/');
-
-  const issuer: { [key: string]: string } = {};
-  issuerParts.forEach(field => {
-    const [key, val] = field.split('=');
-    issuer[key] = val;
+  // Issuer
+  const issuer: Issuer = {};
+  parsedCert.issuer.forEach(([iss]) => {
+    const key = issuerSubjectIDKey[iss.type];
+    if (key) {
+      issuer[key] = iss.value.toString();
+    }
   });
 
-  // Break apart the Subject
-  let subjectRaw = '/';
-  try {
-    subjectRaw = subjectCert.getSubjectString();
-  } catch (err) {
-    // Don't throw on an error that indicates an empty subject
-    if (err !== 'malformed RDN') {
-      throw err;
+  // Subject
+  const subject: Subject = {};
+  parsedCert.subject.forEach(([iss]) => {
+    const key = issuerSubjectIDKey[iss.type];
+    if (key) {
+      subject[key] = iss.value.toString();
+    }
+  });
+
+  let basicConstraintsCA = false;
+  if (parsedCert.extensions) {
+    // console.log(parsedCert.extensions);
+    for (const ext of parsedCert.extensions) {
+      if (ext.extnID === id_ce_basicConstraints) {
+        const basicConstraints = AsnParser.parse(ext.extnValue, BasicConstraints);
+        basicConstraintsCA = basicConstraints.cA;
+      }
     }
   }
-  const subjectParts = subjectRaw.slice(1).split('/');
-
-  const subject: { [key: string]: string } = {};
-  subjectParts.forEach(field => {
-    if (field) {
-      const [key, val] = field.split('=');
-      subject[key] = val;
-    }
-  });
-
-  const { version } = subjectCert as x5cCertificate;
-  const basicConstraintsCA = !!subjectCert.getExtBasicConstraints()?.cA;
 
   return {
     issuer,
     subject,
-    version,
+    version: parsedCert.version,
     basicConstraintsCA,
-    notBefore: zulutodate(subjectCert.getNotBefore()),
-    notAfter: zulutodate(subjectCert.getNotAfter()),
+    notBefore: parsedCert.validity.notBefore.getTime(),
+    notAfter: parsedCert.validity.notAfter.getTime(),
   };
 }
