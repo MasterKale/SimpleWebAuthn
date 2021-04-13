@@ -1,31 +1,15 @@
 import verifyAttestationResponse from '../verifyAttestationResponse';
 
-test('should verify Packed response from Chrome virtual authenticator', async () => {
+test('should verify (broken) Packed response from Chrome virtual authenticator', async () => {
   /**
-   * This unit test will ensure future compatibility with Chrome virtual authenticators.
+   * Chrome 89's WebAuthn dev tool enables developers to use "virtual" software authenticators in place
+   * of typical authenticator hardware. Unfortunately a bug in these authenticators has leaf certs
+   * specify the byte sequence "\x30\x03\x01\x01\x00" for the cert's Basic Constraints extension.
+   * As per DER encoding rules this value _should_ be "\x30\x00".
    *
-   * Context:
-   *
-   * Chrome's WebAuthn dev tool enables developers to use "virtual" software authenticators in place
-   * of typical authenticator hardware. The reason this test exists is to ensure SimpleWebAuthn can
-   * handle leaf certs, such as the ones in these virtual authenticators, that specify the byte
-   * sequence "\x30\x03\x01\x01\x00" for the cert's Basic Constraints extension.
-   *
-   * As of March 2021 the jsrsasign@^10.0.5 library has a hardcoded check for "30030101ff", but
-   * not "3003010100" (notice the difference between "ff" and "00"), indicating whether or not this
-   * is a certificate authority certificate:
-   *
-   * https://github.com/kjur/jsrsasign/blob/482e651f2bb380dad3da4bbf0ae220fe3021d407/src/x509-1.1.js#L660
-   *
-   * Physical hardware authenticators have been observed to specify "3000" for this constraint;
-   * this value evaluates to `!!undefined` => `false`, satisfying the Packed attestation
-   * verification's requirement that, "the Basic Constraints extension MUST have the CA component
-   * set to false.""
-   *
-   * https://w3c.github.io/webauthn/#sctn-packed-attestation-cert-requirements
-   *
-   * SimpleWebAuthn will have to implement its own workaround until this issue is resolved in
-   * jsrsasign.
+   * This bug was fixed in https://chromium-review.googlesource.com/c/chromium/src/+/2797998/, and
+   * virtual authenticators should stop returning faulty values like this one starting in Chrome 91.
+   * This unit test will remain for now in case this issue comes up again.
    */
   const verification = await verifyAttestationResponse({
     credential: {
