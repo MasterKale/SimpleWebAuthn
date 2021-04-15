@@ -1,5 +1,4 @@
 import typescript from '@rollup/plugin-typescript';
-import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 // import versionInjector from 'rollup-plugin-version-injector';
@@ -89,7 +88,6 @@ export default [
     },
     plugins: [
       typescript({ tsconfig: './tsconfig.es5.json' }),
-      commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
       // swanVersionInjector,
     ],
@@ -106,7 +104,6 @@ export default [
     },
     plugins: [
       typescript({ tsconfig: './tsconfig.es5.json' }),
-      commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
       // swanVersionInjector,
     ],
