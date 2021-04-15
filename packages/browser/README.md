@@ -79,22 +79,22 @@ The `ES2018` version is suitable for use when only **modern browsers** need to b
 
 #### Webpack support
 
-No matter the `"target"` of your build, though, then you'll need to indicate additional files for WebPack to resolve via the [`"resolve.mainFields"`](https://webpack.js.org/configuration/resolve/#resolvemainfields) property in your Webpack config to read in the `jsnext:main` entry from @simplewebauthn/browser's **package.json**:
+No matter the `"target"` of your build, though, then you'll need to indicate additional files for WebPack to resolve via the [`"resolve.mainFields"`](https://webpack.js.org/configuration/resolve/#resolvemainfields) property in your Webpack config to read in the `main:es2018` entry from @simplewebauthn/browser's **package.json**:
 
 ```js
 module.exports = {
   //...
   resolve: {
-    mainFields: [ 'jsnext:main', 'module', 'main' ],
+    mainFields: [ 'main:es2018', 'module', 'main' ],
   },
 };
 ```
 
-`'jsnext:main'` must come first in the list to ensure that the `ES2018` version of this library is bundled. Additional values can be added afterwards as needed.
+`'main:es2018'` must come first in the list to ensure that the `ES2018` version of this library is bundled. Additional values can be added afterwards as needed.
 
 #### Rollup support
 
-The [`@rollup/plugin-node-resolve`](https://github.com/rollup/rollup-plugin-node-resolve#usage) plugin has to be added to your Rollup config to read in the `jsnext:main` entry from @simplewebauthn/browser's **package.json**:
+The [`@rollup/plugin-node-resolve`](https://github.com/rollup/rollup-plugin-node-resolve#usage) plugin has to be added to your Rollup config to read in the `main:es2018` entry from @simplewebauthn/browser's **package.json**:
 
 ```js
 // rollup.config.js
@@ -105,9 +105,9 @@ export default {
   // output: ...
   plugins: [
     //...
-    resolve({ mainFields: [ 'jsnext:main', 'module', 'main' ] }),
+    resolve({ mainFields: [ 'main:es2018', 'module', 'main' ] }),
   ]
 }
 ```
 
-`'jsnext:main'` must come first in the list to ensure that the `ES2018` version of this library is bundled. Additional values can be added afterwards as needed.
+`'main:es2018'` must come first in the list to ensure that the `ES2018` version of this library is bundled. Additional values can be added afterwards as needed.
