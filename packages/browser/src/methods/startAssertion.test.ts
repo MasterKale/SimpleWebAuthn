@@ -120,7 +120,7 @@ test('should return base64url-encoded response values', async done => {
   expect(response.response.authenticatorData).toEqual('bW9ja0F1dGhlbnRpY2F0b3JEYXRh');
   expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWVudERhdGFKU09O');
   expect(response.response.signature).toEqual('bW9ja1NpZ25hdHVyZQ');
-  expect(response.response.userHandle).toEqual('bW9ja1VzZXJIYW5kbGU');
+  expect(response.response.userHandle).toEqual('mockUserHandle');
 
   done();
 });
