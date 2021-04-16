@@ -4,7 +4,7 @@ import {
   AttestationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 
-import toUint8Array from '../helpers/toUint8Array';
+import stringToArrayBuffer from '../helpers/stringToArrayBuffer';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import supportsWebauthn from '../helpers/supportsWebauthn';
@@ -28,7 +28,7 @@ export default async function startAttestation(
     challenge: base64URLStringToBuffer(creationOptionsJSON.challenge),
     user: {
       ...creationOptionsJSON.user,
-      id: toUint8Array(creationOptionsJSON.user.id),
+      id: stringToArrayBuffer(creationOptionsJSON.user.id),
     },
     excludeCredentials: creationOptionsJSON.excludeCredentials.map(toPublicKeyCredentialDescriptor),
   };
