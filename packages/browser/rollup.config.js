@@ -1,5 +1,4 @@
 import typescript from '@rollup/plugin-typescript';
-import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 // import versionInjector from 'rollup-plugin-version-injector';
@@ -13,20 +12,19 @@ const cleanTslibCommentInUMDBundleTargetingES5 = () => {
     renderChunk: async code => {
       const comment = `
 /*! *****************************************************************************
-\tCopyright (c) Microsoft Corporation.
+    Copyright (c) Microsoft Corporation.
 
-\tPermission to use, copy, modify, and/or distribute this software for any
-\tpurpose with or without fee is hereby granted.
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted.
 
-\tTHE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-\tREGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-\tAND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-\tINDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-\tLOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-\tOTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-\tPERFORMANCE OF THIS SOFTWARE.
-\t***************************************************************************** */
-`;
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+    LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+    OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+    PERFORMANCE OF THIS SOFTWARE.
+    ***************************************************************************** */`;
       return code.indexOf(comment) > -1 ? code.replace(comment, '') : null;
     },
   };
@@ -90,7 +88,6 @@ export default [
     },
     plugins: [
       typescript({ tsconfig: './tsconfig.es5.json' }),
-      commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
       // swanVersionInjector,
     ],
@@ -107,7 +104,6 @@ export default [
     },
     plugins: [
       typescript({ tsconfig: './tsconfig.es5.json' }),
-      commonjs({ extensions: ['.ts'] }),
       nodeResolve(),
       // swanVersionInjector,
     ],
