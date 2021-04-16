@@ -5,7 +5,7 @@ import {
   PublicKeyCredentialCreationOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
-import stringToArrayBuffer from '../helpers/stringToArrayBuffer';
+import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 import supportsWebauthn from '../helpers/supportsWebauthn';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
@@ -20,7 +20,7 @@ const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';
 
 const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
-  challenge: bufferToBase64URLString(stringToArrayBuffer('fizz')),
+  challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
   attestation: 'direct',
   pubKeyCredParams: [
     {
@@ -90,7 +90,7 @@ test('should return base64url-encoded response values', async done => {
       return new Promise(resolve => {
         resolve({
           id: 'foobar',
-          rawId: stringToArrayBuffer('foobar'),
+          rawId: utf8StringToBuffer('foobar'),
           response: {
             attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
             clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
