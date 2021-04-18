@@ -1,8 +1,31 @@
 # Changelog
 
+## v3.0.0 - The one with a legacy
+
+This release is focused on updating @simplewebauthn/browser for better browser support out of the box. Most projects will now pull in its (slightly larger) ES5 bundle to ensure maximum browser compatibility, including older browsers in which WebAuthn will never be available. The ES2018 build is still available for projects that only need to target newer browsers, but bundler configuration changes must now be made to include it instead of the ES5 build.
+
+**Packages:**
+
+- @simplewebauthn/browser@3.0.0
+- @simplewebauthn/server@3.0.0
+- @simplewebauthn/typescript-types@3.0.0
+
+**Changes:**
+
+- **[browser]** Set default bundle to ES5 to support IE10+ and Edge Legacy
+- **[browser]** `startAssertion()` no longer Base64URL-encodes `userHandle` string
+- **[server]** Fix issue with Chrome (< v90) WebAuthn virtual authenticators
+- **[server]** Update `jsrsasign` to `10.2.0` (see [GHSA-27fj-mc8w-j9wg](https://github.com/advisories/GHSA-27fj-mc8w-j9wg))
+- **[typescript-types]** Update assertion JSON declarations as per `startAssertion()` fix
+
+### Breaking Changes
+
+- **[browser]** Projects targeting modern browsers may not wish to bundle the ES5 version due to its inclusion of various polyfills. See the updated "Building for Production" section of the [README.md](https://github.com/MasterKale/SimpleWebAuthn/blob/master/packages/browser/README.md) for more info on how to pull in the ES2018 version instead.
+- **[browser]** RPs with usernameless flows will no longer need to Base64URL-decode `response.userHandle` as returned from `startAssertion()`.
+
 ## v2.2.1
 
-**Packges:**
+**Packages:**
 
 - @simplewebauthn/browser@2.2.1
 - @simplewebauthn/server@2.2.1
