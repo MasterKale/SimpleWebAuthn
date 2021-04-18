@@ -39,7 +39,7 @@
     "base64url": "^3.0.1",
     "cbor": "^5.1.0",
     "elliptic": "^6.5.3",
-    "jsrsasign": "^10.1.13",
+    "jsrsasign": "^10.2.0",
     "jwk-to-pem": "^2.0.4",
     "node-fetch": "^2.6.0",
     "node-rsa": "^1.1.1"
