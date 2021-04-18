@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/browser",
-  "version": "2.2.1",
+  "version": "3.0.0",
   "description": "SimpleWebAuthn for Browsers",
   "main": "dist/es5/index.js",
   "main:es2018": "dist/es2018/index.js",
