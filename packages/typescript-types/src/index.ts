@@ -49,7 +49,7 @@ export interface PublicKeyCredentialDescriptorJSON
 
 export interface PublicKeyCredentialUserEntityJSON
   extends Omit<PublicKeyCredentialUserEntity, 'id'> {
-  id: Base64URLString;
+  id: string;
 }
 
 /**
@@ -111,7 +111,7 @@ export interface AuthenticatorAssertionResponseJSON
   authenticatorData: Base64URLString;
   clientDataJSON: Base64URLString;
   signature: Base64URLString;
-  userHandle?: Base64URLString;
+  userHandle?: string;
 }
 
 /**
