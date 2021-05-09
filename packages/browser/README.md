@@ -56,11 +56,11 @@ You can find in-depth documentation on this package here: https://simplewebauthn
 
 ## Building for Production
 
-Two unbundled versions of this library are offered for your convenience, one targeting `ES2018` and a second targeting `ES5`.
+Two unbundled versions of this library are offered for your convenience, one targeting `ES5` and a second targeting `ES2018`.
 
 ### ES5
 
-The `ES5` version is suitable for use when **old browsers** need to be supported and it's **default** version of this library which is read in the `main` entry from @simplewebauthn/browser's **package.json**.
+The `ES5` version is suitable for use when **deprecated browsers** like IE10+ or Edge Legacy need to be supported. This version is also the **default** version that gets pulled in as the `"main"` entry in **package.json**.
 
 TypeScript and JavaScript codebases alike can import and use this library without any special build configuration considerations.
 
@@ -77,9 +77,11 @@ $> npm install tslib
 
 The `ES2018` version is suitable for use when only **modern browsers** need to be supported. TypeScript and JavaScript codebases alike can import and use this library. However, you will need to ensure that your bundler pulls in the ES2018 version of the library when building your application!
 
+See bundler instructions below.
+
 #### Webpack support
 
-No matter the `"target"` of your build, though, then you'll need to indicate additional files for WebPack to resolve via the [`"resolve.mainFields"`](https://webpack.js.org/configuration/resolve/#resolvemainfields) property in your Webpack config to read in the `main:es2018` entry from @simplewebauthn/browser's **package.json**:
+No matter the `"target"` of your build you'll need to indicate additional files for webpack to resolve via the [`"resolve.mainFields"`](https://webpack.js.org/configuration/resolve/#resolvemainfields) property in your config. Resolve the `"main:es2018"` field defined in **package.json**:
 
 ```js
 module.exports = {
@@ -94,7 +96,7 @@ module.exports = {
 
 #### Rollup support
 
-The [`@rollup/plugin-node-resolve`](https://github.com/rollup/rollup-plugin-node-resolve#usage) plugin has to be added to your Rollup config to read in the `main:es2018` entry from @simplewebauthn/browser's **package.json**:
+Add the [`@rollup/plugin-node-resolve`](https://github.com/rollup/rollup-plugin-node-resolve#usage) plugin to your Rollup config to read in the `"main:es2018"` field from **package.json**:
 
 ```js
 // rollup.config.js
