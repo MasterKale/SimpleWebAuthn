@@ -191,10 +191,6 @@ export class AttestationResponseVerifier {
     /**
      * Verification can only be performed when attestation = 'direct'
      */
-    if (!(fmt in this.formatVerifiers)) {
-      throw new Error(`Unsupported Attestation Format: ${fmt}`);
-    }
-
     const verifier = this.formatVerifiers[fmt];
     if (!verifier) {
       throw new Error(`Unsupported Attestation Format: ${fmt}`);
