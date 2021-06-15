@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "description": "SimpleWebAuthn for Browsers",
   "main": "dist/es5/index.js",
-  "main:es2018": "dist/es2018/index.js",
+  "module": "dist/es2018/index.mjs",
   "types": "dist/types/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",

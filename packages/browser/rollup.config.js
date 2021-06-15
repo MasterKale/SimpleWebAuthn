@@ -52,7 +52,7 @@ export default [
       {
         dir: 'dist',
         format: 'esm',
-        entryFileNames: 'es2018/[name].js',
+        entryFileNames: 'es2018/[name].mjs',
         preferConst: true,
       },
       {
