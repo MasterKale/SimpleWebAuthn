@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "lib": [
+      "ES5",
+      "DOM"
+    ],
+    "baseUrl": "./src",
+    "declaration": false,
+    "declarationDir": null,
+    "declarationMap": false,
+    "downlevelIteration": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "importHelpers": true,
+    "noEmit": true
+  },
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "./src/**/*.test.ts",
+    "./src/setupTests.ts",
+    "./src/**/__mocks__"
+  ]
+}
