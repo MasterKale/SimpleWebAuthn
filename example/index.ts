@@ -130,8 +130,9 @@ app.get('/generate-attestation-options', (req, res) => {
      * the types of authenticators that users to can use for attestation
      */
     authenticatorSelection: {
-      userVerification: 'preferred',
-      requireResidentKey: false,
+      authenticatorAttachment: 'platform',
+      userVerification: 'required',
+      requireResidentKey: false
     },
   };
 
@@ -241,7 +242,7 @@ app.post('/verify-assertion', (req, res) => {
   }
 
   if (!dbAuthenticator) {
-    throw new Error(`could not find authenticator matching ${body.id}`);
+    throw new Error(`Could not find authenticator matching ${body.id}`);
   }
 
   let verification: VerifiedAssertion;

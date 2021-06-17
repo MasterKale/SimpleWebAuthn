@@ -36,11 +36,25 @@
         elemSuccess.innerHTML = '';
         elemError.innerHTML = '';
 
-        const resp = await fetch('/generate-attestation-options');
+        const registerRequest = {
+          userid: 'siva@bez.ai'
+        }
+        const resp = await fetch('http://localhost:8080/webauthn/register/getOptions', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(registerRequest),
+        });
 
+        
+        const registerResponseJSON = await resp.json()
+        console.log(registerResponseJSON)
+        
         let attResp;
         try {
-          attResp = await startAttestation(await resp.json());
+          attResp = await startAttestation(await registerResponseJSON.options);
         } catch (error) {
           if (error.name === 'InvalidStateError') {
             elemError.innerText = 'Error: Authenticator was probably already registered by user';
@@ -51,12 +65,17 @@
           throw error;
         }
 
-        const verificationResp = await fetch('/verify-attestation', {
+        const verificationResp = await fetch('http://localhost:8080/webauthn/register', {
           method: 'POST',
+          credentials: 'same-origin',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(attResp),
+          body: JSON.stringify({
+            userid: 'siva@bez.ai',
+            challengeId: registerResponseJSON.challengeId,
+            credential: attResp
+          }),
         });
 
         const verificationJSON = await verificationResp.json();

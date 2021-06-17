@@ -36,23 +36,38 @@
         elemSuccess.innerHTML = '';
         elemError.innerHTML = '';
 
-        const resp = await fetch('/generate-assertion-options');
+        const loginRequest = {
+          userid: 'siva@bez.ai'
+        }
+        
+        const resp = await fetch('http://localhost:8080/webauthn/login/getOptions',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(loginRequest),
+        })
 
-        let asseResp;
+        const loginResponseJSON = await resp.json()
+
+        let asseResp
         try {
-          const opts = await resp.json();
-          asseResp = await startAssertion(opts);
+          asseResp = await startAssertion(loginResponseJSON.options);
         } catch (error) {
           elemError.innerText = error;
           throw new Error(error);
         }
 
-        const verificationResp = await fetch('/verify-assertion', {
+        const verificationResp = await fetch('http://localhost:8080/webauthn/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(asseResp),
+          body: JSON.stringify({
+            userid: 'siva@bez.ai',
+            challengeId: loginResponseJSON.challengeId,
+            credential: asseResp
+          }),
         });
 
         const verificationJSON = await verificationResp.json();
