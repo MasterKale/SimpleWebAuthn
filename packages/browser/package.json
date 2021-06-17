@@ -2,8 +2,8 @@
   "name": "@simplewebauthn/browser",
   "version": "3.0.0",
   "description": "SimpleWebAuthn for Browsers",
-  "main": "dist/es5/index.js",
-  "main:es2018": "dist/es2018/index.js",
+  "main": "dist/bundle/index.js",
+  "unpkg": "dist/bundle/index.umd.min.js",
   "types": "dist/types/index.d.ts",
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
@@ -29,17 +29,13 @@
     "fido",
     "umd"
   ],
-  "peerDependencies": {
-    "tslib": "^2.2.0"
-  },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-typescript": "^8.2.1",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
-    "rollup": "^2.44.0",
+    "rollup": "^2.52.1",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-version-injector": "^1.3.3",
-    "tslib": "^2.2.0"
+    "rollup-plugin-version-injector": "^1.3.3"
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }
