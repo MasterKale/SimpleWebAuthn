@@ -69,17 +69,6 @@ export default [
     input: 'src/index.ts',
     output: {
       dir: 'dist',
-      format: 'cjs',
-      entryFileNames: 'es5/[name].js',
-      exports: 'auto',
-    },
-    plugins: [typescript({ tsconfig: './tsconfig.es5.json' }), nodeResolve(), swanVersionInjector],
-    external: ['tslib'],
-  },
-  {
-    input: 'src/index.ts',
-    output: {
-      dir: 'dist',
       format: 'umd',
       name: 'SimpleWebAuthnBrowser',
       entryFileNames: 'es5/[name].umd.min.js',
