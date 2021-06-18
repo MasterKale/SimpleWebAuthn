@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.1.0
+
+**Packages:**
+
+- @simplewebauthn/browser@3.1.0
+
+**Changes:**
+
+- **[browser]** The ES2018 bundle is now "main" in package.json. The `tslib` dependency for production is no longer necessary as transpilation to ES5 is now fully the responsibility of the framework implementing **@simplewebauthn/browser**.
+  - The ES5 UMD build remains available for websites not leveraging a build pipeline.
+- **[browser]** Linking to this package via **unpkg** now defaults to the ES2018 build. See browser's [README.md](./packages/browser/README.md) for information on how to link to the ES5 build instead.
+
 ## v3.0.0 - The one with a legacy
 
 This release is focused on updating @simplewebauthn/browser for better browser support out of the box. Most projects will now pull in its (slightly larger) ES5 bundle to ensure maximum browser compatibility, including older browsers in which WebAuthn will never be available. The ES2018 build is still available for projects that only need to target newer browsers, but bundler configuration changes must now be made to include it instead of the ES5 build.
