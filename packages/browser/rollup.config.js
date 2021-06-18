@@ -52,14 +52,14 @@ export default [
       {
         dir: 'dist',
         format: 'esm',
-        entryFileNames: 'es2018/[name].js',
+        entryFileNames: 'bundle/[name].js',
         preferConst: true,
       },
       {
         dir: 'dist',
         format: 'umd',
         name: 'SimpleWebAuthnBrowser',
-        entryFileNames: 'es2018/[name].umd.min.js',
+        entryFileNames: 'bundle/[name].umd.min.js',
         plugins: [terser()],
       },
     ],
@@ -69,20 +69,9 @@ export default [
     input: 'src/index.ts',
     output: {
       dir: 'dist',
-      format: 'cjs',
-      entryFileNames: 'es5/[name].js',
-      exports: 'auto',
-    },
-    plugins: [typescript({ tsconfig: './tsconfig.es5.json' }), nodeResolve(), swanVersionInjector],
-    external: ['tslib'],
-  },
-  {
-    input: 'src/index.ts',
-    output: {
-      dir: 'dist',
       format: 'umd',
       name: 'SimpleWebAuthnBrowser',
-      entryFileNames: 'es5/[name].umd.min.js',
+      entryFileNames: 'bundle/[name].es5.umd.min.js',
       plugins: [terser(), cleanTslibCommentInUMDBundleTargetingES5()],
     },
     plugins: [typescript({ tsconfig: './tsconfig.es5.json' }), nodeResolve(), swanVersionInjector],
