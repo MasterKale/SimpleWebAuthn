@@ -5,3 +5,4 @@ coverage
 tsconfig.json
 *.config.js
 __mocks__
+.env
