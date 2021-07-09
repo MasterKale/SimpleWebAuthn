@@ -4,19 +4,16 @@ import { TPM_ALG, TPM_ECC_CURVE } from './constants';
  * Break apart a TPM attestation's pubArea buffer
  */
 export default function parsePubArea(pubArea: Buffer): ParsedPubArea {
-  let pubBuffer: Buffer = pubArea;
+  let pointer = 0;
 
-  const typeBuffer = pubBuffer.slice(0, 2);
-  pubBuffer = pubBuffer.slice(2);
+  const typeBuffer = pubArea.slice(pointer, (pointer += 2));
   const type = TPM_ALG[typeBuffer.readUInt16BE(0)];
 
-  const nameAlgBuffer = pubBuffer.slice(0, 2);
-  pubBuffer = pubBuffer.slice(2);
+  const nameAlgBuffer = pubArea.slice(pointer, (pointer += 2));
   const nameAlg = TPM_ALG[nameAlgBuffer.readUInt16BE(0)];
 
   // Get some authenticator attributes(?)
-  const objectAttributesInt = pubBuffer.slice(0, 4).readUInt32BE(0);
-  pubBuffer = pubBuffer.slice(4);
+  const objectAttributesInt = pubArea.slice(pointer, (pointer += 4)).readUInt32BE(0);
   const objectAttributes = {
     fixedTPM: !!(objectAttributesInt & 1),
     stClear: !!(objectAttributesInt & 2),
@@ -32,16 +29,13 @@ export default function parsePubArea(pubArea: Buffer): ParsedPubArea {
   };
 
   // Slice out the authPolicy of dynamic length
-  const authPolicyLength = pubBuffer.slice(0, 2).readUInt16BE(0);
-  pubBuffer = pubBuffer.slice(2);
-  const authPolicy = pubBuffer.slice(0, authPolicyLength);
-  pubBuffer = pubBuffer.slice(authPolicyLength);
+  const authPolicyLength = pubArea.slice(pointer, (pointer += 2)).readUInt16BE(0);
+  const authPolicy = pubArea.slice(pointer, (pointer += authPolicyLength));
 
   // Extract additional curve params according to type
   const parameters: { rsa?: RSAParameters; ecc?: ECCParameters } = {};
   if (type === 'TPM_ALG_RSA') {
-    const rsaBuffer = pubBuffer.slice(0, 10);
-    pubBuffer = pubBuffer.slice(10);
+    const rsaBuffer = pubArea.slice(pointer, (pointer += 10));
 
     parameters.rsa = {
       symmetric: TPM_ALG[rsaBuffer.slice(0, 2).readUInt16BE(0)],
@@ -50,8 +44,7 @@ export default function parsePubArea(pubArea: Buffer): ParsedPubArea {
       exponent: rsaBuffer.slice(6, 10).readUInt32BE(0),
     };
   } else if (type === 'TPM_ALG_ECC') {
-    const eccBuffer = pubBuffer.slice(0, 8);
-    pubBuffer = pubBuffer.slice(8);
+    const eccBuffer = pubArea.slice(pointer, (pointer += 8));
 
     parameters.ecc = {
       symmetric: TPM_ALG[eccBuffer.slice(0, 2).readUInt16BE(0)],
@@ -64,10 +57,8 @@ export default function parsePubArea(pubArea: Buffer): ParsedPubArea {
   }
 
   // Slice out unique of dynamic length
-  const uniqueLength = pubBuffer.slice(0, 2).readUInt16BE(0);
-  pubBuffer = pubBuffer.slice(2);
-  const unique = pubBuffer.slice(0, uniqueLength);
-  pubBuffer = pubBuffer.slice(uniqueLength);
+  const uniqueLength = pubArea.slice(pointer, (pointer += 2)).readUInt16BE(0);
+  const unique = pubArea.slice(pointer, (pointer += uniqueLength));
 
   return {
     type,
