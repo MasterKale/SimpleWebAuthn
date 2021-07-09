@@ -182,6 +182,7 @@ app.post('/verify-attestation', async (req, res) => {
         credentialPublicKey,
         credentialID,
         counter,
+        transports: body.transports,
       };
       user.devices.push(newDevice);
     }
@@ -202,7 +203,7 @@ app.get('/generate-assertion-options', (req, res) => {
     allowCredentials: user.devices.map(dev => ({
       id: dev.credentialID,
       type: 'public-key',
-      transports: ['usb', 'ble', 'nfc', 'internal'],
+      transports: dev.transports ?? ['usb', 'ble', 'nfc', 'internal'],
     })),
     /**
      * This optional value controls whether or not the authenticator needs be able to uniquely
