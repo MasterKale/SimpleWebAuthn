@@ -37,9 +37,10 @@ details {
 }
 
 .container {
-  max-width: 70rem;
+  width: 95%;
   margin: auto;
   text-align: center;
+  padding: 0.5rem;
 }
 
 .error {
@@ -64,6 +65,10 @@ details {
 /* Desktop Styles */
 @media (min-width: 75rem) {
   * {
-    font-size: 24px;
+    font-size: 20px;
+  }
+
+  .container {
+    width: 45rem;
   }
 }
