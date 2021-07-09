@@ -32,6 +32,10 @@ button:hover {
   background: #efefef;
 }
 
+details {
+  margin-top: 0.75rem;
+}
+
 .container {
   max-width: 70rem;
   margin: auto;
@@ -44,6 +48,17 @@ button:hover {
 
 .success {
   color: #11a000;
+}
+
+#regDebug, #authDebug {
+  background: #efefef;
+  border-radius: 0.25rem;
+  text-align: left;
+  font-size: 0.7rem;
+  padding: 0.5rem;
+  height: 15rem;
+  width: 95%;
+  overflow-y: auto;
 }
 
 /* Desktop Styles */
