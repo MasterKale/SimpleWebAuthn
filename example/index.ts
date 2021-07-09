@@ -133,6 +133,10 @@ app.get('/generate-attestation-options', (req, res) => {
       userVerification: 'preferred',
       requireResidentKey: false,
     },
+    /**
+     * Support the two most common algorithms: ES256, and RS256
+     */
+    supportedAlgorithmIDs: [-7, -257],
   };
 
   const options = generateAttestationOptions(opts);
