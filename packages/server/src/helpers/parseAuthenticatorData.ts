@@ -11,14 +11,11 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     );
   }
 
-  let intBuffer = authData;
+  let pointer = 0;
 
-  const rpIdHash = intBuffer.slice(0, 32);
-  intBuffer = intBuffer.slice(32);
+  const rpIdHash = authData.slice(pointer, (pointer += 32));
 
-  const flagsBuf = intBuffer.slice(0, 1);
-  intBuffer = intBuffer.slice(1);
-
+  const flagsBuf = authData.slice(pointer, (pointer += 1));
   const flagsInt = flagsBuf[0];
 
   const flags = {
@@ -29,9 +26,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     flagsInt,
   };
 
-  const counterBuf = intBuffer.slice(0, 4);
-  intBuffer = intBuffer.slice(4);
-
+  const counterBuf = authData.slice(pointer, (pointer += 4));
   const counter = counterBuf.readUInt32BE(0);
 
   let aaguid: Buffer | undefined = undefined;
@@ -39,33 +34,29 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
   let credentialPublicKey: Buffer | undefined = undefined;
 
   if (flags.at) {
-    aaguid = intBuffer.slice(0, 16);
-    intBuffer = intBuffer.slice(16);
+    aaguid = authData.slice(pointer, (pointer += 16));
 
-    const credIDLenBuf = intBuffer.slice(0, 2);
-    intBuffer = intBuffer.slice(2);
-
+    const credIDLenBuf = authData.slice(pointer, (pointer += 2));
     const credIDLen = credIDLenBuf.readUInt16BE(0);
 
-    credentialID = intBuffer.slice(0, credIDLen);
-    intBuffer = intBuffer.slice(credIDLen);
+    credentialID = authData.slice(pointer, (pointer += credIDLen));
 
     // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
-    const firstDecoded = decodeCborFirst(intBuffer);
+    const firstDecoded = decodeCborFirst(authData.slice(pointer));
     const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
     credentialPublicKey = firstEncoded;
-    intBuffer = intBuffer.slice(firstEncoded.byteLength);
+    authData = authData.slice((pointer += firstEncoded.byteLength));
   }
 
   let extensionsDataBuffer: Buffer | undefined = undefined;
   if (flags.ed) {
-    const firstDecoded = decodeCborFirst(intBuffer);
+    const firstDecoded = decodeCborFirst(authData);
     const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
     extensionsDataBuffer = firstEncoded;
-    intBuffer = intBuffer.slice(firstEncoded.byteLength);
+    authData = authData.slice((pointer += firstEncoded.byteLength));
   }
 
-  if (intBuffer.byteLength > 0) {
+  if (authData.byteLength > pointer) {
     throw new Error('Leftover bytes detected while parsing authenticator data');
   }
 
