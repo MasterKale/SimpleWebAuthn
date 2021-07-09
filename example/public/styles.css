@@ -1,3 +1,11 @@
+:root {
+  --background: #f7f7f7;
+  --text: black;
+  --button: white;
+  --button-active: #eeeeee;
+  --button-hover: #efefef;
+}
+
 * {
   font-size: 16px;
   font-family: 'Courier New', Courier, monospace;
@@ -10,7 +18,8 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #f7f7f7;
+  background: var(--background);
+  color: var(--text);
 }
 
 h1 {
@@ -19,17 +28,18 @@ h1 {
 
 button {
   padding: 0.5rem;
-  background: white;
+  background: var(--button);
+  color: var(--text);
   border-radius: 0.25rem;
   width: 13rem;
 }
 
 button:active {
-  background: #eeeeee;
+  background: var(--button-active);
 }
 
 button:hover {
-  background: #efefef;
+  background: var(--button-hover);
 }
 
 details {
@@ -52,7 +62,8 @@ details {
 }
 
 #regDebug, #authDebug {
-  background: #efefef;
+  background: var(--button-hover);
+  color: var(--text);
   border-radius: 0.25rem;
   text-align: left;
   font-size: 0.7rem;
@@ -70,5 +81,15 @@ details {
 
   .container {
     width: 45rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1c2128;
+    --text: #adbac7;
+    --button: #373e47;
+    --button-active: #eeeeee;
+    --button-hover: #444c56;
   }
 }
