@@ -133,6 +133,10 @@ app.get('/generate-attestation-options', (req, res) => {
       userVerification: 'preferred',
       requireResidentKey: false,
     },
+    /**
+     * Support the two most common algorithms: ES256, and RS256
+     */
+    supportedAlgorithmIDs: [-7, -257],
   };
 
   const options = generateAttestationOptions(opts);
@@ -182,6 +186,7 @@ app.post('/verify-attestation', async (req, res) => {
         credentialPublicKey,
         credentialID,
         counter,
+        transports: body.transports,
       };
       user.devices.push(newDevice);
     }
@@ -202,7 +207,7 @@ app.get('/generate-assertion-options', (req, res) => {
     allowCredentials: user.devices.map(dev => ({
       id: dev.credentialID,
       type: 'public-key',
-      transports: ['usb', 'ble', 'nfc', 'internal'],
+      transports: dev.transports ?? ['usb', 'ble', 'nfc', 'internal'],
     })),
     /**
      * This optional value controls whether or not the authenticator needs be able to uniquely
