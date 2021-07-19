@@ -15,9 +15,9 @@ import parseJWT from '../metadata/parseJWT';
 
 // Cached WebAuthn metadata statements
 type CachedAAGUID = {
-  url: TOCEntry['url'];
-  hash: TOCEntry['hash'];
-  statusReports: TOCEntry['statusReports'];
+  url: MDSEntry['url'];
+  hash: MDSEntry['hash'];
+  statusReports: MDSEntry['statusReports'];
   statement?: MetadataStatement;
   tocURL?: CachedMDS['url'];
 };
@@ -216,7 +216,7 @@ class MetadataService {
     const data = await respTOC.text();
 
     // Break apart the JWT we get back
-    const parsedJWT = parseJWT<MDSJWTTOCHeader, MDSJWTTOCPayload>(data);
+    const parsedJWT = parseJWT<MDSJWTHeader, MDSJWTPayload>(data);
     const header = parsedJWT[0];
     const payload = parsedJWT[1];
 
@@ -369,28 +369,23 @@ export type MetadataStatement = {
   userVerificationDetails: [[{ userVerification: 1 }]];
 };
 
-type MDSJWTTOCHeader = {
+type MDSJWTHeader = {
   alg: string;
   typ: string;
   x5c: Base64URLString[];
 };
 
-type MDSJWTTOCPayload = {
+type MDSJWTPayload = {
+  legalHeader: string;
+  no: number;
   // YYYY-MM-DD
   nextUpdate: string;
-  entries: TOCEntry[];
-  no: number;
-  legalHeader: string;
+  entries: MDSEntry[];
 };
 
-type TOCEntry = {
-  url: string;
-  // YYYY-MM-DD
-  timeOfLastStatusChange: string;
-  hash: string;
-  aaid?: string;
-  aaguid?: string;
+type MDSEntry = {
   attestationCertificateKeyIdentifiers: string[];
+  metadataStatement: MetadataStatement;
   statusReports: {
     status: FIDO_AUTHENTICATOR_STATUS;
     certificateNumber: string;
@@ -402,8 +397,10 @@ type TOCEntry = {
     // YYYY-MM-DD
     effectiveDate: string;
   }[];
+  // YYYY-MM-DD
+  timeOfLastStatusChange: string;
 };
 
-type TOCAAGUIDEntry = Omit<TOCEntry, 'aaid'> & {
+type TOCAAGUIDEntry = Omit<MDSEntry, 'aaid'> & {
   aaguid: string;
 };
