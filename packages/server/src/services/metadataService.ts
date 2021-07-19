@@ -65,6 +65,12 @@ class MetadataService {
 
     const { mdsServers, statements } = opts;
 
+    if (!mdsServers?.length && !statements?.length) {
+      throw new Error(
+        'MetadataService must be initialized with at least one MDS server or local metadata statement(s)',
+      );
+    }
+
     this.setState(SERVICE_STATE.REFRESHING);
 
     // If metadata statements are provided, load them into the cache first
@@ -80,10 +86,6 @@ class MetadataService {
           };
         }
       });
-    }
-
-    if (!mdsServers.length) {
-      throw new Error('MetadataService must be initialized with at least one MDS server');
     }
 
     // If MDS servers are provided, then process them and add their statements to the cache
