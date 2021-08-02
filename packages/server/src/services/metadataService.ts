@@ -347,19 +347,24 @@ const metadataService = new MetadataService();
 
 export default metadataService;
 
+/**
+ * https://fidoalliance.org/specs/mds/fido-metadata-statement-v3.0-ps-20210518.html#metadata-keys
+ */
 export type MetadataStatement = {
-  aaguid: string;
+  legalHeader: string;
+  aaid?: string;
+  aaguid?: string;
+  attestationCertificateKeyIdentifiers?: string[];
+  description: string;
   assertionScheme: string;
   attachmentHint: number;
   attestationRootCertificates: Base64URLString[];
   attestationTypes: number[];
   authenticationAlgorithm: number;
   authenticatorVersion: number;
-  description: string;
   icon: string;
   isSecondFactorOnly: string;
   keyProtection: number;
-  legalHeader: string;
   matcherProtection: number;
   protocolFamily: string;
   publicKeyAlgAndEncoding: number;
