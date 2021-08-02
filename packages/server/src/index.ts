@@ -7,6 +7,7 @@ import verifyAttestationResponse from './attestation/verifyAttestationResponse';
 import generateAssertionOptions from './assertion/generateAssertionOptions';
 import verifyAssertionResponse from './assertion/verifyAssertionResponse';
 import MetadataService from './services/metadataService';
+import SettingsService from './services/settingsService';
 
 export {
   generateAttestationOptions,
@@ -14,6 +15,7 @@ export {
   generateAssertionOptions,
   verifyAssertionResponse,
   MetadataService,
+  SettingsService,
 };
 
 import type { GenerateAttestationOptionsOpts } from './attestation/generateAttestationOptions';
