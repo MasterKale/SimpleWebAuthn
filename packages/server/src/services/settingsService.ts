@@ -43,4 +43,32 @@ class SettingsService {
 
 const settingsService = new SettingsService();
 
+// Initialize default certificates
+/**
+ * Google GlobalSign R2
+ *
+ * Downloaded from https://pki.goog/gsr2/GSR2.crt
+ *
+ * Valid until 2021-12-15 @ 00:00 PST
+ */
+settingsService.setRootCertificate({
+  attestationFormat: 'android-safetynet',
+  certificate: fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR2.crt')),
+});
+
+/**
+ * Apple WebAuthn Root CA PEM
+ *
+ * Downloaded from https://www.apple.com/certificateauthority/Apple_WebAuthn_Root_CA.pem
+ *
+ * Valid until 2045-03-14 @ 17:00 PST
+ */
+settingsService.setRootCertificate({
+  attestationFormat: 'apple',
+  certificate: fs.readFileSync(
+    path.resolve(__dirname, './defaultRootCerts/Apple_WebAuthn_Root_CA.pem'),
+    { encoding: 'utf-8' },
+  ),
+});
+
 export default settingsService;
