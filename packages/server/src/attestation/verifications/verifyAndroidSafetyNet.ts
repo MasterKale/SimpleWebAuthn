@@ -15,6 +15,7 @@ type Options = {
   clientDataHash: Buffer;
   authData: Buffer;
   aaguid: Buffer;
+  rootCertificate: string;
   verifyTimestampMS?: boolean;
 };
 
@@ -24,7 +25,14 @@ type Options = {
 export default async function verifyAttestationAndroidSafetyNet(
   options: Options,
 ): Promise<boolean> {
-  const { attStmt, clientDataHash, authData, aaguid, verifyTimestampMS = true } = options;
+  const {
+    attStmt,
+    clientDataHash,
+    authData,
+    aaguid,
+    rootCertificate,
+    verifyTimestampMS = true,
+  } = options;
   const { response, ver } = attStmt;
 
   if (!ver) {
@@ -103,7 +111,8 @@ export default async function verifyAttestationAndroidSafetyNet(
     }
   } else {
     // Validate certificate path using a fixed global root cert
-    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertCertBufferToPEM);
+    const path = HEADER.x5c.map(convertCertBufferToPEM);
+    path.push(rootCertificate);
 
     try {
       await validateCertificatePath(path);

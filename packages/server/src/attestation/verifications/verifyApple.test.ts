@@ -1,5 +1,6 @@
-import verifyAttestationResponse from '../verifyAttestationResponse';
 import base64url from 'base64url';
+
+import verifyAttestationResponse from '../verifyAttestationResponse';
 
 test('should verify Apple attestation', async () => {
   const expectedChallenge = 'h5xSyIRMx2IQPr1mQk6GD98XSQOBHgMHVpJIkMV9Nkc';

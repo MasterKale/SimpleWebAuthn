@@ -7,6 +7,11 @@ import decodeAttestationObject, {
 } from '../../helpers/decodeAttestationObject';
 import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 import toHash from '../../helpers/toHash';
+import settingsService from '../../services/settingsService';
+
+const rootCertificate = settingsService.getRootCertificate({
+  attestationFormat: 'android-safetynet',
+});
 
 let authData: Buffer;
 let attStmt: AttestationStatement;
@@ -36,6 +41,7 @@ test('should verify Android SafetyNet attestation', async () => {
     clientDataHash,
     verifyTimestampMS: false,
     aaguid,
+    rootCertificate,
   });
 
   expect(verified).toEqual(true);
@@ -48,6 +54,7 @@ test('should throw error when timestamp is not within one minute of now', async 
       authData,
       clientDataHash,
       aaguid,
+      rootCertificate,
     }),
   ).rejects.toThrow(/has expired/i);
 });

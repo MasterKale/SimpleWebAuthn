@@ -11,6 +11,7 @@ import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+import settingsService from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
@@ -174,6 +175,7 @@ export default async function verifyAttestationResponse(
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
+  const rootCertificate = settingsService.getRootCertificate({ attestationFormat: fmt });
 
   /**
    * Verification can only be performed when attestation = 'direct'
@@ -202,6 +204,7 @@ export default async function verifyAttestationResponse(
       authData,
       clientDataHash,
       aaguid,
+      rootCertificate,
     });
   } else if (fmt === 'android-key') {
     verified = await verifyAndroidKey({
@@ -225,6 +228,7 @@ export default async function verifyAttestationResponse(
       authData,
       clientDataHash,
       credentialPublicKey,
+      rootCertificate,
     });
   } else if (fmt === 'none') {
     if (Object.keys(attStmt).length > 0) {
