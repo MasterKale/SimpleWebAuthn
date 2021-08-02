@@ -2,7 +2,7 @@ import { Base64URLString } from '@simplewebauthn/typescript-types';
 
 import { MetadataStatement } from '../services/metadataService';
 import { FIDO_METADATA_AUTH_ALG_TO_COSE } from '../helpers/constants';
-import convertX509CertToPEM from '../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 
 export default async function verifyAttestationWithMetadata(
@@ -17,14 +17,14 @@ export default async function verifyAttestationWithMetadata(
   }
 
   // Make a copy of x5c so we don't modify the original
-  const path = [...x5c].map(convertX509CertToPEM);
+  const path = [...x5c].map(convertCertBufferToPEM);
 
   // Try to validate the chain with each metadata root cert until we find one that works
   let foundValidPath = false;
   for (const rootCert of statement.attestationRootCertificates) {
     try {
       // Push the root cert to the cert path and try to validate it
-      path.push(convertX509CertToPEM(rootCert));
+      path.push(convertCertBufferToPEM(rootCert));
       foundValidPath = await validateCertificatePath(path);
     } catch (err) {
       // Swallow the error for now

@@ -3,7 +3,7 @@ import { Certificate } from '@peculiar/asn1-x509';
 import { KeyDescription, id_ce_keyDescription } from '@peculiar/asn1-android';
 
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
-import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import verifySignature from '../../helpers/verifySignature';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
 import MetadataService from '../../services/metadataService';
@@ -76,7 +76,7 @@ export default async function verifyAttestationAndroidKey(options: Options): Pro
   }
 
   // TODO: Confirm that the root certificate is an expected certificate
-  // const rootCertPEM = convertX509CertToPEM(x5c[x5c.length - 1]);
+  // const rootCertPEM = convertBufferToPEM(x5c[x5c.length - 1]);
   // console.log(rootCertPEM);
 
   // if (rootCertPEM !== expectedRootCert) {
@@ -93,7 +93,7 @@ export default async function verifyAttestationAndroidKey(options: Options): Pro
   }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
-  const leafCertPEM = convertX509CertToPEM(x5c[0]);
+  const leafCertPEM = convertCertBufferToPEM(x5c[0]);
   const hashAlg = COSEALGHASH[alg as number];
 
   return verifySignature(sig, signatureBase, leafCertPEM, hashAlg);

@@ -6,7 +6,7 @@ import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
-import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
@@ -103,7 +103,7 @@ export default async function verifyAttestationAndroidSafetyNet(
     }
   } else {
     // Validate certificate path using a fixed global root cert
-    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertX509CertToPEM);
+    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertCertBufferToPEM);
 
     try {
       await validateCertificatePath(path);
@@ -121,7 +121,7 @@ export default async function verifyAttestationAndroidSafetyNet(
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const leafCertPEM = convertX509CertToPEM(leafCertBuffer);
+  const leafCertPEM = convertCertBufferToPEM(leafCertBuffer);
   const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCertPEM);
   /**
    * END Verify Signature

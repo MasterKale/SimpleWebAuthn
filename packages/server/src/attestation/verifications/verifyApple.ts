@@ -3,7 +3,7 @@ import { Certificate } from '@peculiar/asn1-x509';
 
 import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
-import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import toHash from '../../helpers/toHash';
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 
@@ -25,7 +25,7 @@ export default async function verifyApple(options: Options): Promise<boolean> {
   /**
    * Verify certificate path
    */
-  const certPath = x5c.map(convertX509CertToPEM);
+  const certPath = x5c.map(convertCertBufferToPEM);
   certPath.push(AppleWebAuthnRootCertificate);
 
   try {

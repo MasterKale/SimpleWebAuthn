@@ -12,7 +12,7 @@ import type { AttestationStatement } from '../../../helpers/decodeAttestationObj
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
-import convertX509CertToPEM from '../../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../../helpers/convertCertBufferToPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
 import MetadataService from '../../../services/metadataService';
@@ -274,7 +274,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
 
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // In the wise words of Yuriy Ackermann: "Get Martini friend, you are done!"
-  const leafCertPEM = convertX509CertToPEM(x5c[0]);
+  const leafCertPEM = convertCertBufferToPEM(x5c[0]);
   return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
 }
 
