@@ -6,7 +6,7 @@ import type { AttestationStatement } from '../../helpers/decodeAttestationObject
 import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
 import verifySignature from '../../helpers/verifySignature';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
-import MetadataService from '../../metadata/metadataService';
+import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
 type Options = {

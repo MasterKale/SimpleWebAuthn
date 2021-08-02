@@ -15,7 +15,7 @@ import toHash from '../../../helpers/toHash';
 import convertX509CertToPEM from '../../../helpers/convertX509CertToPEM';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
-import MetadataService from '../../../metadata/metadataService';
+import MetadataService from '../../../services/metadataService';
 import verifyAttestationWithMetadata from '../../../metadata/verifyAttestationWithMetadata';
 
 import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
@@ -281,9 +281,7 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
 /**
  * Contain logic for pulling TPM-specific values out of subjectAlternativeName extension
  */
-function getTcgAtTpmValues(
-  root: Name,
-): {
+function getTcgAtTpmValues(root: Name): {
   tcgAtTpmManufacturer?: string;
   tcgAtTpmModel?: string;
   tcgAtTpmVersion?: string;

@@ -7,7 +7,7 @@ import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
-import MetadataService from '../../metadata/metadataService';
+import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
 type Options = {

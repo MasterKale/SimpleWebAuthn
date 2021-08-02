@@ -11,7 +11,7 @@ import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 // TODO: Re-enable this once we figure out logging
 // import { log } from '../helpers/logging';
 
-import parseJWT from './parseJWT';
+import parseJWT from '../metadata/parseJWT';
 
 // Cached WebAuthn metadata statements
 type CachedAAGUID = {
