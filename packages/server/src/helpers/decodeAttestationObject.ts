@@ -10,18 +10,17 @@ export default function decodeAttestationObject(attestationObject: Buffer): Atte
   return toCBOR;
 }
 
-export enum ATTESTATION_FORMAT {
-  FIDO_U2F = 'fido-u2f',
-  PACKED = 'packed',
-  ANDROID_SAFETYNET = 'android-safetynet',
-  ANDROID_KEY = 'android-key',
-  TPM = 'tpm',
-  APPLE = 'apple',
-  NONE = 'none',
-}
+export type AttestationFormat =
+  | 'fido-u2f'
+  | 'packed'
+  | 'android-safetynet'
+  | 'android-key'
+  | 'tpm'
+  | 'apple'
+  | 'none';
 
 export type AttestationObject = {
-  fmt: ATTESTATION_FORMAT;
+  fmt: AttestationFormat;
   attStmt: AttestationStatement;
   authData: Buffer;
 };

@@ -4,7 +4,7 @@ import {
   COSEAlgorithmIdentifier,
 } from '@simplewebauthn/typescript-types';
 
-import decodeAttestationObject, { ATTESTATION_FORMAT } from '../helpers/decodeAttestationObject';
+import decodeAttestationObject, { AttestationFormat } from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -179,7 +179,7 @@ export default async function verifyAttestationResponse(
    * Verification can only be performed when attestation = 'direct'
    */
   let verified = false;
-  if (fmt === ATTESTATION_FORMAT.FIDO_U2F) {
+  if (fmt === 'fido-u2f') {
     verified = verifyFIDOU2F({
       attStmt,
       clientDataHash,
@@ -188,7 +188,7 @@ export default async function verifyAttestationResponse(
       rpIdHash,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMAT.PACKED) {
+  } else if (fmt === 'packed') {
     verified = await verifyPacked({
       attStmt,
       authData,
@@ -196,14 +196,14 @@ export default async function verifyAttestationResponse(
       credentialPublicKey,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMAT.ANDROID_SAFETYNET) {
+  } else if (fmt === 'android-safetynet') {
     verified = await verifyAndroidSafetynet({
       attStmt,
       authData,
       clientDataHash,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMAT.ANDROID_KEY) {
+  } else if (fmt === 'android-key') {
     verified = await verifyAndroidKey({
       attStmt,
       authData,
@@ -211,7 +211,7 @@ export default async function verifyAttestationResponse(
       credentialPublicKey,
       aaguid,
     });
-  } else if (fmt === ATTESTATION_FORMAT.TPM) {
+  } else if (fmt === 'tpm') {
     verified = await verifyTPM({
       aaguid,
       attStmt,
@@ -219,14 +219,14 @@ export default async function verifyAttestationResponse(
       credentialPublicKey,
       clientDataHash,
     });
-  } else if (fmt === ATTESTATION_FORMAT.APPLE) {
+  } else if (fmt === 'apple') {
     verified = await verifyApple({
       attStmt,
       authData,
       clientDataHash,
       credentialPublicKey,
     });
-  } else if (fmt === ATTESTATION_FORMAT.NONE) {
+  } else if (fmt === 'none') {
     if (Object.keys(attStmt).length > 0) {
       throw new Error('None attestation had unexpected attestation statement');
     }
@@ -275,7 +275,7 @@ export default async function verifyAttestationResponse(
 export type VerifiedAttestation = {
   verified: boolean;
   attestationInfo?: {
-    fmt: ATTESTATION_FORMAT;
+    fmt: AttestationFormat;
     counter: number;
     aaguid: string;
     credentialPublicKey: Buffer;
