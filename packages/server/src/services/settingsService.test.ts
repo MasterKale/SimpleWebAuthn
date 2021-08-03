@@ -51,31 +51,31 @@ jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
 
 describe('setRootCertificate/getRootCertificate', () => {
   test('should accept cert as Buffer', () => {
-    settingsService.setRootCertificate({
+    settingsService.setRootCertificates({
       attestationFormat: 'android-safetynet',
-      certificate: gsr2,
+      certificates: [gsr2],
     });
 
-    const cert = settingsService.getRootCertificate({ attestationFormat: 'android-safetynet' });
+    const certs = settingsService.getRootCertificates({ attestationFormat: 'android-safetynet' });
 
-    expect(cert).toEqual(gsr2AsPEM);
+    expect(certs).toEqual([gsr2AsPEM]);
   });
 
   test('should accept cert as PEM string', () => {
-    settingsService.setRootCertificate({
+    settingsService.setRootCertificates({
       attestationFormat: 'apple',
-      certificate: apple,
+      certificates: [apple],
     });
 
-    const cert = settingsService.getRootCertificate({ attestationFormat: 'apple' });
+    const certs = settingsService.getRootCertificates({ attestationFormat: 'apple' });
 
-    expect(cert).toEqual(appleAsPEM);
+    expect(certs).toEqual([appleAsPEM]);
   });
 
-  test('should return empty string when certificate is not set', () => {
-    const cert = settingsService.getRootCertificate({ attestationFormat: 'none' });
+  test('should return empty array when certificate is not set', () => {
+    const certs = settingsService.getRootCertificates({ attestationFormat: 'none' });
 
-    expect(typeof cert).toEqual('string');
-    expect(cert.length).toEqual(0);
+    expect(Array.isArray(certs)).toEqual(true);
+    expect(certs.length).toEqual(0);
   });
 });
