@@ -58,7 +58,10 @@ const settingsService = new SettingsService();
  */
 settingsService.setRootCertificates({
   attestationFormat: 'android-safetynet',
-  certificates: [fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR2.crt'))],
+  certificates: [
+    fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR2.crt')),
+    fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR1.crt')),
+  ],
 });
 
 /**
