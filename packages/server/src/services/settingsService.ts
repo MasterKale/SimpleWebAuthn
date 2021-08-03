@@ -6,38 +6,43 @@ import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 
 class SettingsService {
   // Certificates are stored as PEM-formatted strings
-  private pemCertificates: Map<AttestationFormat, string>;
+  private pemCertificates: Map<AttestationFormat, string[]>;
 
   constructor() {
     this.pemCertificates = new Map();
   }
 
   /**
-   * Allow setting custom root certificates for attestation formats that use them
+   * Set potential root certificates for attestation formats that use them. Root certs will be tried
+   * one-by-one when validating a certificate path.
    *
-   * The certificate can be specified as a raw `Buffer`, or as a PEM-formatted string. If a
+   * Certificates can be specified as a raw `Buffer`, or as a PEM-formatted string. If a
    * `Buffer` is passed in it will be converted to PEM format.
    */
-  setRootCertificate(opts: {
+  setRootCertificates(opts: {
     attestationFormat: AttestationFormat;
-    certificate: Buffer | string;
+    certificates: (Buffer | string)[];
   }): void {
-    const { attestationFormat } = opts;
-    let { certificate: newCertificate } = opts;
+    const { attestationFormat, certificates } = opts;
 
-    if (newCertificate instanceof Buffer) {
-      newCertificate = convertCertBufferToPEM(newCertificate);
+    const newCertificates: string[] = [];
+    for (const cert of certificates) {
+      if (cert instanceof Buffer) {
+        newCertificates.push(convertCertBufferToPEM(cert));
+      } else {
+        newCertificates.push(cert);
+      }
     }
 
-    this.pemCertificates.set(attestationFormat, newCertificate);
+    this.pemCertificates.set(attestationFormat, newCertificates);
   }
 
   /**
    * Get any registered root certificates for the specified attestation format
    */
-  getRootCertificate(opts: { attestationFormat: AttestationFormat }): string {
+  getRootCertificates(opts: { attestationFormat: AttestationFormat }): string[] {
     const { attestationFormat } = opts;
-    return this.pemCertificates.get(attestationFormat) ?? '';
+    return this.pemCertificates.get(attestationFormat) ?? [];
   }
 }
 
@@ -51,9 +56,9 @@ const settingsService = new SettingsService();
  *
  * Valid until 2021-12-15 @ 00:00 PST
  */
-settingsService.setRootCertificate({
+settingsService.setRootCertificates({
   attestationFormat: 'android-safetynet',
-  certificate: fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR2.crt')),
+  certificates: [fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR2.crt'))],
 });
 
 /**
@@ -63,12 +68,13 @@ settingsService.setRootCertificate({
  *
  * Valid until 2045-03-14 @ 17:00 PST
  */
-settingsService.setRootCertificate({
+settingsService.setRootCertificates({
   attestationFormat: 'apple',
-  certificate: fs.readFileSync(
-    path.resolve(__dirname, './defaultRootCerts/Apple_WebAuthn_Root_CA.pem'),
-    { encoding: 'utf-8' },
-  ),
+  certificates: [
+    fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/Apple_WebAuthn_Root_CA.pem'), {
+      encoding: 'utf-8',
+    }),
+  ],
 });
 
 export default settingsService;
