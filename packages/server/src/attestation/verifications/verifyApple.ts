@@ -12,11 +12,11 @@ type Options = {
   authData: Buffer;
   clientDataHash: Buffer;
   credentialPublicKey: Buffer;
-  rootCertificate: string;
+  rootCertificates: string[];
 };
 
 export default async function verifyApple(options: Options): Promise<boolean> {
-  const { attStmt, authData, clientDataHash, credentialPublicKey, rootCertificate } = options;
+  const { attStmt, authData, clientDataHash, credentialPublicKey, rootCertificates } = options;
   const { x5c } = attStmt;
 
   if (!x5c) {
@@ -27,10 +27,9 @@ export default async function verifyApple(options: Options): Promise<boolean> {
    * Verify certificate path
    */
   const certPath = x5c.map(convertCertBufferToPEM);
-  certPath.push(rootCertificate);
 
   try {
-    await validateCertificatePath(certPath);
+    await validateCertificatePath(certPath, rootCertificates);
   } catch (err) {
     throw new Error(`${err.message} (Apple)`);
   }

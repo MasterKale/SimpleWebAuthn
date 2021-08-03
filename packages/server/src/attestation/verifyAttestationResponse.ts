@@ -175,7 +175,7 @@ export default async function verifyAttestationResponse(
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const rootCertificate = settingsService.getRootCertificate({ attestationFormat: fmt });
+  const rootCertificates = settingsService.getRootCertificates({ attestationFormat: fmt });
 
   /**
    * Verification can only be performed when attestation = 'direct'
@@ -204,7 +204,7 @@ export default async function verifyAttestationResponse(
       authData,
       clientDataHash,
       aaguid,
-      rootCertificate,
+      rootCertificates,
     });
   } else if (fmt === 'android-key') {
     verified = await verifyAndroidKey({
@@ -228,7 +228,7 @@ export default async function verifyAttestationResponse(
       authData,
       clientDataHash,
       credentialPublicKey,
-      rootCertificate,
+      rootCertificates,
     });
   } else if (fmt === 'none') {
     if (Object.keys(attStmt).length > 0) {
