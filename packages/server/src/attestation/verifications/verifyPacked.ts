@@ -13,6 +13,7 @@ import convertCOSEtoPKCS, {
 import { FIDO_METADATA_ATTESTATION_TYPES } from '../../helpers/constants';
 import toHash from '../../helpers/toHash';
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import validateCertificatePath from '../../helpers/validateCertificatePath';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
 import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
@@ -25,7 +26,8 @@ import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithM
 export default async function verifyAttestationPacked(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
-  const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid } = options;
+  const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid, rootCertificates } =
+    options;
 
   const { sig, x5c, alg } = attStmt;
 
@@ -101,6 +103,13 @@ export default async function verifyAttestationPacked(
 
       try {
         await verifyAttestationWithMetadata(statement, alg, x5c);
+      } catch (err) {
+        throw new Error(`${err.message} (Packed|Full)`);
+      }
+    } else {
+      try {
+        // Try validating the certificate path using the root certificates set via SettingsService
+        await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
       } catch (err) {
         throw new Error(`${err.message} (Packed|Full)`);
       }

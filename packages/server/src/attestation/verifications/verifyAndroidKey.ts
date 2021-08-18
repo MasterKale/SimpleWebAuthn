@@ -5,6 +5,7 @@ import { KeyDescription, id_ce_keyDescription } from '@peculiar/asn1-android';
 import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
 
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import validateCertificatePath from '../../helpers/validateCertificatePath';
 import verifySignature from '../../helpers/verifySignature';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
 import MetadataService from '../../services/metadataService';
@@ -16,7 +17,8 @@ import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithM
 export default async function verifyAttestationAndroidKey(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
-  const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid } = options;
+  const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid, rootCertificates } =
+    options;
   const { x5c, sig, alg } = attStmt;
 
   if (!x5c) {
@@ -73,18 +75,17 @@ export default async function verifyAttestationAndroidKey(
     throw new Error('teeEnforced contained "allApplications [600]" tag (AndroidKey)');
   }
 
-  // TODO: Confirm that the root certificate is an expected certificate
-  // const rootCertPEM = convertBufferToPEM(x5c[x5c.length - 1]);
-  // console.log(rootCertPEM);
-
-  // if (rootCertPEM !== expectedRootCert) {
-  //   throw new Error('Root certificate was not expected certificate (AndroidKey)');
-  // }
-
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
     try {
       await verifyAttestationWithMetadata(statement, alg, x5c);
+    } catch (err) {
+      throw new Error(`${err.message} (AndroidKey)`);
+    }
+  } else {
+    try {
+      // Try validating the certificate path using the root certificates set via SettingsService
+      await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
     } catch (err) {
       throw new Error(`${err.message} (AndroidKey)`);
     }
@@ -96,13 +97,3 @@ export default async function verifyAttestationAndroidKey(
 
   return verifySignature(sig, signatureBase, leafCertPEM, hashAlg);
 }
-
-type KeyStoreExtensionDescription = {
-  attestationVersion: number;
-  attestationChallenge: Buffer;
-  softwareEnforced: string[];
-  teeEnforced: string[];
-};
-
-// TODO: Find the most up-to-date expected root cert, the one from Yuriy's article doesn't match
-const expectedRootCert = ``;

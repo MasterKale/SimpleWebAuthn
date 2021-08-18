@@ -197,7 +197,7 @@ export default async function verifyAttestationResponse(
    */
   let verified = false;
   if (fmt === 'fido-u2f') {
-    verified = verifyFIDOU2F(verifierOpts);
+    verified = await verifyFIDOU2F(verifierOpts);
   } else if (fmt === 'packed') {
     verified = await verifyPacked(verifierOpts);
   } else if (fmt === 'android-safetynet') {

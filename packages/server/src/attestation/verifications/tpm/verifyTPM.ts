@@ -14,6 +14,7 @@ import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKe
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
 import convertCertBufferToPEM from '../../../helpers/convertCertBufferToPEM';
+import validateCertificatePath from '../../../helpers/validateCertificatePath';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
 import MetadataService from '../../../services/metadataService';
@@ -24,7 +25,8 @@ import parseCertInfo from './parseCertInfo';
 import parsePubArea from './parsePubArea';
 
 export default async function verifyTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
-  const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash } = options;
+  const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
+    options;
   const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
 
   /**
@@ -260,6 +262,13 @@ export default async function verifyTPM(options: AttestationFormatVerifierOpts):
   if (statement) {
     try {
       await verifyAttestationWithMetadata(statement, alg, x5c);
+    } catch (err) {
+      throw new Error(`${err.message} (TPM)`);
+    }
+  } else {
+    try {
+      // Try validating the certificate path using the root certificates set via SettingsService
+      await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
     } catch (err) {
       throw new Error(`${err.message} (TPM)`);
     }
