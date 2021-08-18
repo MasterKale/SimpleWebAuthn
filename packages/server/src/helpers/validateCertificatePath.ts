@@ -17,7 +17,8 @@ export default async function validateCertificatePath(
   rootCertificates: string[] = [],
 ): Promise<boolean> {
   if (rootCertificates.length === 0) {
-    await _validatePath(certificates);
+    // We have no root certs with which to create a full path, so skip path validation
+    // TODO: Is this going to be acceptable default behavior??
     return true;
   }
 
