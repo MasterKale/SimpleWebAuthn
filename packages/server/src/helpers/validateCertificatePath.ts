@@ -17,7 +17,7 @@ export default async function validateCertificatePath(
   rootCertificates: string[] = [],
 ): Promise<boolean> {
   if (rootCertificates.length === 0) {
-    _validatePath(certificates);
+    await _validatePath(certificates);
     return true;
   }
 
