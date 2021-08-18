@@ -2,6 +2,10 @@ import { AttestationFormat } from '../helpers/decodeAttestationObject';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 
 import { GlobalSign_Root_CA, GlobalSign_R2 } from './defaultRootCerts/android-safetynet';
+import {
+  Google_Hardware_Attestation_Root_1,
+  Google_Hardware_Attestation_Root_2,
+} from './defaultRootCerts/android-key';
 import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple';
 
 class SettingsService {
@@ -49,6 +53,11 @@ class SettingsService {
 const settingsService = new SettingsService();
 
 // Initialize default certificates
+settingsService.setRootCertificates({
+  attestationFormat: 'android-key',
+  certificates: [Google_Hardware_Attestation_Root_1, Google_Hardware_Attestation_Root_2],
+});
+
 settingsService.setRootCertificates({
   attestationFormat: 'android-safetynet',
   certificates: [GlobalSign_R2, GlobalSign_Root_CA],
