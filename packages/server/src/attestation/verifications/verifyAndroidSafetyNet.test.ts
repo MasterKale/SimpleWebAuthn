@@ -17,6 +17,9 @@ let authData: Buffer;
 let attStmt: AttestationStatement;
 let clientDataHash: Buffer;
 let aaguid: Buffer;
+let credentialID: Buffer;
+let credentialPublicKey: Buffer;
+let rpIdHash: Buffer;
 
 beforeEach(() => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
@@ -28,6 +31,8 @@ beforeEach(() => {
 
   const parsedAuthData = parseAuthenticatorData(authData);
   aaguid = parsedAuthData.aaguid!;
+  credentialID = parsedAuthData.credentialID!;
+  credentialPublicKey = parsedAuthData.credentialPublicKey!;
 });
 
 /**
@@ -42,6 +47,9 @@ test('should verify Android SafetyNet attestation', async () => {
     verifyTimestampMS: false,
     aaguid,
     rootCertificates,
+    credentialID,
+    credentialPublicKey,
+    rpIdHash,
   });
 
   expect(verified).toEqual(true);
@@ -55,6 +63,9 @@ test('should throw error when timestamp is not within one minute of now', async 
       clientDataHash,
       aaguid,
       rootCertificates,
+      credentialID,
+      credentialPublicKey,
+      rpIdHash,
     }),
   ).rejects.toThrow(/has expired/i);
 });
@@ -77,6 +88,9 @@ test('should validate response with cert path completed with GlobalSign R1 root 
     verifyTimestampMS: false,
     aaguid: _aaguid,
     rootCertificates,
+    credentialID,
+    credentialPublicKey,
+    rpIdHash,
   });
 
   expect(verified).toEqual(true);
@@ -180,7 +194,6 @@ const attestationAndroidSafetyNet = {
   getClientExtensionResults: () => ({}),
   type: 'public-key',
 };
-const attestationAndroidSafetyNetChallenge = '_vVPoE42Dh-wk3bvHmaktiVvEYC-LwBX';
 
 const safetyNetUsingGSR1RootCert = {
   id: 'AQsMmnEQ8OxpZxijXBMT4tyamgkqC_3hr18_e8KeK8nG69ijcTaXNKX_CRmYiW0fegPE0N_3NVHEaj_kit7LPNM',
