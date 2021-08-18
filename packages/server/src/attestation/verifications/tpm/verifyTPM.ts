@@ -8,30 +8,25 @@ import {
   Name,
 } from '@peculiar/asn1-x509';
 
-import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../../verifyAttestationResponse';
+
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
-import convertX509CertToPEM from '../../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../../helpers/convertCertBufferToPEM';
+import validateCertificatePath from '../../../helpers/validateCertificatePath';
 import getCertificateInfo from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
-import MetadataService from '../../../metadata/metadataService';
+import MetadataService from '../../../services/metadataService';
 import verifyAttestationWithMetadata from '../../../metadata/verifyAttestationWithMetadata';
 
 import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
 import parseCertInfo from './parseCertInfo';
 import parsePubArea from './parsePubArea';
 
-type Options = {
-  aaguid: Buffer;
-  attStmt: AttestationStatement;
-  authData: Buffer;
-  credentialPublicKey: Buffer;
-  clientDataHash: Buffer;
-};
-
-export default async function verifyTPM(options: Options): Promise<boolean> {
-  const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash } = options;
+export default async function verifyTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
+  const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
+    options;
   const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
 
   /**
@@ -270,20 +265,25 @@ export default async function verifyTPM(options: Options): Promise<boolean> {
     } catch (err) {
       throw new Error(`${err.message} (TPM)`);
     }
+  } else {
+    try {
+      // Try validating the certificate path using the root certificates set via SettingsService
+      await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
+    } catch (err) {
+      throw new Error(`${err.message} (TPM)`);
+    }
   }
 
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // In the wise words of Yuriy Ackermann: "Get Martini friend, you are done!"
-  const leafCertPEM = convertX509CertToPEM(x5c[0]);
+  const leafCertPEM = convertCertBufferToPEM(x5c[0]);
   return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
 }
 
 /**
  * Contain logic for pulling TPM-specific values out of subjectAlternativeName extension
  */
-function getTcgAtTpmValues(
-  root: Name,
-): {
+function getTcgAtTpmValues(root: Name): {
   tcgAtTpmManufacturer?: string;
   tcgAtTpmModel?: string;
   tcgAtTpmVersion?: string;

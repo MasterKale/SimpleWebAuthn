@@ -6,11 +6,18 @@ import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import SettingsService from '../services/settingsService';
 
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
 import toHash from '../helpers/toHash';
 import { AttestationCredentialJSON } from '@simplewebauthn/typescript-types';
+
+/**
+ * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
+ * and have cert paths that can't be validated with known root certs from Google
+ */
+SettingsService.setRootCertificates({ attestationFormat: 'android-key', certificates: [] });
 
 let mockDecodeAttestation: jest.SpyInstance;
 let mockDecodeClientData: jest.SpyInstance;

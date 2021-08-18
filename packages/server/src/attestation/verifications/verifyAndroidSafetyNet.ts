@@ -1,30 +1,29 @@
 import base64url from 'base64url';
 
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
 
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
-import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
-import MetadataService from '../../metadata/metadataService';
+import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
-
-type Options = {
-  attStmt: AttestationStatement;
-  clientDataHash: Buffer;
-  authData: Buffer;
-  aaguid: Buffer;
-  verifyTimestampMS?: boolean;
-};
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
 export default async function verifyAttestationAndroidSafetyNet(
-  options: Options,
+  options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
-  const { attStmt, clientDataHash, authData, aaguid, verifyTimestampMS = true } = options;
+  const {
+    attStmt,
+    clientDataHash,
+    authData,
+    aaguid,
+    rootCertificates,
+    verifyTimestampMS = true,
+  } = options;
   const { response, ver } = attStmt;
 
   if (!ver) {
@@ -102,11 +101,9 @@ export default async function verifyAttestationAndroidSafetyNet(
       throw new Error(`${err.message} (SafetyNet)`);
     }
   } else {
-    // Validate certificate path using a fixed global root cert
-    const path = HEADER.x5c.concat([GlobalSignRootCAR2]).map(convertX509CertToPEM);
-
     try {
-      await validateCertificatePath(path);
+      // Try validating the certificate path using the root certificates set via SettingsService
+      await validateCertificatePath(HEADER.x5c.map(convertCertBufferToPEM), rootCertificates);
     } catch (err) {
       throw new Error(`${err.message} (SafetyNet)`);
     }
@@ -121,7 +118,7 @@ export default async function verifyAttestationAndroidSafetyNet(
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const leafCertPEM = convertX509CertToPEM(leafCertBuffer);
+  const leafCertPEM = convertCertBufferToPEM(leafCertBuffer);
   const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCertPEM);
   /**
    * END Verify Signature
@@ -129,28 +126,6 @@ export default async function verifyAttestationAndroidSafetyNet(
 
   return verified;
 }
-
-/**
- * This "GS Root R2" root certificate was downloaded from https://pki.goog/gsr2/GSR2.crt
- * on 08/10/2019 and then run through `base64url.encode()` to get this representation.
- *
- * The certificate is valid until Dec 15, 2021
- */
-const GlobalSignRootCAR2 =
-  'MIIDujCCAqKgAwIBAgILBAAAAAABD4Ym5g0wDQYJKoZIhvcNAQEFBQAwTDEgMB4GA1UEC' +
-  'xMXR2xvYmFsU2lnbiBSb290IENBIC0gUjIxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wHhc' +
-  'NMDYxMjE1MDgwMDAwWhcNMjExMjE1MDgwMDAwWjBMMSAwHgYDVQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMjETMBEGA' +
-  '1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMKR2xvYmFsU2lnbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKb' +
-  'PJA6-Lm8omUVCxKs-IVSbC9N_hHD6ErPLv4dfxn-G07IwXNb9rfF73OX4YJYJkhD10FPe-3t-c4isUoh7SqbKSaZeqKeMW' +
-  'hG8eoLrvozps6yWJQeXSpkqBy-0Hne_ig-1AnwblrjFuTosvNYSuetZfeLQBoZfXklqtTleiDTsvHgMCJiEbKjNS7SgfQx' +
-  '5TfC4LcshytVsW33hoCmEofnTlEnLJGKRILzdC9XZzPnqJworc5HGnRusyMvo4KD0L5CLTfuwNhv2GXqF4G3yYROIXJ_gk' +
-  'wpRl4pazq-r1feqCapgvdzZX99yqWATXgAByUr6P6TqBwMhAo6CygPCm48CAwEAAaOBnDCBmTAOBgNVHQ8BAf8EBAMCAQY' +
-  'wDwYDVR0TAQH_BAUwAwEB_zAdBgNVHQ4EFgQUm-IHV2ccHsBqBt5ZtJot39wZhi4wNgYDVR0fBC8wLTAroCmgJ4YlaHR0c' +
-  'DovL2NybC5nbG9iYWxzaWduLm5ldC9yb290LXIyLmNybDAfBgNVHSMEGDAWgBSb4gdXZxwewGoG3lm0mi3f3BmGLjANBgk' +
-  'qhkiG9w0BAQUFAAOCAQEAmYFThxxol4aR7OBKuEQLq4GsJ0_WwbgcQ3izDJr86iw8bmEbTUsp9Z8FHSbBuOmDAGJFtqkIk' +
-  '7mpM0sYmsL4h4hO291xNBrBVNpGP-DTKqttVCL1OmLNIG-6KYnX3ZHu01yiPqFbQfXf5WRDLenVOavSot-3i9DAgBkcRcA' +
-  'tjOj4LaR0VknFBbVPFd5uRHg5h6h-u_N5GJG79G-dwfCMNYxdAfvDbbnvRG15RjF-Cv6pgsH_76tuIMRQyV-dTZsXjAzlA' +
-  'cmgQWpzU_qlULRuJQ_7TBj0_VLZjmmx6BEP3ojY-x1J96relc8geMJgEtslQIxq_H5COEBkEveegeGTLg';
 
 type SafetyNetJWTHeader = {
   alg: string;

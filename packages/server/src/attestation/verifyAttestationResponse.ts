@@ -4,13 +4,17 @@ import {
   COSEAlgorithmIdentifier,
 } from '@simplewebauthn/typescript-types';
 
-import decodeAttestationObject, { ATTESTATION_FORMAT } from '../helpers/decodeAttestationObject';
+import decodeAttestationObject, {
+  AttestationFormat,
+  AttestationStatement,
+} from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+import settingsService from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
@@ -174,59 +178,37 @@ export default async function verifyAttestationResponse(
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
+  const rootCertificates = settingsService.getRootCertificates({ attestationFormat: fmt });
+
+  // Prepare arguments to pass to the relevant verification method
+  const verifierOpts: AttestationFormatVerifierOpts = {
+    aaguid,
+    attStmt,
+    authData,
+    clientDataHash,
+    credentialID,
+    credentialPublicKey,
+    rootCertificates,
+    rpIdHash,
+  };
 
   /**
    * Verification can only be performed when attestation = 'direct'
    */
   let verified = false;
-  if (fmt === ATTESTATION_FORMAT.FIDO_U2F) {
-    verified = verifyFIDOU2F({
-      attStmt,
-      clientDataHash,
-      credentialID,
-      credentialPublicKey,
-      rpIdHash,
-      aaguid,
-    });
-  } else if (fmt === ATTESTATION_FORMAT.PACKED) {
-    verified = await verifyPacked({
-      attStmt,
-      authData,
-      clientDataHash,
-      credentialPublicKey,
-      aaguid,
-    });
-  } else if (fmt === ATTESTATION_FORMAT.ANDROID_SAFETYNET) {
-    verified = await verifyAndroidSafetynet({
-      attStmt,
-      authData,
-      clientDataHash,
-      aaguid,
-    });
-  } else if (fmt === ATTESTATION_FORMAT.ANDROID_KEY) {
-    verified = await verifyAndroidKey({
-      attStmt,
-      authData,
-      clientDataHash,
-      credentialPublicKey,
-      aaguid,
-    });
-  } else if (fmt === ATTESTATION_FORMAT.TPM) {
-    verified = await verifyTPM({
-      aaguid,
-      attStmt,
-      authData,
-      credentialPublicKey,
-      clientDataHash,
-    });
-  } else if (fmt === ATTESTATION_FORMAT.APPLE) {
-    verified = await verifyApple({
-      attStmt,
-      authData,
-      clientDataHash,
-      credentialPublicKey,
-    });
-  } else if (fmt === ATTESTATION_FORMAT.NONE) {
+  if (fmt === 'fido-u2f') {
+    verified = await verifyFIDOU2F(verifierOpts);
+  } else if (fmt === 'packed') {
+    verified = await verifyPacked(verifierOpts);
+  } else if (fmt === 'android-safetynet') {
+    verified = await verifyAndroidSafetynet(verifierOpts);
+  } else if (fmt === 'android-key') {
+    verified = await verifyAndroidKey(verifierOpts);
+  } else if (fmt === 'tpm') {
+    verified = await verifyTPM(verifierOpts);
+  } else if (fmt === 'apple') {
+    verified = await verifyApple(verifierOpts);
+  } else if (fmt === 'none') {
     if (Object.keys(attStmt).length > 0) {
       throw new Error('None attestation had unexpected attestation statement');
     }
@@ -275,7 +257,7 @@ export default async function verifyAttestationResponse(
 export type VerifiedAttestation = {
   verified: boolean;
   attestationInfo?: {
-    fmt: ATTESTATION_FORMAT;
+    fmt: AttestationFormat;
     counter: number;
     aaguid: string;
     credentialPublicKey: Buffer;
@@ -284,4 +266,19 @@ export type VerifiedAttestation = {
     userVerified: boolean;
     attestationObject: Buffer;
   };
+};
+
+/**
+ * Values passed to all attestation format verifiers, from which they are free to use as they please
+ */
+export type AttestationFormatVerifierOpts = {
+  aaguid: Buffer;
+  attStmt: AttestationStatement;
+  authData: Buffer;
+  clientDataHash: Buffer;
+  credentialID: Buffer;
+  credentialPublicKey: Buffer;
+  rootCertificates: string[];
+  rpIdHash: Buffer;
+  verifyTimestampMS?: boolean;
 };

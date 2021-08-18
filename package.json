@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "npm run build:types && npm run build:testing && npm run build:browser && npm run build:server",
-    "lint": "prettier --write packages/ example/ && eslint --fix packages/ example/",
+    "lint": "prettier --write packages/**/src/**/*.ts example/**/*.ts && eslint --fix packages/**/src/**/*.ts example/**/*.ts",
     "docs": "npm run bootstrap && typedoc --tsconfig tsconfigdoc.json",
     "test": "lerna run test",
     "build:types": "lerna bootstrap --scope=@simplewebauthn/typescript-types",

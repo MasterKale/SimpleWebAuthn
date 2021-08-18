@@ -10,8 +10,44 @@ const { crypto } = KJUR;
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
  * @param certificates Typically the result of `x5c.map(convertASN1toPEM)`
+ * @param rootCertificates Possible root certificates to complete the path
  */
-export default async function validateCertificatePath(certificates: string[]): Promise<boolean> {
+export default async function validateCertificatePath(
+  certificates: string[],
+  rootCertificates: string[] = [],
+): Promise<boolean> {
+  if (rootCertificates.length === 0) {
+    // We have no root certs with which to create a full path, so skip path validation
+    // TODO: Is this going to be acceptable default behavior??
+    return true;
+  }
+
+  let invalidSubjectAndIssuerError = false;
+  for (const rootCert of rootCertificates) {
+    try {
+      const certsWithRoot = certificates.concat([rootCert]);
+      await _validatePath(certsWithRoot);
+      // If we successfully validated a path then there's no need to continue
+      invalidSubjectAndIssuerError = false;
+      break;
+    } catch (err) {
+      if (err instanceof InvalidSubjectAndIssuer) {
+        invalidSubjectAndIssuerError = true;
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  // We tried multiple root certs and none of them worked
+  if (invalidSubjectAndIssuerError) {
+    throw new InvalidSubjectAndIssuer();
+  }
+
+  return true;
+}
+
+async function _validatePath(certificates: string[]): Promise<boolean> {
   if (new Set(certificates).size !== certificates.length) {
     throw new Error('Invalid certificate path: found duplicate certificates');
   }
@@ -50,7 +86,7 @@ export default async function validateCertificatePath(certificates: string[]): P
     }
 
     if (subjectCert.getIssuerString() !== issuerCert.getSubjectString()) {
-      throw new Error('Invalid certificate path: subject issuer did not match issuer subject');
+      throw new InvalidSubjectAndIssuer();
     }
 
     const subjectCertStruct = ASN1HEX.getTLVbyList(subjectCert.hex, 0, [0]);
@@ -67,4 +103,13 @@ export default async function validateCertificatePath(certificates: string[]): P
   }
 
   return true;
+}
+
+// Custom errors to help pass on certain errors
+class InvalidSubjectAndIssuer extends Error {
+  constructor() {
+    const message = 'Subject issuer did not match issuer subject';
+    super(message);
+    this.name = 'InvalidSubjectAndIssuer';
+  }
 }

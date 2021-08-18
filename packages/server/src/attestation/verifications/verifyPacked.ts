@@ -1,7 +1,8 @@
 import elliptic from 'elliptic';
 import NodeRSA from 'node-rsa';
 
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+
 import convertCOSEtoPKCS, {
   COSEKEYS,
   COSEALGHASH,
@@ -11,26 +12,22 @@ import convertCOSEtoPKCS, {
 } from '../../helpers/convertCOSEtoPKCS';
 import { FIDO_METADATA_ATTESTATION_TYPES } from '../../helpers/constants';
 import toHash from '../../helpers/toHash';
-import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import validateCertificatePath from '../../helpers/validateCertificatePath';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';
 import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
-import MetadataService from '../../metadata/metadataService';
+import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
-
-type Options = {
-  attStmt: AttestationStatement;
-  clientDataHash: Buffer;
-  authData: Buffer;
-  credentialPublicKey: Buffer;
-  aaguid: Buffer;
-};
 
 /**
  * Verify an attestation response with fmt 'packed'
  */
-export default async function verifyAttestationPacked(options: Options): Promise<boolean> {
-  const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid } = options;
+export default async function verifyAttestationPacked(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
+  const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid, rootCertificates } =
+    options;
 
   const { sig, x5c, alg } = attStmt;
 
@@ -48,7 +45,7 @@ export default async function verifyAttestationPacked(options: Options): Promise
   const pkcsPublicKey = convertCOSEtoPKCS(credentialPublicKey);
 
   if (x5c) {
-    const leafCert = convertX509CertToPEM(x5c[0]);
+    const leafCert = convertCertBufferToPEM(x5c[0]);
     const { subject, basicConstraintsCA, version, notBefore, notAfter } = getCertificateInfo(
       x5c[0],
     );
@@ -106,6 +103,13 @@ export default async function verifyAttestationPacked(options: Options): Promise
 
       try {
         await verifyAttestationWithMetadata(statement, alg, x5c);
+      } catch (err) {
+        throw new Error(`${err.message} (Packed|Full)`);
+      }
+    } else {
+      try {
+        // Try validating the certificate path using the root certificates set via SettingsService
+        await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
       } catch (err) {
         throw new Error(`${err.message} (Packed|Full)`);
       }

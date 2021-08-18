@@ -1,21 +1,17 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+
 import validateCertificatePath from '../../helpers/validateCertificatePath';
-import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import toHash from '../../helpers/toHash';
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 
-type Options = {
-  attStmt: AttestationStatement;
-  authData: Buffer;
-  clientDataHash: Buffer;
-  credentialPublicKey: Buffer;
-};
-
-export default async function verifyApple(options: Options): Promise<boolean> {
-  const { attStmt, authData, clientDataHash, credentialPublicKey } = options;
+export default async function verifyApple(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
+  const { attStmt, authData, clientDataHash, credentialPublicKey, rootCertificates } = options;
   const { x5c } = attStmt;
 
   if (!x5c) {
@@ -25,11 +21,8 @@ export default async function verifyApple(options: Options): Promise<boolean> {
   /**
    * Verify certificate path
    */
-  const certPath = x5c.map(convertX509CertToPEM);
-  certPath.push(AppleWebAuthnRootCertificate);
-
   try {
-    await validateCertificatePath(certPath);
+    await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
   } catch (err) {
     throw new Error(`${err.message} (Apple)`);
   }
@@ -77,25 +70,3 @@ export default async function verifyApple(options: Options): Promise<boolean> {
 
   return true;
 }
-
-/**
- * Apple WebAuthn Root CA PEM
- *
- * Downloaded from https://www.apple.com/certificateauthority/Apple_WebAuthn_Root_CA.pem
- *
- * Valid until 03/14/2045 @ 5:00 PM PST
- */
-const AppleWebAuthnRootCertificate = `-----BEGIN CERTIFICATE-----
-MIICEjCCAZmgAwIBAgIQaB0BbHo84wIlpQGUKEdXcTAKBggqhkjOPQQDAzBLMR8w
-HQYDVQQDDBZBcHBsZSBXZWJBdXRobiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJ
-bmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMB4XDTIwMDMxODE4MjEzMloXDTQ1MDMx
-NTAwMDAwMFowSzEfMB0GA1UEAwwWQXBwbGUgV2ViQXV0aG4gUm9vdCBDQTETMBEG
-A1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTB2MBAGByqGSM49
-AgEGBSuBBAAiA2IABCJCQ2pTVhzjl4Wo6IhHtMSAzO2cv+H9DQKev3//fG59G11k
-xu9eI0/7o6V5uShBpe1u6l6mS19S1FEh6yGljnZAJ+2GNP1mi/YK2kSXIuTHjxA/
-pcoRf7XkOtO4o1qlcaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUJtdk
-2cV4wlpn0afeaxLQG2PxxtcwDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMDA2cA
-MGQCMFrZ+9DsJ1PW9hfNdBywZDsWDbWFp28it1d/5w2RPkRX3Bbn/UbDTNLx7Jr3
-jAGGiQIwHFj+dJZYUJR786osByBelJYsVZd2GbHQu209b5RCmGQ21gpSAk9QZW4B
-1bWeT0vT
------END CERTIFICATE-----`;

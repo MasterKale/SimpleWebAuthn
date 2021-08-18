@@ -1,22 +1,16 @@
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
 
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
-import convertX509CertToPEM from '../../helpers/convertX509CertToPEM';
+import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import validateCertificatePath from '../../helpers/validateCertificatePath';
 import verifySignature from '../../helpers/verifySignature';
-
-type Options = {
-  attStmt: AttestationStatement;
-  clientDataHash: Buffer;
-  rpIdHash: Buffer;
-  credentialID: Buffer;
-  credentialPublicKey: Buffer;
-  aaguid: Buffer;
-};
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
  */
-export default function verifyAttestationFIDOU2F(options: Options): boolean {
+export default async function verifyAttestationFIDOU2F(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
   const {
     attStmt,
     clientDataHash,
@@ -24,6 +18,7 @@ export default function verifyAttestationFIDOU2F(options: Options): boolean {
     credentialID,
     credentialPublicKey,
     aaguid = '',
+    rootCertificates,
   } = options;
 
   const reservedByte = Buffer.from([0x00]);
@@ -53,7 +48,14 @@ export default function verifyAttestationFIDOU2F(options: Options): boolean {
     throw new Error(`AAGUID "${aaguidToHex}" was not expected value`);
   }
 
-  const leafCertPEM = convertX509CertToPEM(x5c[0]);
+  try {
+    // Try validating the certificate path using the root certificates set via SettingsService
+    await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
+  } catch (err) {
+    throw new Error(`${err.message} (FIDOU2F)`);
+  }
+
+  const leafCertPEM = convertCertBufferToPEM(x5c[0]);
 
   return verifySignature(sig, signatureBase, leafCertPEM);
 }
