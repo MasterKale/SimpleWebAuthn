@@ -21,10 +21,8 @@ export default async function verifyApple(
   /**
    * Verify certificate path
    */
-  const certPath = x5c.map(convertCertBufferToPEM);
-
   try {
-    await validateCertificatePath(certPath, rootCertificates);
+    await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
   } catch (err) {
     throw new Error(`${err.message} (Apple)`);
   }
