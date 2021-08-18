@@ -20,6 +20,7 @@ export {
 
 import type { GenerateAttestationOptionsOpts } from './attestation/generateAttestationOptions';
 import type { GenerateAssertionOptionsOpts } from './assertion/generateAssertionOptions';
+import type { MetadataStatement } from './services/metadataService';
 import type {
   VerifiedAttestation,
   VerifyAttestationResponseOpts,
@@ -32,6 +33,7 @@ import type {
 export type {
   GenerateAttestationOptionsOpts,
   GenerateAssertionOptionsOpts,
+  MetadataStatement,
   VerifyAttestationResponseOpts,
   VerifyAssertionResponseOpts,
   VerifiedAttestation,
