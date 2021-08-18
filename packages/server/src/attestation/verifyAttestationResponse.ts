@@ -4,7 +4,10 @@ import {
   COSEAlgorithmIdentifier,
 } from '@simplewebauthn/typescript-types';
 
-import decodeAttestationObject, { AttestationFormat } from '../helpers/decodeAttestationObject';
+import decodeAttestationObject, {
+  AttestationFormat,
+  AttestationStatement,
+} from '../helpers/decodeAttestationObject';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -288,4 +291,19 @@ export type VerifiedAttestation = {
     userVerified: boolean;
     attestationObject: Buffer;
   };
+};
+
+/**
+ * Values passed to all attestation format verifiers, from which they are free to use as they please
+ */
+export type AttestationFormatVerifierOpts = {
+  aaguid: Buffer;
+  attStmt: AttestationStatement;
+  authData: Buffer;
+  clientDataHash: Buffer;
+  credentialID: Buffer;
+  credentialPublicKey: Buffer;
+  rootCertificates: string[];
+  rpIdHash: Buffer;
+  verifyTimestampMS?: boolean;
 };
