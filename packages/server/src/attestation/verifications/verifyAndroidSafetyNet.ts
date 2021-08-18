@@ -101,11 +101,9 @@ export default async function verifyAttestationAndroidSafetyNet(
       throw new Error(`${err.message} (SafetyNet)`);
     }
   } else {
-    // Try validating the certificate path using the root certificates set via SettingsService
-    const path = HEADER.x5c.map(convertCertBufferToPEM);
-
     try {
-      await validateCertificatePath(path, rootCertificates);
+      // Try validating the certificate path using the root certificates set via SettingsService
+      await validateCertificatePath(HEADER.x5c.map(convertCertBufferToPEM), rootCertificates);
     } catch (err) {
       throw new Error(`${err.message} (SafetyNet)`);
     }
