@@ -1,8 +1,8 @@
 import { AttestationFormat } from '../helpers/decodeAttestationObject';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 
-import GSR1 from './defaultRootCerts/GSR1';
-import GSR2 from './defaultRootCerts/GSR2';
+import GlobalSign_Root_CA from './defaultRootCerts/GlobalSign_Root_CA';
+import GlobalSign_R2 from './defaultRootCerts/GlobalSign_R2';
 import Apple_WebAuthn_Root_CA from './defaultRootCerts/Apple_WebAuthn_Root_CA';
 
 class SettingsService {
@@ -52,7 +52,7 @@ const settingsService = new SettingsService();
 // Initialize default certificates
 settingsService.setRootCertificates({
   attestationFormat: 'android-safetynet',
-  certificates: [GSR2, GSR1],
+  certificates: [GlobalSign_R2, GlobalSign_Root_CA],
 });
 
 settingsService.setRootCertificates({

@@ -1,5 +1,5 @@
 /**
- * Apple WebAuthn Root CA PEM
+ * Apple WebAuthn Root CA
  *
  * Downloaded from https://www.apple.com/certificateauthority/Apple_WebAuthn_Root_CA.pem
  *

@@ -1,5 +1,5 @@
 /**
- * Google GlobalSign R2
+ * GlobalSign R2
  *
  * Downloaded from https://pki.goog/repo/certs/gsr2.pem
  *
