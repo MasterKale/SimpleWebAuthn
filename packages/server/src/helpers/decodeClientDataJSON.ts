@@ -10,7 +10,7 @@ export default function decodeClientDataJSON(data: string): ClientDataJSON {
   return clientData;
 }
 
-type ClientDataJSON = {
+export type ClientDataJSON = {
   type: string;
   challenge: string;
   origin: string;
