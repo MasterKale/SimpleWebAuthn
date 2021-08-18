@@ -1,9 +1,8 @@
 import { AttestationFormat } from '../helpers/decodeAttestationObject';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 
-import GlobalSign_Root_CA from './defaultRootCerts/GlobalSign_Root_CA';
-import GlobalSign_R2 from './defaultRootCerts/GlobalSign_R2';
-import Apple_WebAuthn_Root_CA from './defaultRootCerts/Apple_WebAuthn_Root_CA';
+import { GlobalSign_Root_CA, GlobalSign_R2 } from './defaultRootCerts/android-safetynet';
+import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple';
 
 class SettingsService {
   // Certificates are stored as PEM-formatted strings

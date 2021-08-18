@@ -3,8 +3,8 @@ import path from 'path';
 
 import settingsService from './settingsService';
 
-import GSR1 from './defaultRootCerts/GSR1';
-import Apple_WebAuthn_Root_CA from './defaultRootCerts/Apple_WebAuthn_Root_CA';
+import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet';
+import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple';
 
 function pemToBuffer(pem: string): Buffer {
   const trimmed = pem
@@ -16,7 +16,7 @@ function pemToBuffer(pem: string): Buffer {
 
 describe('setRootCertificate/getRootCertificate', () => {
   test('should accept cert as Buffer', () => {
-    const gsr1Buffer = pemToBuffer(GSR1);
+    const gsr1Buffer = pemToBuffer(GlobalSign_Root_CA);
     settingsService.setRootCertificates({
       attestationFormat: 'android-safetynet',
       certificates: [gsr1Buffer],
@@ -24,7 +24,7 @@ describe('setRootCertificate/getRootCertificate', () => {
 
     const certs = settingsService.getRootCertificates({ attestationFormat: 'android-safetynet' });
 
-    expect(certs).toEqual([GSR1]);
+    expect(certs).toEqual([GlobalSign_Root_CA]);
   });
 
   test('should accept cert as PEM string', () => {
