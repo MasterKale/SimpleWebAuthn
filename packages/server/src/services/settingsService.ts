@@ -1,8 +1,9 @@
-import fs from 'fs';
-import path from 'path';
-
 import { AttestationFormat } from '../helpers/decodeAttestationObject';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
+
+import GSR1 from './defaultRootCerts/GSR1';
+import GSR2 from './defaultRootCerts/GSR2';
+import Apple_WebAuthn_Root_CA from './defaultRootCerts/Apple_WebAuthn_Root_CA';
 
 class SettingsService {
   // Certificates are stored as PEM-formatted strings
@@ -49,35 +50,14 @@ class SettingsService {
 const settingsService = new SettingsService();
 
 // Initialize default certificates
-/**
- * Google GlobalSign R2
- *
- * Downloaded from https://pki.goog/gsr2/GSR2.crt
- *
- * Valid until 2021-12-15 @ 00:00 PST
- */
 settingsService.setRootCertificates({
   attestationFormat: 'android-safetynet',
-  certificates: [
-    fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR2.crt')),
-    fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/GSR1.crt')),
-  ],
+  certificates: [GSR2, GSR1],
 });
 
-/**
- * Apple WebAuthn Root CA PEM
- *
- * Downloaded from https://www.apple.com/certificateauthority/Apple_WebAuthn_Root_CA.pem
- *
- * Valid until 2045-03-14 @ 17:00 PST
- */
 settingsService.setRootCertificates({
   attestationFormat: 'apple',
-  certificates: [
-    fs.readFileSync(path.resolve(__dirname, './defaultRootCerts/Apple_WebAuthn_Root_CA.pem'), {
-      encoding: 'utf-8',
-    }),
-  ],
+  certificates: [Apple_WebAuthn_Root_CA],
 });
 
 export default settingsService;
