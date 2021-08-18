@@ -177,6 +177,9 @@ export default async function verifyAttestationResponse(
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
+  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
+  const rootCertificates = settingsService.getRootCertificates({ attestationFormat: fmt });
+
   // Prepare arguments to pass to the relevant verification method
   const verifierOpts: AttestationFormatVerifierOpts = {
     aaguid,
@@ -188,9 +191,6 @@ export default async function verifyAttestationResponse(
     rootCertificates,
     rpIdHash,
   };
-
-  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const rootCertificates = settingsService.getRootCertificates({ attestationFormat: fmt });
 
   /**
    * Verification can only be performed when attestation = 'direct'
