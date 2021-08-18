@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
 
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
@@ -10,20 +10,11 @@ import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
-type Options = {
-  attStmt: AttestationStatement;
-  clientDataHash: Buffer;
-  authData: Buffer;
-  aaguid: Buffer;
-  rootCertificates: string[];
-  verifyTimestampMS?: boolean;
-};
-
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
 export default async function verifyAttestationAndroidSafetyNet(
-  options: Options,
+  options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const {
     attStmt,

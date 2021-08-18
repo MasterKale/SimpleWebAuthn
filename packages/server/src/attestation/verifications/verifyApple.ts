@@ -1,21 +1,16 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import toHash from '../../helpers/toHash';
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 
-type Options = {
-  attStmt: AttestationStatement;
-  authData: Buffer;
-  clientDataHash: Buffer;
-  credentialPublicKey: Buffer;
-  rootCertificates: string[];
-};
-
-export default async function verifyApple(options: Options): Promise<boolean> {
+export default async function verifyApple(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
   const { attStmt, authData, clientDataHash, credentialPublicKey, rootCertificates } = options;
   const { x5c } = attStmt;
 

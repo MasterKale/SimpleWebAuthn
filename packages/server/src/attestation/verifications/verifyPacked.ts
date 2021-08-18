@@ -1,7 +1,8 @@
 import elliptic from 'elliptic';
 import NodeRSA from 'node-rsa';
 
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+
 import convertCOSEtoPKCS, {
   COSEKEYS,
   COSEALGHASH,
@@ -18,18 +19,12 @@ import decodeCredentialPublicKey from '../../helpers/decodeCredentialPublicKey';
 import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
-type Options = {
-  attStmt: AttestationStatement;
-  clientDataHash: Buffer;
-  authData: Buffer;
-  credentialPublicKey: Buffer;
-  aaguid: Buffer;
-};
-
 /**
  * Verify an attestation response with fmt 'packed'
  */
-export default async function verifyAttestationPacked(options: Options): Promise<boolean> {
+export default async function verifyAttestationPacked(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
   const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid } = options;
 
   const { sig, x5c, alg } = attStmt;

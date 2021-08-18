@@ -8,7 +8,8 @@ import {
   Name,
 } from '@peculiar/asn1-x509';
 
-import type { AttestationStatement } from '../../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../../verifyAttestationResponse';
+
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
@@ -22,15 +23,7 @@ import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
 import parseCertInfo from './parseCertInfo';
 import parsePubArea from './parsePubArea';
 
-type Options = {
-  aaguid: Buffer;
-  attStmt: AttestationStatement;
-  authData: Buffer;
-  credentialPublicKey: Buffer;
-  clientDataHash: Buffer;
-};
-
-export default async function verifyTPM(options: Options): Promise<boolean> {
+export default async function verifyTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash } = options;
   const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
 

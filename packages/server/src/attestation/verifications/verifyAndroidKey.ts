@@ -2,22 +2,20 @@ import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 import { KeyDescription, id_ce_keyDescription } from '@peculiar/asn1-android';
 
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import verifySignature from '../../helpers/verifySignature';
 import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
 import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
 
-type Options = {
-  authData: Buffer;
-  clientDataHash: Buffer;
-  attStmt: AttestationStatement;
-  credentialPublicKey: Buffer;
-  aaguid: Buffer;
-};
-
-export default async function verifyAttestationAndroidKey(options: Options): Promise<boolean> {
+/**
+ * Verify an attestation response with fmt 'android-key'
+ */
+export default async function verifyAttestationAndroidKey(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
   const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid } = options;
   const { x5c, sig, alg } = attStmt;
 

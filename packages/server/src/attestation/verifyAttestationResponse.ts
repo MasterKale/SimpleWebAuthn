@@ -177,6 +177,18 @@ export default async function verifyAttestationResponse(
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
+  // Prepare arguments to pass to the relevant verification method
+  const verifierOpts: AttestationFormatVerifierOpts = {
+    aaguid,
+    attStmt,
+    authData,
+    clientDataHash,
+    credentialID,
+    credentialPublicKey,
+    rootCertificates,
+    rpIdHash,
+  };
+
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const rootCertificates = settingsService.getRootCertificates({ attestationFormat: fmt });
 
@@ -185,54 +197,17 @@ export default async function verifyAttestationResponse(
    */
   let verified = false;
   if (fmt === 'fido-u2f') {
-    verified = verifyFIDOU2F({
-      attStmt,
-      clientDataHash,
-      credentialID,
-      credentialPublicKey,
-      rpIdHash,
-      aaguid,
-    });
+    verified = verifyFIDOU2F(verifierOpts);
   } else if (fmt === 'packed') {
-    verified = await verifyPacked({
-      attStmt,
-      authData,
-      clientDataHash,
-      credentialPublicKey,
-      aaguid,
-    });
+    verified = await verifyPacked(verifierOpts);
   } else if (fmt === 'android-safetynet') {
-    verified = await verifyAndroidSafetynet({
-      attStmt,
-      authData,
-      clientDataHash,
-      aaguid,
-      rootCertificates,
-    });
+    verified = await verifyAndroidSafetynet(verifierOpts);
   } else if (fmt === 'android-key') {
-    verified = await verifyAndroidKey({
-      attStmt,
-      authData,
-      clientDataHash,
-      credentialPublicKey,
-      aaguid,
-    });
+    verified = await verifyAndroidKey(verifierOpts);
   } else if (fmt === 'tpm') {
-    verified = await verifyTPM({
-      aaguid,
-      attStmt,
-      authData,
-      credentialPublicKey,
-      clientDataHash,
-    });
+    verified = await verifyTPM(verifierOpts);
   } else if (fmt === 'apple') {
-    verified = await verifyApple({
-      attStmt,
-      authData,
-      clientDataHash,
-      credentialPublicKey,
-      rootCertificates,
-    });
+    verified = await verifyApple(verifierOpts);
   } else if (fmt === 'none') {
     if (Object.keys(attStmt).length > 0) {
       throw new Error('None attestation had unexpected attestation statement');

@@ -1,22 +1,13 @@
-import type { AttestationStatement } from '../../helpers/decodeAttestationObject';
+import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
 
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import verifySignature from '../../helpers/verifySignature';
 
-type Options = {
-  attStmt: AttestationStatement;
-  clientDataHash: Buffer;
-  rpIdHash: Buffer;
-  credentialID: Buffer;
-  credentialPublicKey: Buffer;
-  aaguid: Buffer;
-};
-
 /**
  * Verify an attestation response with fmt 'fido-u2f'
  */
-export default function verifyAttestationFIDOU2F(options: Options): boolean {
+export default function verifyAttestationFIDOU2F(options: AttestationFormatVerifierOpts): boolean {
   const {
     attStmt,
     clientDataHash,
