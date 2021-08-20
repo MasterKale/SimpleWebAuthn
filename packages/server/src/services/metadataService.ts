@@ -89,11 +89,8 @@ class MetadataService {
 
       for (const server of mdsServers) {
         try {
-          await this.downloadTOC({
-            url: server.url,
-            rootCertURL: server.rootCertURL,
-            metadataURLSuffix: server.metadataURLSuffix,
-            alg: '',
+          await this.downloadBlob({
+            url,
             no: 0,
             nextUpdate: new Date(0),
           });
@@ -145,13 +142,13 @@ class MetadataService {
     }
 
     // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
-    if (cachedStatement.tocURL) {
-      const mds = this.mdsCache[cachedStatement.tocURL];
+    if (cachedStatement.url) {
+      const mds = this.mdsCache[cachedStatement.url];
       const now = new Date();
       if (now > mds.nextUpdate) {
         try {
           this.setState(SERVICE_STATE.REFRESHING);
-          await this.downloadTOC(mds);
+          await this.downloadBlob(mds);
         } finally {
           this.setState(SERVICE_STATE.READY);
         }
@@ -200,16 +197,15 @@ class MetadataService {
   }
 
   /**
-   * Download and process the latest TOC from MDS
+   * Download and process the latest BLOB from MDS
    */
-  private async downloadTOC(mds: CachedMDS) {
-    const { url, no, rootCertURL, metadataURLSuffix } = mds;
+  private async downloadBlob(mds: CachedMDS) {
+    const { url, no } = mds;
+    // Get latest "BLOB" (FIDO's terminology, not mine)
+    const resp = await fetch(url);
+    const data = await resp.text();
 
-    // Query MDS for the latest TOC
-    const respTOC = await fetch(url);
-    const data = await respTOC.text();
-
-    // Break apart the JWT we get back
+    // Parse the JWT
     const parsedJWT = parseJWT<MDSJWTHeader, MDSJWTPayload>(data);
     const header = parsedJWT[0];
     const payload = parsedJWT[1];
@@ -220,25 +216,19 @@ class MetadataService {
       throw new Error(`Latest TOC no. "${payload.no}" is not greater than previous ${no}`);
     }
 
-    let fullCertPath = header.x5c.map(convertCertBufferToPEM);
-    if (rootCertURL.length > 0) {
-      // Download FIDO the root certificate and append it to the TOC certs
-      const respFIDORootCert = await fetch(rootCertURL);
-      const fidoRootCert = await respFIDORootCert.text();
-      fullCertPath = fullCertPath.concat(fidoRootCert);
-    }
-
+    const headerCertsPEM = header.x5c.map(convertCertBufferToPEM);
     try {
       // Validate the certificate chain
-      await validateCertificatePath(fullCertPath);
+      const rootCerts = SettingsService.getRootCertificates({ identifier: 'mds' });
+      await validateCertificatePath(headerCertsPEM, rootCerts);
     } catch (err) {
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
-      throw new Error(`TOC certificate path could not be validated: ${err.message}`);
+      throw new Error(`BLOB certificate path could not be validated: ${err.message}`);
     }
 
     // Verify the TOC JWT signature
-    const leafCert = fullCertPath[0];
+    const leafCert = headerCertsPEM[0];
     const verified = KJUR.jws.JWS.verifyJWT(data, leafCert, {
       alg: [header.alg],
       // Empty values to appease TypeScript and this library's subtly mis-typed @types definitions
@@ -249,32 +239,21 @@ class MetadataService {
 
     if (!verified) {
       // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
-      throw new Error('TOC signature could not be verified');
+      throw new Error('BLOB signature could not be verified');
     }
 
-    // Prepare the in-memory cache of statements.
+    // Cache statements for FIDO2 devices
     for (const entry of payload.entries) {
       // Only cache entries with an `aaguid`
       if (entry.aaguid) {
-        const _entry = entry as TOCAAGUIDEntry;
-        const cached: CachedAAGUID = {
-          url: `${entry.url}${metadataURLSuffix}`,
-          hash: entry.hash,
-          statusReports: entry.statusReports,
-          // An easy way for us to link back to a cached MDS API entry
-          tocURL: url,
-        };
-
-        this.statementCache[_entry.aaguid] = cached;
+        this.statementCache[entry.aaguid] = { entry, url };
       }
     }
 
-    // Cache this MDS API
+    // Remember info about the server so we can refresh later
     const [year, month, day] = payload.nextUpdate.split('-');
     this.mdsCache[url] = {
       ...mds,
-      // Store the header `alg` so we know what to use when verifying metadata statement hashes
-      alg: header.alg,
       // Store the payload `no` to make sure we're getting the next TOC in the sequence
       no: payload.no,
       // Convert the nextUpdate property into a Date so we can determine when to re-download
