@@ -17,26 +17,16 @@ import type {
 
 import parseJWT from '../metadata/parseJWT';
 
-// Cached WebAuthn metadata statements
-type CachedAAGUID = {
-  url: MDSEntry['url'];
-  hash: MDSEntry['hash'];
-  statusReports: MDSEntry['statusReports'];
-  statement?: MetadataStatement;
-  tocURL?: CachedMDS['url'];
-};
-
-// Cached MDS APIs from which TOCs are downloaded
+// Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
   url: string;
-  alg: string;
   no: number;
   nextUpdate: Date;
-  rootCertURL: string;
-  // Specify a query param, etc... to be appended to the end of a metadata statement URL
-  // TODO: This will need to be extended later, for now support FIDO MDS API that requires an API
-  // token passed as a query param
-  metadataURLSuffix: string;
+};
+
+type CachedBLOBEntry = {
+  entry: MetadataBLOBPayloadEntry;
+  url: string;
 };
 
 enum SERVICE_STATE {
@@ -53,7 +43,7 @@ enum SERVICE_STATE {
  */
 class MetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
-  private statementCache: { [aaguid: string]: CachedAAGUID } = {};
+  private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
 
   /**
