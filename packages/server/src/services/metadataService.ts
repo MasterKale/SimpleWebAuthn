@@ -111,7 +111,7 @@ class MetadataService {
    * This method will coordinate updating the TOC as per the `nextUpdate` property in the initial
    * TOC download.
    */
-  async getStatement(aaguid: string | Buffer): Promise<MetadataBLOBPayloadEntry | undefined> {
+  async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
       return;
     }
@@ -165,7 +165,7 @@ class MetadataService {
       }
     }
 
-    return entry;
+    return entry.metadataStatement;
   }
 
   /**
