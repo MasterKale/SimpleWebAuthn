@@ -1,9 +1,8 @@
 import { Base64URLString } from '@simplewebauthn/typescript-types';
 
-import { FIDO_AUTHENTICATOR_STATUS } from '../helpers/constants';
-
 /**
- * Parsed JWT structures
+ * Metadata Service structures
+ * https://fidoalliance.org/specs/mds/fido-metadata-service-v3.0-ps-20210518.html
  */
 export type MDSJWTHeader = {
   alg: string;
@@ -15,26 +14,59 @@ export type MDSJWTPayload = {
   legalHeader: string;
   no: number;
   nextUpdate: string; // YYYY-MM-DD
-  entries: MDSEntry[];
+  entries: MetadataBLOBPayloadEntry[];
 };
 
-export type MDSEntry = {
+export type MetadataBLOBPayloadEntry = {
+  aaid?: string;
+  aaguid?: string;
   attestationCertificateKeyIdentifiers?: string[];
-  metadataStatement: MetadataStatement;
-  statusReports: {
-    status: FIDO_AUTHENTICATOR_STATUS;
-    certificateNumber: string;
-    certificate: string;
-    certificationDescriptor: string;
-    url: string;
-    certificationRequirementsVersion: string;
-    certificationPolicyVersion: string;
-    // YYYY-MM-DD
-    effectiveDate: string;
-  }[];
-  // YYYY-MM-DD
-  timeOfLastStatusChange: string;
+  metadataStatement?: MetadataStatement;
+  biometricStatusReports?: BiometricStatusReport[];
+  statusReports: StatusReport[];
+  timeOfLastStatusChange: string; // YYYY-MM-DD
+  rogueListURL?: string;
+  rogueListHash?: string;
 };
+
+export type BiometricStatusReport = {
+  certLevel: number;
+  modality: UserVerify;
+  effectiveDate?: string;
+  certificationDescriptor?: string;
+  certificateNumber?: string;
+  certificationPolicyVersion?: string;
+  certificationRequirementsVersion?: string;
+};
+
+export type StatusReport = {
+  status: AuthenticatorStatus;
+  effectiveDate?: string; // YYYY-MM-DD
+  authenticatorVersion?: number;
+  certificate?: string;
+  url?: string;
+  certificationDescriptor?: string;
+  certificateNumber?: string;
+  certificationPolicyVersion?: string;
+  certificationRequirementsVersion?: string;
+};
+
+export type AuthenticatorStatus =
+  | 'NOT_FIDO_CERTIFIED'
+  | 'FIDO_CERTIFIED'
+  | 'USER_VERIFICATION_BYPASS'
+  | 'ATTESTATION_KEY_COMPROMISE'
+  | 'USER_KEY_REMOTE_COMPROMISE'
+  | 'USER_KEY_PHYSICAL_COMPROMISE'
+  | 'UPDATE_AVAILABLE'
+  | 'REVOKED'
+  | 'SELF_ASSERTION_SUBMITTED'
+  | 'FIDO_CERTIFIED_L1'
+  | 'FIDO_CERTIFIED_L1plus'
+  | 'FIDO_CERTIFIED_L2'
+  | 'FIDO_CERTIFIED_L2plus'
+  | 'FIDO_CERTIFIED_L3'
+  | 'FIDO_CERTIFIED_L3plus';
 
 /**
  * Types defined in the FIDO Metadata Statement spec
