@@ -1,13 +1,17 @@
-import { Base64URLString } from '@simplewebauthn/typescript-types';
 import fetch from 'node-fetch';
 import { KJUR } from 'jsrsasign';
 import base64url from 'base64url';
 
-import { FIDO_AUTHENTICATOR_STATUS } from '../helpers/constants';
 import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+import type {
+  MDSJWTHeader,
+  MDSJWTPayload,
+  MDSEntry,
+  MetadataStatement,
+} from '../metadata/mdsTypes';
 // TODO: Re-enable this once we figure out logging
 // import { log } from '../helpers/logging';
 
@@ -346,66 +350,3 @@ class MetadataService {
 const metadataService = new MetadataService();
 
 export default metadataService;
-
-/**
- * https://fidoalliance.org/specs/mds/fido-metadata-statement-v3.0-ps-20210518.html#metadata-keys
- */
-export type MetadataStatement = {
-  legalHeader: string;
-  aaid?: string;
-  aaguid?: string;
-  attestationCertificateKeyIdentifiers?: string[];
-  description: string;
-  assertionScheme: string;
-  attachmentHint: number;
-  attestationRootCertificates: Base64URLString[];
-  attestationTypes: number[];
-  authenticationAlgorithm: number;
-  authenticatorVersion: number;
-  icon: string;
-  isSecondFactorOnly: string;
-  keyProtection: number;
-  matcherProtection: number;
-  protocolFamily: string;
-  publicKeyAlgAndEncoding: number;
-  tcDisplay: number;
-  tcDisplayContentType: string;
-  upv: [{ major: number; minor: number }];
-  userVerificationDetails: [[{ userVerification: 1 }]];
-};
-
-type MDSJWTHeader = {
-  alg: string;
-  typ: string;
-  x5c: Base64URLString[];
-};
-
-type MDSJWTPayload = {
-  legalHeader: string;
-  no: number;
-  // YYYY-MM-DD
-  nextUpdate: string;
-  entries: MDSEntry[];
-};
-
-type MDSEntry = {
-  attestationCertificateKeyIdentifiers: string[];
-  metadataStatement: MetadataStatement;
-  statusReports: {
-    status: FIDO_AUTHENTICATOR_STATUS;
-    certificateNumber: string;
-    certificate: string;
-    certificationDescriptor: string;
-    url: string;
-    certificationRequirementsVersion: string;
-    certificationPolicyVersion: string;
-    // YYYY-MM-DD
-    effectiveDate: string;
-  }[];
-  // YYYY-MM-DD
-  timeOfLastStatusChange: string;
-};
-
-type TOCAAGUIDEntry = Omit<MDSEntry, 'aaid'> & {
-  aaguid: string;
-};
