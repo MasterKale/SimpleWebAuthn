@@ -1,17 +1,16 @@
 import fetch from 'node-fetch';
 import { KJUR } from 'jsrsasign';
-import base64url from 'base64url';
 
-import toHash from '../helpers/toHash';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 import type {
   MDSJWTHeader,
   MDSJWTPayload,
-  MDSEntry,
   MetadataStatement,
+  MetadataBLOBPayloadEntry,
 } from '../metadata/mdsTypes';
+import SettingsService from '../services/settingsService';
 // TODO: Re-enable this once we figure out logging
 // import { log } from '../helpers/logging';
 
@@ -28,6 +27,8 @@ type CachedBLOBEntry = {
   entry: MetadataBLOBPayloadEntry;
   url: string;
 };
+
+const defaultURLMDS = 'https://mds.fidoalliance.org/'; // v3
 
 enum SERVICE_STATE {
   DISABLED,
