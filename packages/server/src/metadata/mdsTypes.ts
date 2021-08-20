@@ -73,14 +73,14 @@ export type AuthenticatorStatus =
  *
  * See https://fidoalliance.org/specs/mds/fido-metadata-statement-v3.0-ps-20210518.html
  */
-type CodeAccuracyDescriptor = {
+export type CodeAccuracyDescriptor = {
   base: number;
   minLength: number;
   maxRetries?: number;
   blockSlowdown?: number;
 };
 
-type BiometricAccuracyDescriptor = {
+export type BiometricAccuracyDescriptor = {
   selfAttestedFRR?: number;
   selfAttestedFAR?: number;
   maxTemplates?: number;
@@ -88,28 +88,28 @@ type BiometricAccuracyDescriptor = {
   blockSlowdown?: number;
 };
 
-type PatternAccuracyDescriptor = {
+export type PatternAccuracyDescriptor = {
   minComplexity: number;
   maxRetries?: number;
   blockSlowdown?: number;
 };
 
-type VerificationMethodDescriptor = {
+export type VerificationMethodDescriptor = {
   userVerificationMethod: UserVerify;
   caDesc?: CodeAccuracyDescriptor;
   baDesc?: BiometricAccuracyDescriptor;
   paDesc?: PatternAccuracyDescriptor;
 };
 
-type VerificationMethodANDCombinations = VerificationMethodDescriptor[];
+export type VerificationMethodANDCombinations = VerificationMethodDescriptor[];
 
-type rgbPaletteEntry = {
+export type rgbPaletteEntry = {
   r: number;
   g: number;
   b: number;
 };
 
-type DisplayPNGCharacteristicsDescriptor = {
+export type DisplayPNGCharacteristicsDescriptor = {
   width: number;
   height: number;
   bitDepth: number;
@@ -120,7 +120,7 @@ type DisplayPNGCharacteristicsDescriptor = {
   plte?: rgbPaletteEntry[];
 };
 
-type EcdaaTrustAnchor = {
+export type EcdaaTrustAnchor = {
   X: string;
   Y: string;
   c: string;
@@ -129,7 +129,7 @@ type EcdaaTrustAnchor = {
   G1Curve: string;
 };
 
-type ExtensionDescriptor = {
+export type ExtensionDescriptor = {
   id: string;
   tag?: number;
   data?: string;
@@ -137,7 +137,7 @@ type ExtensionDescriptor = {
 };
 
 // langCode -> "en-US", "ja-JP", etc...
-type AlternativeDescriptions = { [langCode: string]: string };
+export type AlternativeDescriptions = { [langCode: string]: string };
 
 export type MetadataStatement = {
   legalHeader?: string;
@@ -178,7 +178,7 @@ export type MetadataStatement = {
  * USER_VERIFY
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#user-verification-methods
  */
-type UserVerify =
+export type UserVerify =
   | 'presence_internal'
   | 'fingerprint_internal'
   | 'passcode_internal'
@@ -197,7 +197,7 @@ type UserVerify =
  * ALG_SIGN
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authentication-algorithms
  */
-type AlgSign =
+export type AlgSign =
   | 'secp256r1_ecdsa_sha256_raw'
   | 'secp256r1_ecdsa_sha256_der'
   | 'rsassa_pss_sha256_raw'
@@ -221,31 +221,31 @@ type AlgSign =
  * ALG_KEY
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#public-key-representation-formats
  */
-type AlgKey = 'ecc_x962_raw' | 'ecc_x962_der' | 'rsa_2048_raw' | 'rsa_2048_der' | 'cose';
+export type AlgKey = 'ecc_x962_raw' | 'ecc_x962_der' | 'rsa_2048_raw' | 'rsa_2048_der' | 'cose';
 
 /**
  * ATTESTATION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authenticator-attestation-types
  */
-type Attestation = 'basic_full' | 'basic_surrogate' | 'ecdaa' | 'attca';
+export type Attestation = 'basic_full' | 'basic_surrogate' | 'ecdaa' | 'attca';
 
 /**
  * KEY_PROTECTION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#key-protection-types
  */
-type KeyProtection = 'software' | 'hardware' | 'tee' | 'secure_element' | 'remote_handle';
+export type KeyProtection = 'software' | 'hardware' | 'tee' | 'secure_element' | 'remote_handle';
 
 /**
  * MATCHER_PROTECTION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#matcher-protection-types
  */
-type MatcherProtection = 'software' | 'tee' | 'on_chip';
+export type MatcherProtection = 'software' | 'tee' | 'on_chip';
 
 /**
  * ATTACHMENT_HINT
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authenticator-attachment-hints
  */
-type AttachmentHint =
+export type AttachmentHint =
   | 'internal'
   | 'external'
   | 'wired'
@@ -260,12 +260,17 @@ type AttachmentHint =
  * TRANSACTION_CONFIRMATION_DISPLAY
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#transaction-confirmation-display-types
  */
-type TransactionConfirmationDisplay = 'any' | 'privileged_software' | 'tee' | 'hardware' | 'remote';
+export type TransactionConfirmationDisplay =
+  | 'any'
+  | 'privileged_software'
+  | 'tee'
+  | 'hardware'
+  | 'remote';
 
 /**
  * https://fidoalliance.org/specs/fido-uaf-v1.2-ps-20201020/fido-uaf-protocol-v1.2-ps-20201020.html#version-interface
  */
-type Version = {
+export type Version = {
   major: number;
   minor: number;
 };
@@ -273,7 +278,7 @@ type Version = {
 /**
  * https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticatorGetInfoz
  */
-type AuthenticatorGetInfo = {
+export type AuthenticatorGetInfo = {
   versions: ('FIDO_2_0' | 'U2F_V2')[];
   extensions?: string[];
   aaguid: string;
