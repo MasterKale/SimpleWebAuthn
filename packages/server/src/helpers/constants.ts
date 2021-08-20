@@ -37,18 +37,3 @@ export const FIDO_METADATA_AUTH_ALG_TO_COSE: { [algKey: number]: COSEInfo } = {
   // ALG_SIGN_SECP521R1_ECDSA_SHA512_RAW
   18: { kty: 1, alg: -8, crv: 6 },
 };
-
-/**
- * A map of ATTESTATION hex values (as unsigned shorts). Values should appear in a metadata
- * statement's `attestationTypes` property.
- *
- * From https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-registry-v2.0-rd-20180702.html
- * FIDO Registry of Predefined Values - 3.6.3 Authenticator Attestation Types
- */
-export enum FIDO_METADATA_ATTESTATION_TYPES {
-  ATTESTATION_BASIC_FULL = 15879,
-  // Self attestation
-  ATTESTATION_BASIC_SURROGATE = 15880,
-  ATTESTATION_ECDAA = 15881,
-  ATTESTATION_ATTCA = 15882,
-}
