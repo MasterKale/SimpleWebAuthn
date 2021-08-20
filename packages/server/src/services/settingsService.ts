@@ -10,7 +10,7 @@ import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple';
 
 class SettingsService {
   // Certificates are stored as PEM-formatted strings
-  private pemCertificates: Map<AttestationFormat, string[]>;
+  private pemCertificates: Map<RootCertIdentifier, string[]>;
 
   constructor() {
     this.pemCertificates = new Map();
@@ -24,10 +24,10 @@ class SettingsService {
    * `Buffer` is passed in it will be converted to PEM format.
    */
   setRootCertificates(opts: {
-    attestationFormat: AttestationFormat;
+    identifier: RootCertIdentifier;
     certificates: (Buffer | string)[];
   }): void {
-    const { attestationFormat, certificates } = opts;
+    const { identifier, certificates } = opts;
 
     const newCertificates: string[] = [];
     for (const cert of certificates) {
@@ -38,15 +38,15 @@ class SettingsService {
       }
     }
 
-    this.pemCertificates.set(attestationFormat, newCertificates);
+    this.pemCertificates.set(identifier, newCertificates);
   }
 
   /**
    * Get any registered root certificates for the specified attestation format
    */
-  getRootCertificates(opts: { attestationFormat: AttestationFormat }): string[] {
-    const { attestationFormat } = opts;
-    return this.pemCertificates.get(attestationFormat) ?? [];
+  getRootCertificates(opts: { identifier: RootCertIdentifier }): string[] {
+    const { identifier } = opts;
+    return this.pemCertificates.get(identifier) ?? [];
   }
 }
 
@@ -54,18 +54,20 @@ const settingsService = new SettingsService();
 
 // Initialize default certificates
 settingsService.setRootCertificates({
-  attestationFormat: 'android-key',
+  identifier: 'android-key',
   certificates: [Google_Hardware_Attestation_Root_1, Google_Hardware_Attestation_Root_2],
 });
 
 settingsService.setRootCertificates({
-  attestationFormat: 'android-safetynet',
+  identifier: 'android-safetynet',
   certificates: [GlobalSign_R2, GlobalSign_Root_CA],
 });
 
 settingsService.setRootCertificates({
-  attestationFormat: 'apple',
+  identifier: 'apple',
   certificates: [Apple_WebAuthn_Root_CA],
 });
+
+type RootCertIdentifier = AttestationFormat | 'mds';
 
 export default settingsService;
