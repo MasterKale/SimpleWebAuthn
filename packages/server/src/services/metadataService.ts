@@ -116,7 +116,7 @@ class MetadataService {
    * This method will coordinate updating the TOC as per the `nextUpdate` property in the initial
    * TOC download.
    */
-  async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
+  async getStatement(aaguid: string | Buffer): Promise<MetadataBLOBPayloadEntry | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
       return;
     }
@@ -155,8 +155,10 @@ class MetadataService {
       }
     }
 
+    const { entry } = cachedStatement;
+
     // Check to see if the this aaguid has a status report with a "compromised" status
-    for (const report of cachedStatement.statusReports) {
+    for (const report of entry.statusReports) {
       const { status } = report;
       if (
         status === 'USER_VERIFICATION_BYPASS' ||
@@ -168,32 +170,7 @@ class MetadataService {
       }
     }
 
-    // If the statement hasn't been cached but came from an MDS TOC, then download it
-    if (!cachedStatement.statement && cachedStatement.tocURL) {
-      // Download the metadata statement if it's not been cached
-      const resp = await fetch(cachedStatement.url);
-      const data = await resp.text();
-      const statement: MetadataStatement = JSON.parse(
-        Buffer.from(data, 'base64').toString('utf-8'),
-      );
-
-      const mds = this.mdsCache[cachedStatement.tocURL];
-
-      const hashAlg = mds?.alg === 'ES256' ? 'SHA256' : undefined;
-      const calculatedHash = base64url.encode(toHash(data, hashAlg));
-
-      if (calculatedHash === cachedStatement.hash) {
-        // Update the cached entry with the latest statement
-        cachedStatement.statement = statement;
-      } else {
-        // From FIDO MDS docs: "Ignore the downloaded metadata statement if the hash value doesn't
-        // match."
-        cachedStatement.statement = undefined;
-        throw new Error(`Downloaded metadata for aaguid "${aaguid}" but hash did not match`);
-      }
-    }
-
-    return cachedStatement.statement;
+    return entry;
   }
 
   /**
