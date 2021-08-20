@@ -178,7 +178,7 @@ export default async function verifyAttestationResponse(
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const rootCertificates = settingsService.getRootCertificates({ attestationFormat: fmt });
+  const rootCertificates = settingsService.getRootCertificates({ identifier: fmt });
 
   // Prepare arguments to pass to the relevant verification method
   const verifierOpts: AttestationFormatVerifierOpts = {
