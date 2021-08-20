@@ -1,6 +1,6 @@
 import { Base64URLString } from '@simplewebauthn/typescript-types';
 
-import { MetadataStatement } from '../services/metadataService';
+import { MetadataStatement } from '../metadata/mdsTypes';
 import { FIDO_METADATA_AUTH_ALG_TO_COSE } from '../helpers/constants';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../helpers/validateCertificatePath';
