@@ -49,21 +49,13 @@ class MetadataService {
   /**
    * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
    */
-  async initialize(opts: {
-    mdsServers: Pick<CachedMDS, 'url' | 'rootCertURL' | 'metadataURLSuffix'>[];
-    statements?: MetadataStatement[];
-  }): Promise<void> {
-    if (!opts) {
-      throw new Error('MetadataService initialization options are missing');
-    }
-
-    const { mdsServers, statements } = opts;
-
-    if (!mdsServers?.length && !statements?.length) {
-      throw new Error(
-        'MetadataService must be initialized with at least one MDS server or local metadata statement(s)',
-      );
-    }
+  async initialize(
+    opts: {
+      mdsServers?: string[];
+      statements?: MetadataStatement[];
+    } = {},
+  ): Promise<void> {
+    const { mdsServers = [defaultURLMDS], statements } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
 
@@ -73,10 +65,12 @@ class MetadataService {
         // Only cache statements that are for FIDO2-compatible authenticators
         if (statement.aaguid) {
           this.statementCache[statement.aaguid] = {
+            entry: {
+              metadataStatement: statement,
+              statusReports: [],
+              timeOfLastStatusChange: '1970-01-01',
+            },
             url: '',
-            hash: '',
-            statement,
-            statusReports: [],
           };
         }
       });
@@ -87,7 +81,7 @@ class MetadataService {
       // TODO: Re-enable this once we figure out logging
       // const currentCacheCount = Object.keys(this.statementCache).length;
 
-      for (const server of mdsServers) {
+      for (const url of mdsServers) {
         try {
           await this.downloadBlob({
             url,
@@ -97,7 +91,7 @@ class MetadataService {
         } catch (err) {
           // Notify of the error and move on
           // TODO: Re-enable this once we figure out logging
-          // log('warning', `Could not download TOC from ${server.url}:`, err);
+          // log('warning', `Could not download BLOB from ${url}:`, err);
         }
       }
 
