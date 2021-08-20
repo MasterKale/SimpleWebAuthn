@@ -7,6 +7,7 @@ import {
   Google_Hardware_Attestation_Root_2,
 } from './defaultRootCerts/android-key';
 import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple';
+import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds';
 
 class SettingsService {
   // Certificates are stored as PEM-formatted strings
@@ -66,6 +67,11 @@ settingsService.setRootCertificates({
 settingsService.setRootCertificates({
   identifier: 'apple',
   certificates: [Apple_WebAuthn_Root_CA],
+});
+
+settingsService.setRootCertificates({
+  identifier: 'mds',
+  certificates: [GlobalSign_Root_CA_R3],
 });
 
 type RootCertIdentifier = AttestationFormat | 'mds';
