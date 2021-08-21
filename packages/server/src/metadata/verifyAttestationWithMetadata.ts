@@ -4,6 +4,10 @@ import { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 
+/**
+ * Match properties of the authenticator's attestation statement against expected values as
+ * registered with the FIDO Alliance Metadata Service
+ */
 export default async function verifyAttestationWithMetadata(
   statement: MetadataStatement,
   alg: number,
