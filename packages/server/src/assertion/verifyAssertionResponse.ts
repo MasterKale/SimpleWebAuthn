@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import {
-  AssertionCredentialJSON,
+  AuthenticationCredentialJSON,
   AuthenticatorDevice,
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
@@ -13,7 +13,7 @@ import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
 
 export type VerifyAssertionResponseOpts = {
-  credential: AssertionCredentialJSON;
+  credential: AuthenticationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
   expectedRPID: string | string[];

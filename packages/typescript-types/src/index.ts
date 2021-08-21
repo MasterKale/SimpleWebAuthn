@@ -60,7 +60,7 @@ export interface RegistrationCredential extends PublicKeyCredential {
 }
 
 /**
- * A slightly-modified AttestationCredential to simplify working with ArrayBuffers that
+ * A slightly-modified RegistrationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
  */
 export interface RegistrationCredentialJSON
@@ -74,16 +74,16 @@ export interface RegistrationCredentialJSON
 /**
  * The value returned from navigator.credentials.get()
  */
-export interface AssertionCredential extends PublicKeyCredential {
+export interface AuthenticationCredential extends PublicKeyCredential {
   response: AuthenticatorAssertionResponse;
 }
 
 /**
- * A slightly-modified AssertionCredential to simplify working with ArrayBuffers that
+ * A slightly-modified AuthenticationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface AssertionCredentialJSON
-  extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+export interface AuthenticationCredentialJSON
+  extends Omit<AuthenticationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;

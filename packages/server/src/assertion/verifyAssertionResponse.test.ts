@@ -4,7 +4,10 @@ import verifyAssertionResponse from './verifyAssertionResponse';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
-import { AuthenticatorDevice, AssertionCredentialJSON } from '@simplewebauthn/typescript-types';
+import {
+  AuthenticatorDevice,
+  AuthenticationCredentialJSON,
+} from '@simplewebauthn/typescript-types';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -261,7 +264,7 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
  * Assertion examples below
  */
 
-const assertionResponse: AssertionCredentialJSON = {
+const assertionResponse: AuthenticationCredentialJSON = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   rawId: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   response: {
@@ -293,7 +296,7 @@ const authenticator: AuthenticatorDevice = {
 /**
  * Represented a device that's being used on the website for the first time
  */
-const assertionFirstTimeUsedResponse: AssertionCredentialJSON = {
+const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
   id: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   rawId: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   response: {
