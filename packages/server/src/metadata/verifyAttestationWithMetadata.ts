@@ -1,6 +1,6 @@
 import { Base64URLString } from '@simplewebauthn/typescript-types';
 
-import { MetadataStatement } from '../metadata/mdsTypes';
+import { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 
@@ -9,10 +9,20 @@ export default async function verifyAttestationWithMetadata(
   alg: number,
   x5c: Buffer[] | Base64URLString[],
 ): Promise<boolean> {
-  // Make sure the alg in the attestation statement matches the one specified in the metadata
-  const metaCOSE = FIDO_METADATA_AUTH_ALG_TO_COSE[statement.authenticationAlgorithm];
-  if (metaCOSE.alg !== alg) {
-    throw new Error(`Attestation alg "${alg}" did not match metadata auth alg "${metaCOSE.alg}"`);
+  // Make sure the alg in the attestation statement matches one of the ones specified in metadata
+  const statementCOSEAlgs: Set<number> = new Set();
+  statement.authenticationAlgorithms.forEach(algSign => {
+    // Convert algSign string to { kty, alg, crv }
+    const algSignCOSEINFO = algSignToCOSEInfo(algSign);
+
+    if (algSignCOSEINFO) {
+      statementCOSEAlgs.add(algSignCOSEINFO.alg);
+    }
+  });
+
+  if (!statementCOSEAlgs.has(alg)) {
+    const debugAlgs = Array.from(statementCOSEAlgs).join(', ');
+    throw new Error(`Attestation alg "${alg}" did not match metadata auth algs [${debugAlgs}]`);
   }
 
   try {
