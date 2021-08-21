@@ -8,7 +8,7 @@ import verifyAttestationResponse from '../verifyAttestationResponse';
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
  * and have cert paths that can't be validated with known root certs from Google
  */
-SettingsService.setRootCertificates({ attestationFormat: 'android-key', certificates: [] });
+SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
 
 test('should verify Android KeyStore response', async () => {
   const expectedChallenge = '4ab7dfd1-a695-4777-985f-ad2993828e99';
