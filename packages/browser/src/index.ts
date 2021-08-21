@@ -2,8 +2,8 @@
  * @packageDocumentation
  * @module @simplewebauthn/browser
  */
-import startAttestation from './methods/startAttestation';
+import startRegistration from './methods/startRegistration';
 import startAssertion from './methods/startAssertion';
 import supportsWebauthn from './helpers/supportsWebauthn';
 
-export { startAttestation, startAssertion, supportsWebauthn };
+export { startRegistration, startAssertion, supportsWebauthn };

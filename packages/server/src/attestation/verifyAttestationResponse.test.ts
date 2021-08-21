@@ -11,7 +11,7 @@ import SettingsService from '../services/settingsService';
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
 import toHash from '../helpers/toHash';
-import { AttestationCredentialJSON } from '@simplewebauthn/typescript-types';
+import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -532,7 +532,7 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
  * Various Attestations Below
  */
 
-const attestationFIDOU2F: AttestationCredentialJSON = {
+const attestationFIDOU2F: RegistrationCredentialJSON = {
   id: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   rawId: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   response: {
@@ -546,7 +546,7 @@ const attestationFIDOU2F: AttestationCredentialJSON = {
 };
 const attestationFIDOU2FChallenge = base64url.encode('totallyUniqueValueEveryAttestation');
 
-const attestationPacked: AttestationCredentialJSON = {
+const attestationPacked: RegistrationCredentialJSON = {
   id: 'bbb',
   rawId: 'bbb',
   response: {
@@ -567,7 +567,7 @@ const attestationPacked: AttestationCredentialJSON = {
 };
 const attestationPackedChallenge = base64url.encode('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
 
-const attestationPackedX5C: AttestationCredentialJSON = {
+const attestationPackedX5C: RegistrationCredentialJSON = {
   // TODO: Grab these from another iPhone attestation
   id: 'aaa',
   rawId: 'aaa',
@@ -598,7 +598,7 @@ const attestationPackedX5C: AttestationCredentialJSON = {
 };
 const attestationPackedX5CChallenge = base64url.encode('totallyUniqueValueEveryTime');
 
-const attestationNone: AttestationCredentialJSON = {
+const attestationNone: RegistrationCredentialJSON = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   rawId: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   response: {

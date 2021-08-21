@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import {
-  AttestationCredentialJSON,
+  RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
 } from '@simplewebauthn/typescript-types';
 
@@ -25,7 +25,7 @@ import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
 
 export type VerifyAttestationResponseOpts = {
-  credential: AttestationCredentialJSON;
+  credential: RegistrationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];
