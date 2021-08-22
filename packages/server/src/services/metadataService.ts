@@ -37,7 +37,7 @@ enum SERVICE_STATE {
 }
 
 /**
- * A basic service for coordinating interactions with the FIDO Metadata Service. This includes TOC
+ * A basic service for coordinating interactions with the FIDO Metadata Service. This includes BLOB
  * download and parsing, and on-demand requesting and caching of individual metadata statements.
  *
  * https://fidoalliance.org/metadata/
@@ -110,8 +110,8 @@ class MetadataService {
   /**
    * Get a metadata statement for a given aaguid. Defaults to returning a cached statement.
    *
-   * This method will coordinate updating the TOC as per the `nextUpdate` property in the initial
-   * TOC download.
+   * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
+   * BLOB download.
    */
   async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
@@ -126,7 +126,7 @@ class MetadataService {
       aaguid = convertAAGUIDToString(aaguid);
     }
 
-    // If a TOC refresh is in progress then pause this until the service is ready
+    // If a cache refresh is in progress then pause this until the service is ready
     await this.pauseUntilReady();
 
     // Try to grab a cached statement
@@ -186,8 +186,8 @@ class MetadataService {
 
     if (payload.no <= no) {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
-      // number of the last Metadata TOC object cached locally."
-      throw new Error(`Latest TOC no. "${payload.no}" is not greater than previous ${no}`);
+      // number of the last BLOB cached locally."
+      throw new Error(`Latest BLOB no. "${payload.no}" is not greater than previous ${no}`);
     }
 
     const headerCertsPEM = header.x5c.map(convertCertBufferToPEM);
@@ -201,7 +201,7 @@ class MetadataService {
       throw new Error(`BLOB certificate path could not be validated: ${err.message}`);
     }
 
-    // Verify the TOC JWT signature
+    // Verify the BLOB JWT signature
     const leafCert = headerCertsPEM[0];
     const verified = KJUR.jws.JWS.verifyJWT(data, leafCert, {
       alg: [header.alg],
@@ -228,7 +228,7 @@ class MetadataService {
     const [year, month, day] = payload.nextUpdate.split('-');
     this.mdsCache[url] = {
       ...mds,
-      // Store the payload `no` to make sure we're getting the next TOC in the sequence
+      // Store the payload `no` to make sure we're getting the next BLOB in the sequence
       no: payload.no,
       // Convert the nextUpdate property into a Date so we can determine when to re-download
       nextUpdate: new Date(
