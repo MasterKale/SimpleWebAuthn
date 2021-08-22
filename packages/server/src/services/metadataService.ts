@@ -133,7 +133,7 @@ class MetadataService {
     if (!cachedStatement) {
       // TODO: FIDO conformance requires this, but it seems excessive for WebAuthn. Investigate
       // later
-      throw new Error(`Unlisted aaguid "${aaguid}" in TOC`);
+      throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
     }
 
     // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
