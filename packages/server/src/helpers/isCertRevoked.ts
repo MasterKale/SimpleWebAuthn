@@ -3,6 +3,8 @@ import fetch from 'node-fetch';
 import { AsnParser } from '@peculiar/asn1-schema';
 import { CertificateList } from '@peculiar/asn1-x509';
 
+import convertCertBufferToPEM from './convertCertBufferToPEM';
+
 /**
  * A cache of revoked cert serial numbers by Authority Key ID
  */
@@ -59,8 +61,9 @@ export default async function isCertRevoked(cert: X509): Promise<boolean> {
   const crlCert = new X509();
   try {
     const respCRL = await fetch(crlURL[0]);
-    const dataCRL = await respCRL.text();
-    crlCert.readCertPEM(dataCRL);
+    const dataCRL = await respCRL.buffer();
+    const dataPEM = convertCertBufferToPEM(dataCRL);
+    crlCert.readCertPEM(dataPEM);
   } catch (err) {
     return false;
   }
