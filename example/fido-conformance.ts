@@ -313,3 +313,7 @@ X2S5Ht8+e+EQnezLJBJXtnkRWY+Zt491wgt/AwSs5PHHMv5QgjELOuMxQBc=
 
 // Set above root cert for use by MetadataService
 SettingsService.setRootCertificates({ identifier: 'mds', certificates: [MDS3ROOT] });
+// Reset preset root certificates
+SettingsService.setRootCertificates({ identifier: 'apple', certificates: [] });
+SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
+SettingsService.setRootCertificates({ identifier: 'android-safetynet', certificates: [] });
