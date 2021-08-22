@@ -81,6 +81,7 @@ class MetadataService {
     if (mdsServers?.length) {
       // TODO: Re-enable this once we figure out logging
       // const currentCacheCount = Object.keys(this.statementCache).length;
+      // let numServers = mdsServers.length;
 
       for (const url of mdsServers) {
         try {
@@ -93,13 +94,14 @@ class MetadataService {
           // Notify of the error and move on
           // TODO: Re-enable this once we figure out logging
           // log('warning', `Could not download BLOB from ${url}:`, err);
+          // numServers -= 1;
         }
       }
 
       // TODO: Re-enable this once we figure out logging
       // const newCacheCount = Object.keys(this.statementCache).length;
       // const cacheDiff = newCacheCount - currentCacheCount;
-      // log('info', `Downloaded ${cacheDiff} statements from ${mdsServers.length} metadata servers`);
+      // log('info', `Downloaded ${cacheDiff} statements from ${numServers} metadata servers`);
     }
 
     this.setState(SERVICE_STATE.READY);
