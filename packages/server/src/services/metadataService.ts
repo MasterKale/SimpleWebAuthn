@@ -42,7 +42,7 @@ enum SERVICE_STATE {
  *
  * https://fidoalliance.org/metadata/
  */
-class MetadataService {
+export class BaseMetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
@@ -290,6 +290,7 @@ class MetadataService {
   }
 }
 
-const metadataService = new MetadataService();
+// Export a service singleton
+const MetadataService = new BaseMetadataService();
 
-export default metadataService;
+export default MetadataService;
