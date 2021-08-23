@@ -16,7 +16,7 @@ import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 import settingsService from '../services/settingsService';
 
-import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
+import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
@@ -24,7 +24,7 @@ import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
 
-export type VerifyAttestationResponseOpts = {
+export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
@@ -38,18 +38,18 @@ export type VerifyAttestationResponseOpts = {
  *
  * **Options:**
  *
- * @param credential Authenticator credential returned by browser's `startAttestation()`
+ * @param credential Authenticator credential returned by browser's `startAuthentication()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
- * `generateAttestationOptions()`
- * @param expectedOrigin Website URL (or array of URLs) that the attestation should have occurred on
- * @param expectedRPID RP ID (or array of IDs) that was specified in the attestation options
+ * `generateRegistrationOptions()`
+ * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
+ * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export default async function verifyAttestationResponse(
-  options: VerifyAttestationResponseOpts,
+export default async function verifyRegistrationResponse(
+  options: VerifyRegistrationResponseOpts,
 ): Promise<VerifiedAttestation> {
   const {
     credential,
@@ -80,15 +80,15 @@ export default async function verifyAttestationResponse(
 
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
-  // Make sure we're handling an attestation
+  // Make sure we're handling an registration
   if (type !== 'webauthn.create') {
-    throw new Error(`Unexpected attestation type: ${type}`);
+    throw new Error(`Unexpected registration type: ${type}`);
   }
 
   // Ensure the device provided the challenge we gave it
   if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected registration challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 
@@ -96,12 +96,12 @@ export default async function verifyAttestationResponse(
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
       throw new Error(
-        `Unexpected attestation origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+        `Unexpected registration origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
       );
     }
   } else {
     if (origin !== expectedOrigin) {
-      throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
+      throw new Error(`Unexpected registration origin "${origin}", expected "${expectedOrigin}"`);
     }
   }
 
@@ -171,7 +171,7 @@ export default async function verifyAttestationResponse(
     throw new Error('Credential public key was missing numeric alg');
   }
 
-  // Make sure the key algorithm is one we specified within the attestation options
+  // Make sure the key algorithm is one we specified within the registration options
   if (!supportedAlgorithmIDs.includes(alg as number)) {
     const supported = supportedAlgorithmIDs.join(', ');
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
@@ -239,7 +239,7 @@ export default async function verifyAttestationResponse(
 }
 
 /**
- * Result of attestation verification
+ * Result of registration verification
  *
  * @param verified If the assertion response could be verified
  * @param attestationInfo.fmt Type of attestation

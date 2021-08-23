@@ -2,39 +2,39 @@
  * @packageDocumentation
  * @module @simplewebauthn/server
  */
-import generateAttestationOptions from './attestation/generateAttestationOptions';
-import verifyAttestationResponse from './attestation/verifyAttestationResponse';
-import generateAssertionOptions from './assertion/generateAssertionOptions';
-import verifyAssertionResponse from './assertion/verifyAssertionResponse';
+import generateRegistrationOptions from './registration/generateRegistrationOptions';
+import verifyRegistrationResponse from './registration/verifyRegistrationResponse';
+import generateAssertionOptions from './authentication/generateAuthenticationOptions';
+import verifyAssertionResponse from './authentication/verifyAuthenticationResponse';
 import MetadataService from './services/metadataService';
 import SettingsService from './services/settingsService';
 
 export {
-  generateAttestationOptions,
-  verifyAttestationResponse,
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
   generateAssertionOptions,
   verifyAssertionResponse,
   MetadataService,
   SettingsService,
 };
 
-import type { GenerateAttestationOptionsOpts } from './attestation/generateAttestationOptions';
-import type { GenerateAssertionOptionsOpts } from './assertion/generateAssertionOptions';
+import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions';
+import type { GenerateAssertionOptionsOpts } from './authentication/generateAuthenticationOptions';
 import type { MetadataStatement } from './services/metadataService';
 import type {
   VerifiedAttestation,
-  VerifyAttestationResponseOpts,
-} from './attestation/verifyAttestationResponse';
+  VerifyRegistrationResponseOpts,
+} from './registration/verifyRegistrationResponse';
 import type {
   VerifiedAssertion,
   VerifyAssertionResponseOpts,
-} from './assertion/verifyAssertionResponse';
+} from './authentication/verifyAuthenticationResponse';
 
 export type {
-  GenerateAttestationOptionsOpts,
+  GenerateRegistrationOptionsOpts,
   GenerateAssertionOptionsOpts,
   MetadataStatement,
-  VerifyAttestationResponseOpts,
+  VerifyRegistrationResponseOpts,
   VerifyAssertionResponseOpts,
   VerifiedAttestation,
   VerifiedAssertion,

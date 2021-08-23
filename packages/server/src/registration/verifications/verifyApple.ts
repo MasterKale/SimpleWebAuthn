@@ -1,7 +1,7 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 
-import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';

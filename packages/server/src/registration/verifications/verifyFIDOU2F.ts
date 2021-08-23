@@ -1,4 +1,4 @@
-import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';

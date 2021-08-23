@@ -1,7 +1,7 @@
 import elliptic from 'elliptic';
 import NodeRSA from 'node-rsa';
 
-import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import convertCOSEtoPKCS, {
   COSEKEYS,

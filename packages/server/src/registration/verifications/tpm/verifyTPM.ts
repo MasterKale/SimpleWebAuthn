@@ -8,7 +8,7 @@ import {
   Name,
 } from '@peculiar/asn1-x509';
 
-import type { AttestationFormatVerifierOpts } from '../../verifyAttestationResponse';
+import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse';
 
 import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
