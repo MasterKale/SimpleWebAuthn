@@ -45,17 +45,18 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     const firstDecoded = decodeCborFirst(authData.slice(pointer));
     const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
     credentialPublicKey = firstEncoded;
-    authData = authData.slice((pointer += firstEncoded.byteLength));
+    pointer += firstEncoded.byteLength;
   }
 
   let extensionsDataBuffer: Buffer | undefined = undefined;
   if (flags.ed) {
-    const firstDecoded = decodeCborFirst(authData);
+    const firstDecoded = decodeCborFirst(authData.slice(pointer));
     const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
     extensionsDataBuffer = firstEncoded;
-    authData = authData.slice((pointer += firstEncoded.byteLength));
+    pointer += firstEncoded.byteLength;
   }
 
+  // Pointer should be at the end of the authenticator data, otherwise too much data was sent
   if (authData.byteLength > pointer) {
     throw new Error('Leftover bytes detected while parsing authenticator data');
   }
