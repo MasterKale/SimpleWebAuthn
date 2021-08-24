@@ -37,7 +37,7 @@ export default async function startRegistration(
   const credential = (await navigator.credentials.create({ publicKey })) as RegistrationCredential;
 
   if (!credential) {
-    throw new Error('Attestation was not completed');
+    throw new Error('Registration was not completed');
   }
 
   const { id, rawId, response, type } = credential;

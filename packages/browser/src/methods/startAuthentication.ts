@@ -15,7 +15,7 @@ import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDes
  *
  * @param requestOptionsJSON Output from @simplewebauthn/server's generateAssertionOptions(...)
  */
-export default async function startAssertion(
+export default async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
 ): Promise<AuthenticationCredentialJSON> {
   if (!supportsWebauthn()) {
@@ -40,7 +40,7 @@ export default async function startAssertion(
   const credential = (await navigator.credentials.get({ publicKey })) as AuthenticationCredential;
 
   if (!credential) {
-    throw new Error('Assertion was not completed');
+    throw new Error('Authentication was not completed');
   }
 
   const { id, rawId, response, type } = credential;
