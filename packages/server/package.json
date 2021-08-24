@@ -4,6 +4,16 @@
   "description": "SimpleWebAuthn for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./helpers": "./dist/helpers/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "./dist/index.d.ts": [ "./dist/index.d.ts" ],
+      "helpers": [ "./dist/helpers/index.d.ts" ]
+    }
+  },
   "author": "Matthew Miller <matthew@millerti.me>",
   "license": "MIT",
   "repository": {

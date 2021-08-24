@@ -6,15 +6,15 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
-import supportsWebauthn from '../helpers/supportsWebauthn';
+import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
 import startRegistration from './startRegistration';
 
-jest.mock('../helpers/supportsWebauthn');
+jest.mock('../helpers/browserSupportsWebauthn');
 
 const mockNavigatorCreate = window.navigator.credentials.create as jest.Mock;
-const mockSupportsWebauthn = supportsWebauthn as jest.Mock;
+const mockSupportsWebauthn = browserSupportsWebauthn as jest.Mock;
 
 const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';

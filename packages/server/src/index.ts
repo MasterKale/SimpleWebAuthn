@@ -20,7 +20,7 @@ export {
 
 import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions';
 import type { GenerateAuthenticationOptionsOpts } from './authentication/generateAuthenticationOptions';
-import type { MetadataStatement } from './services/metadataService';
+import type { MetadataStatement } from './metadata/mdsTypes';
 import type {
   VerifiedRegistrationResponse,
   VerifyRegistrationResponseOpts,

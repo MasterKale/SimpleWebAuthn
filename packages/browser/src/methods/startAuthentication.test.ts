@@ -5,16 +5,16 @@ import {
   AuthenticationExtensionsClientOutputs,
 } from '@simplewebauthn/typescript-types';
 
-import supportsWebauthn from '../helpers/supportsWebauthn';
+import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
 import startAuthentication from './startAuthentication';
 
-jest.mock('../helpers/supportsWebauthn');
+jest.mock('../helpers/browserSupportsWebauthn');
 
 const mockNavigatorGet = window.navigator.credentials.get as jest.Mock;
-const mockSupportsWebauthn = supportsWebauthn as jest.Mock;
+const mockSupportsWebauthn = browserSupportsWebauthn as jest.Mock;
 
 const mockAuthenticatorData = 'mockAuthenticatorData';
 const mockClientDataJSON = 'mockClientDataJSON';

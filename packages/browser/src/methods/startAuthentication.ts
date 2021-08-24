@@ -7,7 +7,7 @@ import {
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import bufferToUTF8String from '../helpers/bufferToUTF8String';
-import supportsWebauthn from '../helpers/supportsWebauthn';
+import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 
 /**
@@ -18,7 +18,7 @@ import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDes
 export default async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
 ): Promise<AuthenticationCredentialJSON> {
-  if (!supportsWebauthn()) {
+  if (!browserSupportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
 

@@ -10,7 +10,6 @@ import convertCOSEtoPKCS, {
   COSEKTY,
   COSERSASCHEME,
 } from '../../helpers/convertCOSEtoPKCS';
-import { FIDO_METADATA_ATTESTATION_TYPES } from '../../helpers/constants';
 import toHash from '../../helpers/toHash';
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
@@ -94,10 +93,7 @@ export default async function verifyAttestationPacked(
     if (statement) {
       // The presence of x5c means this is a full attestation. Check to see if attestationTypes
       // includes packed attestations.
-      if (
-        statement.attestationTypes.indexOf(FIDO_METADATA_ATTESTATION_TYPES.ATTESTATION_BASIC_FULL) <
-        0
-      ) {
+      if (statement.attestationTypes.indexOf('basic_full') < 0) {
         throw new Error('Metadata does not indicate support for full attestations (Packed|Full)');
       }
 

@@ -10,7 +10,7 @@ import toHash from '../../helpers/toHash';
 import settingsService from '../../services/settingsService';
 
 const rootCertificates = settingsService.getRootCertificates({
-  attestationFormat: 'android-safetynet',
+  identifier: 'android-safetynet',
 });
 
 let authData: Buffer;

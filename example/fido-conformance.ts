@@ -10,12 +10,13 @@ import {
   generateAssertionOptions,
   verifyAssertionResponse,
   MetadataService,
+  SettingsService,
 } from '@simplewebauthn/server';
 import {
   AssertionCredentialJSON,
   AttestationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
-import { MetadataStatement } from '@simplewebauthn/server/dist/metadata/metadataService';
+import type { MetadataStatement } from '@simplewebauthn/server';
 
 import { rpID, expectedOrigin } from './index';
 import { LoggedInUser } from './example-server';
@@ -56,25 +57,21 @@ try {
 /**
  * Initialize MetadataService with Conformance Testing-specific statements.
  */
-fetch('https://mds.certinfra.fidoalliance.org/getEndpoints', {
+fetch('https://mds3.certinfra.fidoalliance.org/getEndpoints', {
   method: 'POST',
   body: JSON.stringify({ endpoint: `${expectedOrigin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
 })
   .then(resp => resp.json())
   .then(json => {
-    const routes = json.result;
-    const mdsServers = routes.map((url: string) => ({
-      url,
-      rootCertURL: 'https://mds.certinfra.fidoalliance.org/pki/MDSROOT.crt',
-      metadataURLSuffix: '',
-    }));
+    const mdsServers: string[] = json.result;
 
-    MetadataService.initialize({
+    return MetadataService.initialize({
       statements,
       mdsServers,
     });
   })
+  .catch(console.error)
   .finally(() => {
     if (statements.length) {
       console.log(`ℹ️  Initializing metadata service with ${statements.length} local statements`);
@@ -286,3 +283,37 @@ fidoConformanceRouter.all('*', (req, res, next) => {
 
   next();
 });
+
+/**
+ * MDS3ROOT
+ *
+ * Downloaded from https://mds3.certinfra.fidoalliance.org/
+ *
+ * Valid until 2045-01-31 @ 00:00 PST
+ *
+ * SHA256 Fingerprint
+ * 66:D9:77:0B:57:71:10:9B:8D:83:55:7B:A2:7D:58:9B:56:BD:B3:BF:DB:DE:A2:D2:42:C4:CA:0D:57:70:A4:7C
+ */
+export const MDS3ROOT = `-----BEGIN CERTIFICATE-----
+MIICaDCCAe6gAwIBAgIPBCqih0DiJLW7+UHXx/o1MAoGCCqGSM49BAMDMGcxCzAJ
+BgNVBAYTAlVTMRYwFAYDVQQKDA1GSURPIEFsbGlhbmNlMScwJQYDVQQLDB5GQUtF
+IE1ldGFkYXRhIDMgQkxPQiBST09UIEZBS0UxFzAVBgNVBAMMDkZBS0UgUm9vdCBG
+QUtFMB4XDTE3MDIwMTAwMDAwMFoXDTQ1MDEzMTIzNTk1OVowZzELMAkGA1UEBhMC
+VVMxFjAUBgNVBAoMDUZJRE8gQWxsaWFuY2UxJzAlBgNVBAsMHkZBS0UgTWV0YWRh
+dGEgMyBCTE9CIFJPT1QgRkFLRTEXMBUGA1UEAwwORkFLRSBSb290IEZBS0UwdjAQ
+BgcqhkjOPQIBBgUrgQQAIgNiAASKYiz3YltC6+lmxhPKwA1WFZlIqnX8yL5RybSL
+TKFAPEQeTD9O6mOz+tg8wcSdnVxHzwnXiQKJwhrav70rKc2ierQi/4QUrdsPes8T
+EirZOkCVJurpDFbXZOgs++pa4XmjYDBeMAsGA1UdDwQEAwIBBjAPBgNVHRMBAf8E
+BTADAQH/MB0GA1UdDgQWBBQGcfeCs0Y8D+lh6U5B2xSrR74eHTAfBgNVHSMEGDAW
+gBQGcfeCs0Y8D+lh6U5B2xSrR74eHTAKBggqhkjOPQQDAwNoADBlAjEA/xFsgri0
+xubSa3y3v5ormpPqCwfqn9s0MLBAtzCIgxQ/zkzPKctkiwoPtDzI51KnAjAmeMyg
+X2S5Ht8+e+EQnezLJBJXtnkRWY+Zt491wgt/AwSs5PHHMv5QgjELOuMxQBc=
+-----END CERTIFICATE-----
+`;
+
+// Set above root cert for use by MetadataService
+SettingsService.setRootCertificates({ identifier: 'mds', certificates: [MDS3ROOT] });
+// Reset preset root certificates
+SettingsService.setRootCertificates({ identifier: 'apple', certificates: [] });
+SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
+SettingsService.setRootCertificates({ identifier: 'android-safetynet', certificates: [] });
