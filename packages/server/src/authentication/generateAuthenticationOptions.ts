@@ -8,7 +8,7 @@ import base64url from 'base64url';
 
 import generateChallenge from '../helpers/generateChallenge';
 
-export type GenerateAssertionOptionsOpts = {
+export type GenerateAuthenticationOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptor[];
   challenge?: string | Buffer;
   timeout?: number;
@@ -23,15 +23,15 @@ export type GenerateAssertionOptionsOpts = {
  * @param allowCredentials Authenticators previously registered by the user, if any. If undefined
  * the client will ask the user which credential they want to use
  * @param challenge Random value the authenticator needs to sign and pass back
- * user for assertion
- * @param timeout How long (in ms) the user can take to complete assertion
+ * user for authentication
+ * @param timeout How long (in ms) the user can take to complete authentication
  * @param userVerification Set to `'discouraged'` when asserting as part of a 2FA flow, otherwise
  * set to `'preferred'` or `'required'` as desired.
- * @param extensions Additional plugins the authenticator or browser should use during assertion
+ * @param extensions Additional plugins the authenticator or browser should use during authentication
  * @param rpID Valid domain name (after `https://`)
  */
-export default function generateAssertionOptions(
-  options: GenerateAssertionOptionsOpts = {},
+export default function generateAuthenticationOptions(
+  options: GenerateAuthenticationOptionsOpts = {},
 ): PublicKeyCredentialRequestOptionsJSON {
   const {
     allowCredentials,

@@ -19,23 +19,23 @@ export {
 };
 
 import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions';
-import type { GenerateAssertionOptionsOpts } from './authentication/generateAuthenticationOptions';
+import type { GenerateAuthenticationOptionsOpts } from './authentication/generateAuthenticationOptions';
 import type { MetadataStatement } from './services/metadataService';
 import type {
-  VerifiedAttestation,
+  VerifiedRegistrationResponse,
   VerifyRegistrationResponseOpts,
 } from './registration/verifyRegistrationResponse';
 import type {
-  VerifiedAssertion,
-  VerifyAssertionResponseOpts,
+  VerifiedAuthenticationResponse,
+  VerifyAuthenticationResponseOpts,
 } from './authentication/verifyAuthenticationResponse';
 
 export type {
   GenerateRegistrationOptionsOpts,
-  GenerateAssertionOptionsOpts,
+  GenerateAuthenticationOptionsOpts,
   MetadataStatement,
   VerifyRegistrationResponseOpts,
-  VerifyAssertionResponseOpts,
-  VerifiedAttestation,
-  VerifiedAssertion,
+  VerifyAuthenticationResponseOpts,
+  VerifiedRegistrationResponse,
+  VerifiedAuthenticationResponse,
 };

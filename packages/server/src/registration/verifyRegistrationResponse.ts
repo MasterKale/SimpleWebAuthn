@@ -50,7 +50,7 @@ export type VerifyRegistrationResponseOpts = {
  */
 export default async function verifyRegistrationResponse(
   options: VerifyRegistrationResponseOpts,
-): Promise<VerifiedAttestation> {
+): Promise<VerifiedRegistrationResponse> {
   const {
     credential,
     expectedChallenge,
@@ -144,7 +144,7 @@ export default async function verifyRegistrationResponse(
 
   // Make sure someone was physically present
   if (!flags.up) {
-    throw new Error('User not present during assertion');
+    throw new Error('User not present during registration');
   }
 
   // Enforce user verification if specified
@@ -161,7 +161,7 @@ export default async function verifyRegistrationResponse(
   }
 
   if (!aaguid) {
-    throw new Error('No AAGUID was present in attestation');
+    throw new Error('No AAGUID was present during registration');
   }
 
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
@@ -218,12 +218,12 @@ export default async function verifyRegistrationResponse(
     throw new Error(`Unsupported Attestation Format: ${fmt}`);
   }
 
-  const toReturn: VerifiedAttestation = {
+  const toReturn: VerifiedRegistrationResponse = {
     verified,
   };
 
   if (toReturn.verified) {
-    toReturn.attestationInfo = {
+    toReturn.registrationInfo = {
       fmt,
       counter,
       aaguid: convertAAGUIDToString(aaguid),
@@ -242,21 +242,21 @@ export default async function verifyRegistrationResponse(
  * Result of registration verification
  *
  * @param verified If the assertion response could be verified
- * @param attestationInfo.fmt Type of attestation
- * @param attestationInfo.counter The number of times the authenticator reported it has been used.
+ * @param registrationInfo.fmt Type of attestation
+ * @param registrationInfo.counter The number of times the authenticator reported it has been used.
  * Should be kept in a DB for later reference to help prevent replay attacks
- * @param attestationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
+ * @param registrationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
  * authenticator
- * @param attestationInfo.credentialPublicKey The credential's public key
- * @param attestationInfo.credentialID The credential's credential ID for the public key above
- * @param attestationInfo.credentialType The type of the credential returned by the browser
- * @param attestationInfo.userVerified Whether the user was uniquely identified during attestation
- * @param attestationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
+ * @param registrationInfo.credentialPublicKey The credential's public key
+ * @param registrationInfo.credentialID The credential's credential ID for the public key above
+ * @param registrationInfo.credentialType The type of the credential returned by the browser
+ * @param registrationInfo.userVerified Whether the user was uniquely identified during attestation
+ * @param registrationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
  * the authenticator
  */
-export type VerifiedAttestation = {
+export type VerifiedRegistrationResponse = {
   verified: boolean;
-  attestationInfo?: {
+  registrationInfo?: {
     fmt: AttestationFormat;
     counter: number;
     aaguid: string;

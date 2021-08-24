@@ -1,5 +1,5 @@
 import base64url from 'base64url';
-import verifyAssertionResponse from './verifyAuthenticationResponse';
+import verifyAuthenticationResponse from './verifyAuthenticationResponse';
 
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 test('should verify an assertion response', () => {
-  const verification = verifyAssertionResponse({
+  const verification = verifyAuthenticationResponse({
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
@@ -35,7 +35,7 @@ test('should verify an assertion response', () => {
 });
 
 test('should return authenticator info after verification', () => {
-  const verification = verifyAssertionResponse({
+  const verification = verifyAuthenticationResponse({
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
@@ -49,7 +49,7 @@ test('should return authenticator info after verification', () => {
 
 test('should throw when response challenge is not expected value', () => {
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://different.address',
@@ -61,7 +61,7 @@ test('should throw when response challenge is not expected value', () => {
 
 test('should throw when response origin is not expected value', () => {
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: 'https://different.address',
@@ -80,7 +80,7 @@ test('should throw when assertion type is not webauthn.create', () => {
   });
 
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
@@ -97,7 +97,7 @@ test('should throw error if user was not present', () => {
   });
 
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
@@ -116,7 +116,7 @@ test('should throw error if previous counter value is not less than in response'
   };
 
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
@@ -133,7 +133,7 @@ test('should throw error if assertion RP ID is unexpected value', () => {
   });
 
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
@@ -144,7 +144,7 @@ test('should throw error if assertion RP ID is unexpected value', () => {
 });
 
 test('should not compare counters if both are 0', () => {
-  const verification = verifyAssertionResponse({
+  const verification = verifyAuthenticationResponse({
     credential: assertionFirstTimeUsedResponse,
     expectedChallenge: assertionFirstTimeUsedChallenge,
     expectedOrigin: assertionFirstTimeUsedOrigin,
@@ -169,7 +169,7 @@ test('should throw an error if user verification is required but user was not ve
   });
 
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
@@ -184,7 +184,7 @@ test('should throw an error if user verification is required but user was not ve
 test.skip('should verify TPM assertion', () => {
   const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBc3NlcnRpb24';
   jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
-  const verification = verifyAssertionResponse({
+  const verification = verifyAuthenticationResponse({
     credential: {
       id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
       rawId: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
@@ -213,7 +213,7 @@ test.skip('should verify TPM assertion', () => {
 });
 
 test('should support multiple possible origins', () => {
-  const verification = verifyAssertionResponse({
+  const verification = verifyAuthenticationResponse({
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: ['https://simplewebauthn.dev', assertionOrigin],
@@ -226,7 +226,7 @@ test('should support multiple possible origins', () => {
 
 test('should throw an error if origin not in list of expected origins', async () => {
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: ['https://simplewebauthn.dev', 'https://fizz.buzz'],
@@ -237,7 +237,7 @@ test('should throw an error if origin not in list of expected origins', async ()
 });
 
 test('should support multiple possible RP IDs', async () => {
-  const verification = verifyAssertionResponse({
+  const verification = verifyAuthenticationResponse({
     credential: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
@@ -250,7 +250,7 @@ test('should support multiple possible RP IDs', async () => {
 
 test('should throw an error if RP ID not in list of possible RP IDs', async () => {
   expect(() => {
-    verifyAssertionResponse({
+    verifyAuthenticationResponse({
       credential: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
