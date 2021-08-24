@@ -4,6 +4,12 @@
  */
 import startAttestation from './methods/startAttestation';
 import startAssertion from './methods/startAssertion';
-import supportsWebauthn from './helpers/supportsWebauthn';
+import { browserSupportsWebauthn } from './helpers/browserSupportsWebauthn';
+import { platformAuthenticatorIsAvailable } from './helpers/platformAuthenticatorIsAvailable';
 
-export { startAttestation, startAssertion, supportsWebauthn };
+export {
+  startAttestation,
+  startAssertion,
+  browserSupportsWebauthn,
+  platformAuthenticatorIsAvailable,
+};

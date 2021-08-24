@@ -6,15 +6,15 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
-import supportsWebauthn from '../helpers/supportsWebauthn';
+import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
 import startAttestation from './startAttestation';
 
-jest.mock('../helpers/supportsWebauthn');
+jest.mock('../helpers/browserSupportsWebauthn');
 
 const mockNavigatorCreate = window.navigator.credentials.create as jest.Mock;
-const mockSupportsWebauthn = supportsWebauthn as jest.Mock;
+const mockSupportsWebauthn = browserSupportsWebauthn as jest.Mock;
 
 const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';
@@ -49,13 +49,11 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
 
 beforeEach(() => {
   // Stub out a response so the method won't throw
-  mockNavigatorCreate.mockImplementation(
-    (): Promise<any> => {
-      return new Promise(resolve => {
-        resolve({ response: {}, getClientExtensionResults: () => ({}) });
-      });
-    },
-  );
+  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+    return new Promise(resolve => {
+      resolve({ response: {}, getClientExtensionResults: () => ({}) });
+    });
+  });
 
   mockSupportsWebauthn.mockReturnValue(true);
 });
@@ -85,22 +83,20 @@ test('should convert options before passing to navigator.credentials.create(...)
 });
 
 test('should return base64url-encoded response values', async done => {
-  mockNavigatorCreate.mockImplementation(
-    (): Promise<AttestationCredential> => {
-      return new Promise(resolve => {
-        resolve({
-          id: 'foobar',
-          rawId: utf8StringToBuffer('foobar'),
-          response: {
-            attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
-            clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
-          },
-          getClientExtensionResults: () => ({}),
-          type: 'webauthn.create',
-        });
+  mockNavigatorCreate.mockImplementation((): Promise<AttestationCredential> => {
+    return new Promise(resolve => {
+      resolve({
+        id: 'foobar',
+        rawId: utf8StringToBuffer('foobar'),
+        response: {
+          attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
+          clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
+        },
+        getClientExtensionResults: () => ({}),
+        type: 'webauthn.create',
       });
-    },
-  );
+    });
+  });
 
   const response = await startAttestation(goodOpts1);
 
@@ -122,13 +118,11 @@ test("should throw error if WebAuthn isn't supported", async done => {
 });
 
 test('should throw error if attestation is cancelled for some reason', async done => {
-  mockNavigatorCreate.mockImplementation(
-    (): Promise<null> => {
-      return new Promise(resolve => {
-        resolve(null);
-      });
-    },
-  );
+  mockNavigatorCreate.mockImplementation((): Promise<null> => {
+    return new Promise(resolve => {
+      resolve(null);
+    });
+  });
 
   await expect(startAttestation(goodOpts1)).rejects.toThrow('Attestation was not completed');
 
@@ -174,13 +168,11 @@ test('should include extension results', async done => {
   };
 
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation(
-    (): Promise<any> => {
-      return new Promise(resolve => {
-        resolve({ response: {}, getClientExtensionResults: () => extResults });
-      });
-    },
-  );
+  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+    return new Promise(resolve => {
+      resolve({ response: {}, getClientExtensionResults: () => extResults });
+    });
+  });
 
   // Extensions aren't present in this object, but it doesn't matter since we're faking the response
   const response = await startAttestation(goodOpts1);

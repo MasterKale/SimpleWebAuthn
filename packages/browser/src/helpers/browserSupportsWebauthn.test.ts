@@ -1,4 +1,4 @@
-import supportsWebauthn from './supportsWebauthn';
+import { browserSupportsWebauthn } from './browserSupportsWebauthn';
 
 beforeEach(() => {
   // @ts-ignore 2741
@@ -6,12 +6,12 @@ beforeEach(() => {
 });
 
 test('should return true when browser supports WebAuthn', () => {
-  expect(supportsWebauthn()).toBe(true);
+  expect(browserSupportsWebauthn()).toBe(true);
 });
 
 test('should return false when browser does not support WebAuthn', () => {
   delete (window as any).PublicKeyCredential;
-  expect(supportsWebauthn()).toBe(false);
+  expect(browserSupportsWebauthn()).toBe(false);
 });
 
 test('should return false when window is undefined', () => {
@@ -20,7 +20,7 @@ test('should return false when window is undefined', () => {
   windowSpy.mockImplementation(() => undefined);
 
   expect(window).toBe(undefined);
-  expect(supportsWebauthn()).toBe(false);
+  expect(browserSupportsWebauthn()).toBe(false);
 
   // Restore original window value.
   windowSpy.mockRestore();
