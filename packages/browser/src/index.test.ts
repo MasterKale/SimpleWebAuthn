@@ -8,6 +8,6 @@ test('should export method `startAssertion`', () => {
   expect(index.startAssertion).toBeDefined();
 });
 
-test('should export method `supportsWebauthn`', () => {
-  expect(index.supportsWebauthn).toBeDefined();
+test('should export method `browserSupportsWebauthn`', () => {
+  expect(index.browserSupportsWebauthn).toBeDefined();
 });
