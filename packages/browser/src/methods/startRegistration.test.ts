@@ -124,7 +124,7 @@ test('should throw error if attestation is cancelled for some reason', async don
     });
   });
 
-  await expect(startRegistration(goodOpts1)).rejects.toThrow('Attestation was not completed');
+  await expect(startRegistration(goodOpts1)).rejects.toThrow('Registration was not completed');
 
   done();
 });

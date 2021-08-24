@@ -138,7 +138,7 @@ test('should throw error if assertion is cancelled for some reason', async done 
     });
   });
 
-  await expect(startAuthentication(goodOpts1)).rejects.toThrow('Assertion was not completed');
+  await expect(startAuthentication(goodOpts1)).rejects.toThrow('Authentication was not completed');
 
   done();
 });
