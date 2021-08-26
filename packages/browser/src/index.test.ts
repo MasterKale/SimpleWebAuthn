@@ -1,11 +1,11 @@
 import * as index from './index';
 
-test('should export method `startAttestation`', () => {
-  expect(index.startAttestation).toBeDefined();
+test('should export method `startRegistration`', () => {
+  expect(index.startRegistration).toBeDefined();
 });
 
-test('should export method `startAssertion`', () => {
-  expect(index.startAssertion).toBeDefined();
+test('should export method `startAuthentication`', () => {
+  expect(index.startAuthentication).toBeDefined();
 });
 
 test('should export method `browserSupportsWebauthn`', () => {

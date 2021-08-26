@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import {
-  AssertionCredentialJSON,
+  AuthenticationCredentialJSON,
   AuthenticatorDevice,
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
@@ -12,8 +12,8 @@ import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
 
-export type VerifyAssertionResponseOpts = {
-  credential: AssertionCredentialJSON;
+export type VerifyAuthenticationResponseOpts = {
+  credential: AuthenticationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
@@ -29,16 +29,16 @@ export type VerifyAssertionResponseOpts = {
  * @param credential Authenticator credential returned by browser's `startAssertion()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
  * `generateAssertionOptions()`
- * @param expectedOrigin Website URL (or array of URLs) that the attestation should have occurred on
- * @param expectedRPID RP ID (or array of IDs) that was specified in the attestation options
+ * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
+ * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
  * @param fidoUserVerification (Optional) The value specified for `userVerification` when calling
  * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
  * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
  */
-export default function verifyAssertionResponse(
-  options: VerifyAssertionResponseOpts,
-): VerifiedAssertion {
+export default function verifyAuthenticationResponse(
+  options: VerifyAuthenticationResponseOpts,
+): VerifiedAuthenticationResponse {
   const {
     credential,
     expectedChallenge,
@@ -78,26 +78,29 @@ export default function verifyAssertionResponse(
 
   // Make sure we're handling an assertion
   if (type !== 'webauthn.get') {
-    throw new Error(`Unexpected assertion type: ${type}`);
+    throw new Error(`Unexpected authentication response type: ${type}`);
   }
 
   // Ensure the device provided the challenge we gave it
   if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected assertion challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected authentication response challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 
   // Check that the origin is our site
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
+      const joinedExpectedOrigin = expectedOrigin.join(', ');
       throw new Error(
-        `Unexpected assertion origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+        `Unexpected authentication response origin "${origin}", expected one of: ${joinedExpectedOrigin}`,
       );
     }
   } else {
     if (origin !== expectedOrigin) {
-      throw new Error(`Unexpected assertion origin "${origin}", expected "${expectedOrigin}"`);
+      throw new Error(
+        `Unexpected authentication response origin "${origin}", expected "${expectedOrigin}"`,
+      );
     }
   }
 
@@ -158,7 +161,7 @@ export default function verifyAssertionResponse(
   } else {
     // WebAuthn only requires the user presence flag be true
     if (!flags.up) {
-      throw new Error('User not present during assertion');
+      throw new Error('User not present during authentication');
     }
   }
 
@@ -180,7 +183,7 @@ export default function verifyAssertionResponse(
 
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
-    assertionInfo: {
+    authenticationInfo: {
       newCounter: counter,
       credentialID: authenticator.credentialID,
     },
@@ -190,19 +193,19 @@ export default function verifyAssertionResponse(
 }
 
 /**
- * Result of assertion verification
+ * Result of authentication verification
  *
- * @param verified If the assertion response could be verified
- * @param assertionInfo.credentialID The ID of the authenticator used during assertion.
+ * @param verified If the authentication response could be verified
+ * @param authenticationInfo.credentialID The ID of the authenticator used during authentication.
  * Should be used to identify which DB authenticator entry needs its `counter` updated to the value
  * below
- * @param assertionInfo.newCounter The number of times the authenticator identified above
+ * @param authenticationInfo.newCounter The number of times the authenticator identified above
  * reported it has been used. **Should be kept in a DB for later reference to help prevent replay
  * attacks!**
  */
-export type VerifiedAssertion = {
+export type VerifiedAuthenticationResponse = {
   verified: boolean;
-  assertionInfo: {
+  authenticationInfo: {
     credentialID: Buffer;
     newCounter: number;
   };

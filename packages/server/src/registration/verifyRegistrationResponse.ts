@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 import {
-  AttestationCredentialJSON,
+  RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
 } from '@simplewebauthn/typescript-types';
 
@@ -16,7 +16,7 @@ import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
 import settingsService from '../services/settingsService';
 
-import { supportedCOSEAlgorithmIdentifiers } from './generateAttestationOptions';
+import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
@@ -24,8 +24,8 @@ import verifyTPM from './verifications/tpm/verifyTPM';
 import verifyAndroidKey from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';
 
-export type VerifyAttestationResponseOpts = {
-  credential: AttestationCredentialJSON;
+export type VerifyRegistrationResponseOpts = {
+  credential: RegistrationCredentialJSON;
   expectedChallenge: string;
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];
@@ -38,19 +38,19 @@ export type VerifyAttestationResponseOpts = {
  *
  * **Options:**
  *
- * @param credential Authenticator credential returned by browser's `startAttestation()`
+ * @param credential Authenticator credential returned by browser's `startAuthentication()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
- * `generateAttestationOptions()`
- * @param expectedOrigin Website URL (or array of URLs) that the attestation should have occurred on
- * @param expectedRPID RP ID (or array of IDs) that was specified in the attestation options
+ * `generateRegistrationOptions()`
+ * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
+ * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export default async function verifyAttestationResponse(
-  options: VerifyAttestationResponseOpts,
-): Promise<VerifiedAttestation> {
+export default async function verifyRegistrationResponse(
+  options: VerifyRegistrationResponseOpts,
+): Promise<VerifiedRegistrationResponse> {
   const {
     credential,
     expectedChallenge,
@@ -80,15 +80,15 @@ export default async function verifyAttestationResponse(
 
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
-  // Make sure we're handling an attestation
+  // Make sure we're handling an registration
   if (type !== 'webauthn.create') {
-    throw new Error(`Unexpected attestation type: ${type}`);
+    throw new Error(`Unexpected registration response type: ${type}`);
   }
 
   // Ensure the device provided the challenge we gave it
   if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected attestation challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected registration response challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 
@@ -96,12 +96,16 @@ export default async function verifyAttestationResponse(
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
       throw new Error(
-        `Unexpected attestation origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+        `Unexpected registration response origin "${origin}", expected one of: ${expectedOrigin.join(
+          ', ',
+        )}`,
       );
     }
   } else {
     if (origin !== expectedOrigin) {
-      throw new Error(`Unexpected attestation origin "${origin}", expected "${expectedOrigin}"`);
+      throw new Error(
+        `Unexpected registration response origin "${origin}", expected "${expectedOrigin}"`,
+      );
     }
   }
 
@@ -144,7 +148,7 @@ export default async function verifyAttestationResponse(
 
   // Make sure someone was physically present
   if (!flags.up) {
-    throw new Error('User not present during assertion');
+    throw new Error('User not present during registration');
   }
 
   // Enforce user verification if specified
@@ -161,7 +165,7 @@ export default async function verifyAttestationResponse(
   }
 
   if (!aaguid) {
-    throw new Error('No AAGUID was present in attestation');
+    throw new Error('No AAGUID was present during registration');
   }
 
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
@@ -171,7 +175,7 @@ export default async function verifyAttestationResponse(
     throw new Error('Credential public key was missing numeric alg');
   }
 
-  // Make sure the key algorithm is one we specified within the attestation options
+  // Make sure the key algorithm is one we specified within the registration options
   if (!supportedAlgorithmIDs.includes(alg as number)) {
     const supported = supportedAlgorithmIDs.join(', ');
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
@@ -218,12 +222,12 @@ export default async function verifyAttestationResponse(
     throw new Error(`Unsupported Attestation Format: ${fmt}`);
   }
 
-  const toReturn: VerifiedAttestation = {
+  const toReturn: VerifiedRegistrationResponse = {
     verified,
   };
 
   if (toReturn.verified) {
-    toReturn.attestationInfo = {
+    toReturn.registrationInfo = {
       fmt,
       counter,
       aaguid: convertAAGUIDToString(aaguid),
@@ -239,24 +243,24 @@ export default async function verifyAttestationResponse(
 }
 
 /**
- * Result of attestation verification
+ * Result of registration verification
  *
  * @param verified If the assertion response could be verified
- * @param attestationInfo.fmt Type of attestation
- * @param attestationInfo.counter The number of times the authenticator reported it has been used.
+ * @param registrationInfo.fmt Type of attestation
+ * @param registrationInfo.counter The number of times the authenticator reported it has been used.
  * Should be kept in a DB for later reference to help prevent replay attacks
- * @param attestationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
+ * @param registrationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
  * authenticator
- * @param attestationInfo.credentialPublicKey The credential's public key
- * @param attestationInfo.credentialID The credential's credential ID for the public key above
- * @param attestationInfo.credentialType The type of the credential returned by the browser
- * @param attestationInfo.userVerified Whether the user was uniquely identified during attestation
- * @param attestationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
+ * @param registrationInfo.credentialPublicKey The credential's public key
+ * @param registrationInfo.credentialID The credential's credential ID for the public key above
+ * @param registrationInfo.credentialType The type of the credential returned by the browser
+ * @param registrationInfo.userVerified Whether the user was uniquely identified during attestation
+ * @param registrationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
  * the authenticator
  */
-export type VerifiedAttestation = {
+export type VerifiedRegistrationResponse = {
   verified: boolean;
-  attestationInfo?: {
+  registrationInfo?: {
     fmt: AttestationFormat;
     counter: number;
     aaguid: string;

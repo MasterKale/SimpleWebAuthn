@@ -55,16 +55,16 @@ export interface PublicKeyCredentialUserEntityJSON
 /**
  * The value returned from navigator.credentials.create()
  */
-export interface AttestationCredential extends PublicKeyCredential {
+export interface RegistrationCredential extends PublicKeyCredential {
   response: AuthenticatorAttestationResponseFuture;
 }
 
 /**
- * A slightly-modified AttestationCredential to simplify working with ArrayBuffers that
+ * A slightly-modified RegistrationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface AttestationCredentialJSON
-  extends Omit<AttestationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+export interface RegistrationCredentialJSON
+  extends Omit<RegistrationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
@@ -74,16 +74,16 @@ export interface AttestationCredentialJSON
 /**
  * The value returned from navigator.credentials.get()
  */
-export interface AssertionCredential extends PublicKeyCredential {
+export interface AuthenticationCredential extends PublicKeyCredential {
   response: AuthenticatorAssertionResponse;
 }
 
 /**
- * A slightly-modified AssertionCredential to simplify working with ArrayBuffers that
+ * A slightly-modified AuthenticationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
  */
-export interface AssertionCredentialJSON
-  extends Omit<AssertionCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+export interface AuthenticationCredentialJSON
+  extends Omit<AuthenticationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
@@ -122,7 +122,7 @@ export type AuthenticatorDevice = {
   credentialID: Buffer;
   // Number of times this authenticator is expected to have been used
   counter: number;
-  // From browser's `startAttestation()` -> AttestationCredentialJSON.transports (API L2 and up)
+  // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
   transports?: AuthenticatorTransport[];
 };
 

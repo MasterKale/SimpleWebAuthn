@@ -2,7 +2,7 @@ import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 import { KeyDescription, id_ce_keyDescription } from '@peculiar/asn1-android';
 
-import type { AttestationFormatVerifierOpts } from '../verifyAttestationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../../helpers/validateCertificatePath';

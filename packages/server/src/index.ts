@@ -2,40 +2,40 @@
  * @packageDocumentation
  * @module @simplewebauthn/server
  */
-import generateAttestationOptions from './attestation/generateAttestationOptions';
-import verifyAttestationResponse from './attestation/verifyAttestationResponse';
-import generateAssertionOptions from './assertion/generateAssertionOptions';
-import verifyAssertionResponse from './assertion/verifyAssertionResponse';
+import generateRegistrationOptions from './registration/generateRegistrationOptions';
+import verifyRegistrationResponse from './registration/verifyRegistrationResponse';
+import generateAuthenticationOptions from './authentication/generateAuthenticationOptions';
+import verifyAuthenticationResponse from './authentication/verifyAuthenticationResponse';
 import MetadataService from './services/metadataService';
 import SettingsService from './services/settingsService';
 
 export {
-  generateAttestationOptions,
-  verifyAttestationResponse,
-  generateAssertionOptions,
-  verifyAssertionResponse,
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  generateAuthenticationOptions as generateAuthenticationOptions,
+  verifyAuthenticationResponse,
   MetadataService,
   SettingsService,
 };
 
-import type { GenerateAttestationOptionsOpts } from './attestation/generateAttestationOptions';
-import type { GenerateAssertionOptionsOpts } from './assertion/generateAssertionOptions';
+import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions';
+import type { GenerateAuthenticationOptionsOpts } from './authentication/generateAuthenticationOptions';
 import type { MetadataStatement } from './metadata/mdsTypes';
 import type {
-  VerifiedAttestation,
-  VerifyAttestationResponseOpts,
-} from './attestation/verifyAttestationResponse';
+  VerifiedRegistrationResponse,
+  VerifyRegistrationResponseOpts,
+} from './registration/verifyRegistrationResponse';
 import type {
-  VerifiedAssertion,
-  VerifyAssertionResponseOpts,
-} from './assertion/verifyAssertionResponse';
+  VerifiedAuthenticationResponse,
+  VerifyAuthenticationResponseOpts,
+} from './authentication/verifyAuthenticationResponse';
 
 export type {
-  GenerateAttestationOptionsOpts,
-  GenerateAssertionOptionsOpts,
+  GenerateRegistrationOptionsOpts,
+  GenerateAuthenticationOptionsOpts,
   MetadataStatement,
-  VerifyAttestationResponseOpts,
-  VerifyAssertionResponseOpts,
-  VerifiedAttestation,
-  VerifiedAssertion,
+  VerifyRegistrationResponseOpts,
+  VerifyAuthenticationResponseOpts,
+  VerifiedRegistrationResponse,
+  VerifiedAuthenticationResponse,
 };

@@ -1,11 +1,11 @@
 jest.mock('../helpers/generateChallenge');
 
-import generateAssertionOptions from './generateAssertionOptions';
+import generateAuthenticationOptions from './generateAuthenticationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
   const challenge = 'totallyrandomvalue';
 
-  const options = generateAssertionOptions({
+  const options = generateAuthenticationOptions({
     allowCredentials: [
       {
         id: Buffer.from('1234', 'ascii'),
@@ -42,7 +42,7 @@ test('should generate credential request options suitable for sending via JSON',
 });
 
 test('defaults to 60 seconds if no timeout is specified', () => {
-  const options = generateAssertionOptions({
+  const options = generateAuthenticationOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
@@ -54,7 +54,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
 });
 
 test('should not set userVerification if not specified', () => {
-  const options = generateAssertionOptions({
+  const options = generateAuthenticationOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
@@ -66,13 +66,13 @@ test('should not set userVerification if not specified', () => {
 });
 
 test('should not set allowCredentials if not specified', () => {
-  const options = generateAssertionOptions({ rpID: 'test' });
+  const options = generateAuthenticationOptions({ rpID: 'test' });
 
   expect(options.allowCredentials).toEqual(undefined);
 });
 
 test('should generate without params', () => {
-  const options = generateAssertionOptions();
+  const options = generateAuthenticationOptions();
   const { challenge, ...otherFields } = options;
   expect(otherFields).toEqual({
     allowCredentials: undefined,
@@ -85,7 +85,7 @@ test('should generate without params', () => {
 });
 
 test('should set userVerification if specified', () => {
-  const options = generateAssertionOptions({
+  const options = generateAuthenticationOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
@@ -98,7 +98,7 @@ test('should set userVerification if specified', () => {
 });
 
 test('should set extensions if specified', () => {
-  const options = generateAssertionOptions({
+  const options = generateAuthenticationOptions({
     challenge: 'totallyrandomvalue',
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
@@ -121,7 +121,7 @@ test('should generate a challenge if one is not provided', () => {
   };
 
   // @ts-ignore 2345
-  const options = generateAssertionOptions(opts);
+  const options = generateAuthenticationOptions(opts);
 
   // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
   expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
@@ -130,7 +130,7 @@ test('should generate a challenge if one is not provided', () => {
 test('should set rpId if specified', () => {
   const rpID = 'simplewebauthn.dev';
 
-  const opts = generateAssertionOptions({
+  const opts = generateAuthenticationOptions({
     allowCredentials: [],
     rpID,
   });

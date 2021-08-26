@@ -1,5 +1,5 @@
 import {
-  AssertionCredential,
+  AuthenticationCredential,
   PublicKeyCredentialRequestOptionsJSON,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
@@ -9,7 +9,7 @@ import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 
-import startAssertion from './startAssertion';
+import startAuthentication from './startAuthentication';
 
 jest.mock('../helpers/browserSupportsWebauthn');
 
@@ -61,7 +61,7 @@ afterEach(() => {
 });
 
 test('should convert options before passing to navigator.credentials.get(...)', async done => {
-  await startAssertion(goodOpts1);
+  await startAuthentication(goodOpts1);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
   const credId = argsPublicKey.allowCredentials[0].id;
@@ -75,7 +75,7 @@ test('should convert options before passing to navigator.credentials.get(...)', 
 });
 
 test('should support optional allowCredential', async () => {
-  await startAssertion({
+  await startAuthentication({
     challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
     timeout: 1,
   });
@@ -84,7 +84,7 @@ test('should support optional allowCredential', async () => {
 });
 
 test('should convert allow allowCredential to undefined when empty', async () => {
-  await startAssertion({
+  await startAuthentication({
     challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
     timeout: 1,
     allowCredentials: [],
@@ -93,7 +93,7 @@ test('should convert allow allowCredential to undefined when empty', async () =>
 });
 
 test('should return base64url-encoded response values', async done => {
-  mockNavigatorGet.mockImplementation((): Promise<AssertionCredential> => {
+  mockNavigatorGet.mockImplementation((): Promise<AuthenticationCredential> => {
     return new Promise(resolve => {
       resolve({
         id: 'foobar',
@@ -110,7 +110,7 @@ test('should return base64url-encoded response values', async done => {
     });
   });
 
-  const response = await startAssertion(goodOpts1);
+  const response = await startAuthentication(goodOpts1);
 
   expect(response.rawId).toEqual('Zm9vYmFy');
   expect(response.response.authenticatorData).toEqual('bW9ja0F1dGhlbnRpY2F0b3JEYXRh');
@@ -124,7 +124,7 @@ test('should return base64url-encoded response values', async done => {
 test("should throw error if WebAuthn isn't supported", async done => {
   mockSupportsWebauthn.mockReturnValue(false);
 
-  await expect(startAssertion(goodOpts1)).rejects.toThrow(
+  await expect(startAuthentication(goodOpts1)).rejects.toThrow(
     'WebAuthn is not supported in this browser',
   );
 
@@ -138,13 +138,13 @@ test('should throw error if assertion is cancelled for some reason', async done 
     });
   });
 
-  await expect(startAssertion(goodOpts1)).rejects.toThrow('Assertion was not completed');
+  await expect(startAuthentication(goodOpts1)).rejects.toThrow('Authentication was not completed');
 
   done();
 });
 
 test('should handle UTF-8 challenges', async done => {
-  await startAssertion(goodOpts2UTF8);
+  await startAuthentication(goodOpts2UTF8);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
 
@@ -168,7 +168,7 @@ test('should send extensions to authenticator if present in options', async done
     ...goodOpts1,
     extensions,
   };
-  await startAssertion(optsWithExts);
+  await startAuthentication(optsWithExts);
 
   const argsExtensions = mockNavigatorGet.mock.calls[0][0].publicKey.extensions;
 
@@ -178,7 +178,7 @@ test('should send extensions to authenticator if present in options', async done
 });
 
 test('should not set any extensions if not present in options', async done => {
-  await startAssertion(goodOpts1);
+  await startAuthentication(goodOpts1);
 
   const argsExtensions = mockNavigatorGet.mock.calls[0][0].publicKey.extensions;
 
@@ -203,7 +203,7 @@ test('should include extension results', async done => {
   });
 
   // Extensions aren't present in this object, but it doesn't matter since we're faking the response
-  const response = await startAssertion(goodOpts1);
+  const response = await startAuthentication(goodOpts1);
 
   expect(response.clientExtensionResults).toEqual(extResults);
 
@@ -211,7 +211,7 @@ test('should include extension results', async done => {
 });
 
 test('should include extension results when no extensions specified', async done => {
-  const response = await startAssertion(goodOpts1);
+  const response = await startAuthentication(goodOpts1);
 
   expect(response.clientExtensionResults).toEqual({});
 

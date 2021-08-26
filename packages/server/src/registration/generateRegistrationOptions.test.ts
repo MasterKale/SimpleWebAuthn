@@ -1,6 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
-import generateAttestationOptions from './generateAttestationOptions';
+import generateRegistrationOptions from './generateRegistrationOptions';
 
 test('should generate credential request options suitable for sending via JSON', () => {
   const rpName = 'SimpleWebAuthn';
@@ -11,7 +11,7 @@ test('should generate credential request options suitable for sending via JSON',
   const timeout = 1;
   const attestationType = 'indirect';
 
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpName,
     rpID,
     challenge,
@@ -55,7 +55,7 @@ test('should generate credential request options suitable for sending via JSON',
 });
 
 test('should map excluded credential IDs if specified', () => {
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -80,7 +80,7 @@ test('should map excluded credential IDs if specified', () => {
 });
 
 test('defaults to 60 seconds if no timeout is specified', () => {
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -92,7 +92,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
 });
 
 test('defaults to none attestation if no attestation type is specified', () => {
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -104,7 +104,7 @@ test('defaults to none attestation if no attestation type is specified', () => {
 });
 
 test('should set authenticatorSelection if specified', () => {
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -125,7 +125,7 @@ test('should set authenticatorSelection if specified', () => {
 });
 
 test('should set extensions if specified', () => {
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -140,7 +140,7 @@ test('should set extensions if specified', () => {
 });
 
 test('should generate a challenge if one is not provided', () => {
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -152,7 +152,7 @@ test('should generate a challenge if one is not provided', () => {
 });
 
 test('should use custom supported algorithm IDs as-is when provided', () => {
-  const options = generateAttestationOptions({
+  const options = generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',

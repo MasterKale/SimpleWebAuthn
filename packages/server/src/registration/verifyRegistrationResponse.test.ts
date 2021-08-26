@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import verifyAttestationResponse from './verifyAttestationResponse';
+import verifyRegistrationResponse from './verifyRegistrationResponse';
 
 import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -11,7 +11,7 @@ import SettingsService from '../services/settingsService';
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
 import toHash from '../helpers/toHash';
-import { AttestationCredentialJSON } from '@simplewebauthn/typescript-types';
+import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -42,7 +42,7 @@ afterEach(() => {
 });
 
 test('should verify FIDO U2F attestation', async () => {
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -50,28 +50,28 @@ test('should verify FIDO U2F attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('fido-u2f');
-  expect(verification.attestationInfo?.counter).toEqual(0);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('fido-u2f');
+  expect(verification.registrationInfo?.counter).toEqual(0);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer(
       'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
     ),
   );
-  expect(verification.attestationInfo?.aaguid).toEqual('00000000-0000-0000-0000-000000000000');
-  expect(verification.attestationInfo?.credentialType).toEqual('public-key');
-  expect(verification.attestationInfo?.userVerified).toEqual(false);
-  expect(verification.attestationInfo?.attestationObject).toEqual(
+  expect(verification.registrationInfo?.aaguid).toEqual('00000000-0000-0000-0000-000000000000');
+  expect(verification.registrationInfo?.credentialType).toEqual('public-key');
+  expect(verification.registrationInfo?.userVerified).toEqual(false);
+  expect(verification.registrationInfo?.attestationObject).toEqual(
     base64url.toBuffer(attestationFIDOU2F.response.attestationObject),
   );
 });
 
 test('should verify Packed (EC2) attestation', async () => {
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: attestationPacked,
     expectedChallenge: attestationPackedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -79,14 +79,14 @@ test('should verify Packed (EC2) attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('packed');
-  expect(verification.attestationInfo?.counter).toEqual(1589874425);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('packed');
+  expect(verification.registrationInfo?.counter).toEqual(1589874425);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pQECAyYgASFYIEoxVVqK-oIGmqoDEyO4KjmMx5R2HeMM4LQQXh8sE01PIlggtzuuoMN5fWnAIuuXdlfshOGu1k3ApBUtDJ8eKiuo_6c',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
         'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
@@ -95,7 +95,7 @@ test('should verify Packed (EC2) attestation', async () => {
 });
 
 test('should verify Packed (X5C) attestation', async () => {
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: attestationPackedX5C,
     expectedChallenge: attestationPackedX5CChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -103,14 +103,14 @@ test('should verify Packed (X5C) attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('packed');
-  expect(verification.attestationInfo?.counter).toEqual(28);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('packed');
+  expect(verification.registrationInfo?.counter).toEqual(28);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pQECAyYgASFYIGwlsYCNyRb4AD9cyTw6cH5VS-uzflmmO1UldGGe9eIaIlggvadzKD8p6wKLjgYfxRxldjCMGRV0YyM13osWbKIPrF8',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer(
       '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
     ),
@@ -118,7 +118,7 @@ test('should verify Packed (X5C) attestation', async () => {
 });
 
 test('should verify None attestation', async () => {
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -126,14 +126,14 @@ test('should verify None attestation', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('none');
-  expect(verification.attestationInfo?.counter).toEqual(0);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('none');
+  expect(verification.registrationInfo?.counter).toEqual(0);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer(
       'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
     ),
@@ -142,7 +142,7 @@ test('should verify None attestation', async () => {
 
 test('should verify None attestation w/RSA public key', async () => {
   const expectedChallenge = 'pYZ3VX2yb8dS9yplNxJChiXhPGBk8gZzTAyJ2iU5x1k';
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: {
       id: 'kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo',
       rawId: 'kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo',
@@ -161,38 +161,38 @@ test('should verify None attestation w/RSA public key', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('none');
-  expect(verification.attestationInfo?.counter).toEqual(0);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('none');
+  expect(verification.registrationInfo?.counter).toEqual(0);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pAEDAzkBACBZAQDxfpXrj0ba_AH30JJ_-W7BHSOPugOD8aEDdNBKc1gjB9AmV3FPl2aL0fwiOMKtM_byI24qXb2FzcyjC7HUVkHRtzkAQnahXckI4wY_01koaY6iwXuIE3Ya0Zjs2iZyz6u4G_abGnWdObqa_kHxc3CHR7Xy5MDkAkKyX6TqU0tgHZcEhDd_Lb5ONJDwg4wvKlZBtZYElfMuZ6lonoRZ7qR_81rGkDZyFaxp6RlyvzEbo4ijeIaHQylqCz-oFm03ifZMOfRHYuF4uTjJDRH-g4BW1f3rdi7DTHk1hJnIw1IyL_VFIQ9NifkAguYjNCySCUNpYli2eMrPhAu5dYJFFjINIUMBAAE',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
   );
 });
 
 test('should throw when response challenge is not expected value', async () => {
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/attestation challenge/i);
+  ).rejects.toThrow(/registration response challenge/i);
 });
 
 test('should throw when response origin is not expected value', async () => {
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://different.address',
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/attestation origin/i);
+  ).rejects.toThrow(/registration response origin/i);
 });
 
 test('should throw when attestation type is not webauthn.create', async () => {
@@ -207,13 +207,13 @@ test('should throw when attestation type is not webauthn.create', async () => {
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: challenge,
       expectedOrigin: origin,
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/attestation type/i);
+  ).rejects.toThrow(/registration response type/i);
 });
 
 test('should throw if an unexpected attestation format is specified', async () => {
@@ -230,7 +230,7 @@ test('should throw if an unexpected attestation format is specified', async () =
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -251,7 +251,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -269,7 +269,7 @@ test('should throw error if user was not present', async () => {
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -288,7 +288,7 @@ test('should throw if the authenticator does not give back credential ID', async
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -308,7 +308,7 @@ test('should throw if the authenticator does not give back credential public key
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -325,7 +325,7 @@ test('should throw error if no alg is specified in public key', async () => {
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -342,7 +342,7 @@ test('should throw error if unsupported alg is used', async () => {
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -354,7 +354,7 @@ test('should throw error if unsupported alg is used', async () => {
 test('should not include authenticator info if not verified', async () => {
   mockVerifyFIDOU2F.mockReturnValue(false);
 
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -362,7 +362,7 @@ test('should not include authenticator info if not verified', async () => {
   });
 
   expect(verification.verified).toBe(false);
-  expect(verification.attestationInfo).toBeUndefined();
+  expect(verification.registrationInfo).toBeUndefined();
 });
 
 test('should throw an error if user verification is required but user was not verified', async () => {
@@ -375,7 +375,7 @@ test('should throw an error if user verification is required but user was not ve
   });
 
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationFIDOU2F,
       expectedChallenge: attestationFIDOU2FChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -387,7 +387,7 @@ test('should throw an error if user verification is required but user was not ve
 
 test('should validate TPM RSA response (SHA256)', async () => {
   const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: {
       id: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
       rawId: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
@@ -406,21 +406,21 @@ test('should validate TPM RSA response (SHA256)', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('tpm');
-  expect(verification.attestationInfo?.counter).toEqual(30);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('tpm');
+  expect(verification.registrationInfo?.counter).toEqual(30);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pAEDAzkBACBZAQCtxzw59Wsl8xWP97wPTu2TSDlushwshL8GedHAHO1R62m3nNy21hCLJlQabfLepRUQ_v9mq3PCmV81tBSqtRGU5_YlK0R2yeu756SnT39c6hKC3PBPt_xdjL_ccz4H_73DunfB63QZOtdeAsswV7WPLqMARofuM-LQ_LHnNguCypDcxhADuUqQtogfwZsknTVIPxzGcfqnQ7ERF9D9AOWIQ8YjOsTi_B2zS8SOySKIFUGwwYcPG7DiCE-QJcI-fpydRDnEq6UxbkYgB7XK4BlmPKlwuXkBDX9egl_Ma4B7W2WJvYbKevu6Z8Kc5y-OITpNVDYKbBK3qKyh4yIUpB1NIUMBAAE',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
   );
 });
 
 test('should validate TPM RSA response (SHA1)', async () => {
   const expectedChallenge = 'f4e8d87b-d363-47cc-ab4d-1a84647bf245';
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: {
       id: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
       rawId: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
@@ -439,21 +439,21 @@ test('should validate TPM RSA response (SHA1)', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('tpm');
-  expect(verification.attestationInfo?.counter).toEqual(97);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('tpm');
+  expect(verification.registrationInfo?.counter).toEqual(97);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pAEDAzn__iBZAQCzl_wD24PZ5z-po2FrwoQVdd13got_CkL8p4B_NvJBC5OwAYKDilii_wj-0CA8ManbpSInx9Tdnz6t91OhudwUT0-W_BHSLK_MqFcjZWrR5LYVmVpz1EgH3DrOTra4AlogEq2D2CYktPrPe7joE-oT3vAYXK8vzQDLRyaxI_Z1qS4KLlLCdajW8PGpw1YRjMDw6s69GZU8mXkgNPMCUh1TZ1bnCvJTO9fnmLjDjqdQGRU4bWo8tFjCL8g1-2WD_2n0-twt6n-Uox5VnR1dQJG4awMlanBCkGGpOb3WBDQ8K10YJJ2evPhJKGJahBvu2Dxmq6pLCAXCv0ma3EHj-PmDIUMBAAE',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
   );
 });
 
 test('should validate Android-Key response', async () => {
   const expectedChallenge = '14e0d1b6-9c36-4849-aeec-ea64676449ef';
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: {
       id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
       rawId: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
@@ -472,20 +472,20 @@ test('should validate Android-Key response', async () => {
   });
 
   expect(verification.verified).toEqual(true);
-  expect(verification.attestationInfo?.fmt).toEqual('android-key');
-  expect(verification.attestationInfo?.counter).toEqual(108);
-  expect(verification.attestationInfo?.credentialPublicKey).toEqual(
+  expect(verification.registrationInfo?.fmt).toEqual('android-key');
+  expect(verification.registrationInfo?.counter).toEqual(108);
+  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
     base64url.toBuffer(
       'pQECAyYgASFYIEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239oIlgg6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
     ),
   );
-  expect(verification.attestationInfo?.credentialID).toEqual(
+  expect(verification.registrationInfo?.credentialID).toEqual(
     base64url.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
   );
 });
 
 test('should support multiple possible origins', async () => {
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: ['https://dev.dontneeda.pw', 'https://different.address'],
@@ -497,17 +497,17 @@ test('should support multiple possible origins', async () => {
 
 test('should throw an error if origin not in list of expected origins', async () => {
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: ['https://different.address'],
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/unexpected attestation origin/i);
+  ).rejects.toThrow(/unexpected registration response origin/i);
 });
 
 test('should support multiple possible RP IDs', async () => {
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -519,7 +519,7 @@ test('should support multiple possible RP IDs', async () => {
 
 test('should throw an error if RP ID not in list of possible RP IDs', async () => {
   await expect(
-    verifyAttestationResponse({
+    verifyRegistrationResponse({
       credential: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
@@ -532,7 +532,7 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
  * Various Attestations Below
  */
 
-const attestationFIDOU2F: AttestationCredentialJSON = {
+const attestationFIDOU2F: RegistrationCredentialJSON = {
   id: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   rawId: 'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
   response: {
@@ -546,7 +546,7 @@ const attestationFIDOU2F: AttestationCredentialJSON = {
 };
 const attestationFIDOU2FChallenge = base64url.encode('totallyUniqueValueEveryAttestation');
 
-const attestationPacked: AttestationCredentialJSON = {
+const attestationPacked: RegistrationCredentialJSON = {
   id: 'bbb',
   rawId: 'bbb',
   response: {
@@ -567,7 +567,7 @@ const attestationPacked: AttestationCredentialJSON = {
 };
 const attestationPackedChallenge = base64url.encode('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
 
-const attestationPackedX5C: AttestationCredentialJSON = {
+const attestationPackedX5C: RegistrationCredentialJSON = {
   // TODO: Grab these from another iPhone attestation
   id: 'aaa',
   rawId: 'aaa',
@@ -598,7 +598,7 @@ const attestationPackedX5C: AttestationCredentialJSON = {
 };
 const attestationPackedX5CChallenge = base64url.encode('totallyUniqueValueEveryTime');
 
-const attestationNone: AttestationCredentialJSON = {
+const attestationNone: RegistrationCredentialJSON = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   rawId: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   response: {

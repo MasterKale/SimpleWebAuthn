@@ -1,7 +1,7 @@
 import {
   PublicKeyCredentialRequestOptionsJSON,
-  AssertionCredential,
-  AssertionCredentialJSON,
+  AuthenticationCredential,
+  AuthenticationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
@@ -15,9 +15,9 @@ import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDes
  *
  * @param requestOptionsJSON Output from @simplewebauthn/server's generateAssertionOptions(...)
  */
-export default async function startAssertion(
+export default async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
-): Promise<AssertionCredentialJSON> {
+): Promise<AuthenticationCredentialJSON> {
   if (!browserSupportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
@@ -37,10 +37,10 @@ export default async function startAssertion(
   };
 
   // Wait for the user to complete assertion
-  const credential = (await navigator.credentials.get({ publicKey })) as AssertionCredential;
+  const credential = (await navigator.credentials.get({ publicKey })) as AuthenticationCredential;
 
   if (!credential) {
-    throw new Error('Assertion was not completed');
+    throw new Error('Authentication was not completed');
   }
 
   const { id, rawId, response, type } = credential;
