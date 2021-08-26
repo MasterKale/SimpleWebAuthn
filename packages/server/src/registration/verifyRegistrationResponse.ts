@@ -82,13 +82,13 @@ export default async function verifyRegistrationResponse(
 
   // Make sure we're handling an registration
   if (type !== 'webauthn.create') {
-    throw new Error(`Unexpected registration type: ${type}`);
+    throw new Error(`Unexpected registration response type: ${type}`);
   }
 
   // Ensure the device provided the challenge we gave it
   if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected registration challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected registration response challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 
@@ -96,12 +96,16 @@ export default async function verifyRegistrationResponse(
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
       throw new Error(
-        `Unexpected registration origin "${origin}", expected one of: ${expectedOrigin.join(', ')}`,
+        `Unexpected registration response origin "${origin}", expected one of: ${expectedOrigin.join(
+          ', ',
+        )}`,
       );
     }
   } else {
     if (origin !== expectedOrigin) {
-      throw new Error(`Unexpected registration origin "${origin}", expected "${expectedOrigin}"`);
+      throw new Error(
+        `Unexpected registration response origin "${origin}", expected "${expectedOrigin}"`,
+      );
     }
   }
 

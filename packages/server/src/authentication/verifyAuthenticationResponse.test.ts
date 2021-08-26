@@ -43,8 +43,8 @@ test('should return authenticator info after verification', () => {
     authenticator: authenticator,
   });
 
-  expect(verification.assertionInfo.newCounter).toEqual(144);
-  expect(verification.assertionInfo.credentialID).toEqual(authenticator.credentialID);
+  expect(verification.authenticationInfo.newCounter).toEqual(144);
+  expect(verification.authenticationInfo.credentialID).toEqual(authenticator.credentialID);
 });
 
 test('should throw when response challenge is not expected value', () => {
@@ -56,7 +56,7 @@ test('should throw when response challenge is not expected value', () => {
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
     });
-  }).toThrow(/assertion challenge/i);
+  }).toThrow(/authentication response challenge/i);
 });
 
 test('should throw when response origin is not expected value', () => {
@@ -68,7 +68,7 @@ test('should throw when response origin is not expected value', () => {
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
     });
-  }).toThrow(/assertion origin/i);
+  }).toThrow(/authentication response origin/i);
 });
 
 test('should throw when assertion type is not webauthn.create', () => {
@@ -87,7 +87,7 @@ test('should throw when assertion type is not webauthn.create', () => {
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
     });
-  }).toThrow(/assertion type/i);
+  }).toThrow(/authentication response type/i);
 });
 
 test('should throw error if user was not present', () => {
@@ -233,7 +233,7 @@ test('should throw an error if origin not in list of expected origins', async ()
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
     });
-  }).toThrow(/unexpected assertion origin/i);
+  }).toThrow(/unexpected authentication response origin/i);
 });
 
 test('should support multiple possible RP IDs', async () => {

@@ -181,7 +181,7 @@ test('should throw when response challenge is not expected value', async () => {
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/attestation challenge/i);
+  ).rejects.toThrow(/registration response challenge/i);
 });
 
 test('should throw when response origin is not expected value', async () => {
@@ -192,7 +192,7 @@ test('should throw when response origin is not expected value', async () => {
       expectedOrigin: 'https://different.address',
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/attestation origin/i);
+  ).rejects.toThrow(/registration response origin/i);
 });
 
 test('should throw when attestation type is not webauthn.create', async () => {
@@ -213,7 +213,7 @@ test('should throw when attestation type is not webauthn.create', async () => {
       expectedOrigin: origin,
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/attestation type/i);
+  ).rejects.toThrow(/registration response type/i);
 });
 
 test('should throw if an unexpected attestation format is specified', async () => {
@@ -503,7 +503,7 @@ test('should throw an error if origin not in list of expected origins', async ()
       expectedOrigin: ['https://different.address'],
       expectedRPID: 'dev.dontneeda.pw',
     }),
-  ).rejects.toThrow(/unexpected attestation origin/i);
+  ).rejects.toThrow(/unexpected registration response origin/i);
 });
 
 test('should support multiple possible RP IDs', async () => {

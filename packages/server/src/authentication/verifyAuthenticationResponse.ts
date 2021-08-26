@@ -78,28 +78,29 @@ export default function verifyAuthenticationResponse(
 
   // Make sure we're handling an assertion
   if (type !== 'webauthn.get') {
-    throw new Error(`Unexpected authentication type: ${type}`);
+    throw new Error(`Unexpected authentication response type: ${type}`);
   }
 
   // Ensure the device provided the challenge we gave it
   if (challenge !== expectedChallenge) {
     throw new Error(
-      `Unexpected authentication challenge "${challenge}", expected "${expectedChallenge}"`,
+      `Unexpected authentication response challenge "${challenge}", expected "${expectedChallenge}"`,
     );
   }
 
   // Check that the origin is our site
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
+      const joinedExpectedOrigin = expectedOrigin.join(', ');
       throw new Error(
-        `Unexpected authentication origin "${origin}", expected one of: ${expectedOrigin.join(
-          ', ',
-        )}`,
+        `Unexpected authentication response origin "${origin}", expected one of: ${joinedExpectedOrigin}`,
       );
     }
   } else {
     if (origin !== expectedOrigin) {
-      throw new Error(`Unexpected authentication origin "${origin}", expected "${expectedOrigin}"`);
+      throw new Error(
+        `Unexpected authentication response origin "${origin}", expected "${expectedOrigin}"`,
+      );
     }
   }
 

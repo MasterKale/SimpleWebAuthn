@@ -1,4 +1,4 @@
-import verifyAttestationResponse from '../verifyAttestationResponse';
+import verifyRegistrationResponse from '../verifyRegistrationResponse';
 
 test('should verify (broken) Packed response from Chrome virtual authenticator', async () => {
   /**
@@ -11,7 +11,7 @@ test('should verify (broken) Packed response from Chrome virtual authenticator',
    * virtual authenticators should stop returning faulty values like this one starting in Chrome 91.
    * This unit test will remain for now in case this issue comes up again.
    */
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: {
       id: '5Hwc78jGjXrzOS8Mke9KhFZEtX54iYD-UEBKgvMXM64',
       rawId: '5Hwc78jGjXrzOS8Mke9KhFZEtX54iYD-UEBKgvMXM64',

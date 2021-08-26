@@ -8,10 +8,10 @@ test('should export method `verifyRegistrationResponse`', () => {
   expect(index.verifyRegistrationResponse).toBeDefined();
 });
 
-test('should export method `generateAssertionOptions`', () => {
-  expect(index.generateAssertionOptions).toBeDefined();
+test('should export method `generateAuthenticationOptions`', () => {
+  expect(index.generateAuthenticationOptions).toBeDefined();
 });
 
-test('should export method `verifyAssertionResponse`', () => {
-  expect(index.verifyAssertionResponse).toBeDefined();
+test('should export method `verifyAuthenticationResponse`', () => {
+  expect(index.verifyAuthenticationResponse).toBeDefined();
 });

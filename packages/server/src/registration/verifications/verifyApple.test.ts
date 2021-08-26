@@ -1,11 +1,11 @@
 import base64url from 'base64url';
 
-import verifyAttestationResponse from '../verifyAttestationResponse';
+import verifyRegistrationResponse from '../verifyRegistrationResponse';
 
 test('should verify Apple attestation', async () => {
   const expectedChallenge = 'h5xSyIRMx2IQPr1mQk6GD98XSQOBHgMHVpJIkMV9Nkc';
   jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
-  const verification = await verifyAttestationResponse({
+  const verification = await verifyRegistrationResponse({
     credential: {
       id: 'J4lAqPXhefDrUD7oh5LQMbBH5TE',
       rawId: 'J4lAqPXhefDrUD7oh5LQMbBH5TE',
