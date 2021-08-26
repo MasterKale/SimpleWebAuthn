@@ -60,7 +60,7 @@ afterEach(() => {
   mockSupportsWebauthn.mockReset();
 });
 
-test('should convert options before passing to navigator.credentials.get(...)', async done => {
+test('should convert options before passing to navigator.credentials.get(...)', async () => {
   await startAuthentication(goodOpts1);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
@@ -70,8 +70,6 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   // Make sure the credential ID is an ArrayBuffer with a length of 64
   expect(credId instanceof ArrayBuffer).toEqual(true);
   expect(credId.byteLength).toEqual(64);
-
-  done();
 });
 
 test('should support optional allowCredential', async () => {
@@ -92,7 +90,7 @@ test('should convert allow allowCredential to undefined when empty', async () =>
   expect(mockNavigatorGet.mock.calls[0][0].allowCredentials).toEqual(undefined);
 });
 
-test('should return base64url-encoded response values', async done => {
+test('should return base64url-encoded response values', async () => {
   mockNavigatorGet.mockImplementation((): Promise<AuthenticationCredential> => {
     return new Promise(resolve => {
       resolve({
@@ -117,21 +115,17 @@ test('should return base64url-encoded response values', async done => {
   expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWVudERhdGFKU09O');
   expect(response.response.signature).toEqual('bW9ja1NpZ25hdHVyZQ');
   expect(response.response.userHandle).toEqual('mockUserHandle');
-
-  done();
 });
 
-test("should throw error if WebAuthn isn't supported", async done => {
+test("should throw error if WebAuthn isn't supported", async () => {
   mockSupportsWebauthn.mockReturnValue(false);
 
   await expect(startAuthentication(goodOpts1)).rejects.toThrow(
     'WebAuthn is not supported in this browser',
   );
-
-  done();
 });
 
-test('should throw error if assertion is cancelled for some reason', async done => {
+test('should throw error if assertion is cancelled for some reason', async () => {
   mockNavigatorGet.mockImplementation((): Promise<null> => {
     return new Promise(resolve => {
       resolve(null);
@@ -139,11 +133,9 @@ test('should throw error if assertion is cancelled for some reason', async done 
   });
 
   await expect(startAuthentication(goodOpts1)).rejects.toThrow('Authentication was not completed');
-
-  done();
 });
 
-test('should handle UTF-8 challenges', async done => {
+test('should handle UTF-8 challenges', async () => {
   await startAuthentication(goodOpts2UTF8);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
@@ -153,11 +145,9 @@ test('should handle UTF-8 challenges', async done => {
       227, 130, 132, 227, 130, 140, 227, 130, 132, 227, 130, 140, 227, 129, 160, 227, 129, 156,
     ]),
   );
-
-  done();
 });
 
-test('should send extensions to authenticator if present in options', async done => {
+test('should send extensions to authenticator if present in options', async () => {
   const extensions: AuthenticationExtensionsClientInputs = {
     credProps: true,
     appid: 'appidHere',
@@ -173,21 +163,17 @@ test('should send extensions to authenticator if present in options', async done
   const argsExtensions = mockNavigatorGet.mock.calls[0][0].publicKey.extensions;
 
   expect(argsExtensions).toEqual(extensions);
-
-  done();
 });
 
-test('should not set any extensions if not present in options', async done => {
+test('should not set any extensions if not present in options', async () => {
   await startAuthentication(goodOpts1);
 
   const argsExtensions = mockNavigatorGet.mock.calls[0][0].publicKey.extensions;
 
   expect(argsExtensions).toEqual(undefined);
-
-  done();
 });
 
-test('should include extension results', async done => {
+test('should include extension results', async () => {
   const extResults: AuthenticationExtensionsClientOutputs = {
     appid: true,
     credProps: {
@@ -206,14 +192,10 @@ test('should include extension results', async done => {
   const response = await startAuthentication(goodOpts1);
 
   expect(response.clientExtensionResults).toEqual(extResults);
-
-  done();
 });
 
-test('should include extension results when no extensions specified', async done => {
+test('should include extension results when no extensions specified', async () => {
   const response = await startAuthentication(goodOpts1);
 
   expect(response.clientExtensionResults).toEqual({});
-
-  done();
 });
