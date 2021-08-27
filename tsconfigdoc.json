@@ -20,7 +20,6 @@
     "readme": "./DOCS.md",
     "name": "@SimpleWebAuthn",
     "excludeExternals": true,
-    "excludePrivate": true,
-    "plugin": ["./typedoc-plugin-external-module-name"]
+    "excludePrivate": true
   }
 }

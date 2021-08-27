@@ -10,8 +10,12 @@
   },
   "typesVersions": {
     "*": {
-      "./dist/index.d.ts": [ "./dist/index.d.ts" ],
-      "helpers": [ "./dist/helpers/index.d.ts" ]
+      "./dist/index.d.ts": [
+        "./dist/index.d.ts"
+      ],
+      "helpers": [
+        "./dist/helpers/index.d.ts"
+      ]
     }
   },
   "author": "Matthew Miller <matthew@millerti.me>",
@@ -42,14 +46,14 @@
     "node"
   ],
   "dependencies": {
-    "@peculiar/asn1-android": "^2.0.26",
-    "@peculiar/asn1-schema": "^2.0.26",
-    "@peculiar/asn1-x509": "^2.0.26",
+    "@peculiar/asn1-android": "^2.0.38",
+    "@peculiar/asn1-schema": "^2.0.38",
+    "@peculiar/asn1-x509": "^2.0.38",
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "^3.0.1",
     "cbor": "^5.1.0",
     "elliptic": "^6.5.3",
-    "jsrsasign": "^10.2.0",
+    "jsrsasign": "^10.4.0",
     "jwk-to-pem": "^2.0.4",
     "node-fetch": "^2.6.0",
     "node-rsa": "^1.1.1"
@@ -57,10 +61,10 @@
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
   "devDependencies": {
     "@types/cbor": "^5.0.1",
-    "@types/elliptic": "^6.4.12",
-    "@types/jsrsasign": "^8.0.11",
-    "@types/jwk-to-pem": "^2.0.0",
-    "@types/node-fetch": "^2.5.7",
-    "@types/node-rsa": "^1.0.0"
+    "@types/elliptic": "^6.4.13",
+    "@types/jsrsasign": "^8.0.13",
+    "@types/jwk-to-pem": "^2.0.1",
+    "@types/node-fetch": "^2.5.12",
+    "@types/node-rsa": "^1.1.1"
   }
 }
