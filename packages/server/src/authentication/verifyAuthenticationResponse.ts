@@ -76,7 +76,7 @@ export default function verifyAuthenticationResponse(
 
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
-  // Make sure we're handling an assertion
+  // Make sure we're handling an authentication
   if (type !== 'webauthn.get') {
     throw new Error(`Unexpected authentication response type: ${type}`);
   }
