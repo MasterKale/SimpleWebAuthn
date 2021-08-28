@@ -1,5 +1,56 @@
 # Changelog
 
+## v4.0.0 - The one with some new names
+
+A lot has happened to me since I first launched SimpleWebAuthn back in May 2020. My understanding of WebAuthn has grown by leaps and bounds thanks in part to my representing Duo/Cisco in the W3C's WebAuth Adoption Working Group. I'm now in a point in my life in which it's no longer sufficient to think, "what's in SimpleWebAuthn's best interests?" Now, I have an opportunity to think bigger - "what's in the **WebAuthn API**'s best interests?"
+
+While early on I thought "attestation" and "assertion" were important names to WebAuthn, I've since come to better appreciate [the spec's efforts to encourage the use of "registration" and "authentication"](https://www.w3.org/TR/webauthn-2/#sctn-use-cases) instead. **To that end I decided it was time to rename all of the project's various public methods and types** to get as much as possible to use "registration" and "authentication" instead.
+
+This release is one of the more disruptive because it affects everyone who's used SimpleWebAuthn to date. The good news is that, while method and type names have changed, their capabilities remain the same. Updating your code to this version of SimpleWebAuthn should only involve renaming existing method calls and type annotations.
+
+**Please take the time to read the entire changelog for this release!** There are a handful of new features also included that users with advanced use cases will find helpful. **The simple use cases of the library remain unchanged** - most new features are for power users who require extra scrutiny of authenticators that interact with their website and are otherwise opt-in as needed.
+
+**Packages:**
+
+- @simplewebauthn/browser@4.0.0
+- @simplewebauthn/server@4.0.0
+- @simplewebauthn/typescript-types@4.0.0
+
+**Changes:**
+- **[browser]** A new (asynchronous) helper method `platformAuthenticatorIsAvailable()` has been added for detecting when hardware-bound authenticators like Touch ID, Windows Hello, etc... are available for use. [More info is available here.](https://simplewebauthn.dev/docs/packages/browser#platformauthenticatorisavailable)
+- **[server]** The new `SettingsService` can be used to configure aspects of SimpleWebAuthn like root certs for enhanced registration response verification or for validating FIDO MDS BLOBs with MetadataService. [More info is available here](https://simplewebauthn.dev/docs/packages/server#settingsservice).
+- **[server]** Known root certificates for the following attestation formats have been updated: `'android-key'`, `'android-safetynet'`, `'apple'`
+- **[server]** A wide range of internal helper methods are now exported from `'@simplewebauthn/server/helpers'` (not a new package, but a subpath.) These methods can be used, for example, to process non-standard responses that are not officially part of the WebAuthn spec and thus unlikely to ever be supported by SimpleWebAuthn.
+- **[server]** `MetadataService` now supports [FIDO Alliance Metadata Service version 3.0](https://fidoalliance.org/metadata/).
+
+### Breaking Changes
+
+- **[browser, server, typescript-types]** All methods and types that included "attestation" in the name have been renamed to use **"registration"** instead
+- **[browser, server, typescript-types]** All methods and types that included "assertion" in the name have been renamed to use **"authentication"** instead.
+
+> The quickest way to update your code is to try changing "attestation" to "registration" and "assertion" to "authentication" in the name of whatever method or type is no longer working and see if that fixes it (exceptions to this rule are called out with asterisks below.) If it doesn't, check out [PR #147](https://github.com/MasterKale/SimpleWebAuthn/pull/147) to see all of the renamed methods and types and try to cross-reference the original to see what it was renamed to.
+>
+>
+> **Examples:**
+>
+> - `generateAttestationOptions()` -> **`generateRegistrationOptions()`**
+> - `GenerateAttestationOptionsOpts` -> **`GenerateRegistrationOptionsOpts`**
+> - `verifyAssertionResponse()` -> **`verifyAuthenticationResponse()`**
+> - `VerifiedAttestation` -> **`VerifiedRegistrationResponse`** (*)
+> - `VerifiedAssertion` -> **`VerifiedAuthenticationResponse`** (*)
+> - `startAttestation()` -> **`startRegistration()`**
+> - `startAssertion()` -> **`startAuthentication()`**
+>
+> **These examples are not a comprehensive list of all the renamed methods!** Rather these are examples of how method names were changed to try and eliminate "attestation" and "assertion" from the public API of both **@simplewebauthn/browser** and **@simplewebauthn/server**.
+
+
+- **[server]** The `opts` argument for `MetadataService.initialize()` is now optional.
+- **[server]** The `opts.mdsServers` argument for `MetadataService.initialize(opts)` is now a simple array of URL strings to FIDO Alliance MDSv3-compatible servers. If no value is specified then MetadataService will query the [official FIDO Alliance Metadata Service version 3.0](https://fidoalliance.org/metadata/).
+
+> See [here](https://simplewebauthn.dev/docs/packages/server#metadataservice) for more information about the updated `MetadataService`.
+
+- **[browser]** `supportsWebAuthn()` has been renamed to **`browserSupportsWebAuthn()`** in an effort to make the method convey a clearer idea of what supports WebAuthn.
+
 ## v3.1.0
 
 **Packages:**
