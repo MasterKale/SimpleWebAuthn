@@ -40,7 +40,7 @@
       <p class="systemError"></p>
     </div>
     <script>
-      const { supportsWebauthn, startAttestation, startAssertion } = SimpleWebAuthnBrowser;
+      const { browserSupportsWebauthn, startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
 
       /**
        * A simple way to control how debug content is written to a debug console element
@@ -54,7 +54,7 @@
       }
 
       // Hide the Begin button if the browser is incapable of using WebAuthn
-      if (!supportsWebauthn()) {
+      if (!browserSupportsWebauthn()) {
         document.querySelector('.controls').style.display = 'none';
         document.querySelector('.systemError').innerText = "It seems this browser doesn't support WebAuthn...";
       } else {
@@ -72,13 +72,13 @@
           elemError.innerHTML = '';
           elemDebug.innerHTML = '';
 
-          const resp = await fetch('/generate-attestation-options');
+          const resp = await fetch('/generate-registration-options');
 
           let attResp;
           try {
             const opts = await resp.json();
             printDebug(elemDebug, 'Registration Options', JSON.stringify(opts, null, 2));
-            attResp = await startAttestation(opts);
+            attResp = await startRegistration(opts);
             printDebug(elemDebug, 'Registration Response', JSON.stringify(attResp, null, 2));
           } catch (error) {
             if (error.name === 'InvalidStateError') {
@@ -90,7 +90,7 @@
             throw error;
           }
 
-          const verificationResp = await fetch('/verify-attestation', {
+          const verificationResp = await fetch('/verify-registration', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -123,20 +123,20 @@
           elemError.innerHTML = '';
           elemDebug.innerHTML = '';
 
-          const resp = await fetch('/generate-assertion-options');
+          const resp = await fetch('/generate-authentication-options');
 
           let asseResp;
           try {
             const opts = await resp.json();
             printDebug(elemDebug, 'Authentication Options', JSON.stringify(opts, null, 2));
-            asseResp = await startAssertion(opts);
+            asseResp = await startAuthentication(opts);
             printDebug(elemDebug, 'Authentication Response', JSON.stringify(asseResp, null, 2));
           } catch (error) {
             elemError.innerText = error;
             throw new Error(error);
           }
 
-          const verificationResp = await fetch('/verify-assertion', {
+          const verificationResp = await fetch('/verify-authentication', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

@@ -16,25 +16,25 @@ import base64url from 'base64url';
 dotenv.config();
 
 import {
-  // Registration ("Attestation")
-  generateAttestationOptions,
-  verifyAttestationResponse,
-  // Login ("Assertion")
-  generateAssertionOptions,
-  verifyAssertionResponse,
+  // Registration
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  // Authentication
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
 import type {
-  GenerateAttestationOptionsOpts,
-  GenerateAssertionOptionsOpts,
-  VerifyAttestationResponseOpts,
-  VerifyAssertionResponseOpts,
-  VerifiedAttestation,
-  VerifiedAssertion,
+  GenerateRegistrationOptionsOpts,
+  GenerateAuthenticationOptionsOpts,
+  VerifyRegistrationResponseOpts,
+  VerifyAuthenticationResponseOpts,
+  VerifiedRegistrationResponse,
+  VerifiedAuthenticationResponse,
 } from '@simplewebauthn/server';
 
 import type {
-  AttestationCredentialJSON,
-  AssertionCredentialJSON,
+  RegistrationCredentialJSON,
+  AuthenticationCredentialJSON,
   AuthenticatorDevice,
 } from '@simplewebauthn/typescript-types';
 
@@ -61,7 +61,7 @@ if (ENABLE_CONFORMANCE === 'true') {
 
 /**
  * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
- * represents the expected URL from which an attestation or assertion occurs.
+ * represents the expected URL from which registration or authentication occurs.
  */
 export const rpID = 'localhost';
 // This value is set at the bottom of page as part of server initialization (the empty string is
@@ -71,7 +71,7 @@ export let expectedOrigin = '';
 
 /**
  * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that
- * performs an attestation or assertion. The user ID you specify here should be your internal,
+ * performs registration or authentication. The user ID you specify here should be your internal,
  * _unique_ ID for that user (uuid, etc...). Avoid using identifying information here, like email
  * addresses, as it may be stored within the authenticator.
  *
@@ -85,7 +85,7 @@ const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
     username: `user@${rpID}`,
     devices: [],
     /**
-     * A simple way of storing a user's current challenge being signed by attestation or assertion.
+     * A simple way of storing a user's current challenge being signed by registration or authentication.
      * It should be expired after `timeout` milliseconds (optional argument for `generate` methods,
      * defaults to 60000ms)
      */
@@ -94,9 +94,9 @@ const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
 };
 
 /**
- * Registration (a.k.a. "Attestation")
+ * Registration (a.k.a. "Registration")
  */
-app.get('/generate-attestation-options', (req, res) => {
+app.get('/generate-registration-options', (req, res) => {
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
   const {
@@ -107,7 +107,7 @@ app.get('/generate-attestation-options', (req, res) => {
     devices,
   } = user;
 
-  const opts: GenerateAttestationOptionsOpts = {
+  const opts: GenerateRegistrationOptionsOpts = {
     rpName: 'SimpleWebAuthn Example',
     rpID,
     userID: loggedInUserId,
@@ -117,7 +117,7 @@ app.get('/generate-attestation-options', (req, res) => {
     /**
      * Passing in a user's list of already-registered authenticator IDs here prevents users from
      * registering the same device multiple times. The authenticator will simply throw an error in
-     * the browser if it's asked to perform an attestation when one of these ID's already resides
+     * the browser if it's asked to perform registration when one of these ID's already resides
      * on it.
      */
     excludeCredentials: devices.map(dev => ({
@@ -127,7 +127,7 @@ app.get('/generate-attestation-options', (req, res) => {
     })),
     /**
      * The optional authenticatorSelection property allows for specifying more constraints around
-     * the types of authenticators that users to can use for attestation
+     * the types of authenticators that users to can use for registration
      */
     authenticatorSelection: {
       userVerification: 'preferred',
@@ -139,7 +139,7 @@ app.get('/generate-attestation-options', (req, res) => {
     supportedAlgorithmIDs: [-7, -257],
   };
 
-  const options = generateAttestationOptions(opts);
+  const options = generateRegistrationOptions(opts);
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
@@ -150,31 +150,32 @@ app.get('/generate-attestation-options', (req, res) => {
   res.send(options);
 });
 
-app.post('/verify-attestation', async (req, res) => {
-  const body: AttestationCredentialJSON = req.body;
+app.post('/verify-registration', async (req, res) => {
+  const body: RegistrationCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
   const expectedChallenge = user.currentChallenge;
 
-  let verification: VerifiedAttestation;
+  let verification: VerifiedRegistrationResponse;
   try {
-    const opts: VerifyAttestationResponseOpts = {
+    const opts: VerifyRegistrationResponseOpts = {
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
     };
-    verification = await verifyAttestationResponse(opts);
+    verification = await verifyRegistrationResponse(opts);
   } catch (error) {
-    console.error(error);
-    return res.status(400).send({ error: error.message });
+    const _error = error as Error;
+    console.error(_error);
+    return res.status(400).send({ error: _error.message });
   }
 
-  const { verified, attestationInfo } = verification;
+  const { verified, registrationInfo } = verification;
 
-  if (verified && attestationInfo) {
-    const { credentialPublicKey, credentialID, counter } = attestationInfo;
+  if (verified && registrationInfo) {
+    const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
     const existingDevice = user.devices.find(device => device.credentialID === credentialID);
 
@@ -196,13 +197,13 @@ app.post('/verify-attestation', async (req, res) => {
 });
 
 /**
- * Login (a.k.a. "Assertion")
+ * Login (a.k.a. "Authentication")
  */
-app.get('/generate-assertion-options', (req, res) => {
+app.get('/generate-authentication-options', (req, res) => {
   // You need to know the user by this point
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
-  const opts: GenerateAssertionOptionsOpts = {
+  const opts: GenerateAuthenticationOptionsOpts = {
     timeout: 60000,
     allowCredentials: user.devices.map(dev => ({
       id: dev.credentialID,
@@ -217,7 +218,7 @@ app.get('/generate-assertion-options', (req, res) => {
     rpID,
   };
 
-  const options = generateAssertionOptions(opts);
+  const options = generateAuthenticationOptions(opts);
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
@@ -228,8 +229,8 @@ app.get('/generate-assertion-options', (req, res) => {
   res.send(options);
 });
 
-app.post('/verify-assertion', (req, res) => {
-  const body: AssertionCredentialJSON = req.body;
+app.post('/verify-authentication', (req, res) => {
+  const body: AuthenticationCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
@@ -249,26 +250,27 @@ app.post('/verify-assertion', (req, res) => {
     throw new Error(`could not find authenticator matching ${body.id}`);
   }
 
-  let verification: VerifiedAssertion;
+  let verification: VerifiedAuthenticationResponse;
   try {
-    const opts: VerifyAssertionResponseOpts = {
+    const opts: VerifyAuthenticationResponseOpts = {
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
     };
-    verification = verifyAssertionResponse(opts);
+    verification = verifyAuthenticationResponse(opts);
   } catch (error) {
-    console.error(error);
-    return res.status(400).send({ error: error.message });
+    const _error = error as Error;
+    console.error(_error);
+    return res.status(400).send({ error: _error.message });
   }
 
-  const { verified, assertionInfo } = verification;
+  const { verified, authenticationInfo } = verification;
 
   if (verified) {
-    // Update the authenticator's counter in the DB to the newest count in the assertion
-    dbAuthenticator.counter = assertionInfo.newCounter;
+    // Update the authenticator's counter in the DB to the newest count in the authentication
+    dbAuthenticator.counter = authenticationInfo.newCounter;
   }
 
   res.send({ verified });

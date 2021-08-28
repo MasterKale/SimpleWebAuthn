@@ -5,15 +5,15 @@ import type { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
  *
  * 1. Users
  *
- * You'll need to be able to associate attestation and assertions challenges, and authenticators to
- * a specific user. See `LoggedInUser` below for an idea of the minimum amount of info you'll need to
- * track for a specific user during these flows.
+ * You'll need to be able to associate registration and authentications challenges, and
+ * authenticators to a specific user. See `LoggedInUser` below for an idea of the minimum amount of
+ * info you'll need to track for a specific user during these flows.
  *
  * 2. Challenges
  *
  * The totally-random-unique-every-time values you pass into every execution of
- * `generateAttestationOptions()` or `generateAssertionOptions()` MUST be stored until
- * `verifyAttestationResponse()` or `verifyAssertionResponse()` (respectively) is called to verify
+ * `generateRegistrationOptions()` or `generateAuthenticationOptions()` MUST be stored until
+ * `verifyRegistrationResponse()` or `verifyAuthenticationResponse()` (respectively) is called to verify
  * that the response contains the signed challenge.
  *
  * These values only need to be persisted for `timeout` number of milliseconds (see the `generate`
@@ -21,15 +21,15 @@ import type { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
  *
  * 3. Authenticator Devices
  *
- * After an attestation, you'll need to store three things about the authenticator:
+ * After registration, you'll need to store three things about the authenticator:
  *
  * - Base64-encoded "Credential ID" (varchar)
  * - Base64-encoded "Public Key" (varchar)
  * - Counter (int)
  *
  * Each authenticator must also be associated to a user so that you can generate a list of
- * authenticator credential IDs to pass into `generateAssertionOptions()`, from which one is
- * expected to generate an assertion response.
+ * authenticator credential IDs to pass into `generateAuthenticationOptions()`, from which one is
+ * expected to generate an authentication response.
  */
 interface LoggedInUser {
   id: string;
