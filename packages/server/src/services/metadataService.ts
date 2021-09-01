@@ -36,6 +36,10 @@ enum SERVICE_STATE {
   READY,
 }
 
+// Allow MetadataService to accommodate unregistered AAGUIDs ("permissive"), or only allow
+// registered AAGUIDs ("strict"). Currently primarily impacts how `getStatement()` operates
+type VerificationMode = 'permissive' | 'strict';
+
 /**
  * A basic service for coordinating interactions with the FIDO Metadata Service. This includes BLOB
  * download and parsing, and on-demand requesting and caching of individual metadata statements.
@@ -46,17 +50,33 @@ export class BaseMetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
+  private verificationMode: VerificationMode = 'strict';
 
   /**
    * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
+   *
+   * **Options:**
+   *
+   * @param opts.mdsServers An array of URLs to FIDO Alliance Metadata Service
+   * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
+   * @param opts.statements An array of local metadata statements
+   * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
+   * `"strict"` which throws errors during registration response verification when an
+   * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
+   * authenticators with unregistered AAGUIDs
    */
   async initialize(
     opts: {
       mdsServers?: string[];
       statements?: MetadataStatement[];
+      verificationMode?: VerificationMode;
     } = {},
   ): Promise<void> {
-    const { mdsServers = [defaultURLMDS], statements } = opts;
+    const {
+      mdsServers = [defaultURLMDS],
+      statements,
+      verificationMode,
+    } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
 
@@ -104,11 +124,15 @@ export class BaseMetadataService {
       // log('info', `Downloaded ${cacheDiff} statements from ${numServers} metadata servers`);
     }
 
+    if (verificationMode) {
+      this.verificationMode = verificationMode;
+    }
+
     this.setState(SERVICE_STATE.READY);
   }
 
   /**
-   * Get a metadata statement for a given aaguid. Defaults to returning a cached statement.
+   * Get a metadata statement for a given AAGUID.
    *
    * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
    * BLOB download.
@@ -133,9 +157,13 @@ export class BaseMetadataService {
     const cachedStatement = this.statementCache[aaguid];
 
     if (!cachedStatement) {
-      // TODO: FIDO conformance requires this, but it seems excessive for WebAuthn. Investigate
-      // later
-      throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
+      if (this.verificationMode === 'strict') {
+        // FIDO conformance requires RP's to only support registered AAGUID's
+        throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
+      }
+
+      // Allow registration verification to continue without using metadata
+      return;
     }
 
     // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
