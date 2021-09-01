@@ -158,7 +158,7 @@ export class BaseMetadataService {
 
     if (!cachedStatement) {
       if (this.verificationMode === 'strict') {
-        // FIDO conformance requires RP's to only support AAGUID's that have metadata statements
+        // FIDO conformance requires RP's to only support registered AAGUID's
         throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
       }
 
