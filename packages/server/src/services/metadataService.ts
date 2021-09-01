@@ -46,6 +46,7 @@ export class BaseMetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
+  private allowUnrecognizedAAGUID = false;
 
   /**
    * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
@@ -54,9 +55,16 @@ export class BaseMetadataService {
     opts: {
       mdsServers?: string[];
       statements?: MetadataStatement[];
+      // TODO: What to call a flag that means "don't error out when an aaguid doesn't have metadata"
+      // Not entirely satisfied with this name
+      allowUnrecognizedAAGUID?: boolean;
     } = {},
   ): Promise<void> {
-    const { mdsServers = [defaultURLMDS], statements } = opts;
+    const {
+      mdsServers = [defaultURLMDS],
+      statements,
+      allowUnrecognizedAAGUID = false,
+    } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
 
@@ -104,6 +112,8 @@ export class BaseMetadataService {
       // log('info', `Downloaded ${cacheDiff} statements from ${numServers} metadata servers`);
     }
 
+    this.allowUnrecognizedAAGUID = allowUnrecognizedAAGUID;
+
     this.setState(SERVICE_STATE.READY);
   }
 
@@ -133,8 +143,12 @@ export class BaseMetadataService {
     const cachedStatement = this.statementCache[aaguid];
 
     if (!cachedStatement) {
-      // TODO: FIDO conformance requires this, but it seems excessive for WebAuthn. Investigate
-      // later
+      // Allow registration verification to continue without using metadata
+      if (this.allowUnrecognizedAAGUID) {
+        return;
+      }
+
+      // FIDO conformance requires RP's to only support AAGUID's that have metadata statements
       throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
     }
 
