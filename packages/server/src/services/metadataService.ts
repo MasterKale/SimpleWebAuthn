@@ -36,6 +36,8 @@ enum SERVICE_STATE {
   READY,
 }
 
+// Allow MetadataService to accommodate unregistered AAGUIDs ("permissive"), or only allow
+// registered AAGUIDs ("strict"). Currently primarily impacts how `getStatement()` operates
 type VerificationMode = 'permissive' | 'strict';
 
 /**
@@ -59,8 +61,9 @@ export class BaseMetadataService {
    * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
    * @param opts.statements An array of local metadata statements
    * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
-   * `"strict"` which throws errors when an unregistered AAGUID is encountered during registration.
-   * Set to `"permissive"` to allow registration by authenticators with unregistered AAGUIDs
+   * `"strict"` which throws errors during registration response verification when an
+   * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
+   * authenticators with unregistered AAGUIDs
    */
   async initialize(
     opts: {
@@ -129,7 +132,7 @@ export class BaseMetadataService {
   }
 
   /**
-   * Get a metadata statement for a given aaguid. Defaults to returning a cached statement.
+   * Get a metadata statement for a given AAGUID.
    *
    * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
    * BLOB download.
