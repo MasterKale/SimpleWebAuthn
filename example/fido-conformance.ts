@@ -69,6 +69,7 @@ fetch('https://mds3.certinfra.fidoalliance.org/getEndpoints', {
     return MetadataService.initialize({
       statements,
       mdsServers,
+      verificationMode: 'strict',
     });
   })
   .catch(console.error)
