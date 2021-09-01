@@ -80,11 +80,11 @@ describe('Method: getStatement()', () => {
     }
   });
 
-  test('should return undefined after initialization on AAGUID with no statement and allowUnrecognizedAAGUID is true', async () => {
+  test('should return undefined after initialization on AAGUID with no statement and verificationMode is "permissive"', async () => {
     await MetadataService.initialize({
       mdsServers: [],
       statements: [],
-      allowUnrecognizedAAGUID: true,
+      verificationMode: 'permissive',
     });
 
     const statement = await MetadataService.getStatement('not-a-real-aaguid');

@@ -36,6 +36,8 @@ enum SERVICE_STATE {
   READY,
 }
 
+type VerificationMode = 'permissive' | 'strict';
+
 /**
  * A basic service for coordinating interactions with the FIDO Metadata Service. This includes BLOB
  * download and parsing, and on-demand requesting and caching of individual metadata statements.
@@ -46,24 +48,31 @@ export class BaseMetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
-  private allowUnrecognizedAAGUID = false;
+  private verificationMode: VerificationMode = 'strict';
 
   /**
    * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
+   *
+   * **Options:**
+   *
+   * @param opts.mdsServers An array of URLs to FIDO Alliance Metadata Service
+   * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
+   * @param opts.statements An array of local metadata statements
+   * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
+   * `"strict"` which throws errors when an unregistered AAGUID is encountered during registration.
+   * Set to `"permissive"` to allow registration by authenticators with unregistered AAGUIDs
    */
   async initialize(
     opts: {
       mdsServers?: string[];
       statements?: MetadataStatement[];
-      // TODO: What to call a flag that means "don't error out when an aaguid doesn't have metadata"
-      // Not entirely satisfied with this name
-      allowUnrecognizedAAGUID?: boolean;
+      verificationMode?: VerificationMode;
     } = {},
   ): Promise<void> {
     const {
       mdsServers = [defaultURLMDS],
       statements,
-      allowUnrecognizedAAGUID = false,
+      verificationMode,
     } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
@@ -112,7 +121,9 @@ export class BaseMetadataService {
       // log('info', `Downloaded ${cacheDiff} statements from ${numServers} metadata servers`);
     }
 
-    this.allowUnrecognizedAAGUID = allowUnrecognizedAAGUID;
+    if (verificationMode) {
+      this.verificationMode = verificationMode;
+    }
 
     this.setState(SERVICE_STATE.READY);
   }
@@ -143,13 +154,13 @@ export class BaseMetadataService {
     const cachedStatement = this.statementCache[aaguid];
 
     if (!cachedStatement) {
-      // Allow registration verification to continue without using metadata
-      if (this.allowUnrecognizedAAGUID) {
-        return;
+      if (this.verificationMode === 'strict') {
+        // FIDO conformance requires RP's to only support AAGUID's that have metadata statements
+        throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
       }
 
-      // FIDO conformance requires RP's to only support AAGUID's that have metadata statements
-      throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
+      // Allow registration verification to continue without using metadata
+      return;
     }
 
     // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
