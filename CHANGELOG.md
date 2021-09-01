@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.1.0
+
+**Packages:**
+
+- @simplewebauthn/browser@4.1.0
+- @simplewebauthn/server@4.1.0
+
+**Changes:**
+
+- **[browser]** `platformAuthenticatorIsAvailable()` now checks that WebAuthn is supported at all before attempting to query for the status of an available platform authenticator.
+- **[server]** `MetadataService.initialize()` gained a new `verificationMode` option that can be set to `"permissive"` to allow registration response verification to continue when an unregistered AAGUID is encountered. Default behavior, that fails registration response verification, is represented by the alternative value `"strict"`; MetadataService continues to default to this more restrictive behavior.
+
 ## v4.0.0 - The one with some new names
 
 A lot has happened to me since I first launched SimpleWebAuthn back in May 2020. My understanding of WebAuthn has grown by leaps and bounds thanks in part to my representing Duo/Cisco in the W3C's WebAuth Adoption Working Group. I'm now in a point in my life in which it's no longer sufficient to think, "what's in SimpleWebAuthn's best interests?" Now, I have an opportunity to think bigger - "what's in the **WebAuthn API**'s best interests?"
