@@ -79,6 +79,18 @@ describe('Method: getStatement()', () => {
       expect(err).not.toBeUndefined();
     }
   });
+
+  test('should return undefined after initialization on AAGUID with no statement and allowUnrecognizedAAGUID is true', async () => {
+    await MetadataService.initialize({
+      mdsServers: [],
+      statements: [],
+      allowUnrecognizedAAGUID: true,
+    });
+
+    const statement = await MetadataService.getStatement('not-a-real-aaguid');
+
+    expect(statement).toBeUndefined();
+  });
 });
 
 const localStatementAAGUID = '91dfead7-959e-4475-ad26-9b0d482be089';
