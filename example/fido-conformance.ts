@@ -104,9 +104,9 @@ let loggedInUsername: string | undefined = undefined;
 /**
  * [FIDO2] Server Tests > MakeCredential Request
  */
-fidoConformanceRouter.post('/registration/options', (req, res) => {
+fidoConformanceRouter.post('/attestation/options', (req, res) => {
   const { body } = req;
-  const { username, displayName, authenticatorSelection, registration, extensions } = body;
+  const { username, displayName, authenticatorSelection, attestation, extensions } = body;
 
   loggedInUsername = username;
 
@@ -130,7 +130,7 @@ fidoConformanceRouter.post('/registration/options', (req, res) => {
     userID: username,
     userName: username,
     userDisplayName: displayName,
-    attestationType: registration,
+    attestationType: attestation,
     authenticatorSelection,
     extensions,
     excludeCredentials: devices.map(dev => ({
@@ -152,7 +152,7 @@ fidoConformanceRouter.post('/registration/options', (req, res) => {
 /**
  * [FIDO2] Server Tests > MakeCredential Response
  */
-fidoConformanceRouter.post('/registration/result', async (req, res) => {
+fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   const body: RegistrationCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
@@ -200,7 +200,7 @@ fidoConformanceRouter.post('/registration/result', async (req, res) => {
 /**
  * [FIDO2] Server Tests > GetAuthentication Request
  */
-fidoConformanceRouter.post('/authentication/options', (req, res) => {
+fidoConformanceRouter.post('/assertion/options', (req, res) => {
   const { body } = req;
   const { username, userVerification, extensions } = body;
 
@@ -230,7 +230,7 @@ fidoConformanceRouter.post('/authentication/options', (req, res) => {
   });
 });
 
-fidoConformanceRouter.post('/authentication/result', (req, res) => {
+fidoConformanceRouter.post('/assertion/result', (req, res) => {
   const body: AuthenticationCredentialJSON = req.body;
   const { id } = body;
 
