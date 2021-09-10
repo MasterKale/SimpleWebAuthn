@@ -83,6 +83,8 @@ export class BaseMetadataService {
 
     // If metadata statements are provided, load them into the cache first
     if (statements?.length) {
+      let statementsAdded = 0;
+
       statements.forEach(statement => {
         // Only cache statements that are for FIDO2-compatible authenticators
         if (statement.aaguid) {
@@ -94,8 +96,12 @@ export class BaseMetadataService {
             },
             url: '',
           };
+
+          statementsAdded += 1;
         }
       });
+
+      log(`Cached ${statementsAdded} local statements`);
     }
 
     // If MDS servers are provided, then process them and add their statements to the cache
