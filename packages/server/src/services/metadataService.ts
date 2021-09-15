@@ -11,8 +11,7 @@ import type {
   MetadataBLOBPayloadEntry,
 } from '../metadata/mdsTypes';
 import SettingsService from '../services/settingsService';
-// TODO: Re-enable this once we figure out logging
-// import { log } from '../helpers/logging';
+import { getLogger } from '../helpers/logging';
 
 import parseJWT from '../metadata/parseJWT';
 
@@ -39,6 +38,8 @@ enum SERVICE_STATE {
 // Allow MetadataService to accommodate unregistered AAGUIDs ("permissive"), or only allow
 // registered AAGUIDs ("strict"). Currently primarily impacts how `getStatement()` operates
 type VerificationMode = 'permissive' | 'strict';
+
+const log = getLogger('MetadataService');
 
 /**
  * A basic service for coordinating interactions with the FIDO Metadata Service. This includes BLOB
@@ -82,6 +83,8 @@ export class BaseMetadataService {
 
     // If metadata statements are provided, load them into the cache first
     if (statements?.length) {
+      let statementsAdded = 0;
+
       statements.forEach(statement => {
         // Only cache statements that are for FIDO2-compatible authenticators
         if (statement.aaguid) {
@@ -93,15 +96,19 @@ export class BaseMetadataService {
             },
             url: '',
           };
+
+          statementsAdded += 1;
         }
       });
+
+      log(`Cached ${statementsAdded} local statements`);
     }
 
     // If MDS servers are provided, then process them and add their statements to the cache
     if (mdsServers?.length) {
-      // TODO: Re-enable this once we figure out logging
-      // const currentCacheCount = Object.keys(this.statementCache).length;
-      // let numServers = mdsServers.length;
+      // Get a current count so we know how many new statements we've added from MDS servers
+      const currentCacheCount = Object.keys(this.statementCache).length;
+      let numServers = mdsServers.length;
 
       for (const url of mdsServers) {
         try {
@@ -112,16 +119,15 @@ export class BaseMetadataService {
           });
         } catch (err) {
           // Notify of the error and move on
-          // TODO: Re-enable this once we figure out logging
-          // log('warning', `Could not download BLOB from ${url}:`, err);
-          // numServers -= 1;
+          log(`Could not download BLOB from ${url}:`, err);
+          numServers -= 1;
         }
       }
 
-      // TODO: Re-enable this once we figure out logging
-      // const newCacheCount = Object.keys(this.statementCache).length;
-      // const cacheDiff = newCacheCount - currentCacheCount;
-      // log('info', `Downloaded ${cacheDiff} statements from ${numServers} metadata servers`);
+      // Calculate the difference to get the total number of new statements we successfully added
+      const newCacheCount = Object.keys(this.statementCache).length;
+      const cacheDiff = newCacheCount - currentCacheCount;
+      log(`Cached ${cacheDiff} statements from ${numServers} metadata server(s)`);
     }
 
     if (verificationMode) {
@@ -223,10 +229,11 @@ export class BaseMetadataService {
       // Validate the certificate chain
       const rootCerts = SettingsService.getRootCertificates({ identifier: 'mds' });
       await validateCertificatePath(headerCertsPEM, rootCerts);
-    } catch (err) {
+    } catch (error) {
+      const _error: Error = error as Error;
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
-      throw new Error(`BLOB certificate path could not be validated: ${err.message}`);
+      throw new Error(`BLOB certificate path could not be validated: ${_error.message}`);
     }
 
     // Verify the BLOB JWT signature
@@ -306,14 +313,11 @@ export class BaseMetadataService {
     this.state = newState;
 
     if (newState === SERVICE_STATE.DISABLED) {
-      // TODO: Re-enable this once we figure out logging
-      // log('MetadataService is DISABLED');
+      log('MetadataService is DISABLED');
     } else if (newState === SERVICE_STATE.REFRESHING) {
-      // TODO: Re-enable this once we figure out logging
-      // log('MetadataService is REFRESHING');
+      log('MetadataService is REFRESHING');
     } else if (newState === SERVICE_STATE.READY) {
-      // TODO: Re-enable this once we figure out logging
-      // log('MetadataService is READY');
+      log('MetadataService is READY');
     }
   }
 }

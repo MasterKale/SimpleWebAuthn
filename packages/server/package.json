@@ -52,6 +52,7 @@
     "@simplewebauthn/typescript-types": "file:../typescript-types",
     "base64url": "^3.0.1",
     "cbor": "^5.1.0",
+    "debug": "^4.3.2",
     "elliptic": "^6.5.3",
     "jsrsasign": "^10.4.0",
     "jwk-to-pem": "^2.0.4",
@@ -61,6 +62,7 @@
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
   "devDependencies": {
     "@types/cbor": "^5.0.1",
+    "@types/debug": "^4.1.7",
     "@types/elliptic": "^6.4.13",
     "@types/jsrsasign": "^8.0.13",
     "@types/jwk-to-pem": "^2.0.1",

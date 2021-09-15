@@ -74,10 +74,6 @@ fetch('https://mds3.certinfra.fidoalliance.org/getEndpoints', {
   })
   .catch(console.error)
   .finally(() => {
-    if (statements.length) {
-      console.log(`ℹ️  Initializing metadata service with ${statements.length} local statements`);
-    }
-
     console.log('🔐 FIDO Conformance routes ready');
   });
 
