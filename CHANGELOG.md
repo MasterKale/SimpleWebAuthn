@@ -1,5 +1,27 @@
 # Changelog
 
+## v4.2.0
+
+**Packages:**
+
+- @simplewebauthn/server@4.2.0
+
+**Changes:**
+
+- **[server]** The [debug](https://www.npmjs.com/package/debug) library has been incorporated to support logging output from the library's internal operations. Add the following environment variable to your application to view this output when using this library:
+
+```
+DEBUG=SimpleWebAuthn:*
+```
+
+The following logging scopes are defined in this release:
+
+```
+SimpleWebAuthn:MetadataService
+```
+
+See [PR #159](https://github.com/MasterKale/SimpleWebAuthn/pull/159) for a preview of logging output.
+
 ## v4.1.0
 
 **Packages:**
