@@ -127,7 +127,7 @@ export class BaseMetadataService {
       // Calculate the difference to get the total number of new statements we successfully added
       const newCacheCount = Object.keys(this.statementCache).length;
       const cacheDiff = newCacheCount - currentCacheCount;
-      log(`Cached ${cacheDiff} statements from ${numServers} metadata servers`);
+      log(`Cached ${cacheDiff} statements from ${numServers} metadata server(s)`);
     }
 
     if (verificationMode) {
