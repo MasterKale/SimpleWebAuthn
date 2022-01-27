@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
-    "./helpers": "./dist/helpers/index.js"
+    "./helpers": "./dist/helpers/index.js",
+    "./passwordless": "./dist/modes/passwordless/index.js"
   },
   "typesVersions": {
     "*": {
@@ -15,6 +16,9 @@
       ],
       "helpers": [
         "./dist/helpers/index.d.ts"
+      ],
+      "passwordless": [
+        "./dist/modes/passwordless/index.d.ts"
       ]
     }
   },
