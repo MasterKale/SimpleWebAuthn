@@ -12,7 +12,7 @@ import SettingsService from './services/settingsService';
 export {
   generateRegistrationOptions,
   verifyRegistrationResponse,
-  generateAuthenticationOptions as generateAuthenticationOptions,
+  generateAuthenticationOptions,
   verifyAuthenticationResponse,
   MetadataService,
   SettingsService,
