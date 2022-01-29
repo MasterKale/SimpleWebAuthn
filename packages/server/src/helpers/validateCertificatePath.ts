@@ -4,6 +4,7 @@
 import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
 
 import isCertRevoked from './isCertRevoked';
+import { validateCertificateValidityWindow } from './validateCertificateValidityWindow';
 
 const { crypto } = KJUR;
 
@@ -80,8 +81,7 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const notBefore = zulutodate(issuerCert.getNotBefore());
     const notAfter = zulutodate(issuerCert.getNotAfter());
 
-    const now = new Date();
-    if (notBefore > now || notAfter < now) {
+    if (!validateCertificateValidityWindow(notBefore, notAfter)) {
       throw new Error('Intermediate certificate is not yet valid or expired');
     }
 
