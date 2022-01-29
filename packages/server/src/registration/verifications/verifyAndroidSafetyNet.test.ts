@@ -1,3 +1,7 @@
+// Mock the notBefore and notAfter time window check to always return true due to expiring
+// SafetyNet intermediate certs
+jest.mock('../../helpers/validateCertificateValidityWindow');
+
 import base64url from 'base64url';
 
 import verifyAndroidSafetyNet from './verifyAndroidSafetyNet';
