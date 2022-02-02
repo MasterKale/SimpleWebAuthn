@@ -80,7 +80,7 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const notBefore = zulutodate(issuerCert.getNotBefore());
     const notAfter = zulutodate(issuerCert.getNotAfter());
 
-    const now = new Date();
+    const now = new Date(Date.now());
     if (notBefore > now || notAfter < now) {
       throw new Error('Intermediate certificate is not yet valid or expired');
     }

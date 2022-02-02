@@ -26,12 +26,13 @@ import verifyApple from './verifications/verifyApple';
 
 export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
-  expectedChallenge: string;
+  expectedChallenge: string | ChallengeVerifier;
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
+export type ChallengeVerifier = (challenge: string) => boolean;
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -86,7 +87,13 @@ export default async function verifyRegistrationResponse(
   }
 
   // Ensure the device provided the challenge we gave it
-  if (challenge !== expectedChallenge) {
+  if (typeof expectedChallenge === 'function') {
+    if (!expectedChallenge(challenge)) {
+      throw new Error(
+        `Custom challenge verifier returned false for registration response challenge "${challenge}"`,
+      );
+    }
+  } else if (challenge !== expectedChallenge) {
     throw new Error(
       `Unexpected registration response challenge "${challenge}", expected "${expectedChallenge}"`,
     );

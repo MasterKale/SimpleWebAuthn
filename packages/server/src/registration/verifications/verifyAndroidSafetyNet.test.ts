@@ -20,6 +20,7 @@ let aaguid: Buffer;
 let credentialID: Buffer;
 let credentialPublicKey: Buffer;
 let rpIdHash: Buffer;
+let spyDate: jest.SpyInstance;
 
 beforeEach(() => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
@@ -33,6 +34,12 @@ beforeEach(() => {
   aaguid = parsedAuthData.aaguid!;
   credentialID = parsedAuthData.credentialID!;
   credentialPublicKey = parsedAuthData.credentialPublicKey!;
+
+  spyDate = jest.spyOn(global.Date, 'now');
+});
+
+afterEach(() => {
+  spyDate.mockRestore();
 });
 
 /**
@@ -40,6 +47,10 @@ beforeEach(() => {
  * signature after modifying the payload with a `timestampMs` we can dynamically set
  */
 test('should verify Android SafetyNet attestation', async () => {
+  // notBefore: 2017-06-15T00:00:42.000Z
+  // notAfter: 2021-12-15T00:00:42.000Z
+  spyDate.mockReturnValue(new Date('2021-11-15T00:00:42.000Z'));
+
   const verified = await verifyAndroidSafetyNet({
     attStmt,
     authData,
@@ -71,6 +82,10 @@ test('should throw error when timestamp is not within one minute of now', async 
 });
 
 test('should validate response with cert path completed with GlobalSign R1 root cert', async () => {
+  // notBefore: 2006-12-15T08:00:00.000Z
+  // notAfter: 2021-12-15T08:00:00.000Z
+  spyDate.mockReturnValue(new Date('2021-11-15T00:00:42.000Z'));
+
   const { attestationObject, clientDataJSON } = safetyNetUsingGSR1RootCert.response;
   const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
 
