@@ -260,6 +260,16 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
   }).toThrow(/unexpected rp id/i);
 });
 
+test('should pass verification if custom challenge verifier returns true', () => {
+  // TODO: Write test
+  expect(true).toBeFalsy();
+});
+
+test('should fail verification if custom challenge verifier returns false', () => {
+  // TODO: Write test
+  expect(true).toBeFalsy();
+});
+
 /**
  * Assertion examples below
  */
