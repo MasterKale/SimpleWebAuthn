@@ -1,5 +1,54 @@
 # Changelog
 
+## v4.3.0
+
+**Packages:**
+
+- @simplewebauthn/server@4.3.0
+
+**Changes:**
+
+- **[server]** The `expectedChallenge` argument passed to `verifyRegistrationResponse()` can now be a function that accepts a Base64URL `string` and returns a `boolean` to run custom logic against the `clientDataJSON.challenge` returned by the authenticator. This allows for arbitrary data to be included in the challenge so it can be signed by the authenticator.
+
+After generating registration options, the challenge can be augmented with additional data:
+
+```js
+const options = generateRegistrationOptions(opts);
+
+// Remember the plain challenge
+inMemoryUserDeviceDB[loggedInUserId].currentChallenge = options.challenge;
+
+// Add data to be signed
+options.challenge = base64url(JSON.stringify({
+  actualChallenge: options.challenge,
+  arbitraryData: 'arbitraryDataForSigning',
+}));
+```
+
+Then, when invoking `verifyRegistrationResponse()`, pass in a method for `expectedChallenge` to parse the challenge and return a `boolean`:
+
+```js
+const expectedChallenge = inMemoryUserDeviceDB[loggedInUserId].currentChallenge;
+
+const verification = await verifyRegistrationResponse({
+  expectedChallenge: (challenge: string) => {
+    const parsedChallenge = JSON.parse(base64url.decode(challenge));
+    return parsedChallenge.actualChallenge === expectedChallenge;
+  },
+  // ...
+});
+```
+
+To retrieve the arbitrary data afterwards, use `decodeClientDataJSON()` afterwards to get it out:
+
+```js
+import { decodeClientDataJSON } from '@simplewebauthn/server/helpers';
+
+const { challenge } = decodeClientDataJSON(response.clientDataJSON);
+const parsedChallenge = JSON.parse(base64url.decode(challenge));
+console.log(parsedChallenge.arbitraryData); // 'arbitraryDataForSigning'
+```
+
 ## v4.2.0
 
 **Packages:**
