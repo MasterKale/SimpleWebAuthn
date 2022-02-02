@@ -14,7 +14,7 @@ import isBase64URLString from '../helpers/isBase64URLString';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
-  expectedChallenge: string;
+  expectedChallenge: string | ((challenge: string) => boolean);
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
   authenticator: AuthenticatorDevice;
@@ -82,7 +82,13 @@ export default function verifyAuthenticationResponse(
   }
 
   // Ensure the device provided the challenge we gave it
-  if (challenge !== expectedChallenge) {
+  if (typeof expectedChallenge === 'function') {
+    if (!expectedChallenge(challenge)) {
+      throw new Error(
+        `Custom challenge verifier returned false for registration response challenge "${challenge}"`,
+      );
+    }
+  } else if (challenge !== expectedChallenge) {
     throw new Error(
       `Unexpected authentication response challenge "${challenge}", expected "${expectedChallenge}"`,
     );
