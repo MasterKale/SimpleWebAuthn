@@ -26,13 +26,12 @@ import verifyApple from './verifications/verifyApple';
 
 export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
-  expectedChallenge: string | ChallengeVerifier;
+  expectedChallenge: string | ((challenge: string) => boolean);
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
-export type ChallengeVerifier = (challenge: string) => boolean;
 
 /**
  * Verify that the user has legitimately completed the registration process
