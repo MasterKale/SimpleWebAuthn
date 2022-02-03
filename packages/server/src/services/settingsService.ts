@@ -1,7 +1,7 @@
 import { AttestationFormat } from '../helpers/decodeAttestationObject';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 
-import { GlobalSign_Root_CA, GlobalSign_R2 } from './defaultRootCerts/android-safetynet';
+import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet';
 import {
   Google_Hardware_Attestation_Root_1,
   Google_Hardware_Attestation_Root_2,
@@ -63,7 +63,7 @@ settingsService.setRootCertificates({
 
 settingsService.setRootCertificates({
   identifier: 'android-safetynet',
-  certificates: [GlobalSign_R2, GlobalSign_Root_CA],
+  certificates: [GlobalSign_Root_CA],
 });
 
 settingsService.setRootCertificates({
