@@ -59,8 +59,11 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const subjectCert = new X509();
     subjectCert.readCertPEM(subjectPem);
 
+    const isLeafCert = i === 0;
+    const isRootCert = i + 1 >= certificates.length;
+
     let issuerPem = '';
-    if (i + 1 >= certificates.length) {
+    if (isRootCert) {
       issuerPem = subjectPem;
     } else {
       issuerPem = certificates[i + 1];
@@ -82,7 +85,13 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
 
     const now = new Date(Date.now());
     if (notBefore > now || notAfter < now) {
-      throw new Error('Intermediate certificate is not yet valid or expired');
+      if (isLeafCert) {
+        throw new Error('Leaf certificate is not yet valid or expired');
+      } else if (isRootCert) {
+        throw new Error('Root certificate is not yet valid or expired');
+      } else {
+        throw new Error('Intermediate certificate is not yet valid or expired');
+      }
     }
 
     if (subjectCert.getIssuerString() !== issuerCert.getSubjectString()) {
