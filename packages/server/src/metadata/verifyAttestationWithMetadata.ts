@@ -4,7 +4,7 @@ import { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../helpers/validateCertificatePath';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
-import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import { COSEKEYS, COSEKTY } from '../helpers/convertCOSEtoPKCS';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as
@@ -117,7 +117,7 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
 function serializeCOSEInfo(info: COSEInfo): string {
   let toReturn = `kty${info.kty}alg${info.alg}`;
 
-  if (info.crv) {
+  if (info.kty === COSEKTY.EC2 || info.kty === COSEKTY.OKP) {
     toReturn += `crv${info.crv}`;
   }
 
