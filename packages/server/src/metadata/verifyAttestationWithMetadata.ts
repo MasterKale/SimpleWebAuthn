@@ -3,6 +3,8 @@ import { Base64URLString } from '@simplewebauthn/typescript-types';
 import { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../helpers/validateCertificatePath';
+import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as
@@ -10,23 +12,38 @@ import validateCertificatePath from '../helpers/validateCertificatePath';
  */
 export default async function verifyAttestationWithMetadata(
   statement: MetadataStatement,
-  alg: number,
+  credentialPublicKey: Buffer,
   x5c: Buffer[] | Base64URLString[],
 ): Promise<boolean> {
   // Make sure the alg in the attestation statement matches one of the ones specified in metadata
-  const statementCOSEAlgs: Set<number> = new Set();
+  const keypairCOSEAlgs: Set<string> = new Set();
   statement.authenticationAlgorithms.forEach(algSign => {
     // Convert algSign string to { kty, alg, crv }
     const algSignCOSEINFO = algSignToCOSEInfo(algSign);
 
     if (algSignCOSEINFO) {
-      statementCOSEAlgs.add(algSignCOSEINFO.alg);
+      keypairCOSEAlgs.add(serializeCOSEInfo(algSignCOSEINFO));
     }
   });
 
-  if (!statementCOSEAlgs.has(alg)) {
-    const debugAlgs = Array.from(statementCOSEAlgs).join(', ');
-    throw new Error(`Attestation alg "${alg}" did not match metadata auth algs [${debugAlgs}]`);
+  // Extract the public key's COSE info for comparison
+  const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
+  // Assume everything is a number because these values should be
+  const publicKeyCOSEInfo: COSEInfo = {
+    kty: decodedPublicKey.get(COSEKEYS.kty) as number,
+    alg: decodedPublicKey.get(COSEKEYS.alg) as number,
+    crv: decodedPublicKey.get(COSEKEYS.crv) as number,
+  };
+  if (!publicKeyCOSEInfo.crv) {
+    delete publicKeyCOSEInfo.crv;
+  }
+
+  const strPublicKeyCOSEInfo = serializeCOSEInfo(publicKeyCOSEInfo);
+
+  // Make sure the public key is one of the allowed algorithms
+  if (!keypairCOSEAlgs.has(strPublicKeyCOSEInfo)) {
+    const debugAlgs = Array.from(keypairCOSEAlgs).join(', ');
+    throw new Error(`Public key algorithm ${strPublicKeyCOSEInfo} did not match any metadata algorithms [${debugAlgs}]`);
   }
 
   try {
@@ -35,7 +52,7 @@ export default async function verifyAttestationWithMetadata(
       statement.attestationRootCertificates.map(convertCertBufferToPEM),
     );
   } catch (err) {
-    throw new Error(`Could not validate certificate path with any metadata root certificates`);
+    throw new Error(`Could not validate certificate path with any metadata root certificates: ${err.message}`);
   }
 
   return true;
@@ -87,4 +104,22 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
     default:
       return undefined;
   }
+}
+
+/**
+ * Convert an instance of COSEInfo into a string so we can easily identify a match
+ *
+ * Examples:
+ *
+ * - `{ kty: 2, alg: -7, crv: 1 }` => `"kty2alg-7crv1"`
+ * - `{ kty: 3, alg: -38 }` => `"kty3alg-38"`
+ */
+function serializeCOSEInfo(info: COSEInfo): string {
+  let toReturn = `kty${info.kty}alg${info.alg}`;
+
+  if (info.crv) {
+    toReturn += `crv${info.crv}`;
+  }
+
+  return toReturn;
 }
