@@ -23,16 +23,21 @@ export default async function validateCertificatePath(
   }
 
   let invalidSubjectAndIssuerError = false;
+  let certificateNotYetValidOrExpiredErrorMessage = undefined;
   for (const rootCert of rootCertificates) {
     try {
       const certsWithRoot = certificates.concat([rootCert]);
       await _validatePath(certsWithRoot);
-      // If we successfully validated a path then there's no need to continue
+      // If we successfully validated a path then there's no need to continue. Reset any existing
+      // errors that were thrown by earlier root certificates
       invalidSubjectAndIssuerError = false;
+      certificateNotYetValidOrExpiredErrorMessage = undefined;
       break;
     } catch (err) {
       if (err instanceof InvalidSubjectAndIssuer) {
         invalidSubjectAndIssuerError = true;
+      } else if (err instanceof CertificateNotYetValidOrExpired) {
+        certificateNotYetValidOrExpiredErrorMessage = err.message;
       } else {
         throw err;
       }
@@ -42,6 +47,8 @@ export default async function validateCertificatePath(
   // We tried multiple root certs and none of them worked
   if (invalidSubjectAndIssuerError) {
     throw new InvalidSubjectAndIssuer();
+  } else if (certificateNotYetValidOrExpiredErrorMessage) {
+    throw new CertificateNotYetValidOrExpired(certificateNotYetValidOrExpiredErrorMessage);
   }
 
   return true;
