@@ -107,7 +107,12 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
 }
 
 /**
- * Convert an instance of COSEInfo into a string so we can easily identify a match
+ * Convert an instance of COSEInfo into a string so we can more easily identify a match.
+ *
+ * NOTE: This is a bit convoluted, but since `Set.has()` uses identity for non-primitive values, and
+ * `Array.indexOf()` suffers from the same complication as well, this serialize-to-primitive
+ * approach lets us use `Set.has()` to simplify detecting matches without lots of messy nested
+ * `if ()` statements.
  *
  * Examples:
  *
