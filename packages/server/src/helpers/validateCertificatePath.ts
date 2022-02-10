@@ -86,11 +86,17 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const now = new Date(Date.now());
     if (notBefore > now || notAfter < now) {
       if (isLeafCert) {
-        throw new Error('Leaf certificate is not yet valid or expired');
+        throw new CertificateNotYetValidOrExpired(
+          `Leaf certificate is not yet valid or expired: ${issuerPem}`
+        );
       } else if (isRootCert) {
-        throw new Error('Root certificate is not yet valid or expired');
+        throw new CertificateNotYetValidOrExpired(
+          `Root certificate is not yet valid or expired: ${issuerPem}`
+        );
       } else {
-        throw new Error(`Intermediate certificate at index ${i} is not yet valid or expired`);
+        throw new CertificateNotYetValidOrExpired(
+          `Intermediate certificate is not yet valid or expired: ${issuerPem}`
+        );
       }
     }
 
@@ -120,5 +126,12 @@ class InvalidSubjectAndIssuer extends Error {
     const message = 'Subject issuer did not match issuer subject';
     super(message);
     this.name = 'InvalidSubjectAndIssuer';
+  }
+}
+
+class CertificateNotYetValidOrExpired extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CertificateNotYetValidOrExpired';
   }
 }
