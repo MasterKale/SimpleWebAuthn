@@ -90,7 +90,7 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
       } else if (isRootCert) {
         throw new Error('Root certificate is not yet valid or expired');
       } else {
-        throw new Error('Intermediate certificate is not yet valid or expired');
+        throw new Error(`Intermediate certificate at index ${i} is not yet valid or expired`);
       }
     }
 
