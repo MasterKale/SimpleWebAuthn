@@ -23,6 +23,7 @@ export default async function verifyAttestationAndroidSafetyNet(
     aaguid,
     rootCertificates,
     verifyTimestampMS = true,
+    credentialPublicKey,
   } = options;
   const { response, ver } = attStmt;
 
@@ -94,9 +95,7 @@ export default async function verifyAttestationAndroidSafetyNet(
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
     try {
-      // Convert from alg in JWT header to a number in the metadata
-      const alg = HEADER.alg === 'RS256' ? -257 : -99999;
-      await verifyAttestationWithMetadata(statement, alg, HEADER.x5c);
+      await verifyAttestationWithMetadata(statement, credentialPublicKey, HEADER.x5c);
     } catch (err) {
       throw new Error(`${err.message} (SafetyNet)`);
     }

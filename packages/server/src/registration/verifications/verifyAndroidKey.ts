@@ -78,7 +78,7 @@ export default async function verifyAttestationAndroidKey(
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
     try {
-      await verifyAttestationWithMetadata(statement, alg, x5c);
+      await verifyAttestationWithMetadata(statement, credentialPublicKey, x5c);
     } catch (err) {
       throw new Error(`${err.message} (AndroidKey)`);
     }

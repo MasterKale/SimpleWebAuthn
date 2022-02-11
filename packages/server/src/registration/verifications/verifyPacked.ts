@@ -98,7 +98,7 @@ export default async function verifyAttestationPacked(
       }
 
       try {
-        await verifyAttestationWithMetadata(statement, alg, x5c);
+        await verifyAttestationWithMetadata(statement, credentialPublicKey, x5c);
       } catch (err) {
         throw new Error(`${err.message} (Packed|Full)`);
       }

@@ -23,16 +23,21 @@ export default async function validateCertificatePath(
   }
 
   let invalidSubjectAndIssuerError = false;
+  let certificateNotYetValidOrExpiredErrorMessage = undefined;
   for (const rootCert of rootCertificates) {
     try {
       const certsWithRoot = certificates.concat([rootCert]);
       await _validatePath(certsWithRoot);
-      // If we successfully validated a path then there's no need to continue
+      // If we successfully validated a path then there's no need to continue. Reset any existing
+      // errors that were thrown by earlier root certificates
       invalidSubjectAndIssuerError = false;
+      certificateNotYetValidOrExpiredErrorMessage = undefined;
       break;
     } catch (err) {
       if (err instanceof InvalidSubjectAndIssuer) {
         invalidSubjectAndIssuerError = true;
+      } else if (err instanceof CertificateNotYetValidOrExpired) {
+        certificateNotYetValidOrExpiredErrorMessage = err.message;
       } else {
         throw err;
       }
@@ -42,6 +47,8 @@ export default async function validateCertificatePath(
   // We tried multiple root certs and none of them worked
   if (invalidSubjectAndIssuerError) {
     throw new InvalidSubjectAndIssuer();
+  } else if (certificateNotYetValidOrExpiredErrorMessage) {
+    throw new CertificateNotYetValidOrExpired(certificateNotYetValidOrExpiredErrorMessage);
   }
 
   return true;
@@ -86,11 +93,17 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const now = new Date(Date.now());
     if (notBefore > now || notAfter < now) {
       if (isLeafCert) {
-        throw new Error('Leaf certificate is not yet valid or expired');
+        throw new CertificateNotYetValidOrExpired(
+          `Leaf certificate is not yet valid or expired: ${issuerPem}`
+        );
       } else if (isRootCert) {
-        throw new Error('Root certificate is not yet valid or expired');
+        throw new CertificateNotYetValidOrExpired(
+          `Root certificate is not yet valid or expired: ${issuerPem}`
+        );
       } else {
-        throw new Error('Intermediate certificate is not yet valid or expired');
+        throw new CertificateNotYetValidOrExpired(
+          `Intermediate certificate is not yet valid or expired: ${issuerPem}`
+        );
       }
     }
 
@@ -120,5 +133,12 @@ class InvalidSubjectAndIssuer extends Error {
     const message = 'Subject issuer did not match issuer subject';
     super(message);
     this.name = 'InvalidSubjectAndIssuer';
+  }
+}
+
+class CertificateNotYetValidOrExpired extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CertificateNotYetValidOrExpired';
   }
 }
