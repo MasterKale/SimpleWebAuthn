@@ -16,13 +16,13 @@ export default async function verifyAttestationWithMetadata(
   x5c: Buffer[] | Base64URLString[],
 ): Promise<boolean> {
   // Make sure the alg in the attestation statement matches one of the ones specified in metadata
-  const keypairCOSEAlgs: Set<string> = new Set();
+  const keypairCOSEAlgs: Set<COSEInfo> = new Set();
   statement.authenticationAlgorithms.forEach(algSign => {
     // Convert algSign string to { kty, alg, crv }
     const algSignCOSEINFO = algSignToCOSEInfo(algSign);
 
     if (algSignCOSEINFO) {
-      keypairCOSEAlgs.add(serializeCOSEInfo(algSignCOSEINFO));
+      keypairCOSEAlgs.add(algSignCOSEINFO);
     }
   });
 
@@ -38,12 +38,35 @@ export default async function verifyAttestationWithMetadata(
     delete publicKeyCOSEInfo.crv;
   }
 
-  const strPublicKeyCOSEInfo = serializeCOSEInfo(publicKeyCOSEInfo);
+  /**
+   * Attempt to match the credential public key's algorithm to one specified in the device's
+   * metadata
+   */
+  let foundMatch = false;
+  for (const keypairAlg of keypairCOSEAlgs) {
+    // Make sure algorithm and key type match
+    if (keypairAlg.alg === publicKeyCOSEInfo.alg && keypairAlg.kty === publicKeyCOSEInfo.kty) {
+      // If not an RSA keypair then make sure curve numbers match too
+      if (
+        (keypairAlg.kty === COSEKTY.EC2 || keypairAlg.kty === COSEKTY.OKP)
+        && keypairAlg.crv === publicKeyCOSEInfo.crv
+      ) {
+        foundMatch = true;
+      } else {
+        // We've matched an RSA public key's properties
+        foundMatch = true;
+      }
+    }
+
+    if (foundMatch) {
+      break;
+    }
+  }
 
   // Make sure the public key is one of the allowed algorithms
-  if (!keypairCOSEAlgs.has(strPublicKeyCOSEInfo)) {
+  if (!foundMatch) {
     const debugAlgs = Array.from(keypairCOSEAlgs).join(', ');
-    throw new Error(`Public key algorithm ${strPublicKeyCOSEInfo} did not match any metadata algorithms [${debugAlgs}]`);
+    throw new Error(`Public key algorithm ${publicKeyCOSEInfo} did not match any metadata algorithms [${debugAlgs}]`);
   }
 
   try {
@@ -104,27 +127,4 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
     default:
       return undefined;
   }
-}
-
-/**
- * Convert an instance of COSEInfo into a string so we can more easily identify a match.
- *
- * NOTE: This is a bit convoluted, but since `Set.has()` uses identity for non-primitive values, and
- * `Array.indexOf()` suffers from the same complication as well, this serialize-to-primitive
- * approach lets us use `Set.has()` to simplify detecting matches without lots of messy nested
- * `if ()` statements.
- *
- * Examples:
- *
- * - `{ kty: 2, alg: -7, crv: 1 }` => `"kty2alg-7crv1"`
- * - `{ kty: 3, alg: -38 }` => `"kty3alg-38"`
- */
-function serializeCOSEInfo(info: COSEInfo): string {
-  let toReturn = `kty${info.kty}alg${info.alg}`;
-
-  if (info.kty === COSEKTY.EC2 || info.kty === COSEKTY.OKP) {
-    toReturn += `crv${info.crv}`;
-  }
-
-  return toReturn;
 }
