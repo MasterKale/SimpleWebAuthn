@@ -113,7 +113,7 @@ app.get('/generate-registration-options', (req, res) => {
     userID: loggedInUserId,
     userName: username,
     timeout: 60000,
-    attestationType: 'indirect',
+    attestationType: 'none',
     /**
      * Passing in a user's list of already-registered authenticator IDs here prevents users from
      * registering the same device multiple times. The authenticator will simply throw an error in
