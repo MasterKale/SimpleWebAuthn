@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.4.0
+
+**Packages:**
+
+- @simplewebauthn/server@4.4.0
+
+**Changes:**
+
+- **[server]** Attestation statement verification involving FIDO metadata now correctly validates the credential public keypair algorithm against possible algorithms defined in the metadata statement.
+- **[server]** The expired GlobalSign R2 root certificate for `"android-safetynet"` responses has been removed
+- **[server]** Certificate path validation errors will now identify which part of the chain and which certificate has an issue
+- **[server]** `verifyAuthenticationResponse()`'s `expectedChallenge` argument also accepts a function that accepts a Base64URL `string` and returns a `boolean` to run custom logic against the `clientDataJSON.challenge` returned by the authenticator (see v4.3.0 release notes for more info).
+
 ## v4.3.0
 
 **Packages:**
