@@ -130,7 +130,7 @@ app.get('/generate-registration-options', (req, res) => {
      * the types of authenticators that users to can use for registration
      */
     authenticatorSelection: {
-      userVerification: 'preferred',
+      userVerification: 'required',
       requireResidentKey: false,
     },
     /**
@@ -164,6 +164,7 @@ app.post('/verify-registration', async (req, res) => {
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
+      requireUserVerification: true,
     };
     verification = await verifyRegistrationResponse(opts);
   } catch (error) {
@@ -210,11 +211,7 @@ app.get('/generate-authentication-options', (req, res) => {
       type: 'public-key',
       transports: dev.transports ?? ['usb', 'ble', 'nfc', 'internal'],
     })),
-    /**
-     * This optional value controls whether or not the authenticator needs be able to uniquely
-     * identify the user interacting with it (via built-in PIN pad, fingerprint scanner, etc...)
-     */
-    userVerification: 'preferred',
+    userVerification: 'required',
     rpID,
   };
 
@@ -258,6 +255,7 @@ app.post('/verify-authentication', (req, res) => {
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
+      fidoUserVerification: 'required',
     };
     verification = verifyAuthenticationResponse(opts);
   } catch (error) {
