@@ -175,7 +175,7 @@ test('should throw an error if user verification is required but user was not ve
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
-      fidoUserVerification: 'required',
+      requireUserVerification: true,
     });
   }).toThrow(/user could not be verified/i);
 });
