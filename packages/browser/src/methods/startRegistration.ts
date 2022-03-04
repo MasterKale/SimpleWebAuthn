@@ -9,6 +9,7 @@ import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
+import { identifyRegistrationError } from '../helpers/identifyRegistrationError';
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
@@ -33,8 +34,15 @@ export default async function startRegistration(
     excludeCredentials: creationOptionsJSON.excludeCredentials.map(toPublicKeyCredentialDescriptor),
   };
 
+  const options: CredentialCreationOptions = { publicKey };
+
   // Wait for the user to complete attestation
-  const credential = (await navigator.credentials.create({ publicKey })) as RegistrationCredential;
+  let credential;
+  try {
+    credential = (await navigator.credentials.create(options)) as RegistrationCredential;
+  } catch(err) {
+    throw identifyRegistrationError({ error: err as Error, options });
+  }
 
   if (!credential) {
     throw new Error('Registration was not completed');
