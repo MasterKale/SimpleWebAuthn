@@ -33,7 +33,7 @@ export function identifyRegistrationError({ error, options }: {
     // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 20)
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 3)
     return new WebAuthnError(
-      'The user attempted to re-register an authenticator',
+      'The authenticator was previously registered',
     );
   } else if (error.name === 'NotAllowedError') {
     // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 20)
