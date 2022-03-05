@@ -1,4 +1,5 @@
 import { isValidDomain } from './isValidDomain';
+import { WebAuthnError } from './structs';
 
 export function identifyRegistrationError({ error, options }: {
   error: Error,
@@ -72,11 +73,4 @@ export function identifyRegistrationError({ error, options }: {
   }
 
   return error;
-}
-
-class WebAuthnError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'WebAuthnError';
-  }
 }
