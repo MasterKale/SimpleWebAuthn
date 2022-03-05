@@ -59,8 +59,10 @@ export function identifyRegistrationError({ error, options }: {
       return new WebAuthnError(`The RP ID "${publicKey.rp.id}" is invalid for this domain (SecurityError)`);
     }
   } else if (error.name === 'TypeError') {
-    // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 5)
-    return new WebAuthnError('User ID was not between 1 and 64 characters');
+    if (publicKey.user.id.byteLength < 1 || publicKey.user.id.byteLength > 64) {
+      // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 5)
+      return new WebAuthnError('User ID was not between 1 and 64 characters (TypeError)');
+    }
   } else if (error.name === 'UnknownError') {
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 1)
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 8)
