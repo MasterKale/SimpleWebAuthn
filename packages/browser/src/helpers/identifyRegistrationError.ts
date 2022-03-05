@@ -1,6 +1,10 @@
 import { isValidDomain } from './isValidDomain';
 import { WebAuthnError } from './structs';
 
+
+/**
+ * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.create()`
+ */
 export function identifyRegistrationError({ error, options }: {
   error: Error,
   options: CredentialCreationOptions,
