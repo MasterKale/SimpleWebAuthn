@@ -5,8 +5,6 @@ export function identifyRegistrationError({ error, options }: {
   options: CredentialCreationOptions,
 }): WebAuthnError | Error {
   const { publicKey } = options;
-  console.log(error);
-  console.log(options);
 
   if (!publicKey) {
     throw Error('options was missing required publicKey property');
