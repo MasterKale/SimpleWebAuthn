@@ -15,3 +15,12 @@ Object.defineProperty(window.navigator, 'credentials', {
   },
 });
 
+/**
+ * Allow for setting values to `window.location.hostname`
+ */
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: {
+    hostname: '',
+  },
+});
