@@ -24,3 +24,64 @@ Object.defineProperty(window, 'location', {
     hostname: '',
   },
 });
+
+/**
+ * Define WebAuthn's custom API errors
+ */
+
+class AbortError extends Error {
+  constructor() {
+    super();
+    this.name = 'AbortError';
+  }
+}
+
+class ConstraintError extends Error {
+  constructor() {
+    super();
+    this.name = 'ConstraintError';
+  }
+}
+
+class InvalidStateError extends Error {
+  constructor() {
+    super();
+    this.name = 'InvalidStateError';
+  }
+}
+
+class NotAllowedError extends Error {
+  constructor() {
+    super();
+    this.name = 'NotAllowedError';
+  }
+}
+
+class NotSupportedError extends Error {
+  constructor() {
+    super();
+    this.name = 'NotSupportedError';
+  }
+}
+
+class SecurityError extends Error {
+  constructor() {
+    super();
+    this.name = 'SecurityError';
+  }
+}
+
+class UnknownError extends Error {
+  constructor() {
+    super();
+    this.name = 'UnknownError';
+  }
+}
+
+Object.defineProperty(global, 'AbortError', { value: AbortError });
+Object.defineProperty(global, 'ConstraintError', { value: ConstraintError });
+Object.defineProperty(global, 'InvalidStateError', { value: InvalidStateError });
+Object.defineProperty(global, 'NotAllowedError', { value: NotAllowedError });
+Object.defineProperty(global, 'NotSupportedError', { value: NotSupportedError });
+Object.defineProperty(global, 'SecurityError', { value: SecurityError });
+Object.defineProperty(global, 'UnknownError', { value: UnknownError });
