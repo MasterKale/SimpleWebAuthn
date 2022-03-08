@@ -9,6 +9,7 @@ import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import bufferToUTF8String from '../helpers/bufferToUTF8String';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
+import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
@@ -36,8 +37,15 @@ export default async function startAuthentication(
     allowCredentials,
   };
 
+  const options: CredentialRequestOptions = { publicKey };
+
   // Wait for the user to complete assertion
-  const credential = (await navigator.credentials.get({ publicKey })) as AuthenticationCredential;
+  let credential;
+  try {
+    credential = (await navigator.credentials.get(options)) as AuthenticationCredential;
+  } catch (err) {
+    throw identifyAuthenticationError({ error: err as Error, options });
+  }
 
   if (!credential) {
     throw new Error('Authentication was not completed');
