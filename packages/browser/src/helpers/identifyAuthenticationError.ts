@@ -21,7 +21,7 @@ export function identifyAuthenticationError({
   if (error.name === 'AbortError') {
     if (options.signal === (new AbortController()).signal) {
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 16)
-      return new WebAuthnError('Registration ceremony was sent an abort signal (AbortError)');
+      return new WebAuthnError('Authentication ceremony was sent an abort signal (AbortError)');
     }
   } else if (error.name === 'NotAllowedError') {
     if (publicKey.allowCredentials?.length) {
@@ -34,7 +34,7 @@ export function identifyAuthenticationError({
 
     // https://www.w3.org/TR/webauthn-2/#sctn-discover-from-external-source (Step 18)
     // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 7)
-    return new WebAuthnError('User clicked cancel, or the registration ceremony timed out (NotAllowedError)');
+    return new WebAuthnError('User clicked cancel, or the authentication ceremony timed out (NotAllowedError)');
   } else if (error.name === 'SecurityError') {
     const effectiveDomain = window.location.hostname;
     if (!isValidDomain(effectiveDomain)) {
