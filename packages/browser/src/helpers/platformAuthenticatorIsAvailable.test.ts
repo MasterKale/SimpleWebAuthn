@@ -7,7 +7,8 @@ beforeEach(() => {
 
   // @ts-ignore 2741
   window.PublicKeyCredential = jest.fn().mockReturnValue(() => {});
-  window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable = mockIsUVPAA.mockResolvedValue(true);
+  window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable =
+    mockIsUVPAA.mockResolvedValue(true);
 });
 
 test('should return true when platform authenticator is available', async () => {

@@ -203,7 +203,7 @@ describe('WebAuthnError', () => {
         authenticatorSelection: {
           residentKey: 'required',
           requireResidentKey: true,
-        }
+        },
       };
 
       const rejected = await expect(startRegistration(opts)).rejects;
@@ -220,7 +220,7 @@ describe('WebAuthnError', () => {
         ...goodOpts1,
         authenticatorSelection: {
           userVerification: 'required',
-        }
+        },
       };
 
       const rejected = await expect(startRegistration(opts)).rejects;
@@ -332,7 +332,7 @@ describe('WebAuthnError', () => {
         user: {
           ...goodOpts1.user,
           id: Array(65).fill('a').join(''),
-        }
+        },
       };
 
       const rejected = await expect(startRegistration(opts)).rejects;

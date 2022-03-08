@@ -40,7 +40,7 @@ export default async function startRegistration(
   let credential;
   try {
     credential = (await navigator.credentials.create(options)) as RegistrationCredential;
-  } catch(err) {
+  } catch (err) {
     throw identifyRegistrationError({ error: err as Error, options });
   }
 

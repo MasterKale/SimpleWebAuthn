@@ -1,13 +1,15 @@
 import { isValidDomain } from './isValidDomain';
 import { WebAuthnError } from './structs';
 
-
 /**
  * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.create()`
  */
-export function identifyRegistrationError({ error, options }: {
-  error: Error,
-  options: CredentialCreationOptions,
+export function identifyRegistrationError({
+  error,
+  options,
+}: {
+  error: Error;
+  options: CredentialCreationOptions;
 }): WebAuthnError | Error {
   const { publicKey } = options;
 
@@ -16,7 +18,7 @@ export function identifyRegistrationError({ error, options }: {
   }
 
   if (error.name === 'AbortError') {
-    if (options.signal === (new AbortController()).signal) {
+    if (options.signal === new AbortController().signal) {
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 16)
       return new WebAuthnError('Registration ceremony was sent an abort signal');
     }
@@ -39,15 +41,19 @@ export function identifyRegistrationError({ error, options }: {
   } else if (error.name === 'NotAllowedError') {
     // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 20)
     // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 21)
-    return new WebAuthnError('User clicked cancel, or the registration ceremony timed out (NotAllowedError)');
+    return new WebAuthnError(
+      'User clicked cancel, or the registration ceremony timed out (NotAllowedError)',
+    );
   } else if (error.name === 'NotSupportedError') {
     const validPubKeyCredParams = publicKey.pubKeyCredParams.filter(
-      (param) => param.type === 'public-key',
+      param => param.type === 'public-key',
     );
 
     if (validPubKeyCredParams.length === 0) {
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 10)
-      return new WebAuthnError('No entry in pubKeyCredParams was of type "public-key" (NotSupportedError)');
+      return new WebAuthnError(
+        'No entry in pubKeyCredParams was of type "public-key" (NotSupportedError)',
+      );
     }
 
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 2)
@@ -61,7 +67,9 @@ export function identifyRegistrationError({ error, options }: {
       return new WebAuthnError(`${window.location.hostname} is an invalid domain (SecurityError)`);
     } else if (publicKey.rp.id !== effectiveDomain) {
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 8)
-      return new WebAuthnError(`The RP ID "${publicKey.rp.id}" is invalid for this domain (SecurityError)`);
+      return new WebAuthnError(
+        `The RP ID "${publicKey.rp.id}" is invalid for this domain (SecurityError)`,
+      );
     }
   } else if (error.name === 'TypeError') {
     if (publicKey.user.id.byteLength < 1 || publicKey.user.id.byteLength > 64) {
@@ -72,7 +80,7 @@ export function identifyRegistrationError({ error, options }: {
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 1)
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 8)
     return new WebAuthnError(
-      'The authenticator was unable to process the specified options, or could not create a new credential (UnknownError)'
+      'The authenticator was unable to process the specified options, or could not create a new credential (UnknownError)',
     );
   }
 

@@ -9,7 +9,6 @@
 export function isValidDomain(hostname: string): boolean {
   return (
     // Consider localhost valid as well since it's okay wrt Secure Contexts
-    hostname === 'localhost'
-    || /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(hostname)
+    hostname === 'localhost' || /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(hostname)
   );
 }
