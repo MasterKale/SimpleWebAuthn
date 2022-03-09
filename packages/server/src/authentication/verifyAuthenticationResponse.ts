@@ -18,7 +18,7 @@ export type VerifyAuthenticationResponseOpts = {
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
   authenticator: AuthenticatorDevice;
-  fidoUserVerification?: UserVerificationRequirement;
+  requireUserVerification?: boolean;
 };
 
 /**
@@ -32,9 +32,8 @@ export type VerifyAuthenticationResponseOpts = {
  * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
- * @param fidoUserVerification (Optional) The value specified for `userVerification` when calling
- * `generateAssertionOptions()`. Activates FIDO-specific user presence and verification checks.
- * Omitting this value defaults verification to a WebAuthn-specific user presence requirement.
+ * @param requireUserVerification (Optional) Enforce user verification by the authenticator
+ * (via PIN, fingerprint, etc...)
  */
 export default function verifyAuthenticationResponse(
   options: VerifyAuthenticationResponseOpts,
@@ -45,7 +44,7 @@ export default function verifyAuthenticationResponse(
     expectedOrigin,
     expectedRPID,
     authenticator,
-    fidoUserVerification,
+    requireUserVerification,
   } = options;
   const { id, rawId, type: credentialType, response } = credential;
 
@@ -154,21 +153,14 @@ export default function verifyAuthenticationResponse(
     }
   }
 
+  // WebAuthn only requires the user presence flag be true
+  if (!flags.up) {
+    throw new Error('User not present during authentication');
+  }
+
   // Enforce user verification if required
-  if (fidoUserVerification) {
-    if (fidoUserVerification === 'required') {
-      // Require `flags.uv` be true (implies `flags.up` is true)
-      if (!flags.uv) {
-        throw new Error('User verification required, but user could not be verified');
-      }
-    } else if (fidoUserVerification === 'preferred' || fidoUserVerification === 'discouraged') {
-      // Ignore `flags.uv`
-    }
-  } else {
-    // WebAuthn only requires the user presence flag be true
-    if (!flags.up) {
-      throw new Error('User not present during authentication');
-    }
+  if (requireUserVerification && !flags.uv) {
+    throw new Error('User verification required, but user could not be verified');
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
