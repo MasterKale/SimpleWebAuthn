@@ -8,6 +8,7 @@ import {
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
+import { WebAuthnError } from '../helpers/structs';
 
 import startAuthentication from './startAuthentication';
 
@@ -198,4 +199,99 @@ test('should include extension results when no extensions specified', async () =
   const response = await startAuthentication(goodOpts1);
 
   expect(response.clientExtensionResults).toEqual({});
+});
+
+describe('WebAuthnError', () => {
+  describe('AbortError', () => {
+    /**
+     * We can't actually test this because nothing in startAuthentication() propagates the abort
+     * signal. But if you invoked WebAuthn via this and then manually sent an abort signal I guess
+     * this will catch.
+     *
+     * As a matter of fact I couldn't actually get any browser to respect the abort signal...
+     */
+    test.skip('should identify abort signal', async () => {
+      mockNavigatorGet.mockRejectedValueOnce(new AbortError());
+
+      const rejected = await expect(startAuthentication(goodOpts1)).rejects;
+      rejected.toThrow(WebAuthnError);
+      rejected.toThrow(/abort signal/i);
+      rejected.toThrow(/AbortError/);
+    });
+  });
+
+  describe('NotAllowedError', () => {
+    test('should identify unrecognized allowed credentials', async () => {
+      mockNavigatorGet.mockRejectedValueOnce(new NotAllowedError());
+
+      const rejected = await expect(startAuthentication(goodOpts1)).rejects;
+      rejected.toThrow(WebAuthnError);
+      rejected.toThrow(/allowed credentials/i);
+      rejected.toThrow(/NotAllowedError/);
+    });
+
+    test('should identify cancellation or timeout', async () => {
+      mockNavigatorGet.mockRejectedValueOnce(new NotAllowedError());
+
+      const opts = {
+        ...goodOpts1,
+        allowCredentials: [],
+      };
+
+      const rejected = await expect(startAuthentication(opts)).rejects;
+      rejected.toThrow(WebAuthnError);
+      rejected.toThrow(/cancel/i);
+      rejected.toThrow(/timed out/i);
+      rejected.toThrow(/NotAllowedError/);
+    });
+  });
+
+  describe('SecurityError', () => {
+    let _originalHostName: string;
+
+    beforeEach(() => {
+      _originalHostName = window.location.hostname;
+    });
+
+    afterEach(() => {
+      window.location.hostname = _originalHostName;
+    });
+
+    test('should identify invalid domain', async () => {
+      window.location.hostname = '1.2.3.4';
+
+      mockNavigatorGet.mockRejectedValueOnce(new SecurityError());
+
+      const rejected = await expect(startAuthentication(goodOpts1)).rejects;
+      rejected.toThrowError(WebAuthnError);
+      rejected.toThrow(/1\.2\.3\.4/);
+      rejected.toThrow(/invalid domain/i);
+      rejected.toThrow(/SecurityError/);
+    });
+
+    test('should identify invalid RP ID', async () => {
+      window.location.hostname = 'simplewebauthn.com';
+
+      mockNavigatorGet.mockRejectedValueOnce(new SecurityError());
+
+      const rejected = await expect(startAuthentication(goodOpts1)).rejects;
+      rejected.toThrowError(WebAuthnError);
+      rejected.toThrow(goodOpts1.rpId);
+      rejected.toThrow(/invalid for this domain/i);
+      rejected.toThrow(/SecurityError/);
+    });
+  });
+
+  describe('UnknownError', () => {
+    test('should identify potential authenticator issues', async () => {
+      mockNavigatorGet.mockRejectedValueOnce(new UnknownError());
+
+      const rejected = await expect(startAuthentication(goodOpts1)).rejects;
+      rejected.toThrow(WebAuthnError);
+      rejected.toThrow(/authenticator/i);
+      rejected.toThrow(/unable to process the specified options/i);
+      rejected.toThrow(/could not create a new assertion signature /i);
+      rejected.toThrow(/UnknownError/);
+    });
+  });
 });
