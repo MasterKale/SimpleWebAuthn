@@ -10,20 +10,20 @@ import _generateRegistrationOptions from '../../registration/generateRegistratio
  *
  * @param options.rpID Valid domain name (after `https://`)
  * @param options.userID Website's unique ID for the user (uuid, etc...)
- * @param options.username User's display name (email, etc...)
+ * @param options.userName User's display name (email, etc...)
  * @param options.userRegisteredCredentials The user's existing credentials. Prevents existing users
  * from re-enrolling an authenticator and locking themselves out of their account
  */
 export function generateRegistrationOptions(options: {
   rpID: string,
   userID: string,
-  username: string,
+  userName: string,
   userRegisteredCredentials: PublicKeyCredentialDescriptor[],
 }): PublicKeyCredentialCreationOptionsJSON {
   const {
     rpID,
     userID,
-    username,
+    userName,
     userRegisteredCredentials,
   } = options;
 
@@ -31,7 +31,7 @@ export function generateRegistrationOptions(options: {
     rpID,
     rpName: rpID,
     userID,
-    userName: username,
+    userName,
     authenticatorSelection: {
       userVerification: 'required',
       residentKey: 'required',
@@ -40,6 +40,6 @@ export function generateRegistrationOptions(options: {
     excludeCredentials: userRegisteredCredentials,
     // ES256 and RS256
     supportedAlgorithmIDs: [-7, -257],
-    userDisplayName: username,
+    userDisplayName: userName,
   });
 }
