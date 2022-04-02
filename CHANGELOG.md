@@ -1,5 +1,42 @@
 # Changelog
 
+## v5.0.0 The one with more insights
+
+**Packages:**
+
+- @simplewebauthn/browser@5.0.0
+- @simplewebauthn/server@5.0.0
+- @simplewebauthn/testing@5.0.0
+- @simplewebauthn/typescript-types@5.0.0
+
+**Changes:**
+
+- **[browser]** Most common WebAuthn errors that can occur when calling `startRegistration()` and `startAuthentication()` will now return descriptions with more specific insights into what went wrong ([#184](https://github.com/MasterKale/SimpleWebAuthn/pull/184))
+- **[testing]** Version sync
+- **[typescript-types]** Version sync
+
+### Breaking Changes
+
+- **[server]** The `fidoUserVerification` argument to `verifyAuthenticationResponse()` has been replaced with the simpler `requireUserVerification` boolean ([#181](https://github.com/MasterKale/SimpleWebAuthn/pull/181))
+
+Previous values of `"required"` should specify `true` for this new argument; previous values of `"preferred"` or `"discouraged"` should specify `false`:
+
+**Before:**
+```ts
+const verification = verifyAuthenticationResponse({
+  // ...snip...
+  fidoUserVerification: 'required',
+});
+```
+
+**After:**
+```ts
+const verification = verifyAuthenticationResponse({
+  // ...snip...
+  requireUserVerification: true,
+});
+```
+
 ## v4.4.0
 
 **Packages:**
