@@ -2,7 +2,6 @@ import base64url from 'base64url';
 import {
   AuthenticationCredentialJSON,
   AuthenticatorDevice,
-  UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
