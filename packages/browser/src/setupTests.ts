@@ -26,62 +26,20 @@ Object.defineProperty(window, 'location', {
 });
 
 /**
- * Define WebAuthn's custom API errors
+ * Create "custom errors" to help emulate WebAuthn API errors
  */
-
-class AbortError extends Error {
-  constructor() {
-    super();
-    this.name = 'AbortError';
-  }
+type WebAuthnErrorName =
+  'AbortError'
+  | 'ConstraintError'
+  | 'InvalidStateError'
+  | 'NotAllowedError'
+  | 'NotSupportedError'
+  | 'SecurityError'
+  | 'UnknownError';
+function generateCustomError(name: WebAuthnErrorName): Error {
+  const customError = new Error();
+  customError.name = name;
+  return customError;
 }
 
-class ConstraintError extends Error {
-  constructor() {
-    super();
-    this.name = 'ConstraintError';
-  }
-}
-
-class InvalidStateError extends Error {
-  constructor() {
-    super();
-    this.name = 'InvalidStateError';
-  }
-}
-
-class NotAllowedError extends Error {
-  constructor() {
-    super();
-    this.name = 'NotAllowedError';
-  }
-}
-
-class NotSupportedError extends Error {
-  constructor() {
-    super();
-    this.name = 'NotSupportedError';
-  }
-}
-
-class SecurityError extends Error {
-  constructor() {
-    super();
-    this.name = 'SecurityError';
-  }
-}
-
-class UnknownError extends Error {
-  constructor() {
-    super();
-    this.name = 'UnknownError';
-  }
-}
-
-Object.defineProperty(global, 'AbortError', { value: AbortError });
-Object.defineProperty(global, 'ConstraintError', { value: ConstraintError });
-Object.defineProperty(global, 'InvalidStateError', { value: InvalidStateError });
-Object.defineProperty(global, 'NotAllowedError', { value: NotAllowedError });
-Object.defineProperty(global, 'NotSupportedError', { value: NotSupportedError });
-Object.defineProperty(global, 'SecurityError', { value: SecurityError });
-Object.defineProperty(global, 'UnknownError', { value: UnknownError });
+Object.defineProperty(global, 'generateCustomError', { value: generateCustomError });
