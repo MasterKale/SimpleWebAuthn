@@ -9,6 +9,7 @@ import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
+import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 
 import startAuthentication from './startAuthentication';
 
@@ -203,6 +204,8 @@ test('should include extension results when no extensions specified', async () =
 
 describe('WebAuthnError', () => {
   describe('AbortError', () => {
+    const AbortError = generateCustomError('AbortError');
+
     /**
      * We can't actually test this because nothing in startAuthentication() propagates the abort
      * signal. But if you invoked WebAuthn via this and then manually sent an abort signal I guess
@@ -211,7 +214,7 @@ describe('WebAuthnError', () => {
      * As a matter of fact I couldn't actually get any browser to respect the abort signal...
      */
     test.skip('should identify abort signal', async () => {
-      mockNavigatorGet.mockRejectedValueOnce(new AbortError());
+      mockNavigatorGet.mockRejectedValueOnce(AbortError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(WebAuthnError);
@@ -221,8 +224,10 @@ describe('WebAuthnError', () => {
   });
 
   describe('NotAllowedError', () => {
+    const NotAllowedError = generateCustomError('NotAllowedError');
+
     test('should identify unrecognized allowed credentials', async () => {
-      mockNavigatorGet.mockRejectedValueOnce(new NotAllowedError());
+      mockNavigatorGet.mockRejectedValueOnce(NotAllowedError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(WebAuthnError);
@@ -231,7 +236,7 @@ describe('WebAuthnError', () => {
     });
 
     test('should identify cancellation or timeout', async () => {
-      mockNavigatorGet.mockRejectedValueOnce(new NotAllowedError());
+      mockNavigatorGet.mockRejectedValueOnce(NotAllowedError);
 
       const opts = {
         ...goodOpts1,
@@ -247,6 +252,8 @@ describe('WebAuthnError', () => {
   });
 
   describe('SecurityError', () => {
+    const SecurityError = generateCustomError('SecurityError');
+
     let _originalHostName: string;
 
     beforeEach(() => {
@@ -260,7 +267,7 @@ describe('WebAuthnError', () => {
     test('should identify invalid domain', async () => {
       window.location.hostname = '1.2.3.4';
 
-      mockNavigatorGet.mockRejectedValueOnce(new SecurityError());
+      mockNavigatorGet.mockRejectedValueOnce(SecurityError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrowError(WebAuthnError);
@@ -272,7 +279,7 @@ describe('WebAuthnError', () => {
     test('should identify invalid RP ID', async () => {
       window.location.hostname = 'simplewebauthn.com';
 
-      mockNavigatorGet.mockRejectedValueOnce(new SecurityError());
+      mockNavigatorGet.mockRejectedValueOnce(SecurityError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrowError(WebAuthnError);
@@ -283,8 +290,10 @@ describe('WebAuthnError', () => {
   });
 
   describe('UnknownError', () => {
+    const UnknownError = generateCustomError('UnknownError');
+
     test('should identify potential authenticator issues', async () => {
-      mockNavigatorGet.mockRejectedValueOnce(new UnknownError());
+      mockNavigatorGet.mockRejectedValueOnce(UnknownError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(WebAuthnError);
