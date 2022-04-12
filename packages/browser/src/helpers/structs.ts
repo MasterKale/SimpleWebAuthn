@@ -16,8 +16,8 @@
  * scenarios a given error would be raised.
  */
 export class WebAuthnError extends Error {
-  constructor(message: string) {
+  constructor(message: string, name = 'WebAuthnError') {
     super(message);
-    this.name = 'WebAuthnError';
+    this.name = name;
   }
 }
