@@ -237,11 +237,11 @@ export default async function verifyRegistrationResponse(
       fmt,
       counter,
       aaguid: convertAAGUIDToString(aaguid),
-      credentialPublicKey,
       credentialID,
+      credentialPublicKey,
       credentialType,
-      userVerified: flags.uv,
       attestationObject,
+      userVerified: flags.uv,
     };
   }
 
@@ -270,11 +270,11 @@ export type VerifiedRegistrationResponse = {
     fmt: AttestationFormat;
     counter: number;
     aaguid: string;
-    credentialPublicKey: Buffer;
     credentialID: Buffer;
-    credentialType: string;
-    userVerified: boolean;
+    credentialPublicKey: Buffer;
+    credentialType: "public-key";
     attestationObject: Buffer;
+    userVerified: boolean;
   };
 };
 
