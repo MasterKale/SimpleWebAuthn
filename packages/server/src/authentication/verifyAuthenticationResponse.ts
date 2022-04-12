@@ -2,6 +2,7 @@ import base64url from 'base64url';
 import {
   AuthenticationCredentialJSON,
   AuthenticatorDevice,
+  CredentialDeviceType,
 } from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -10,6 +11,7 @@ import convertPublicKeyToPEM from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
+import { parseBackupFlags } from '../helpers/parseBackupFlags';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -178,11 +180,15 @@ export default function verifyAuthenticationResponse(
     );
   }
 
+  const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
+
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
     authenticationInfo: {
       newCounter: counter,
       credentialID: authenticator.credentialID,
+      credentialDeviceType,
+      credentialBackedUp,
     },
   };
 
@@ -205,5 +211,7 @@ export type VerifiedAuthenticationResponse = {
   authenticationInfo: {
     credentialID: Buffer;
     newCounter: number;
+    credentialDeviceType: CredentialDeviceType;
+    credentialBackedUp: boolean;
   };
 };

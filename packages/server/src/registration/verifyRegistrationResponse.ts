@@ -2,6 +2,7 @@ import base64url from 'base64url';
 import {
   RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
+  CredentialDeviceType,
 } from '@simplewebauthn/typescript-types';
 
 import decodeAttestationObject, {
@@ -14,6 +15,7 @@ import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import settingsService from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
@@ -233,6 +235,8 @@ export default async function verifyRegistrationResponse(
   };
 
   if (toReturn.verified) {
+    const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
+
     toReturn.registrationInfo = {
       fmt,
       counter,
@@ -242,6 +246,8 @@ export default async function verifyRegistrationResponse(
       credentialType,
       attestationObject,
       userVerified: flags.uv,
+      credentialDeviceType,
+      credentialBackedUp,
     };
   }
 
@@ -275,6 +281,8 @@ export type VerifiedRegistrationResponse = {
     credentialType: "public-key";
     attestationObject: Buffer;
     userVerified: boolean;
+    credentialDeviceType: CredentialDeviceType;
+    credentialBackedUp: boolean;
   };
 };
 
