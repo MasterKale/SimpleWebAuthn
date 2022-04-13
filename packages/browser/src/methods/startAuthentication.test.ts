@@ -219,7 +219,7 @@ describe('WebAuthnError', () => {
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/abort signal/i);
-      rejected.toThrow(/AbortError/);
+      rejected.toHaveProperty('name', 'AbortError');
     });
   });
 
@@ -232,7 +232,7 @@ describe('WebAuthnError', () => {
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/allowed credentials/i);
-      rejected.toThrow(/NotAllowedError/);
+      rejected.toHaveProperty('name', 'NotAllowedError');
     });
 
     test('should identify cancellation or timeout', async () => {
@@ -247,7 +247,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/cancel/i);
       rejected.toThrow(/timed out/i);
-      rejected.toThrow(/NotAllowedError/);
+      rejected.toHaveProperty('name', 'NotAllowedError');
     });
   });
 
@@ -273,7 +273,7 @@ describe('WebAuthnError', () => {
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(/1\.2\.3\.4/);
       rejected.toThrow(/invalid domain/i);
-      rejected.toThrow(/SecurityError/);
+      rejected.toHaveProperty('name', 'SecurityError');
     });
 
     test('should identify invalid RP ID', async () => {
@@ -285,7 +285,7 @@ describe('WebAuthnError', () => {
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(goodOpts1.rpId);
       rejected.toThrow(/invalid for this domain/i);
-      rejected.toThrow(/SecurityError/);
+      rejected.toHaveProperty('name', 'SecurityError');
     });
   });
 
@@ -299,8 +299,8 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/authenticator/i);
       rejected.toThrow(/unable to process the specified options/i);
-      rejected.toThrow(/could not create a new assertion signature /i);
-      rejected.toThrow(/UnknownError/);
+      rejected.toThrow(/could not create a new assertion signature/i);
+      rejected.toHaveProperty('name', 'UnknownError');
     });
   });
 });

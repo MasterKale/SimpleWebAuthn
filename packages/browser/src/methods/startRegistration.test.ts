@@ -1,15 +1,15 @@
 import {
-  RegistrationCredential,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialCreationOptionsJSON,
+  RegistrationCredential,
 } from '@simplewebauthn/typescript-types';
-
-import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
+import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
-import { generateCustomError } from '../helpers/__jest__/generateCustomError';
+
+import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 
 import startRegistration from './startRegistration';
 
@@ -105,7 +105,7 @@ test('should return base64url-encoded response values', async () => {
   expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWU');
 });
 
-test("should throw error if WebAuthn isn't supported", async () => {
+test('should throw error if WebAuthn isn\'t supported', async () => {
   mockSupportsWebauthn.mockReturnValue(false);
 
   await expect(startRegistration(goodOpts1)).rejects.toThrow(
@@ -214,7 +214,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/discoverable credentials were required/i);
       rejected.toThrow(/no available authenticator supported/i);
-      rejected.toThrow(/ConstraintError/);
+      rejected.toHaveProperty('name', 'ConstraintError');
     });
 
     test('should identify unsupported user verification', async () => {
@@ -231,7 +231,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/user verification was required/i);
       rejected.toThrow(/no available authenticator supported/i);
-      rejected.toThrow(/ConstraintError/);
+      rejected.toHaveProperty('name', 'ConstraintError');
     });
   });
 
@@ -245,7 +245,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/authenticator/i);
       rejected.toThrow(/previously registered/i);
-      rejected.toThrow(/InvalidStateError/);
+      rejected.toHaveProperty('name', 'InvalidStateError');
     });
   });
 
@@ -259,7 +259,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/cancel/i);
       rejected.toThrow(/timed out/i);
-      rejected.toThrow(/NotAllowedError/);
+      rejected.toHaveProperty('name', 'NotAllowedError');
     });
   });
 
@@ -278,7 +278,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/pubKeyCredParams/i);
       rejected.toThrow(/public-key/i);
-      rejected.toThrow(/NotSupportedError/);
+      rejected.toHaveProperty('name', 'NotSupportedError');
     });
 
     test('should identify no authenticator supports algs in pubKeyCredParams', async () => {
@@ -293,7 +293,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/No available authenticator/i);
       rejected.toThrow(/pubKeyCredParams/i);
-      rejected.toThrow(/NotSupportedError/);
+      rejected.toHaveProperty('name', 'NotSupportedError');
     });
   });
 
@@ -319,7 +319,7 @@ describe('WebAuthnError', () => {
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(/1\.2\.3\.4/);
       rejected.toThrow(/invalid domain/i);
-      rejected.toThrow(/SecurityError/);
+      rejected.toHaveProperty('name', 'SecurityError');
     });
 
     test('should identify invalid RP ID', async () => {
@@ -331,7 +331,7 @@ describe('WebAuthnError', () => {
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(goodOpts1.rp.id);
       rejected.toThrow(/invalid for this domain/i);
-      rejected.toThrow(/SecurityError/);
+      rejected.toHaveProperty('name', 'SecurityError');
     });
   });
 
@@ -351,7 +351,7 @@ describe('WebAuthnError', () => {
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(/user id/i);
       rejected.toThrow(/not between 1 and 64 characters/i);
-      rejected.toThrow(/TypeError/);
+      rejected.toHaveProperty('name', 'TypeError');
     });
   });
 
@@ -366,7 +366,7 @@ describe('WebAuthnError', () => {
       rejected.toThrow(/authenticator/i);
       rejected.toThrow(/unable to process the specified options/i);
       rejected.toThrow(/could not create a new credential/i);
-      rejected.toThrow(/UnknownError/);
+      rejected.toHaveProperty('name', 'UnknownError');
     });
   });
 });
