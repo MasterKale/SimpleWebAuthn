@@ -20,10 +20,17 @@ export function parseBackupFlags({ be, bs }: { be: boolean, bs: boolean }): {
   }
 
   if (credentialDeviceType === 'singleDevice' && credentialBackedUp) {
-    throw new Error(
+    throw new InvalidBackupFlags(
       'Single-device credential indicated that it was backed up, which should be impossible.'
     )
   }
 
   return { credentialDeviceType, credentialBackedUp };
+}
+
+class InvalidBackupFlags extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidBackupFlags';
+  }
 }
