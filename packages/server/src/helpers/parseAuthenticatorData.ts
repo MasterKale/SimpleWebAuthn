@@ -23,7 +23,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
   const flags = {
     up: !!(flagsInt & 1 << 0), // User Presence
     uv: !!(flagsInt & 1 << 2), // User Verified
-    be: !!(flagsInt & 1 << 3), // Backup Eligible
+    be: !!(flagsInt & 1 << 3), // Backup Eligibility
     bs: !!(flagsInt & 1 << 4), // Backup State
     at: !!(flagsInt & 1 << 6), // Attested Credential Data Present
     ed: !!(flagsInt & 1 << 7), // Extension Data Present

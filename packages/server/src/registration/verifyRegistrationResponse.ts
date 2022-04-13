@@ -270,9 +270,10 @@ export default async function verifyRegistrationResponse(
  * @param registrationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
  * the authenticator
  * @param registrationInfo.credentialDeviceType Whether this is a single-device or multi-device
- * credential
+ * credential. **Should be kept in a DB for later reference!**
  * @param registrationInfo.credentialBackedUp Whether or not the multi-device credential has been
- * backed up. Always `false` for single-device credentials
+ * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
+ * reference!**
  */
 export type VerifiedRegistrationResponse = {
   verified: boolean;
