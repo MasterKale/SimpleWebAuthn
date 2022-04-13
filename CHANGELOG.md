@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.1.0
+
+**Packages:**
+
+- @simplewebauthn/browser@5.1.0
+- @simplewebauthn/server@5.1.0
+
+**Changes:**
+
+- **[browser]** Custom errors raised when calling `startRegistration()` and `startAuthentication()` will now have the same `name` property as the original error ([#191](https://github.com/MasterKale/SimpleWebAuthn/pull/191))
+- **[server]** Cleaned up code and added tests ([#192](https://github.com/MasterKale/SimpleWebAuthn/pull/192), [#193](https://github.com/MasterKale/SimpleWebAuthn/pull/193))
+
 ## v5.0.0 The one with more insights
 
 **Packages:**
