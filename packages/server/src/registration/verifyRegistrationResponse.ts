@@ -260,7 +260,7 @@ export default async function verifyRegistrationResponse(
  * @param verified If the assertion response could be verified
  * @param registrationInfo.fmt Type of attestation
  * @param registrationInfo.counter The number of times the authenticator reported it has been used.
- * Should be kept in a DB for later reference to help prevent replay attacks
+ * **Should be kept in a DB for later reference to help prevent replay attacks!**
  * @param registrationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
  * authenticator
  * @param registrationInfo.credentialPublicKey The credential's public key
