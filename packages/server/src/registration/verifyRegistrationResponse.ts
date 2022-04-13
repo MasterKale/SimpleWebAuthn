@@ -269,6 +269,10 @@ export default async function verifyRegistrationResponse(
  * @param registrationInfo.userVerified Whether the user was uniquely identified during attestation
  * @param registrationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
  * the authenticator
+ * @param registrationInfo.credentialDeviceType Whether this is a single-device or multi-device
+ * credential
+ * @param registrationInfo.credentialBackedUp Whether or not the multi-device credential has been
+ * backed up. Always `false` for single-device credentials
  */
 export type VerifiedRegistrationResponse = {
   verified: boolean;

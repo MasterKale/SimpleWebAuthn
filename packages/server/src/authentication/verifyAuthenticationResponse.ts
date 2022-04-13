@@ -205,6 +205,10 @@ export default function verifyAuthenticationResponse(
  * @param authenticationInfo.newCounter The number of times the authenticator identified above
  * reported it has been used. **Should be kept in a DB for later reference to help prevent replay
  * attacks!**
+ * @param authenticationInfo.credentialDeviceType Whether this is a single-device or multi-device
+ * credential
+ * @param authenticationInfo.credentialBackedUp Whether or not the multi-device credential has been
+ * backed up. Always `false` for single-device credentials
  */
 export type VerifiedAuthenticationResponse = {
   verified: boolean;
