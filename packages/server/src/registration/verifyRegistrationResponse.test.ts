@@ -568,6 +568,18 @@ test('should fail verification if custom challenge verifier returns false', asyn
   ).rejects.toThrow(/custom challenge verifier returned false/i);
 });
 
+test('should return credential backup info', async () => {
+  const verification = await verifyRegistrationResponse({
+    credential: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  expect(verification.registrationInfo?.credentialDeviceType).toEqual('singleDevice');
+  expect(verification.registrationInfo?.credentialBackedUp).toEqual(false);
+});
+
 /**
  * Various Attestations Below
  */
