@@ -243,6 +243,11 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
     throw new Error(`Could not find device matching ${id}`);
   }
 
+  let requireUserVerification = false;
+  if (userVerification === 'required') {
+    requireUserVerification = true;
+  }
+
   let verification;
   try {
     verification = verifyAuthenticationResponse({
@@ -251,7 +256,7 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: existingDevice,
-      fidoUserVerification: userVerification,
+      requireUserVerification,
     });
   } catch (error) {
     const _error = error as Error;

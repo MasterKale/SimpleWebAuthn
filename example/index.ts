@@ -258,7 +258,7 @@ app.post('/verify-authentication', (req, res) => {
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
-      fidoUserVerification: 'required',
+      requireUserVerification: true,
     };
     verification = verifyAuthenticationResponse(opts);
   } catch (error) {
