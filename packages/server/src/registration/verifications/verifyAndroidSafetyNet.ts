@@ -97,14 +97,16 @@ export default async function verifyAttestationAndroidSafetyNet(
     try {
       await verifyAttestationWithMetadata(statement, credentialPublicKey, HEADER.x5c);
     } catch (err) {
-      throw new Error(`${err.message} (SafetyNet)`);
+      const _err = err as Error;
+      throw new Error(`${_err.message} (SafetyNet)`);
     }
   } else {
     try {
       // Try validating the certificate path using the root certificates set via SettingsService
       await validateCertificatePath(HEADER.x5c.map(convertCertBufferToPEM), rootCertificates);
     } catch (err) {
-      throw new Error(`${err.message} (SafetyNet)`);
+      const _err = err as Error;
+      throw new Error(`${_err.message} (SafetyNet)`);
     }
   }
   /**

@@ -100,14 +100,16 @@ export default async function verifyAttestationPacked(
       try {
         await verifyAttestationWithMetadata(statement, credentialPublicKey, x5c);
       } catch (err) {
-        throw new Error(`${err.message} (Packed|Full)`);
+        const _err = err as Error;
+        throw new Error(`${_err.message} (Packed|Full)`);
       }
     } else {
       try {
         // Try validating the certificate path using the root certificates set via SettingsService
         await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
       } catch (err) {
-        throw new Error(`${err.message} (Packed|Full)`);
+        const _err = err as Error;
+        throw new Error(`${_err.message} (Packed|Full)`);
       }
     }
 

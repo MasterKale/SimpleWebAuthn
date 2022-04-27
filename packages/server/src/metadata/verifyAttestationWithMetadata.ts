@@ -75,7 +75,8 @@ export default async function verifyAttestationWithMetadata(
       statement.attestationRootCertificates.map(convertCertBufferToPEM),
     );
   } catch (err) {
-    throw new Error(`Could not validate certificate path with any metadata root certificates: ${err.message}`);
+    const _err = err as Error;
+    throw new Error(`Could not validate certificate path with any metadata root certificates: ${_err.message}`);
   }
 
   return true;
