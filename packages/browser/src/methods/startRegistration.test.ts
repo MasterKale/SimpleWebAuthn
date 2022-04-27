@@ -176,6 +176,23 @@ test('should include extension results when no extensions specified', async () =
   expect(response.clientExtensionResults).toEqual({});
 });
 
+test('should support "cable" transport', async () => {
+  const opts: PublicKeyCredentialCreationOptionsJSON = {
+    ...goodOpts1,
+    excludeCredentials: [
+      {
+        ...goodOpts1.excludeCredentials![0],
+        transports: ["cable"],
+      },
+    ]
+  };
+
+  await startRegistration(opts);
+
+  expect(mockNavigatorCreate.mock.calls[0][0].publicKey.excludeCredentials[0].transports[0])
+    .toEqual("cable");
+});
+
 describe('WebAuthnError', () => {
   describe('AbortError', () => {
     const AbortError = generateCustomError('AbortError');
