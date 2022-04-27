@@ -61,7 +61,7 @@ test('should return pem when input is base64URLString', () => {
   try {
     convertPublicKeyToPEM(input);
   } catch(err) {
-    expect(err.message).toEqual("Public key was missing kty");
+    expect((err as Error).message).toEqual("Public key was missing kty");
   }
 });
 
@@ -76,6 +76,6 @@ test('should return pem when input is base64URLString', () => {
   try {
     convertPublicKeyToPEM(input);
   } catch(err) {
-    expect(err.message).toEqual("Could not convert public key type 1 to PEM");
+    expect((err as Error).message).toEqual("Could not convert public key type 1 to PEM");
   }
 });
