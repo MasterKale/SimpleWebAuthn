@@ -52,7 +52,8 @@ export default async function verifyAttestationFIDOU2F(
     // Try validating the certificate path using the root certificates set via SettingsService
     await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
   } catch (err) {
-    throw new Error(`${err.message} (FIDOU2F)`);
+    const _err = err as Error;
+    throw new Error(`${_err.message} (FIDOU2F)`);
   }
 
   const leafCertPEM = convertCertBufferToPEM(x5c[0]);

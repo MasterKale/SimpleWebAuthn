@@ -8,7 +8,8 @@ export default function convertPublicKeyToPEM(publicKey: Buffer): string {
   try {
     struct = cbor.decodeAllSync(publicKey)[0];
   } catch (err) {
-    throw new Error(`Error decoding public key while converting to PEM: ${err.message}`);
+    const _err = err as Error;
+    throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);
   }
 
   const kty = struct.get(COSEKEYS.kty);
