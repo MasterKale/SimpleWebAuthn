@@ -154,7 +154,7 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
 export type AuthenticatorTransport = "ble" | "internal" | "nfc" | "usb" | "cable";
 
 /**
- * The two types of credentials as defined by bits 3 and 4 in authenticator data:
+ * The two types of credentials as defined by bit 3 ("Backup Eligibility") in authenticator data:
  * - `"singleDevice"` credentials will never be backed up
  * - `"multiDevice"` credentials can be backed up
  */
