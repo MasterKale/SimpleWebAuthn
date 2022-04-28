@@ -15,6 +15,6 @@ export default function toPublicKeyCredentialDescriptor(
      * transports that TypeScript's DOM lib is ignorant of. Convince TS that our list of transports
      * are fine to pass to WebAuthn since browsers will recognize the new value.
      */
-     transports: descriptor.transports as AuthenticatorTransport[],
+    transports: descriptor.transports as AuthenticatorTransport[],
   };
 }
