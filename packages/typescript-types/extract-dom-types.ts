@@ -20,7 +20,6 @@ const types = [
   'AuthenticatorAssertionResponse',
   'AttestationConveyancePreference',
   'AuthenticatorAttestationResponse',
-  'AuthenticatorTransport',
   'AuthenticationExtensionsClientInputs',
   'AuthenticationExtensionsClientOutputs',
   'AuthenticatorSelectionCriteria',

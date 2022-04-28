@@ -6,7 +6,6 @@
 import type {
   AuthenticatorAssertionResponse,
   AuthenticatorAttestationResponse,
-  AuthenticatorTransport,
   COSEAlgorithmIdentifier,
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
@@ -43,8 +42,9 @@ export interface PublicKeyCredentialRequestOptionsJSON
 }
 
 export interface PublicKeyCredentialDescriptorJSON
-  extends Omit<PublicKeyCredentialDescriptor, 'id'> {
+  extends Omit<PublicKeyCredentialDescriptor, 'id' | 'transports'> {
   id: Base64URLString;
+  transports?: AuthenticatorTransport[];
 }
 
 export interface PublicKeyCredentialUserEntityJSON
@@ -146,3 +146,9 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
   getPublicKey?: () => ArrayBuffer;
   getPublicKeyAlgorithm?: () => COSEAlgorithmIdentifier[];
 }
+
+/**
+ * Communication methods by which an authenticator can talk with the browser to perform WebAuthn
+ * registration and authentication.
+ */
+export type AuthenticatorTransport = "ble" | "internal" | "nfc" | "usb" | "cable";
