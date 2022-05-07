@@ -5,13 +5,13 @@
     "bootstrap": "npm run build:types && npm run build:testing && npm run build:browser && npm run build:server",
     "lint": "prettier --write packages/**/src/**/*.ts example/**/*.ts && eslint --fix packages/**/src/**/*.ts example/**/*.ts",
     "docs": "npm run bootstrap && typedoc --tsconfig tsconfigdoc.json",
-    "test": "lerna run test",
-    "build:types": "lerna bootstrap --scope=@simplewebauthn/typescript-types",
-    "build:testing": "lerna bootstrap --scope=@simplewebauthn/testing",
-    "build:browser": "lerna bootstrap --scope=@simplewebauthn/browser",
-    "build:server": "lerna bootstrap --scope=@simplewebauthn/server",
-    "dev:server": "lerna exec npm run test:watch --scope=@simplewebauthn/server",
-    "dev:browser": "lerna exec npm run test:watch --scope=@simplewebauthn/browser"
+    "test": "nx run-many --target=test --all",
+    "build:types": "nx build @simplewebauthn/typescript-types",
+    "build:testing": "nx build @simplewebauthn/testing",
+    "build:browser": "nx build @simplewebauthn/browser",
+    "build:server": "nx build @simplewebauthn/server",
+    "dev:server": "nx test @simplewebauthn/server --watch",
+    "dev:browser": "nx test @simplewebauthn/browser --watch"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
@@ -33,7 +33,8 @@
     "ts-node": "^10.2.1",
     "typedoc": "^0.22.15",
     "typedoc-plugin-missing-exports": "^0.22.6",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.3",
+    "nx": "14.1.4"
   },
   "husky": {
     "hooks": {
