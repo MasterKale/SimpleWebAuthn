@@ -13,8 +13,9 @@ test('should throw on single-device cred, backed up', () => {
   try {
     parseBackupFlags({ be: false, bs: true });
   } catch (err) {
-    expect(err.message).toContain('impossible');
-    expect(err.name).toEqual('InvalidBackupFlags')
+    const _err: Error = err as Error;
+    expect(_err.message).toContain('impossible');
+    expect(_err.name).toEqual('InvalidBackupFlags')
   }
 });
 
