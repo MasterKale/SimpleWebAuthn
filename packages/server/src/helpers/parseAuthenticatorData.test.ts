@@ -20,6 +20,8 @@ test('should parse flags', () => {
 
   expect(flags.up).toEqual(true);
   expect(flags.uv).toEqual(false);
+  expect(flags.be).toEqual(false);
+  expect(flags.bs).toEqual(false);
   expect(flags.at).toEqual(false);
   expect(flags.ed).toEqual(true);
 });

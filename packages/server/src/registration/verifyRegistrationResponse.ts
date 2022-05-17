@@ -2,6 +2,7 @@ import base64url from 'base64url';
 import {
   RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
+  CredentialDeviceType,
 } from '@simplewebauthn/typescript-types';
 
 import decodeAttestationObject, {
@@ -14,6 +15,7 @@ import toHash from '../helpers/toHash';
 import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import settingsService from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
@@ -233,15 +235,19 @@ export default async function verifyRegistrationResponse(
   };
 
   if (toReturn.verified) {
+    const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
+
     toReturn.registrationInfo = {
       fmt,
       counter,
       aaguid: convertAAGUIDToString(aaguid),
-      credentialPublicKey,
       credentialID,
+      credentialPublicKey,
       credentialType,
-      userVerified: flags.uv,
       attestationObject,
+      userVerified: flags.uv,
+      credentialDeviceType,
+      credentialBackedUp,
     };
   }
 
@@ -254,7 +260,7 @@ export default async function verifyRegistrationResponse(
  * @param verified If the assertion response could be verified
  * @param registrationInfo.fmt Type of attestation
  * @param registrationInfo.counter The number of times the authenticator reported it has been used.
- * Should be kept in a DB for later reference to help prevent replay attacks
+ * **Should be kept in a DB for later reference to help prevent replay attacks!**
  * @param registrationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
  * authenticator
  * @param registrationInfo.credentialPublicKey The credential's public key
@@ -263,6 +269,11 @@ export default async function verifyRegistrationResponse(
  * @param registrationInfo.userVerified Whether the user was uniquely identified during attestation
  * @param registrationInfo.attestationObject The raw `response.attestationObject` Buffer returned by
  * the authenticator
+ * @param registrationInfo.credentialDeviceType Whether this is a single-device or multi-device
+ * credential. **Should be kept in a DB for later reference!**
+ * @param registrationInfo.credentialBackedUp Whether or not the multi-device credential has been
+ * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
+ * reference!**
  */
 export type VerifiedRegistrationResponse = {
   verified: boolean;
@@ -270,11 +281,13 @@ export type VerifiedRegistrationResponse = {
     fmt: AttestationFormat;
     counter: number;
     aaguid: string;
-    credentialPublicKey: Buffer;
     credentialID: Buffer;
-    credentialType: string;
-    userVerified: boolean;
+    credentialPublicKey: Buffer;
+    credentialType: "public-key";
     attestationObject: Buffer;
+    userVerified: boolean;
+    credentialDeviceType: CredentialDeviceType;
+    credentialBackedUp: boolean;
   };
 };
 

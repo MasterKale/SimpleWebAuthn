@@ -308,6 +308,19 @@ test('should fail verification if custom challenge verifier returns false', () =
   }).toThrow(/custom challenge verifier returned false/i);
 });
 
+test('should return credential backup info', async () => {
+  const verification = verifyAuthenticationResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+  });
+
+  expect(verification.authenticationInfo?.credentialDeviceType).toEqual('singleDevice');
+  expect(verification.authenticationInfo?.credentialBackedUp).toEqual(false);
+});
+
 /**
  * Assertion examples below
  */

@@ -2,6 +2,7 @@ import base64url from 'base64url';
 import {
   AuthenticationCredentialJSON,
   AuthenticatorDevice,
+  CredentialDeviceType,
 } from '@simplewebauthn/typescript-types';
 
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -10,6 +11,7 @@ import convertPublicKeyToPEM from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
+import { parseBackupFlags } from '../helpers/parseBackupFlags';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -178,11 +180,15 @@ export default function verifyAuthenticationResponse(
     );
   }
 
+  const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
+
   const toReturn = {
     verified: verifySignature(signature, signatureBase, publicKey),
     authenticationInfo: {
       newCounter: counter,
       credentialID: authenticator.credentialID,
+      credentialDeviceType,
+      credentialBackedUp,
     },
   };
 
@@ -199,11 +205,18 @@ export default function verifyAuthenticationResponse(
  * @param authenticationInfo.newCounter The number of times the authenticator identified above
  * reported it has been used. **Should be kept in a DB for later reference to help prevent replay
  * attacks!**
+ * @param authenticationInfo.credentialDeviceType Whether this is a single-device or multi-device
+ * credential. **Should be kept in a DB for later reference!**
+ * @param authenticationInfo.credentialBackedUp Whether or not the multi-device credential has been
+ * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
+ * reference!**
  */
 export type VerifiedAuthenticationResponse = {
   verified: boolean;
   authenticationInfo: {
     credentialID: Buffer;
     newCounter: number;
+    credentialDeviceType: CredentialDeviceType;
+    credentialBackedUp: boolean;
   };
 };

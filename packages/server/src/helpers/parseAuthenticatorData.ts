@@ -18,11 +18,15 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
   const flagsBuf = authData.slice(pointer, (pointer += 1));
   const flagsInt = flagsBuf[0];
 
+  // Bit positions can be referenced here:
+  // https://www.w3.org/TR/webauthn-2/#flags
   const flags = {
-    up: !!(flagsInt & 0x01),
-    uv: !!(flagsInt & 0x04),
-    at: !!(flagsInt & 0x40),
-    ed: !!(flagsInt & 0x80),
+    up: !!(flagsInt & 1 << 0), // User Presence
+    uv: !!(flagsInt & 1 << 2), // User Verified
+    be: !!(flagsInt & 1 << 3), // Backup Eligibility
+    bs: !!(flagsInt & 1 << 4), // Backup State
+    at: !!(flagsInt & 1 << 6), // Attested Credential Data Present
+    ed: !!(flagsInt & 1 << 7), // Extension Data Present
     flagsInt,
   };
 
@@ -80,6 +84,8 @@ export type ParsedAuthenticatorData = {
   flags: {
     up: boolean;
     uv: boolean;
+    be: boolean;
+    bs: boolean;
     at: boolean;
     ed: boolean;
     flagsInt: number;
