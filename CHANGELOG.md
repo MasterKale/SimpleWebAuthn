@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.2.0
+
+**Packages:**
+
+ - @simplewebauthn/browser@5.2.0
+ - @simplewebauthn/server@5.2.0
+ - @simplewebauthn/typescript-types@5.2.0
+
+**Changes:**
+
+- **[browser, typescript-types]** The new `"cable"` transport is now recognized as a potential value of the `AuthenticatorTransport` type ([#198](https://github.com/MasterKale/SimpleWebAuthn/pull/198))
+- **[server]** `verifyRegistrationResponse()` and `verifyAuthenticationResponse()` now return `credentialDeviceType` and `credentialBackedUp` within `authenticatorInfo` as parsed values of two new flags being added to authenticator data. These response verification methods will also now throw an error when the invalid combination of these two flags (`credentialDeviceType: "singleDevice", credentialBackedUp: true`) is detected ([#195](https://github.com/MasterKale/SimpleWebAuthn/pull/195))
+  - This feature supports detection of "multi-device credentials" gradually [coming to all major platform authenticator vendors](https://fidoalliance.org/world-password-day-had-a-good-run-now-were-celebrating-a-future-with-less-passwords/) later this year.
+
 ## v5.1.0
 
 **Packages:**
