@@ -2,6 +2,8 @@
 
 ## v5.2.1
 
+**Packages:**
+
  - @simplewebauthn/browser@5.2.1
  - @simplewebauthn/server@5.2.1
  - @simplewebauthn/typescript-types@5.2.1
