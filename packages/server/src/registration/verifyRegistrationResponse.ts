@@ -9,6 +9,7 @@ import decodeAttestationObject, {
   AttestationFormat,
   AttestationStatement,
 } from '../helpers/decodeAttestationObject';
+import decodeAttObjForDevicePublicKey from '../extensions/decodeAttObjForDevicePublicKey';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -61,7 +62,7 @@ export default async function verifyRegistrationResponse(
     requireUserVerification = false,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
-  const { id, rawId, type: credentialType, response } = credential;
+  const { id, rawId, type: credentialType, response, clientExtensionResults } = credential;
 
   // Ensure credential specified an ID
   if (!id) {
@@ -79,6 +80,27 @@ export default async function verifyRegistrationResponse(
   }
 
   const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
+
+  if (clientExtensionResults) {
+    if (clientExtensionResults.devicePubKey) {
+      const attObjForDevicePublicKey = decodeAttObjForDevicePublicKey(clientExtensionResults.devicePubKey);
+      // TODO: Verify that sig is a valid signature over the concatenation of
+      // hash and credentialId using the device public key dpk (the signature
+      // algorithm is indicated by dpk’s "alg" COSEAlgorithmIdentifier value).
+
+      // TODO: Verify that attStmt is a correct attestation statement, conveying
+      // a valid attestation signature, by using the attestation statement
+      // format fmt’s verification procedure given attStmt, although
+      // substituting aaguid’s value for authenticatorData, and substituting the
+      // concatenation of dpk’s value and nonce’s value for clientDataHash in
+      // the attestation statement format's verification procedure inputs.
+
+      // Note: If fmt’s value is "none" there is no attestation signature to verify.
+
+      // TODO: Store the aaguid, dpk, scope, fmt, attStmt values indexed to the
+      // credential.id in the user account.
+    }
+  }
 
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
