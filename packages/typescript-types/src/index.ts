@@ -44,7 +44,7 @@ export interface PublicKeyCredentialRequestOptionsJSON
 export interface PublicKeyCredentialDescriptorJSON
   extends Omit<PublicKeyCredentialDescriptor, 'id' | 'transports'> {
   id: Base64URLString;
-  transports?: AuthenticatorTransport[];
+  transports?: AuthenticatorTransportFuture[];
 }
 
 export interface PublicKeyCredentialUserEntityJSON
@@ -68,7 +68,7 @@ export interface RegistrationCredentialJSON
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
-  transports?: AuthenticatorTransport[];
+  transports?: AuthenticatorTransportFuture[];
 }
 
 /**
@@ -123,7 +123,7 @@ export type AuthenticatorDevice = {
   // Number of times this authenticator is expected to have been used
   counter: number;
   // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
-  transports?: AuthenticatorTransport[];
+  transports?: AuthenticatorTransportFuture[];
 };
 
 /**
@@ -141,7 +141,7 @@ export type Base64URLString = string;
  * Properties marked optional are not supported in all browsers.
  */
 export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
-  getTransports?: () => AuthenticatorTransport[];
+  getTransports?: () => AuthenticatorTransportFuture[];
   getAuthenticatorData?: () => ArrayBuffer;
   getPublicKey?: () => ArrayBuffer;
   getPublicKeyAlgorithm?: () => COSEAlgorithmIdentifier[];
