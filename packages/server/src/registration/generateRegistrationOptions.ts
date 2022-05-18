@@ -4,7 +4,7 @@ import type {
   AuthenticatorSelectionCriteria,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialDescriptor,
+  PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
@@ -20,7 +20,7 @@ export type GenerateRegistrationOptionsOpts = {
   userDisplayName?: string;
   timeout?: number;
   attestationType?: AttestationConveyancePreference;
-  excludeCredentials?: PublicKeyCredentialDescriptor[];
+  excludeCredentials?: PublicKeyCredentialDescriptorFuture[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
   extensions?: AuthenticationExtensionsClientInputs;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];

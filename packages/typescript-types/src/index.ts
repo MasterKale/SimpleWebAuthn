@@ -42,7 +42,7 @@ export interface PublicKeyCredentialRequestOptionsJSON
 }
 
 export interface PublicKeyCredentialDescriptorJSON
-  extends Omit<PublicKeyCredentialDescriptor, 'id' | 'transports'> {
+  extends Omit<PublicKeyCredentialDescriptorFuture, 'id' | 'transports'> {
   id: Base64URLString;
   transports?: AuthenticatorTransportFuture[];
 }
