@@ -148,10 +148,11 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
 }
 
 /**
- * Communication methods by which an authenticator can talk with the browser to perform WebAuthn
- * registration and authentication.
+ * A super class of TypeScript's `AuthenticatorTransport` that includes support for the latest
+ * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
+ * know about it (sometime after 4.6.3)
  */
-export type AuthenticatorTransport = "ble" | "internal" | "nfc" | "usb" | "cable";
+export type AuthenticatorTransportFuture = "ble" | "internal" | "nfc" | "usb" | "cable";
 
 /**
  * The two types of credentials as defined by bit 3 ("Backup Eligibility") in authenticator data:
