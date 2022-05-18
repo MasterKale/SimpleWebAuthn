@@ -6,6 +6,6 @@ test('should return a buffer of at 32 bytes for input string', () => {
 });
 
 test('should return a buffer of at 32 bytes for input Buffer', () => {
-  const hash = toHash(new Buffer(10));
+  const hash = toHash(Buffer.alloc(10));
   expect(hash.byteLength).toEqual(32);
 });
