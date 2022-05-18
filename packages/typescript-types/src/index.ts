@@ -42,9 +42,9 @@ export interface PublicKeyCredentialRequestOptionsJSON
 }
 
 export interface PublicKeyCredentialDescriptorJSON
-  extends Omit<PublicKeyCredentialDescriptor, 'id' | 'transports'> {
+  extends Omit<PublicKeyCredentialDescriptorFuture, 'id' | 'transports'> {
   id: Base64URLString;
-  transports?: AuthenticatorTransport[];
+  transports?: AuthenticatorTransportFuture[];
 }
 
 export interface PublicKeyCredentialUserEntityJSON
@@ -68,7 +68,7 @@ export interface RegistrationCredentialJSON
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
-  transports?: AuthenticatorTransport[];
+  transports?: AuthenticatorTransportFuture[];
 }
 
 /**
@@ -123,7 +123,7 @@ export type AuthenticatorDevice = {
   // Number of times this authenticator is expected to have been used
   counter: number;
   // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
-  transports?: AuthenticatorTransport[];
+  transports?: AuthenticatorTransportFuture[];
 };
 
 /**
@@ -141,17 +141,27 @@ export type Base64URLString = string;
  * Properties marked optional are not supported in all browsers.
  */
 export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
-  getTransports?: () => AuthenticatorTransport[];
+  getTransports?: () => AuthenticatorTransportFuture[];
   getAuthenticatorData?: () => ArrayBuffer;
   getPublicKey?: () => ArrayBuffer;
   getPublicKeyAlgorithm?: () => COSEAlgorithmIdentifier[];
 }
 
 /**
- * Communication methods by which an authenticator can talk with the browser to perform WebAuthn
- * registration and authentication.
+ * A super class of TypeScript's `AuthenticatorTransport` that includes support for the latest
+ * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
+ * know about it (sometime after 4.6.3)
  */
-export type AuthenticatorTransport = "ble" | "internal" | "nfc" | "usb" | "cable";
+export type AuthenticatorTransportFuture = "ble" | "internal" | "nfc" | "usb" | "cable";
+
+/**
+ * A super class of TypeScript's `PublicKeyCredentialDescriptor` that knows about the latest
+ * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
+ * know about it (sometime after 4.6.3)
+ */
+export interface PublicKeyCredentialDescriptorFuture extends Omit<PublicKeyCredentialDescriptor, 'transports'> {
+  transports?: AuthenticatorTransportFuture[];
+}
 
 /**
  * The two types of credentials as defined by bit 3 ("Backup Eligibility") in authenticator data:

@@ -20,7 +20,7 @@ dHJpbmcgY2VydEJ1ZmZlclN0cmluZw==
 });
 
 test('should return pem when input is buffer', () => {
-  const input = new Buffer(128);
+  const input = Buffer.alloc(128);
   const actual = convertCertBufferToPEM(input);
   const actualPemArr = actual.split("\n");
   expect(actual).toEqual(`-----BEGIN CERTIFICATE-----
