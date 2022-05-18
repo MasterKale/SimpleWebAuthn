@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.2.1
+
+ - @simplewebauthn/browser@5.2.1
+ - @simplewebauthn/server@5.2.1
+ - @simplewebauthn/typescript-types@5.2.1
+
+**Changes:**
+
+- **[server]** `generateRegistrationOptions()` and `generateAuthenticationOptions()` will stop reporting typing errors for definitions of `excludeCredentials` and `allowCredentials` that were otherwise fine before v5.2.0 ([#203](https://github.com/MasterKale/SimpleWebAuthn/pull/203))
+- **[typescript-types]** The new `AuthenticatorTransportFuture` and `PublicKeyCredentialDescriptorFuture` have been added to track changes to WebAuthn that outpace TypeScript's DOM lib typings
+- **[browser]** Version sync
+
 ## v5.2.0
 
 **Packages:**
