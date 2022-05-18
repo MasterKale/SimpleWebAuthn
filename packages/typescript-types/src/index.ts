@@ -155,6 +155,15 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
 export type AuthenticatorTransportFuture = "ble" | "internal" | "nfc" | "usb" | "cable";
 
 /**
+ * A super class of TypeScript's `PublicKeyCredentialDescriptor` that knows about the latest
+ * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
+ * know about it (sometime after 4.6.3)
+ */
+export interface PublicKeyCredentialDescriptorFuture extends Omit<PublicKeyCredentialDescriptor, 'transports'> {
+  transports?: AuthenticatorTransportFuture[];
+}
+
+/**
  * The two types of credentials as defined by bit 3 ("Backup Eligibility") in authenticator data:
  * - `"singleDevice"` credentials will never be backed up
  * - `"multiDevice"` credentials can be backed up
