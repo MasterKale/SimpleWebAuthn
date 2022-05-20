@@ -9,7 +9,7 @@ import decodeAttestationObject, {
   AttestationFormat,
   AttestationStatement,
 } from '../helpers/decodeAttestationObject';
-import { decodeAttObjForDevicePublicKey, verifyAttObjForDevicePublicKey } from '../extensions/devicePubKey';
+// import { decodeAttObjForDevicePublicKey, verifyAttObjForDevicePublicKey } from '../extensions/devicePubKey';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -62,7 +62,7 @@ export default async function verifyRegistrationResponse(
     requireUserVerification = false,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
-  const { id, rawId, type: credentialType, response, clientExtensionResults } = credential;
+  const { id, rawId, type: credentialType, response } = credential;
 
   // Ensure credential specified an ID
   if (!id) {
@@ -133,7 +133,7 @@ export default async function verifyRegistrationResponse(
   const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
+  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsDataBuffer } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
@@ -193,14 +193,14 @@ export default async function verifyRegistrationResponse(
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const rootCertificates = settingsService.getRootCertificates({ identifier: fmt });
 
-  if (clientExtensionResults) {
-    if (clientExtensionResults.devicePubKey) {
-      const attObjForDevicePublicKey = decodeAttObjForDevicePublicKey(clientExtensionResults.devicePubKey);
-      if (!verifyAttObjForDevicePublicKey(credential, attObjForDevicePublicKey, authData, clientDataHash)) {
-        throw new Error('Invalid attestation object for device public key');
-      }
-    }
-  }
+  // if (clientExtensionResults) {
+  //   if (clientExtensionResults.devicePubKey) {
+  //     const attObjForDevicePublicKey = decodeAttObjForDevicePublicKey(clientExtensionResults.devicePubKey);
+  //     if (!verifyAttObjForDevicePublicKey(credential, attObjForDevicePublicKey, authData, clientDataHash)) {
+  //       throw new Error('Invalid attestation object for device public key');
+  //     }
+  //   }
+  // }
 
   // Prepare arguments to pass to the relevant verification method
   const verifierOpts: AttestationFormatVerifierOpts = {
