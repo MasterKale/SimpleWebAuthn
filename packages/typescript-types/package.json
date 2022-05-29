@@ -8,7 +8,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+    "url": "git+https://github.com/MasterKale/SimpleWebAuthn.git",
     "directory": "packages/typescript-types"
   },
   "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types#readme",
@@ -26,5 +26,7 @@
     "fido",
     "types"
   ],
-  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
+  "bugs": {
+    "url": "https://github.com/MasterKale/SimpleWebAuthn/issues"
+  }
 }

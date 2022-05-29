@@ -8,7 +8,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+    "url": "git+https://github.com/MasterKale/SimpleWebAuthn.git",
     "directory": "packages/testing"
   },
   "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/testing#readme",
@@ -24,5 +24,8 @@
     "webauthn",
     "fido",
     "types"
-  ]
+  ],
+  "bugs": {
+    "url": "https://github.com/MasterKale/SimpleWebAuthn/issues"
+  }
 }

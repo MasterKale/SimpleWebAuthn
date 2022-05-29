@@ -34,7 +34,7 @@
     "typedoc": "^0.22.15",
     "typedoc-plugin-missing-exports": "^0.22.6",
     "typescript": "^4.6.3",
-    "nx": "14.1.4"
+    "nx": "14.1.9"
   },
   "husky": {
     "hooks": {
@@ -47,5 +47,11 @@
       "eslint --fix",
       "git add"
     ]
-  }
+  },
+  "workspaces": [
+    "packages/server",
+    "packages/testing",
+    "packages/browser",
+    "packages/typescript-types"
+  ]
 }

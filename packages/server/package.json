@@ -22,7 +22,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+    "url": "git+https://github.com/MasterKale/SimpleWebAuthn.git",
     "directory": "packages/server"
   },
   "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/server#readme",
@@ -59,7 +59,6 @@
     "node-fetch": "^2.6.0",
     "node-rsa": "^1.1.1"
   },
-  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
   "devDependencies": {
     "@types/cbor": "^5.0.1",
     "@types/debug": "^4.1.7",
@@ -68,5 +67,8 @@
     "@types/jwk-to-pem": "^2.0.1",
     "@types/node-fetch": "^2.5.12",
     "@types/node-rsa": "^1.1.1"
+  },
+  "bugs": {
+    "url": "https://github.com/MasterKale/SimpleWebAuthn/issues"
   }
 }
