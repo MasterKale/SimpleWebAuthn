@@ -15,5 +15,6 @@
   },
   "packages": [
     "packages/*"
-  ]
+  ],
+  "useNx": true
 }
