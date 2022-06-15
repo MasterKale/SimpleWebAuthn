@@ -20,6 +20,13 @@
     "extract-dom-types": "ts-node extract-dom-types.ts",
     "prepublish": "npm run build"
   },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": ["./dist"]
+      }
+    }
+  },
   "keywords": [
     "typescript",
     "webauthn",
