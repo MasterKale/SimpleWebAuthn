@@ -33,9 +33,8 @@ const cleanTslibCommentInUMDBundleTargetingES5 = () => {
 const swanVersionInjector = versionInjector({
   injectInComments: {
     fileRegexp: /\.(js)$/,
-    // [@simplewebauthn/browser]  Version: 2.1.0 - Saturday, February 6th, 2021, 4:10:31 PM
-    tag: '[@simplewebauthn/browser]  Version: {version} - {date}',
-    dateFormat: 'dddd, mmmm dS, yyyy, h:MM:ss TT',
+    // [@simplewebauthn/browser@2.1.0]
+    tag: '[@simplewebauthn/browser@{version}]',
   },
 });
 
