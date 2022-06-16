@@ -10,13 +10,10 @@
       }
     }
   },
-  "targetDependencies": {
-    "build": [
-      {
-        "target": "build",
-        "projects": "dependencies"
-      }
-    ]
+  "targetDefaults": {
+    "build": {
+      "outputs": ["./dist"]
+    }
   },
   "pluginsConfig": {
     "@nrwl/js": {

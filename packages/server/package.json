@@ -39,13 +39,6 @@
     "test:coverage": "npm test -- --coverage",
     "prepublish": "npm run build"
   },
-  "nx": {
-    "targets": {
-      "build": {
-        "outputs": ["./dist"]
-      }
-    }
-  },
   "keywords": [
     "typescript",
     "webauthn",
