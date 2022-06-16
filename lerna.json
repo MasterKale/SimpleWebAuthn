@@ -1,6 +1,7 @@
 {
   "version": "5.2.1",
   "npmClient": "npm",
+  "useNx": true,
   "command": {
     "publish": {
       "ignoreChanges": [
