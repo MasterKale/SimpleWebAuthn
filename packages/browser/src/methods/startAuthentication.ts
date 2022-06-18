@@ -14,10 +14,13 @@ import { identifyAuthenticationError } from '../helpers/identifyAuthenticationEr
 /**
  * Begin authenticator "login" via WebAuthn assertion
  *
- * @param requestOptionsJSON Output from @simplewebauthn/server's generateAssertionOptions(...)
+ * @param requestOptionsJSON Output from **@simplewebauthn/server**'s generateAssertionOptions(...)
+ * @param supportBrowserAutofill Initialize conditional UI to enable logging in via browser
+ * autofill prompts
  */
 export default async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
+  supportBrowserAutofill = false,
 ): Promise<AuthenticationCredentialJSON> {
   if (!browserSupportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
