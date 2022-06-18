@@ -8,6 +8,7 @@ import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import bufferToUTF8String from '../helpers/bufferToUTF8String';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
+import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsConditionalMediation';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
 
@@ -41,6 +42,30 @@ export default async function startAuthentication(
   };
 
   const options: CredentialRequestOptions = { publicKey };
+
+  /**
+   * Set up the page to prompt the user to select a credential for authentication via the browser's
+   * input autofill mechanism.
+   */
+  if (supportBrowserAutofill) {
+    if (!(await browserSupportsWebAuthnAutofill())) {
+      throw Error('Browser does not support WebAuthn autofill');
+    }
+
+    // Check for an <input> with "webauthn" in its `autocomplete` attribute
+    const eligibleInputs = document.querySelectorAll("input[autocomplete*='webauthn']");
+
+    // WebAuthn autofill requires at least one valid input
+    if (eligibleInputs.length < 1) {
+      throw Error('No <input> with `"webauthn"` in its `autocomplete` attribute was detected');
+    }
+
+    // `CredentialMediationRequirement` doesn't know about "conditional" yet as of
+    // typescript@4.6.3
+    options.mediation = 'conditional' as CredentialMediationRequirement;
+    // Massage options into a suitable structure
+    delete options.publicKey?.allowCredentials;
+  }
 
   // Wait for the user to complete assertion
   let credential;
