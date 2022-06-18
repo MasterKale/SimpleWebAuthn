@@ -11,6 +11,7 @@ import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsConditionalMediation';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
+import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
@@ -70,6 +71,8 @@ export default async function startAuthentication(
   // Wait for the user to complete assertion
   let credential;
   try {
+    // Set up the ability to cancel this request if the user attempts another
+    options.signal = webauthnAbortService.createNewAbortSignal();
     credential = (await navigator.credentials.get(options)) as AuthenticationCredential;
   } catch (err) {
     throw identifyAuthenticationError({ error: err as Error, options });
