@@ -20,7 +20,7 @@ import { webauthnAbortService } from '../helpers/webAuthnAbortService';
  * @param supportBrowserAutofill Initialize conditional UI to enable logging in via browser
  * autofill prompts
  */
-export default async function startAuthentication(
+export async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
   supportBrowserAutofill = false,
 ): Promise<AuthenticationCredentialJSON> {

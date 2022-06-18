@@ -17,7 +17,7 @@ import { webauthnAbortService } from '../helpers/webAuthnAbortService';
  *
  * @param creationOptionsJSON Output from @simplewebauthn/server's generateRegistrationOptions(...)
  */
-export default async function startRegistration(
+export async function startRegistration(
   creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
 ): Promise<RegistrationCredentialJSON> {
   if (!browserSupportsWebauthn()) {
