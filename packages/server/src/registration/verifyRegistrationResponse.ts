@@ -9,7 +9,7 @@ import decodeAttestationObject, {
   AttestationFormat,
   AttestationStatement,
 } from '../helpers/decodeAttestationObject';
-// import { decodeAttObjForDevicePublicKey, verifyAttObjForDevicePublicKey } from '../extensions/devicePubKey';
+import decodeExtensionDataBuffer, { ExtensionsJSON } from '../helpers/decodeExtensions';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -135,6 +135,15 @@ export default async function verifyRegistrationResponse(
   const parsedAuthData = parseAuthenticatorData(authData);
   const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsDataBuffer } = parsedAuthData;
 
+  let extensions: ExtensionsJSON = {};
+
+  // Temporarily assume that the extension is a DPK
+  // TODO: This needs to be keyed object: { devicePubKey: DPK }
+  if (flags.ed && extensionsDataBuffer) {
+    const devicePublicKey = decodeExtensionDataBuffer(extensionsDataBuffer);
+    extensions = devicePublicKey;
+  }
+
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
     if (typeof expectedRPID === 'string') {
@@ -193,15 +202,6 @@ export default async function verifyRegistrationResponse(
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const rootCertificates = settingsService.getRootCertificates({ identifier: fmt });
 
-  // if (clientExtensionResults) {
-  //   if (clientExtensionResults.devicePubKey) {
-  //     const attObjForDevicePublicKey = decodeAttObjForDevicePublicKey(clientExtensionResults.devicePubKey);
-  //     if (!verifyAttObjForDevicePublicKey(credential, attObjForDevicePublicKey, authData, clientDataHash)) {
-  //       throw new Error('Invalid attestation object for device public key');
-  //     }
-  //   }
-  // }
-
   // Prepare arguments to pass to the relevant verification method
   const verifierOpts: AttestationFormatVerifierOpts = {
     aaguid,
@@ -258,6 +258,7 @@ export default async function verifyRegistrationResponse(
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
+      extensions,
     };
   }
 
@@ -284,6 +285,7 @@ export default async function verifyRegistrationResponse(
  * @param registrationInfo.credentialBackedUp Whether or not the multi-device credential has been
  * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
  * reference!**
+ * @param registrationInfo?.extensions The extensions returned by the browser
  */
 export type VerifiedRegistrationResponse = {
   verified: boolean;
@@ -298,6 +300,7 @@ export type VerifiedRegistrationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
+    extensions?: ExtensionsJSON;
   };
 };
 
