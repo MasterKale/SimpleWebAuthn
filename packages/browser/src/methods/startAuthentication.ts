@@ -8,7 +8,7 @@ import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import bufferToUTF8String from '../helpers/bufferToUTF8String';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
-import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsConditionalMediation';
+import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
