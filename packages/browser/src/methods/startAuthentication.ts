@@ -82,6 +82,8 @@ export async function startAuthentication(
     credential = (await navigator.credentials.get(options)) as AuthenticationCredential;
   } catch (err) {
     throw identifyAuthenticationError({ error: err as Error, options });
+  } finally {
+    webauthnAbortService.reset();
   }
 
   if (!credential) {

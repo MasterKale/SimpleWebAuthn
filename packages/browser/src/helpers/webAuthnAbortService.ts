@@ -18,6 +18,10 @@ class WebAuthnAbortService {
     this.controller = new AbortController();
     return this.controller.signal;
   }
+
+  reset() {
+    this.controller = undefined;
+  }
 }
 
 export const webauthnAbortService = new WebAuthnAbortService();
