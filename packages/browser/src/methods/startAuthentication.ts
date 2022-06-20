@@ -67,8 +67,6 @@ export async function startAuthentication(
     options.mediation = 'conditional' as CredentialMediationRequirement;
     // Conditional UI requires an empty allow list
     publicKey.allowCredentials = [];
-
-    console.log('ready for conditional UI');
   }
 
   // Finalize options

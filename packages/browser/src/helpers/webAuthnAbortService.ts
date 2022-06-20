@@ -10,7 +10,7 @@ class WebAuthnAbortService {
    * reload the page
    */
   createNewAbortSignal() {
-    // Abort any existing calls to navigator.credentials.get()
+    // Abort any existing calls to navigator.credentials.create() or navigator.credentials.get()
     if (this.controller) {
       this.controller.abort();
     }
