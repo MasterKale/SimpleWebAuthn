@@ -215,8 +215,7 @@ test('should return "cable" transport from response', async () => {
 test('should cancel an existing call when executed again', async () => {
   const abortSpy = jest.spyOn(AbortController.prototype, 'abort');
   // Reset the abort service so we get an accurate call count
-  // @ts-ignore
-  webauthnAbortService.controller = undefined;
+  webauthnAbortService.reset();
 
   // Fire off a request and immediately attempt a second one
   startRegistration(goodOpts1);
