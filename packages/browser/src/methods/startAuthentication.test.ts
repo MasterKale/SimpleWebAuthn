@@ -11,7 +11,7 @@ import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 
-import startAuthentication from './startAuthentication';
+import { startAuthentication } from './startAuthentication';
 
 jest.mock('../helpers/browserSupportsWebauthn');
 

@@ -11,7 +11,7 @@ import { WebAuthnError } from '../helpers/structs';
 
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 
-import startRegistration from './startRegistration';
+import { startRegistration } from './startRegistration';
 
 jest.mock('../helpers/browserSupportsWebauthn');
 
