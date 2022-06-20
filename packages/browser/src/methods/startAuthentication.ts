@@ -42,7 +42,8 @@ export async function startAuthentication(
     allowCredentials,
   };
 
-  const options: CredentialRequestOptions = { publicKey };
+  // Prepare options for `.get()`
+  const options: CredentialRequestOptions = {};
 
   /**
    * Set up the page to prompt the user to select a credential for authentication via the browser's
@@ -64,15 +65,20 @@ export async function startAuthentication(
     // `CredentialMediationRequirement` doesn't know about "conditional" yet as of
     // typescript@4.6.3
     options.mediation = 'conditional' as CredentialMediationRequirement;
-    // Massage options into a suitable structure
-    delete options.publicKey?.allowCredentials;
+    // Conditional UI requires an empty allow list
+    publicKey.allowCredentials = [];
+
+    console.log('ready for conditional UI');
   }
+
+  // Finalize options
+  options.publicKey = publicKey;
+  // Set up the ability to cancel this request if the user attempts another
+  options.signal = webauthnAbortService.createNewAbortSignal();
 
   // Wait for the user to complete assertion
   let credential;
   try {
-    // Set up the ability to cancel this request if the user attempts another
-    options.signal = webauthnAbortService.createNewAbortSignal();
     credential = (await navigator.credentials.get(options)) as AuthenticationCredential;
   } catch (err) {
     throw identifyAuthenticationError({ error: err as Error, options });

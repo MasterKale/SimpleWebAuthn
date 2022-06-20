@@ -35,13 +35,14 @@ export async function startRegistration(
     excludeCredentials: creationOptionsJSON.excludeCredentials.map(toPublicKeyCredentialDescriptor),
   };
 
+  // Finalize options
   const options: CredentialCreationOptions = { publicKey };
+  // Set up the ability to cancel this request if the user attempts another
+  options.signal = webauthnAbortService.createNewAbortSignal();
 
   // Wait for the user to complete attestation
   let credential;
   try {
-    // Set up the ability to cancel this request if the user attempts another
-    options.signal = webauthnAbortService.createNewAbortSignal();
     credential = (await navigator.credentials.create(options)) as RegistrationCredential;
   } catch (err) {
     throw identifyRegistrationError({ error: err as Error, options });
