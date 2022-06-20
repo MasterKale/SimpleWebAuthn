@@ -12,6 +12,6 @@ export {
   startRegistration,
   startAuthentication,
   browserSupportsWebauthn,
-  platformAuthenticatorIsAvailable,
   browserSupportsWebAuthnAutofill,
+  platformAuthenticatorIsAvailable,
 };
