@@ -8,6 +8,7 @@ import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
+import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 
@@ -209,6 +210,18 @@ test('should return "cable" transport from response', async () => {
   const response = await startRegistration(goodOpts1);
 
   expect(response.transports).toEqual(["cable"]);
+});
+
+test('should cancel an existing call when executed again', async () => {
+  const abortSpy = jest.spyOn(AbortController.prototype, 'abort');
+  // Reset the abort service so we get an accurate call count
+  // @ts-ignore
+  webauthnAbortService.controller = undefined;
+
+  // Fire off a request and immediately attempt a second one
+  startRegistration(goodOpts1);
+  await startRegistration(goodOpts1);
+  expect(abortSpy).toHaveBeenCalledTimes(1);
 });
 
 describe('WebAuthnError', () => {
