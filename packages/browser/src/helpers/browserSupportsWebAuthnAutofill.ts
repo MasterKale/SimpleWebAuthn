@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { PublicKeyCredentialFuture } from '@simplewebauthn/typescript-types';
+
 /**
  * Determine if the browser supports conditional UI, so that WebAuthn credentials can
  * be shown to the user in the browser's typical password autofill popup.
