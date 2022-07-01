@@ -168,7 +168,7 @@ export interface PublicKeyCredentialDescriptorFuture extends Omit<PublicKeyCrede
  */
 export interface PublicKeyCredentialFuture extends PublicKeyCredential {
   // See https://github.com/w3c/webauthn/issues/1745
-  isConditionalMediationAvailable(): Promise<boolean>;
+  isConditionalMediationAvailable?(): Promise<boolean>;
 }
 
 /**

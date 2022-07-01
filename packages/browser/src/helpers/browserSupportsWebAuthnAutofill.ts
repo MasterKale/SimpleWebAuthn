@@ -22,7 +22,7 @@ export async function browserSupportsWebAuthnAutofill(): Promise<boolean> {
     window.PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
   return (
-    globalPublicKeyCredential.isConditionalMediationAvailable &&
+    globalPublicKeyCredential.isConditionalMediationAvailable !== undefined &&
     globalPublicKeyCredential.isConditionalMediationAvailable()
   );
 }
