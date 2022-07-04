@@ -6,17 +6,21 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
+import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
+import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
-import startAuthentication from './startAuthentication';
+import { startAuthentication } from './startAuthentication';
 
 jest.mock('../helpers/browserSupportsWebauthn');
+jest.mock('../helpers/browserSupportsWebAuthnAutofill');
 
 const mockNavigatorGet = window.navigator.credentials.get as jest.Mock;
 const mockSupportsWebauthn = browserSupportsWebauthn as jest.Mock;
+const mockSupportsAutofill = browserSupportsWebAuthnAutofill as jest.Mock;
 
 const mockAuthenticatorData = 'mockAuthenticatorData';
 const mockClientDataJSON = 'mockClientDataJSON';
@@ -55,11 +59,13 @@ beforeEach(() => {
   });
 
   mockSupportsWebauthn.mockReturnValue(true);
+  mockSupportsAutofill.mockResolvedValue(true);
 });
 
 afterEach(() => {
   mockNavigatorGet.mockReset();
   mockSupportsWebauthn.mockReset();
+  mockSupportsAutofill.mockReset();
 });
 
 test('should convert options before passing to navigator.credentials.get(...)', async () => {
@@ -217,6 +223,68 @@ test('should support "cable" transport', async () => {
 
   expect(mockNavigatorGet.mock.calls[0][0].publicKey.allowCredentials[0].transports[0])
     .toEqual("cable");
+});
+
+test('should cancel an existing call when executed again', async () => {
+  const abortSpy = jest.spyOn(AbortController.prototype, 'abort');
+  // Reset the abort service so we get an accurate call count
+  webauthnAbortService.reset();
+
+  // Fire off a request and immediately attempt a second one
+  startAuthentication(goodOpts1);
+  await startAuthentication(goodOpts1);
+  expect(abortSpy).toHaveBeenCalledTimes(1);
+});
+
+test('should set up autofill a.k.a. Conditional UI', async () => {
+  const opts: PublicKeyCredentialRequestOptionsJSON = {
+    ...goodOpts1,
+    allowCredentials: [
+      {
+        ...goodOpts1.allowCredentials![0],
+        transports: ["cable"],
+      },
+    ]
+  };
+  document.body.innerHTML = `
+    <form>
+      <label for="username">Username</label>
+      <input type="text" name="username" autocomplete="username webauthn" />
+      <button type="submit">Submit</button>
+    </form>
+  `;
+
+  await startAuthentication(opts, true);
+
+  // The most important bit
+  expect(mockNavigatorGet.mock.calls[0][0].mediation).toEqual('conditional');
+  // The latest version of https://github.com/w3c/webauthn/pull/1576 says allowCredentials should
+  // be an "empty list", as opposed to being undefined
+  expect(mockNavigatorGet.mock.calls[0][0].publicKey.allowCredentials).toBeDefined();
+  expect(mockNavigatorGet.mock.calls[0][0].publicKey.allowCredentials.length).toEqual(0);
+});
+
+test('should throw error if autofill not supported', async () => {
+  mockSupportsAutofill.mockResolvedValue(false);
+
+  const rejected = await expect(startAuthentication(goodOpts1, true)).rejects;
+  rejected.toThrow(Error);
+  rejected.toThrow(/does not support webauthn autofill/i);
+});
+
+test('should throw error if no acceptable <input> is found', async () => {
+  // <input> is missing "webauthn" from the autocomplete attribute
+  document.body.innerHTML = `
+    <form>
+      <label for="username">Username</label>
+      <input type="text" name="username" autocomplete="username" />
+      <button type="submit">Submit</button>
+    </form>
+  `;
+
+  const rejected = await expect(startAuthentication(goodOpts1, true)).rejects;
+  rejected.toThrow(Error);
+  rejected.toThrow(/no <input>/i);
 });
 
 describe('WebAuthnError', () => {

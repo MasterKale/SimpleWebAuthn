@@ -164,6 +164,14 @@ export interface PublicKeyCredentialDescriptorFuture extends Omit<PublicKeyCrede
 }
 
 /**
+ * A super class of TypeScript's `PublicKeyCredential` that knows about upcoming WebAuthn methods
+ */
+export interface PublicKeyCredentialFuture extends PublicKeyCredential {
+  // See https://github.com/w3c/webauthn/issues/1745
+  isConditionalMediationAvailable?(): Promise<boolean>;
+}
+
+/**
  * The two types of credentials as defined by bit 3 ("Backup Eligibility") in authenticator data:
  * - `"singleDevice"` credentials will never be backed up
  * - `"multiDevice"` credentials can be backed up

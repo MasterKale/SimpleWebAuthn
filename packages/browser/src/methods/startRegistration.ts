@@ -10,13 +10,14 @@ import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyRegistrationError } from '../helpers/identifyRegistrationError';
+import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
  *
  * @param creationOptionsJSON Output from @simplewebauthn/server's generateRegistrationOptions(...)
  */
-export default async function startRegistration(
+export async function startRegistration(
   creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
 ): Promise<RegistrationCredentialJSON> {
   if (!browserSupportsWebauthn()) {
@@ -34,7 +35,10 @@ export default async function startRegistration(
     excludeCredentials: creationOptionsJSON.excludeCredentials.map(toPublicKeyCredentialDescriptor),
   };
 
+  // Finalize options
   const options: CredentialCreationOptions = { publicKey };
+  // Set up the ability to cancel this request if the user attempts another
+  options.signal = webauthnAbortService.createNewAbortSignal();
 
   // Wait for the user to complete attestation
   let credential;
@@ -42,6 +46,8 @@ export default async function startRegistration(
     credential = (await navigator.credentials.create(options)) as RegistrationCredential;
   } catch (err) {
     throw identifyRegistrationError({ error: err as Error, options });
+  } finally {
+    webauthnAbortService.reset();
   }
 
   if (!credential) {
