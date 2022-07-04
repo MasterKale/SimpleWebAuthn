@@ -14,6 +14,7 @@ import type {
   PublicKeyCredentialUserEntity,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
+  AuthenticatorAttachment,
 } from './dom';
 
 export * from './dom';
@@ -169,6 +170,8 @@ export interface PublicKeyCredentialDescriptorFuture extends Omit<PublicKeyCrede
 export interface PublicKeyCredentialFuture extends PublicKeyCredential {
   // See https://github.com/w3c/webauthn/issues/1745
   isConditionalMediationAvailable?(): Promise<boolean>;
+  // See https://w3c.github.io/webauthn/#dom-publickeycredential-authenticatorattachment
+  authenticatorAttachment?: AuthenticatorAttachment;
 }
 
 /**
