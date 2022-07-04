@@ -213,7 +213,7 @@ app.get('/generate-authentication-options', (req, res) => {
     allowCredentials: user.devices.map(dev => ({
       id: dev.credentialID,
       type: 'public-key',
-      transports: dev.transports ?? ['usb', 'ble', 'nfc', 'internal'],
+      transports: dev.transports,
     })),
     userVerification: 'required',
     rpID,
