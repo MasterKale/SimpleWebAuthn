@@ -107,5 +107,6 @@ export async function startAuthentication(
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
+    authenticatorAttachment: credential.authenticatorAttachment,
   };
 }

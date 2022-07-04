@@ -223,6 +223,23 @@ test('should cancel an existing call when executed again', async () => {
   expect(abortSpy).toHaveBeenCalledTimes(1);
 });
 
+test('should return authenticatorAttachment if present', async () => {
+  // Mock extension return values from authenticator
+  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+    return new Promise(resolve => {
+      resolve({
+        response: {},
+        getClientExtensionResults: () => {},
+        authenticatorAttachment: 'cross-platform',
+      });
+    });
+  });
+
+  const response = await startRegistration(goodOpts1);
+
+  expect(response.authenticatorAttachment).toEqual('cross-platform');
+});
+
 describe('WebAuthnError', () => {
   describe('AbortError', () => {
     const AbortError = generateCustomError('AbortError');
