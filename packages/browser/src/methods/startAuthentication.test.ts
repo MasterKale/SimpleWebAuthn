@@ -287,6 +287,23 @@ test('should throw error if no acceptable <input> is found', async () => {
   rejected.toThrow(/no <input>/i);
 });
 
+test('should return authenticatorAttachment if present', async () => {
+  // Mock extension return values from authenticator
+  mockNavigatorGet.mockImplementation((): Promise<any> => {
+    return new Promise(resolve => {
+      resolve({
+        response: {},
+        getClientExtensionResults: () => {},
+        authenticatorAttachment: 'cross-platform',
+      });
+    });
+  });
+
+  const response = await startAuthentication(goodOpts1);
+
+  expect(response.authenticatorAttachment).toEqual('cross-platform');
+});
+
 describe('WebAuthnError', () => {
   describe('AbortError', () => {
     const AbortError = generateCustomError('AbortError');
