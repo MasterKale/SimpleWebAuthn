@@ -135,6 +135,7 @@ app.get('/generate-registration-options', (req, res) => {
      */
     authenticatorSelection: {
       userVerification: 'required',
+      residentKey: 'required',
     },
     /**
      * Support the two most common algorithms: ES256, and RS256
