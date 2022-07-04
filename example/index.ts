@@ -248,7 +248,7 @@ app.post('/verify-authentication', (req, res) => {
   }
 
   if (!dbAuthenticator) {
-    throw new Error(`could not find authenticator matching ${body.id}`);
+    return res.status(400).send({ error: 'Authenticator is not registered with this site' });
   }
 
   let verification: VerifiedAuthenticationResponse;
