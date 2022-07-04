@@ -1,5 +1,20 @@
 # Changelog
 
+## v5.3.0
+
+**Packages:**
+
+- @simplewebauthn/browser@5.3.0
+- @simplewebauthn/server@5.3.0
+- @simplewebauthn/typescript-types@5.3.0
+
+**Changes:**
+
+- **[browser]** `startAuthentication()` now accepts a second `useBrowserAutofill` boolean argument that sets up support for credential selection via a browser's autofill prompt (a.k.a. Conditional UI). The new `browserSupportsWebAuthnAutofill()` helper method can be used independently to determine when this feature is supported by the browser ([#214](https://github.com/MasterKale/SimpleWebAuthn/pull/214))
+- **[browser]** `startRegistration()` and `startAuthentication()` will return a new `authenticatorAttachment` value when present that captures whether a cross-platform or platform authenticator was just used ([#221](https://github.com/MasterKale/SimpleWebAuthn/pull/221))
+- **[typescript-types]** A new `PublicKeyCredentialFuture` interface has been added to define new properties currently defined in the WebAuthn L3 spec draft. These new values support the above new functionality until official TypeScript types are updated accordingly ([#214](https://github.com/MasterKale/SimpleWebAuthn/pull/214), [#221](https://github.com/MasterKale/SimpleWebAuthn/pull/221))
+- **[typescript-types]** A new `"hybrid"` transport has been added to `AuthenticatorTransportFuture` while browsers migrate away from the existing `"cable"` transport for cross-device auth ([#222](https://github.com/MasterKale/SimpleWebAuthn/pull/222))
+
 ## v5.2.1
 
 **Packages:**
