@@ -66,6 +66,7 @@ export async function startRegistration(
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
+    authenticatorAttachment: credential.authenticatorAttachment,
   };
 
   /**
