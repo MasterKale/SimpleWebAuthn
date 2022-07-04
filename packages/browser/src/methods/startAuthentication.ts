@@ -17,12 +17,12 @@ import { webauthnAbortService } from '../helpers/webAuthnAbortService';
  * Begin authenticator "login" via WebAuthn assertion
  *
  * @param requestOptionsJSON Output from **@simplewebauthn/server**'s generateAssertionOptions(...)
- * @param supportBrowserAutofill Initialize conditional UI to enable logging in via browser
+ * @param useBrowserAutofill Initialize conditional UI to enable logging in via browser
  * autofill prompts
  */
 export async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
-  supportBrowserAutofill = false,
+  useBrowserAutofill = false,
 ): Promise<AuthenticationCredentialJSON> {
   if (!browserSupportsWebauthn()) {
     throw new Error('WebAuthn is not supported in this browser');
@@ -49,7 +49,7 @@ export async function startAuthentication(
    * Set up the page to prompt the user to select a credential for authentication via the browser's
    * input autofill mechanism.
    */
-  if (supportBrowserAutofill) {
+  if (useBrowserAutofill) {
     if (!(await browserSupportsWebAuthnAutofill())) {
       throw Error('Browser does not support WebAuthn autofill');
     }
