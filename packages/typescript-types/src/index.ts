@@ -56,7 +56,7 @@ export interface PublicKeyCredentialUserEntityJSON
 /**
  * The value returned from navigator.credentials.create()
  */
-export interface RegistrationCredential extends PublicKeyCredential {
+export interface RegistrationCredential extends PublicKeyCredentialFuture {
   response: AuthenticatorAttestationResponseFuture;
 }
 
@@ -75,7 +75,7 @@ export interface RegistrationCredentialJSON
 /**
  * The value returned from navigator.credentials.get()
  */
-export interface AuthenticationCredential extends PublicKeyCredential {
+export interface AuthenticationCredential extends PublicKeyCredentialFuture {
   response: AuthenticatorAssertionResponse;
 }
 
