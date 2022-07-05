@@ -182,7 +182,7 @@ app.post('/verify-registration', async (req, res) => {
   if (verified && registrationInfo) {
     const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-    const existingDevice = user.devices.find(device => device.credentialID === credentialID);
+    const existingDevice = user.devices.find(device => device.credentialID.equals(credentialID));
 
     if (!existingDevice) {
       /**
