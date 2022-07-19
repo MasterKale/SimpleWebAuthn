@@ -137,11 +137,8 @@ export default async function verifyRegistrationResponse(
 
   let extensions: ExtensionsJSON = {};
 
-  // Temporarily assume that the extension is a DPK
-  // TODO: This needs to be keyed object: { devicePubKey: DPK }
   if (flags.ed && extensionsDataBuffer) {
-    const devicePublicKey = decodeExtensionDataBuffer(extensionsDataBuffer);
-    extensions = devicePublicKey;
+    extensions = decodeExtensionDataBuffer(extensionsDataBuffer);
   }
 
   // Make sure the response's RP ID is ours
