@@ -580,18 +580,36 @@ test('should return credential backup info', async () => {
   expect(verification.registrationInfo?.credentialBackedUp).toEqual(false);
 });
 
-test('should return extension', async () => {
+test('should return authenticator extension output', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationDPK,
-    expectedChallenge: attestationDPKChallenge,
+    credential: {
+      id: 'E_Pko4wN1BXE23S0ftN3eQ',
+      rawId: 'E_Pko4wN1BXE23S0ftN3eQ',
+      response: {
+        attestationObject:
+          'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBbQ11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzExQAA' +
+          'AAAAAAAAAAAAAAAAAAAAAAAAABAT8-SjjA3UFcTbdLR-03d5pQECAyYgASFYIJIkX8fs9wjKUv5HWBUop--6ig4S' +
+          'zsxj8gBgJJmaX-_5IlggJ5XVdjUfCMlVlUZuHJRxCLFLzZCeK8Fg3l6OLfAIHnKhb2RldmljZVB1YmxpY0tleaVj' +
+          'ZHBrWE2lAQIDJiABIVggmRqr7Z3kJxqe3q2IBvncltbczQxHYlOlUQSJ7IN5vlsiWCCglzz97bt54n_vTudIFnP7' +
+          'MxJQTdylQ0z9I0MdatKe2mNzaWdYRzBFAiEA77OAdL0VuMgs8J-H-8b7PHFp6k8YBrfpCTc3QwI0W3oCICtxEwQH' +
+          'MaDnJ9M41IVChjzmWICqeeXqdArIzNlDR5iOZW5vbmNlQGVzY29wZUEAZmFhZ3VpZFAAAAAAAAAAAAAAAAAAAAAA',
+        clientDataJSON:
+          'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQXJrcmxfRnhfTXZjSl9lSXFDVFE3LXRiRVNJ' +
+          'U1IxNC1weVBSaDBLLTFBOCIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5' +
+          'ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxl' +
+          'LmZpZG8yYXBpZXhhbXBsZSJ9',
+      },
+      clientExtensionResults: {},
+      type: 'public-key',
+    },
+    expectedChallenge: 'Arkrl_Fx_MvcJ_eIqCTQ7-tbESISR14-pyPRh0K-1A8',
     expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
     expectedRPID: 'try-webauthn.appspot.com',
   });
 
-  expect(verification.registrationInfo?.extensions?.dpk).toEqual(Buffer.from('3059301306072A8648CE3D020106082A8648CE3D030107034200046F985BC21D0AD79C63F2430FB52E8905585AE9372AE250B10491FED48822D150AAD22215E511B73C39835FF0F89D7BB4E910E18DDB5DB968CD13890F348DE867', 'hex'));
-  expect(verification.registrationInfo?.extensions?.scp).toEqual('device');
-  expect(verification.registrationInfo?.extensions?.sig).toEqual(Buffer.from('3046022100E28B11DB74A4450336320119A4E8E14624C4E715A22E29DBAFC6AA3A383FD63E022100CF41F069CC511AE77A7288F703C8E0F67255DEFCB5A56C83B16E35E0F38B2849', 'hex'));
-  expect(verification.registrationInfo?.extensions?.aaguid).toEqual(Buffer.from('00000000000000000000000000000000', 'hex'));
+  expect(verification.registrationInfo?.extensions).toMatchObject({
+    'devicePublicKey': expect.anything()
+  });
 });
 
 /**
@@ -682,20 +700,3 @@ const attestationNone: RegistrationCredentialJSON = {
   type: 'public-key',
 };
 const attestationNoneChallenge = base64url.encode('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');
-
-const attestationDPK: RegistrationCredentialJSON = {
-  id: 'LcGIzt53ej1NhnMiwcmv5Q',
-  rawId: 'LcGIzt53ej1NhnMiwcmv5Q',
-  response: {
-    attestationObject:
-      'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBZw11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzExQAAAAAAAAAAAAAAAAAAAAAAAAAAABAtwYjO3nd6PU2GcyLBya_lpQECAyYgASFYIImWMQLU6wTo6sUQJLmAznqm-88GRLg1GSvr6HE9Szm4IlggrKYySExPTjIeD2o62JB3H4fyJD1TSBzwNcRfEZuwD9akY2Rwa1hbMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEb5hbwh0K15xj8kMPtS6JBVha6Tcq4lCxBJH-1Igi0VCq0iIV5RG3PDmDX_D4nXu06RDhjdtduWjNE4kPNI3oZ2NzY3BmZGV2aWNlY3NpZ1hIMEYCIQDiixHbdKRFAzYyARmk6OFGJMTnFaIuKduvxqo6OD_WPgIhAM9B8GnMURrnenKI9wPI4PZyVd78taVsg7FuNeDziyhJZmFhZ3VpZFAAAAAAAAAAAAAAAAAAAAAA',
-    clientDataJSON:
-      'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoid2cyZGdqcnI1aWxjWW1mQ2UtY05VWllvWWlH' +
-      'SVo1dDdIeFk0eV94NG9lOCIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5' +
-      'ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxl' +
-      'LmZpZG8yYXBpZXhhbXBsZSJ9',
-  },
-  clientExtensionResults: {},
-  type: 'public-key',
-};
-const attestationDPKChallenge = 'wg2dgjrr5ilcYmfCe-cNUZYoYiGIZ5t7HxY4y_x4oe8';

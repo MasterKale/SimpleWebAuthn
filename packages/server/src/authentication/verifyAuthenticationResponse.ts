@@ -12,6 +12,7 @@ import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
+import decodeExtensionDataBuffer, { ExtensionsJSON } from '../helpers/decodeExtensions';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -134,7 +135,7 @@ export default function verifyAuthenticationResponse(
 
   const authDataBuffer = base64url.toBuffer(response.authenticatorData);
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
-  const { rpIdHash, flags, counter } = parsedAuthData;
+  const { rpIdHash, flags, counter, extensionsDataBuffer } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (typeof expectedRPID === 'string') {
@@ -157,6 +158,13 @@ export default function verifyAuthenticationResponse(
   // WebAuthn only requires the user presence flag be true
   if (!flags.up) {
     throw new Error('User not present during authentication');
+  }
+
+  let extensions = {};
+
+  // Parse authenticator extensions if available
+  if (flags.ed && extensionsDataBuffer) {
+    extensions = decodeExtensionDataBuffer(extensionsDataBuffer)
   }
 
   // Enforce user verification if required
@@ -189,6 +197,7 @@ export default function verifyAuthenticationResponse(
       credentialID: authenticator.credentialID,
       credentialDeviceType,
       credentialBackedUp,
+      extensions
     },
   };
 
@@ -218,5 +227,6 @@ export type VerifiedAuthenticationResponse = {
     newCounter: number;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
+    extensions: ExtensionsJSON;
   };
 };

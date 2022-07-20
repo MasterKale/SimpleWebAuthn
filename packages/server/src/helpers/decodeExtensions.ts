@@ -11,8 +11,12 @@ export default function decodeExtensionDataBuffer(extensionDataBuffer: Buffer): 
 }
 
 export type ExtensionsJSON = {
+  devicePublicKey?: DevicePublicKeyJSON
+}
+
+export type DevicePublicKeyJSON = {
   dpk?: Buffer;
   scp?: Buffer;
   sig?: string;
   aaguid?: Buffer;
-};
+}
