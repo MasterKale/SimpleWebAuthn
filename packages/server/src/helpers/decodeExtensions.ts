@@ -5,13 +5,14 @@ import cbor from 'cbor';
  *
  * @param extensionDataBuffer Extension Data buffer
  */
-export default function decodeExtensionDataBuffer(extensionDataBuffer: Buffer): ExtensionsJSON {
-  const toCBOR: ExtensionsJSON = cbor.decodeAllSync(extensionDataBuffer)[0];
+export default function decodeExtensionDataBuffer(extensionDataBuffer: Buffer): AuthenticationExtensionsAuthenticatorOutputs {
+  const toCBOR: AuthenticationExtensionsAuthenticatorOutputs = cbor.decodeAllSync(extensionDataBuffer)[0];
   return toCBOR;
 }
 
-export type ExtensionsJSON = {
-  devicePublicKey?: DevicePublicKeyJSON
+export type AuthenticationExtensionsAuthenticatorOutputs = {
+  devicePublicKey?: DevicePublicKeyJSON;
+  uvm?: UvmJSON;
 }
 
 export type DevicePublicKeyJSON = {
@@ -19,4 +20,10 @@ export type DevicePublicKeyJSON = {
   scp?: Buffer;
   sig?: string;
   aaguid?: Buffer;
+}
+
+// TODO: Need to verify this format
+// https://w3c.github.io/webauthn/#sctn-uvm-extension.
+export type UvmJSON = {
+  uvm?: Buffer[]
 }

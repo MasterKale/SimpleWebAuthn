@@ -8,7 +8,6 @@ import {
   AuthenticatorDevice,
   AuthenticationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
-import { anyExtendedKeyUsage } from '@peculiar/asn1-x509';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;

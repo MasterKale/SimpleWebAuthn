@@ -12,7 +12,7 @@ import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import decodeExtensionDataBuffer, { ExtensionsJSON } from '../helpers/decodeExtensions';
+import decodeExtensionDataBuffer, { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeExtensions';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -227,6 +227,6 @@ export type VerifiedAuthenticationResponse = {
     newCounter: number;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
-    extensions: ExtensionsJSON;
+    extensions: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };

@@ -9,7 +9,7 @@ import decodeAttestationObject, {
   AttestationFormat,
   AttestationStatement,
 } from '../helpers/decodeAttestationObject';
-import decodeExtensionDataBuffer, { ExtensionsJSON } from '../helpers/decodeExtensions';
+import decodeExtensionDataBuffer, { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeExtensions';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -135,7 +135,7 @@ export default async function verifyRegistrationResponse(
   const parsedAuthData = parseAuthenticatorData(authData);
   const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsDataBuffer } = parsedAuthData;
 
-  let extensions: ExtensionsJSON = {};
+  let extensions: AuthenticationExtensionsAuthenticatorOutputs = {};
 
   if (flags.ed && extensionsDataBuffer) {
     extensions = decodeExtensionDataBuffer(extensionsDataBuffer);
@@ -297,7 +297,7 @@ export type VerifiedRegistrationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
-    extensions?: ExtensionsJSON;
+    extensions?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };
 
