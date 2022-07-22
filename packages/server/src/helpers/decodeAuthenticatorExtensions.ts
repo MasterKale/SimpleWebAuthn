@@ -11,9 +11,9 @@ export default function decodeAuthenticatorExtensionData(
   let toCBOR: AuthenticationExtensionsAuthenticatorOutputs | undefined;
   try {
     toCBOR = cbor.decodeAllSync(extensionData)[0];
-  } catch (e) {
-    console.error(e);
-    toCBOR = undefined;
+  } catch (err) {
+    const _err = err as Error;
+    throw new Error(`Error decoding authenticator extensions: ${_err.message}`);
   }
   return toCBOR;
 }
