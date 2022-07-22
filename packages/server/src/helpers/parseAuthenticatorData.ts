@@ -53,14 +53,14 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     pointer += firstEncoded.byteLength;
   }
 
-  let authenticatorExtensionResults: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
-  let authenticatorExtensionsDataBuffer: Buffer | undefined = undefined;
+  let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
+  let extensionsDataBuffer: Buffer | undefined = undefined;
 
   if (flags.ed) {
     const firstDecoded = decodeCborFirst(authData.slice(pointer));
     const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
-    authenticatorExtensionsDataBuffer = firstEncoded;
-    authenticatorExtensionResults = decodeAuthenticatorExtensions(authenticatorExtensionsDataBuffer);
+    extensionsDataBuffer = firstEncoded;
+    extensionsData = decodeAuthenticatorExtensions(extensionsDataBuffer);
     pointer += firstEncoded.byteLength;
   }
 
@@ -78,8 +78,8 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     aaguid,
     credentialID,
     credentialPublicKey,
-    authenticatorExtensionResults,
-    authenticatorExtensionsDataBuffer
+    extensionsData,
+    extensionsDataBuffer,
   };
 }
 
@@ -100,6 +100,6 @@ export type ParsedAuthenticatorData = {
   aaguid?: Buffer;
   credentialID?: Buffer;
   credentialPublicKey?: Buffer;
-  authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
-  authenticatorExtensionsDataBuffer?: Buffer;
+  extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
+  extensionsDataBuffer?: Buffer;
 };

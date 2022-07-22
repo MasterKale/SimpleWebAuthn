@@ -140,7 +140,7 @@ export default async function verifyRegistrationResponse(
     credentialID,
     counter,
     credentialPublicKey,
-    authenticatorExtensionResults
+    extensionsData,
   } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
@@ -257,7 +257,7 @@ export default async function verifyRegistrationResponse(
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
-      authenticatorExtensionResults,
+      authenticatorExtensionResults: extensionsData,
     };
   }
 
@@ -284,7 +284,8 @@ export default async function verifyRegistrationResponse(
  * @param registrationInfo.credentialBackedUp Whether or not the multi-device credential has been
  * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
  * reference!**
- * @param registrationInfo?.extensions The extensions returned by the browser
+ * @param registrationInfo?.authenticatorExtensionResults The authenticator extensions returned
+ * by the browser
  */
 export type VerifiedRegistrationResponse = {
   verified: boolean;
