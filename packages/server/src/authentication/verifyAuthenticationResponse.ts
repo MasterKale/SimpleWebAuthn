@@ -135,7 +135,7 @@ export default function verifyAuthenticationResponse(
 
   const authDataBuffer = base64url.toBuffer(response.authenticatorData);
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
-  const { rpIdHash, flags, counter, extensions } = parsedAuthData;
+  const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (typeof expectedRPID === 'string') {
@@ -190,7 +190,7 @@ export default function verifyAuthenticationResponse(
       credentialID: authenticator.credentialID,
       credentialDeviceType,
       credentialBackedUp,
-      extensions
+      extensionsData
     },
   };
 
@@ -220,6 +220,6 @@ export type VerifiedAuthenticationResponse = {
     newCounter: number;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
-    extensions?: AuthenticationExtensionsAuthenticatorOutputs;
+    extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };

@@ -133,7 +133,7 @@ export default async function verifyRegistrationResponse(
   const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensions } = parsedAuthData;
+  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsData } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
@@ -249,7 +249,7 @@ export default async function verifyRegistrationResponse(
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
-      extensions,
+      extensionsData,
     };
   }
 
@@ -291,7 +291,7 @@ export type VerifiedRegistrationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
-    extensions?: AuthenticationExtensionsAuthenticatorOutputs;
+    extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };
 
