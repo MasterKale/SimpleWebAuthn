@@ -1,5 +1,6 @@
 import cbor from 'cbor';
 import { decodeCborFirst } from './decodeCbor';
+import decodeAuthenticatorExtensionData, { AuthenticationExtensionsAuthenticatorOutputs } from './decodeAuthenticatorExtensions';
 
 /**
  * Make sense of the authData buffer contained in an Attestation
@@ -52,11 +53,12 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     pointer += firstEncoded.byteLength;
   }
 
-  let extensionsDataBuffer: Buffer | undefined = undefined;
+  let extensions: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
+
   if (flags.ed) {
     const firstDecoded = decodeCborFirst(authData.slice(pointer));
     const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
-    extensionsDataBuffer = firstEncoded;
+    extensions = decodeAuthenticatorExtensionData(firstEncoded);
     pointer += firstEncoded.byteLength;
   }
 
@@ -74,7 +76,7 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     aaguid,
     credentialID,
     credentialPublicKey,
-    extensionsDataBuffer,
+    extensions,
   };
 }
 
@@ -95,5 +97,5 @@ export type ParsedAuthenticatorData = {
   aaguid?: Buffer;
   credentialID?: Buffer;
   credentialPublicKey?: Buffer;
-  extensionsDataBuffer?: Buffer;
+  extensions?: AuthenticationExtensionsAuthenticatorOutputs;
 };

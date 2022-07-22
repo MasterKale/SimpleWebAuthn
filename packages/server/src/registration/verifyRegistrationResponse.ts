@@ -9,7 +9,7 @@ import decodeAttestationObject, {
   AttestationFormat,
   AttestationStatement,
 } from '../helpers/decodeAttestationObject';
-import decodeExtensionDataBuffer, { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeExtensions';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -133,13 +133,7 @@ export default async function verifyRegistrationResponse(
   const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsDataBuffer } = parsedAuthData;
-
-  let extensions: AuthenticationExtensionsAuthenticatorOutputs = {};
-
-  if (flags.ed && extensionsDataBuffer) {
-    extensions = decodeExtensionDataBuffer(extensionsDataBuffer);
-  }
+  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensions } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {

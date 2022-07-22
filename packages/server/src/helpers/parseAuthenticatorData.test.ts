@@ -43,11 +43,10 @@ test('should parse extension data', () => {
 
   const parsed = parseAuthenticatorData(authDataWithED);
 
-  const { extensionsDataBuffer } = parsed;
+  const { extensions } = parsed;
 
-  if (extensionsDataBuffer) {
-    const decoded = cbor.decodeFirstSync(extensionsDataBuffer);
-    expect(decoded).toEqual({
+  if (extensions) {
+    expect(extensions).toEqual({
       'example.extension':
         'This is an example extension! If you read this message, you probably successfully passing conformance tests. Good job!',
     });
