@@ -1,6 +1,6 @@
 import cbor from 'cbor';
 import { decodeCborFirst } from './decodeCbor';
-import decodeAuthenticatorExtensionData, { AuthenticationExtensionsAuthenticatorOutputs } from './decodeAuthenticatorExtensions';
+import { decodeAuthenticatorExtensions, AuthenticationExtensionsAuthenticatorOutputs } from './decodeAuthenticatorExtensions';
 
 /**
  * Make sense of the authData buffer contained in an Attestation
@@ -53,14 +53,14 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     pointer += firstEncoded.byteLength;
   }
 
-  let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
-  let extensionsDataBuffer: Buffer | undefined = undefined;
+  let authenticatorExtensionResults: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
+  let authenticatorExtensionsDataBuffer: Buffer | undefined = undefined;
 
   if (flags.ed) {
     const firstDecoded = decodeCborFirst(authData.slice(pointer));
     const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
-    extensionsDataBuffer = firstEncoded;
-    extensionsData = decodeAuthenticatorExtensionData(extensionsDataBuffer);
+    authenticatorExtensionsDataBuffer = firstEncoded;
+    authenticatorExtensionResults = decodeAuthenticatorExtensions(authenticatorExtensionsDataBuffer);
     pointer += firstEncoded.byteLength;
   }
 
@@ -78,8 +78,8 @@ export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenti
     aaguid,
     credentialID,
     credentialPublicKey,
-    extensionsData,
-    extensionsDataBuffer
+    authenticatorExtensionResults,
+    authenticatorExtensionsDataBuffer
   };
 }
 
@@ -100,6 +100,6 @@ export type ParsedAuthenticatorData = {
   aaguid?: Buffer;
   credentialID?: Buffer;
   credentialPublicKey?: Buffer;
-  extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
-  extensionsDataBuffer?: Buffer;
+  authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
+  authenticatorExtensionsDataBuffer?: Buffer;
 };

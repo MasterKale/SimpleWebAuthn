@@ -5,7 +5,7 @@ import cbor from 'cbor';
  *
  * @param extensionData Authenticator Extension Data buffer
  */
-export default function decodeAuthenticatorExtensionData(
+export function decodeAuthenticatorExtensions(
   extensionData: Buffer
 ): AuthenticationExtensionsAuthenticatorOutputs | undefined {
   let toCBOR: AuthenticationExtensionsAuthenticatorOutputs | undefined;

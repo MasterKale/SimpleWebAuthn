@@ -336,7 +336,7 @@ test('should return authenticator extension output', async () => {
     }
   });
 
-  expect(verification.authenticationInfo?.extensionsData).toMatchObject({
+  expect(verification.authenticationInfo?.authenticatorExtensionResults).toMatchObject({
     'devicePublicKey': {
       'dpk': Buffer.from('A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA', 'hex'),
       'sig': Buffer.from('3045022049526CD28AEF6B4E621A7D5936D2B504952FC0AE2313A4F0357AAFFFAEA964740221009D513ACAEFB0B32C765AAE6FEBA8C294685EFF63FF1CBF11ECF2107AF4FEB8F8', 'hex'),

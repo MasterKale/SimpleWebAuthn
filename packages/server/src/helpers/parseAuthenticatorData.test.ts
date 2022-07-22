@@ -43,10 +43,10 @@ test('should parse extension data', () => {
 
   const parsed = parseAuthenticatorData(authDataWithED);
 
-  const { extensionsData } = parsed;
+  const { authenticatorExtensionResults } = parsed;
 
-  if (extensionsData) {
-    expect(extensionsData).toEqual({
+  if (authenticatorExtensionResults) {
+    expect(authenticatorExtensionResults).toEqual({
       'example.extension':
         'This is an example extension! If you read this message, you probably successfully passing conformance tests. Good job!',
     });

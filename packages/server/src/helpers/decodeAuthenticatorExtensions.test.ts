@@ -1,7 +1,7 @@
-import decodeAuthenticatorExtensionData from "./decodeAuthenticatorExtensions";
+import { decodeAuthenticatorExtensions } from "./decodeAuthenticatorExtensions";
 
 test('should decode authenticator extensions', () => {
-  const extensions = decodeAuthenticatorExtensionData(Buffer.from(
+  const extensions = decodeAuthenticatorExtensions(Buffer.from(
     'A16F6465766963655075626C69634B6579A56364706B584DA5010203262001215820991A' +
     'ABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973C' +
     'FDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA63736967584730' +
@@ -19,9 +19,4 @@ test('should decode authenticator extensions', () => {
       "aaguid": Buffer.from('00000000000000000000000000000000', 'hex')
     }
   })
-});
-
-test('should return undefined decoding authenticator extensions', () => {
-  const extensions = decodeAuthenticatorExtensionData(Buffer.from('A16F'));
-  expect(extensions).toEqual(undefined);
 });
