@@ -19,11 +19,11 @@ export default function decodeAuthenticatorExtensionData(
 }
 
 export type AuthenticationExtensionsAuthenticatorOutputs = {
-  devicePublicKey?: DevicePublicKeyJSON;
+  devicePublicKey?: DevicePublicKeyAuthenticatorOutput;
   uvm?: UvmJSON;
 }
 
-export type DevicePublicKeyJSON = {
+export type DevicePublicKeyAuthenticatorOutput = {
   dpk?: Buffer;
   scp?: Buffer;
   sig?: string;
