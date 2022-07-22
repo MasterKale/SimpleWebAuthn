@@ -20,7 +20,7 @@ export default function decodeAuthenticatorExtensionData(
 
 export type AuthenticationExtensionsAuthenticatorOutputs = {
   devicePublicKey?: DevicePublicKeyAuthenticatorOutput;
-  uvm?: UvmJSON;
+  uvm?: UVMAuthenticatorOutput;
 }
 
 export type DevicePublicKeyAuthenticatorOutput = {
@@ -32,6 +32,6 @@ export type DevicePublicKeyAuthenticatorOutput = {
 
 // TODO: Need to verify this format
 // https://w3c.github.io/webauthn/#sctn-uvm-extension.
-export type UvmJSON = {
+export type UVMAuthenticatorOutput = {
   uvm?: Buffer[]
 }
