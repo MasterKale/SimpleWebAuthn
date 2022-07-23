@@ -9,6 +9,7 @@ import decodeAttestationObject, {
   AttestationFormat,
   AttestationStatement,
 } from '../helpers/decodeAttestationObject';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
@@ -132,7 +133,15 @@ export default async function verifyRegistrationResponse(
   const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey } = parsedAuthData;
+  const {
+    aaguid,
+    rpIdHash,
+    flags,
+    credentialID,
+    counter,
+    credentialPublicKey,
+    extensionsData,
+  } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
@@ -248,6 +257,7 @@ export default async function verifyRegistrationResponse(
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
+      authenticatorExtensionResults: extensionsData,
     };
   }
 
@@ -274,6 +284,8 @@ export default async function verifyRegistrationResponse(
  * @param registrationInfo.credentialBackedUp Whether or not the multi-device credential has been
  * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
  * reference!**
+ * @param registrationInfo?.authenticatorExtensionResults The authenticator extensions returned
+ * by the browser
  */
 export type VerifiedRegistrationResponse = {
   verified: boolean;
@@ -288,6 +300,7 @@ export type VerifiedRegistrationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
+    authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };
 

@@ -12,6 +12,7 @@ import verifySignature from '../helpers/verifySignature';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import isBase64URLString from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -134,7 +135,7 @@ export default function verifyAuthenticationResponse(
 
   const authDataBuffer = base64url.toBuffer(response.authenticatorData);
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
-  const { rpIdHash, flags, counter } = parsedAuthData;
+  const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (typeof expectedRPID === 'string') {
@@ -189,6 +190,7 @@ export default function verifyAuthenticationResponse(
       credentialID: authenticator.credentialID,
       credentialDeviceType,
       credentialBackedUp,
+      authenticatorExtensionResults: extensionsData,
     },
   };
 
@@ -210,6 +212,8 @@ export default function verifyAuthenticationResponse(
  * @param authenticationInfo.credentialBackedUp Whether or not the multi-device credential has been
  * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
  * reference!**
+ * @param authenticationInfo?.authenticatorExtensionResults The authenticator extensions returned
+ * by the browser
  */
 export type VerifiedAuthenticationResponse = {
   verified: boolean;
@@ -218,5 +222,6 @@ export type VerifiedAuthenticationResponse = {
     newCounter: number;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
+    authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };
