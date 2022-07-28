@@ -21,7 +21,7 @@ import MetadataService from '../../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 
 import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
-import parseCertInfo from './parseCertInfo';
+import { parseCertInfo } from './parseCertInfo';
 import parsePubArea from './parsePubArea';
 
 export default async function verifyTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
