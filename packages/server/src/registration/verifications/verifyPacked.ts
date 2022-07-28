@@ -3,12 +3,12 @@ import NodeRSA from 'node-rsa';
 
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import convertCOSEtoPKCS, {
+import {
   COSEKEYS,
   COSEALGHASH,
   COSECRV,
   COSEKTY,
-  COSERSASCHEME,
+  COSERSASCHEME,, convertCOSEtoPKCS
 } from '../../helpers/convertCOSEtoPKCS';
 import toHash from '../../helpers/toHash';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';

@@ -6,7 +6,7 @@ import type { AttestationFormatVerifierOpts } from '../verifyRegistrationRespons
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import toHash from '../../helpers/toHash';
-import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
 
 export default async function verifyApple(
   options: AttestationFormatVerifierOpts,
