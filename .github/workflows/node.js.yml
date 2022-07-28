@@ -16,7 +16,9 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 16, 18 ]
+        # Disable Node 18 until https://github.com/lerna/lerna/issues/3259 gets solved
+        # node-version: [ 16, 18 ]
+        node-version: [ 16 ]
 
     steps:
     - uses: actions/checkout@v3
