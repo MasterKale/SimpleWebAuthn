@@ -17,7 +17,7 @@ import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { verifySignature } from '../../helpers/verifySignature';
 import { decodeCredentialPublicKey } from '../../helpers/decodeCredentialPublicKey';
 import MetadataService from '../../services/metadataService';
-import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
 /**
  * Verify an attestation response with fmt 'packed'

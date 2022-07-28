@@ -10,7 +10,7 @@ import { COSEKEYS, COSEKTY } from '../helpers/convertCOSEtoPKCS';
  * Match properties of the authenticator's attestation statement against expected values as
  * registered with the FIDO Alliance Metadata Service
  */
-export default async function verifyAttestationWithMetadata(
+export async function verifyAttestationWithMetadata(
   statement: MetadataStatement,
   credentialPublicKey: Buffer,
   x5c: Buffer[] | Base64URLString[],

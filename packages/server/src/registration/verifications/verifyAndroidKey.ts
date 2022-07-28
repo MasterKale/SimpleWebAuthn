@@ -9,7 +9,7 @@ import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
 import { COSEALGHASH, convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
 import MetadataService from '../../services/metadataService';
-import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
 /**
  * Verify an attestation response with fmt 'android-key'
