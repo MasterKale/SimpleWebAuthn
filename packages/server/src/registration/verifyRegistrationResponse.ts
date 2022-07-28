@@ -52,7 +52,7 @@ export type VerifyRegistrationResponseOpts = {
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export default async function verifyRegistrationResponse(
+export async function verifyRegistrationResponse(
   options: VerifyRegistrationResponseOpts,
 ): Promise<VerifiedRegistrationResponse> {
   const {
