@@ -2,7 +2,7 @@ import type { PublicKeyCredentialDescriptorJSON } from '@simplewebauthn/typescri
 
 import { base64URLStringToBuffer } from './base64URLStringToBuffer';
 
-export default function toPublicKeyCredentialDescriptor(
+export function toPublicKeyCredentialDescriptor(
   descriptor: PublicKeyCredentialDescriptorJSON,
 ): PublicKeyCredentialDescriptor {
   const { id } = descriptor;
