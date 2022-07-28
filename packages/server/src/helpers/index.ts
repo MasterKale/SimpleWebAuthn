@@ -6,7 +6,7 @@ import { decodeAttestationObject } from './decodeAttestationObject';
 import { decodeCborFirst } from './decodeCbor';
 import { decodeClientDataJSON } from './decodeClientDataJSON';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
-import generateChallenge from './generateChallenge';
+import { generateChallenge } from './generateChallenge';
 import getCertificateInfo from './getCertificateInfo';
 import isBase64URLString from './isBase64URLString';
 import isCertRevoked from './isCertRevoked';

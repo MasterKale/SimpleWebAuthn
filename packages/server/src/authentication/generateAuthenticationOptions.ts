@@ -6,7 +6,7 @@ import type {
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
 
-import generateChallenge from '../helpers/generateChallenge';
+import { generateChallenge } from '../helpers/generateChallenge';
 
 export type GenerateAuthenticationOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptorFuture[];
