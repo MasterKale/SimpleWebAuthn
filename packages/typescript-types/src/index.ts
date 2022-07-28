@@ -153,14 +153,15 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
  * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
  * know about it (sometime after 4.6.3)
  */
-export type AuthenticatorTransportFuture = "ble" | "internal" | "nfc" | "usb" | "cable" | "hybrid";
+export type AuthenticatorTransportFuture = 'ble' | 'internal' | 'nfc' | 'usb' | 'cable' | 'hybrid';
 
 /**
  * A super class of TypeScript's `PublicKeyCredentialDescriptor` that knows about the latest
  * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
  * know about it (sometime after 4.6.3)
  */
-export interface PublicKeyCredentialDescriptorFuture extends Omit<PublicKeyCredentialDescriptor, 'transports'> {
+export interface PublicKeyCredentialDescriptorFuture
+  extends Omit<PublicKeyCredentialDescriptor, 'transports'> {
   transports?: AuthenticatorTransportFuture[];
 }
 

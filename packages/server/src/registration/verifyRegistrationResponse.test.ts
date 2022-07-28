@@ -531,20 +531,21 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
 test('should pass verification if custom challenge verifier returns true', async () => {
   const verification = await verifyRegistrationResponse({
     credential: {
-      "id": "AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA",
-      "rawId": "AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA",
-      "response": {
-        "attestationObject": "o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhAPgoy3sxIeUvN9Mo8twyIQb9hXDHxQ2urIaEq14u6vNHAiB8ltlCippsMIIsh6AqMoZlUH_BH0bXT1xsN2zKoCEy72hhdXRoRGF0YVjQSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYfWYqK3OAAI1vMYKZIsLJfHwVQMATAFMsA7D2BDqLnCN_qPowdSeirekAMSzGtVsBSo9WzYuKQGpFgLGV_qSeIAHg5qHC-0l55fL81Hy5H6zhiFZnbNUYY1NQ2CFpcXBoQClAQIDJiABIVggPzMMB0nPKu9zvu6tvvyaP7MlGKJi4zazYQw5kyCjGykiWCCyHxcnMCwcj4llYwRY-MedgOCQzcz_TgKeabY4yFQyrA",
-        "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZXlKaFkzUjFZV3hEYUdGc2JHVnVaMlVpT2lKNFVuTlpaRU5SZGpWWFdrOXhiWGhTWldsYWJEWkRPWEUxVTJaeVdtNWxOR3hPVTNJNVVWWjBVR2xuSWl3aVlYSmlhWFJ5WVhKNVJHRjBZU0k2SW1GeVltbDBjbUZ5ZVVSaGRHRkdiM0pUYVdkdWFXNW5JbjAiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjcm9zc09yaWdpbiI6ZmFsc2V9"
+      id: 'AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA',
+      rawId:
+        'AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA',
+      response: {
+        attestationObject:
+          'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhAPgoy3sxIeUvN9Mo8twyIQb9hXDHxQ2urIaEq14u6vNHAiB8ltlCippsMIIsh6AqMoZlUH_BH0bXT1xsN2zKoCEy72hhdXRoRGF0YVjQSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFYfWYqK3OAAI1vMYKZIsLJfHwVQMATAFMsA7D2BDqLnCN_qPowdSeirekAMSzGtVsBSo9WzYuKQGpFgLGV_qSeIAHg5qHC-0l55fL81Hy5H6zhiFZnbNUYY1NQ2CFpcXBoQClAQIDJiABIVggPzMMB0nPKu9zvu6tvvyaP7MlGKJi4zazYQw5kyCjGykiWCCyHxcnMCwcj4llYwRY-MedgOCQzcz_TgKeabY4yFQyrA',
+        clientDataJSON:
+          'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZXlKaFkzUjFZV3hEYUdGc2JHVnVaMlVpT2lKNFVuTlpaRU5SZGpWWFdrOXhiWGhTWldsYWJEWkRPWEUxVTJaeVdtNWxOR3hPVTNJNVVWWjBVR2xuSWl3aVlYSmlhWFJ5WVhKNVJHRjBZU0k2SW1GeVltbDBjbUZ5ZVVSaGRHRkdiM0pUYVdkdWFXNW5JbjAiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjcm9zc09yaWdpbiI6ZmFsc2V9',
       },
-      "type": "public-key",
-      "clientExtensionResults": {},
-      "transports": [
-        "internal"
-      ]
+      type: 'public-key',
+      clientExtensionResults: {},
+      transports: ['internal'],
     },
     expectedChallenge: (challenge: string) => {
-      const parsedChallenge: { actualChallenge: string; arbitraryData: string; } = JSON.parse(
+      const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
         base64url.decode(challenge),
       );
       return parsedChallenge.actualChallenge === 'xRsYdCQv5WZOqmxReiZl6C9q5SfrZne4lNSr9QVtPig';
@@ -557,7 +558,6 @@ test('should pass verification if custom challenge verifier returns true', async
 });
 
 test('should fail verification if custom challenge verifier returns false', async () => {
-
   await expect(
     verifyRegistrationResponse({
       credential: attestationNone,
@@ -608,13 +608,19 @@ test('should return authenticator extension output', async () => {
   });
 
   expect(verification.registrationInfo?.authenticatorExtensionResults).toMatchObject({
-    'devicePublicKey': {
-      "dpk": Buffer.from('A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA', 'hex'),
-      "sig": Buffer.from('3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E', 'hex'),
-      "nonce": Buffer.from('', 'hex'),
-      "scope": Buffer.from('00', 'hex'),
-      "aaguid": Buffer.from('00000000000000000000000000000000', 'hex')
-    }
+    devicePublicKey: {
+      dpk: Buffer.from(
+        'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
+        'hex',
+      ),
+      sig: Buffer.from(
+        '3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E',
+        'hex',
+      ),
+      nonce: Buffer.from('', 'hex'),
+      scope: Buffer.from('00', 'hex'),
+      aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+    },
   });
 });
 

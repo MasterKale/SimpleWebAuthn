@@ -48,8 +48,8 @@ export async function verifyAttestationWithMetadata(
     if (keypairAlg.alg === publicKeyCOSEInfo.alg && keypairAlg.kty === publicKeyCOSEInfo.kty) {
       // If not an RSA keypair then make sure curve numbers match too
       if (
-        (keypairAlg.kty === COSEKTY.EC2 || keypairAlg.kty === COSEKTY.OKP)
-        && keypairAlg.crv === publicKeyCOSEInfo.crv
+        (keypairAlg.kty === COSEKTY.EC2 || keypairAlg.kty === COSEKTY.OKP) &&
+        keypairAlg.crv === publicKeyCOSEInfo.crv
       ) {
         foundMatch = true;
       } else {
@@ -66,7 +66,9 @@ export async function verifyAttestationWithMetadata(
   // Make sure the public key is one of the allowed algorithms
   if (!foundMatch) {
     const debugAlgs = Array.from(keypairCOSEAlgs).join(', ');
-    throw new Error(`Public key algorithm ${publicKeyCOSEInfo} did not match any metadata algorithms [${debugAlgs}]`);
+    throw new Error(
+      `Public key algorithm ${publicKeyCOSEInfo} did not match any metadata algorithms [${debugAlgs}]`,
+    );
   }
 
   try {
@@ -76,7 +78,9 @@ export async function verifyAttestationWithMetadata(
     );
   } catch (err) {
     const _err = err as Error;
-    throw new Error(`Could not validate certificate path with any metadata root certificates: ${_err.message}`);
+    throw new Error(
+      `Could not validate certificate path with any metadata root certificates: ${_err.message}`,
+    );
   }
 
   return true;

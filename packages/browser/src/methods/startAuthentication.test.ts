@@ -214,15 +214,16 @@ test('should support "cable" transport', async () => {
     allowCredentials: [
       {
         ...goodOpts1.allowCredentials![0],
-        transports: ["cable"],
+        transports: ['cable'],
       },
-    ]
+    ],
   };
 
   await startAuthentication(opts);
 
-  expect(mockNavigatorGet.mock.calls[0][0].publicKey.allowCredentials[0].transports[0])
-    .toEqual("cable");
+  expect(mockNavigatorGet.mock.calls[0][0].publicKey.allowCredentials[0].transports[0]).toEqual(
+    'cable',
+  );
 });
 
 test('should cancel an existing call when executed again', async () => {
@@ -242,9 +243,9 @@ test('should set up autofill a.k.a. Conditional UI', async () => {
     allowCredentials: [
       {
         ...goodOpts1.allowCredentials![0],
-        transports: ["cable"],
+        transports: ['cable'],
       },
-    ]
+    ],
   };
   document.body.innerHTML = `
     <form>
