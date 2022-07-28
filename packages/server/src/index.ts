@@ -6,7 +6,7 @@ import { generateRegistrationOptions } from './registration/generateRegistration
 import { verifyRegistrationResponse } from './registration/verifyRegistrationResponse';
 import { generateAuthenticationOptions } from './authentication/generateAuthenticationOptions';
 import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
-import MetadataService from './services/metadataService';
+import { MetadataService } from './services/metadataService';
 import SettingsService from './services/settingsService';
 
 export {

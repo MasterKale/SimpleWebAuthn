@@ -1,7 +1,7 @@
 jest.mock('node-fetch');
 import fetch from 'node-fetch';
 
-import MetadataService, { BaseMetadataService } from './metadataService';
+import { MetadataService, BaseMetadataService } from './metadataService';
 import type { MetadataStatement } from '../metadata/mdsTypes';
 
 const _fetch = fetch as unknown as jest.Mock;

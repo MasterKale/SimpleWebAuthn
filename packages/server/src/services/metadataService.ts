@@ -323,6 +323,4 @@ export class BaseMetadataService {
 }
 
 // Export a service singleton
-const MetadataService = new BaseMetadataService();
-
-export default MetadataService;
+export const MetadataService = new BaseMetadataService();
