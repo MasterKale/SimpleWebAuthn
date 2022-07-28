@@ -5,6 +5,6 @@ import crypto from 'crypto';
  * @param data Data to hash
  * @return The hash
  */
-export default function toHash(data: Buffer | string, algo = 'SHA256'): Buffer {
+export function toHash(data: Buffer | string, algo = 'SHA256'): Buffer {
   return crypto.createHash(algo).update(data).digest();
 }

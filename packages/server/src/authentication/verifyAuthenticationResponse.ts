@@ -6,7 +6,7 @@ import {
 } from '@simplewebauthn/typescript-types';
 
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
-import toHash from '../helpers/toHash';
+import { toHash } from '../helpers/toHash';
 import { convertPublicKeyToPEM } from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
