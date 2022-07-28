@@ -10,21 +10,21 @@ import {
 
 import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse';
 
-import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
+import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
-import toHash from '../../../helpers/toHash';
-import convertCertBufferToPEM from '../../../helpers/convertCertBufferToPEM';
-import validateCertificatePath from '../../../helpers/validateCertificatePath';
-import getCertificateInfo from '../../../helpers/getCertificateInfo';
-import verifySignature from '../../../helpers/verifySignature';
-import MetadataService from '../../../services/metadataService';
-import verifyAttestationWithMetadata from '../../../metadata/verifyAttestationWithMetadata';
+import { toHash } from '../../../helpers/toHash';
+import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';
+import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
+import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
+import { verifySignature } from '../../../helpers/verifySignature';
+import { MetadataService } from '../../../services/metadataService';
+import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 
 import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
-import parseCertInfo from './parseCertInfo';
-import parsePubArea from './parsePubArea';
+import { parseCertInfo } from './parseCertInfo';
+import { parsePubArea } from './parsePubArea';
 
-export default async function verifyTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
+export async function verifyAttestationTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
     options;
   const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;

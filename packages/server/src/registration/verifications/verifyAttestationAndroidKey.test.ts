@@ -1,8 +1,8 @@
 import base64url from 'base64url';
 
-import SettingsService from '../../services/settingsService';
+import { SettingsService } from '../../services/settingsService';
 
-import verifyRegistrationResponse from '../verifyRegistrationResponse';
+import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing

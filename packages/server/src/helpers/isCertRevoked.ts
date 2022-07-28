@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { AsnParser } from '@peculiar/asn1-schema';
 import { CertificateList } from '@peculiar/asn1-x509';
 
-import convertCertBufferToPEM from './convertCertBufferToPEM';
+import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID
@@ -22,7 +22,7 @@ const cacheRevokedCerts: { [certAuthorityKeyID: string]: CAAuthorityInfo } = {};
  *
  * CRL certificate structure referenced from https://tools.ietf.org/html/rfc5280#page-117
  */
-export default async function isCertRevoked(cert: X509): Promise<boolean> {
+export async function isCertRevoked(cert: X509): Promise<boolean> {
   const certSerialHex = cert.getSerialNumberHex();
 
   // Check to see if we've got cached info for the cert's CA

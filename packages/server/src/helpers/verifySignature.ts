@@ -8,7 +8,7 @@ import crypto from 'crypto';
  * @param publicKey Authenticator's public key as a PEM certificate
  * @param algo Which algorithm to use to verify the signature (default: `'sha256'`)
  */
-export default function verifySignature(
+export function verifySignature(
   signature: Buffer,
   signatureBase: Buffer,
   publicKey: string,

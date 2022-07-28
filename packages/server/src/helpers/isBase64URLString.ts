@@ -4,7 +4,7 @@ const base64urlRegEx = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z
 /**
  * Check to see if a string only contains valid Base64URL values
  */
-export default function isBase64URLString(value: string): boolean {
+export function isBase64URLString(value: string): boolean {
   if (!value) {
     return false;
   }

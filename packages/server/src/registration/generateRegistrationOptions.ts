@@ -9,7 +9,7 @@ import type {
 } from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
 
-import generateChallenge from '../helpers/generateChallenge';
+import { generateChallenge } from '../helpers/generateChallenge';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
@@ -93,7 +93,7 @@ const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export default function generateRegistrationOptions(
+export function generateRegistrationOptions(
   options: GenerateRegistrationOptionsOpts,
 ): PublicKeyCredentialCreationOptionsJSON {
   const {

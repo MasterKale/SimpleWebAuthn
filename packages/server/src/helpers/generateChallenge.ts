@@ -3,7 +3,7 @@ import crypto from 'crypto';
 /**
  * Generate a suitably random value to be used as an attestation or assertion challenge
  */
-export default function generateChallenge(): Buffer {
+export function generateChallenge(): Buffer {
   /**
    * WebAuthn spec says that 16 bytes is a good minimum:
    *

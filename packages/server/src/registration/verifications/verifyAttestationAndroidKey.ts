@@ -4,17 +4,17 @@ import { KeyDescription, id_ce_keyDescription } from '@peculiar/asn1-android';
 
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
-import validateCertificatePath from '../../helpers/validateCertificatePath';
-import verifySignature from '../../helpers/verifySignature';
-import convertCOSEtoPKCS, { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
-import MetadataService from '../../services/metadataService';
-import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath';
+import { verifySignature } from '../../helpers/verifySignature';
+import { COSEALGHASH, convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
+import { MetadataService } from '../../services/metadataService';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
 /**
  * Verify an attestation response with fmt 'android-key'
  */
-export default async function verifyAttestationAndroidKey(
+export async function verifyAttestationAndroidKey(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid, rootCertificates } =

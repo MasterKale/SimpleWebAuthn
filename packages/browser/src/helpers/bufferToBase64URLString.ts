@@ -4,7 +4,7 @@
  *
  * Helper method to compliment `base64URLStringToBuffer`
  */
-export default function bufferToBase64URLString(buffer: ArrayBuffer): string {
+export function bufferToBase64URLString(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
   let str = '';
 

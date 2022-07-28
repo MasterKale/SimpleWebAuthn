@@ -1,4 +1,4 @@
-import isBase64URLString from './isBase64URLString';
+import { isBase64URLString } from './isBase64URLString';
 
 test('should return true when input is base64URLString', () => {
   const actual = isBase64URLString("U2ltcGxlV2ViQXV0aG4")

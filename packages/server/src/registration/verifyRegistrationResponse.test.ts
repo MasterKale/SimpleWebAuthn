@@ -1,16 +1,16 @@
 import base64url from 'base64url';
 
-import verifyRegistrationResponse from './verifyRegistrationResponse';
+import { verifyRegistrationResponse } from './verifyRegistrationResponse';
 
-import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
-import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
-import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
-import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
-import SettingsService from '../services/settingsService';
+import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject';
+import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import { SettingsService } from '../services/settingsService';
 
-import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
+import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
 
-import toHash from '../helpers/toHash';
+import { toHash } from '../helpers/toHash';
 import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 /**
@@ -26,11 +26,11 @@ let mockDecodePubKey: jest.SpyInstance;
 let mockVerifyFIDOU2F: jest.SpyInstance;
 
 beforeEach(() => {
-  mockDecodeAttestation = jest.spyOn(decodeAttestationObject, 'default');
-  mockDecodeClientData = jest.spyOn(decodeClientDataJSON, 'default');
-  mockParseAuthData = jest.spyOn(parseAuthenticatorData, 'default');
-  mockDecodePubKey = jest.spyOn(decodeCredentialPublicKey, 'default');
-  mockVerifyFIDOU2F = jest.spyOn(verifyFIDOU2F, 'default');
+  mockDecodeAttestation = jest.spyOn(esmDecodeAttestationObject, 'decodeAttestationObject');
+  mockDecodeClientData = jest.spyOn(esmDecodeClientDataJSON, 'decodeClientDataJSON');
+  mockParseAuthData = jest.spyOn(esmParseAuthenticatorData, 'parseAuthenticatorData');
+  mockDecodePubKey = jest.spyOn(esmDecodeCredentialPublicKey, 'decodeCredentialPublicKey');
+  mockVerifyFIDOU2F = jest.spyOn(esmVerifyAttestationFIDOU2F, 'verifyAttestationFIDOU2F');
 });
 
 afterEach(() => {
@@ -219,7 +219,7 @@ test('should throw when attestation type is not webauthn.create', async () => {
 test('should throw if an unexpected attestation format is specified', async () => {
   const fmt = 'fizzbuzz';
 
-  const realAtteObj = decodeAttestationObject.default(
+  const realAtteObj = esmDecodeAttestationObject.decodeAttestationObject(
     base64url.toBuffer(attestationNone.response.attestationObject),
   );
 
@@ -240,10 +240,10 @@ test('should throw if an unexpected attestation format is specified', async () =
 });
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
-  const { authData } = decodeAttestationObject.default(
+  const { authData } = esmDecodeAttestationObject.decodeAttestationObject(
     base64url.toBuffer(attestationNone.response.attestationObject),
   );
-  const actualAuthData = parseAuthenticatorData.default(authData);
+  const actualAuthData = esmParseAuthenticatorData.parseAuthenticatorData(authData);
 
   mockParseAuthData.mockReturnValue({
     ...actualAuthData,

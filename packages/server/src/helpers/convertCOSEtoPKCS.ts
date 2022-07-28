@@ -5,7 +5,7 @@ import { decodeCborFirst } from './decodeCbor';
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
  */
-export default function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
+export function convertCOSEtoPKCS(cosePublicKey: Buffer): Buffer {
   const struct: COSEPublicKey = decodeCborFirst(cosePublicKey);
 
   const tag = Buffer.from([0x04]);

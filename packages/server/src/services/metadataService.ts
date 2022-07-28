@@ -1,19 +1,19 @@
 import fetch from 'node-fetch';
 import { KJUR } from 'jsrsasign';
 
-import validateCertificatePath from '../helpers/validateCertificatePath';
-import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
-import convertAAGUIDToString from '../helpers/convertAAGUIDToString';
+import { validateCertificatePath } from '../helpers/validateCertificatePath';
+import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
+import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import type {
   MDSJWTHeader,
   MDSJWTPayload,
   MetadataStatement,
   MetadataBLOBPayloadEntry,
 } from '../metadata/mdsTypes';
-import SettingsService from '../services/settingsService';
+import { SettingsService } from '../services/settingsService';
 import { getLogger } from '../helpers/logging';
 
-import parseJWT from '../metadata/parseJWT';
+import { parseJWT } from '../metadata/parseJWT';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -323,6 +323,4 @@ export class BaseMetadataService {
 }
 
 // Export a service singleton
-const MetadataService = new BaseMetadataService();
-
-export default MetadataService;
+export const MetadataService = new BaseMetadataService();

@@ -3,7 +3,7 @@
 // @ts-ignore 2305
 import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
 
-import isCertRevoked from './isCertRevoked';
+import { isCertRevoked } from './isCertRevoked';
 
 const { crypto } = KJUR;
 
@@ -12,7 +12,7 @@ const { crypto } = KJUR;
  * @param certificates Typically the result of `x5c.map(convertASN1toPEM)`
  * @param rootCertificates Possible root certificates to complete the path
  */
-export default async function validateCertificatePath(
+export async function validateCertificatePath(
   certificates: string[],
   rootCertificates: string[] = [],
 ): Promise<boolean> {

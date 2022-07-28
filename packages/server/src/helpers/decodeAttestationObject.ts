@@ -5,7 +5,7 @@ import cbor from 'cbor';
  *
  * @param base64AttestationObject Attestation Object buffer
  */
-export default function decodeAttestationObject(attestationObject: Buffer): AttestationObject {
+export function decodeAttestationObject(attestationObject: Buffer): AttestationObject {
   const toCBOR: AttestationObject = cbor.decodeAllSync(attestationObject)[0];
   return toCBOR;
 }

@@ -1,14 +1,14 @@
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
-import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
-import validateCertificatePath from '../../helpers/validateCertificatePath';
-import verifySignature from '../../helpers/verifySignature';
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath';
+import { verifySignature } from '../../helpers/verifySignature';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
  */
-export default async function verifyAttestationFIDOU2F(
+export async function verifyAttestationFIDOU2F(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const {

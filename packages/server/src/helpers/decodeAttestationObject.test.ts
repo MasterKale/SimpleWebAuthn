@@ -1,4 +1,4 @@
-import decodeAttestationObject from './decodeAttestationObject';
+import { decodeAttestationObject } from './decodeAttestationObject';
 
 test('should decode base64url-encoded indirect attestationObject', () => {
   const decoded = decodeAttestationObject(

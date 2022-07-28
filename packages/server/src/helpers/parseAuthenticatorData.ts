@@ -5,7 +5,7 @@ import { decodeAuthenticatorExtensions, AuthenticationExtensionsAuthenticatorOut
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
-export default function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorData {
+export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorData {
   if (authData.byteLength < 37) {
     throw new Error(
       `Authenticator data was ${authData.byteLength} bytes, expected at least 37 bytes`,

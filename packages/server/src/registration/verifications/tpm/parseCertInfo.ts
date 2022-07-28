@@ -3,7 +3,7 @@ import { TPM_ST, TPM_ALG } from './constants';
 /**
  * Cut up a TPM attestation's certInfo into intelligible chunks
  */
-export default function parseCertInfo(certInfo: Buffer): ParsedCertInfo {
+export function parseCertInfo(certInfo: Buffer): ParsedCertInfo {
   let pointer = 0;
 
   // Get a magic constant

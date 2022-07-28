@@ -2,18 +2,18 @@ import base64url from 'base64url';
 
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import toHash from '../../helpers/toHash';
-import verifySignature from '../../helpers/verifySignature';
-import getCertificateInfo from '../../helpers/getCertificateInfo';
-import validateCertificatePath from '../../helpers/validateCertificatePath';
-import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
-import MetadataService from '../../services/metadataService';
-import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
+import { toHash } from '../../helpers/toHash';
+import { verifySignature } from '../../helpers/verifySignature';
+import { getCertificateInfo } from '../../helpers/getCertificateInfo';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
+import { MetadataService } from '../../services/metadataService';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
-export default async function verifyAttestationAndroidSafetyNet(
+export async function verifyAttestationAndroidSafetyNet(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const {

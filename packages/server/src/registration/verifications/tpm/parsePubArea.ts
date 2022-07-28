@@ -3,7 +3,7 @@ import { TPM_ALG, TPM_ECC_CURVE } from './constants';
 /**
  * Break apart a TPM attestation's pubArea buffer
  */
-export default function parsePubArea(pubArea: Buffer): ParsedPubArea {
+export function parsePubArea(pubArea: Buffer): ParsedPubArea {
   let pointer = 0;
 
   const typeBuffer = pubArea.slice(pointer, (pointer += 2));
