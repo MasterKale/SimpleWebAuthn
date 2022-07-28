@@ -21,7 +21,7 @@ import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import settingsService from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
-import verifyFIDOU2F from './verifications/verifyFIDOU2F';
+import { verifyAttestationFIDOU2F as verifyFIDOU2F } from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
 import { verifyAttestationAndroidSafetyNet as verifyAndroidSafetynet } from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
