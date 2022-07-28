@@ -2,10 +2,10 @@ import base64url from 'base64url';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse';
 
-import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
-import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
-import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
-import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import * as modDecodeAttestationObject from '../helpers/decodeAttestationObject';
+import * as modDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import * as modParseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import * as modDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { SettingsService } from '../services/settingsService';
 
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
@@ -26,11 +26,11 @@ let mockDecodePubKey: jest.SpyInstance;
 let mockVerifyFIDOU2F: jest.SpyInstance;
 
 beforeEach(() => {
-  mockDecodeAttestation = jest.spyOn(decodeAttestationObject, 'default');
-  mockDecodeClientData = jest.spyOn(decodeClientDataJSON, 'default');
-  mockParseAuthData = jest.spyOn(parseAuthenticatorData, 'default');
-  mockDecodePubKey = jest.spyOn(decodeCredentialPublicKey, 'default');
-  mockVerifyFIDOU2F = jest.spyOn(verifyFIDOU2F, 'default');
+  mockDecodeAttestation = jest.spyOn(modDecodeAttestationObject, 'decodeAttestationObject');
+  mockDecodeClientData = jest.spyOn(modDecodeClientDataJSON, 'decodeClientDataJSON');
+  mockParseAuthData = jest.spyOn(modParseAuthenticatorData, 'parseAuthenticatorData');
+  mockDecodePubKey = jest.spyOn(modDecodeCredentialPublicKey, 'decodeCredentialPublicKey');
+  mockVerifyFIDOU2F = jest.spyOn(verifyFIDOU2F, 'verifyAttestationFIDOU2F');
 });
 
 afterEach(() => {
@@ -219,7 +219,7 @@ test('should throw when attestation type is not webauthn.create', async () => {
 test('should throw if an unexpected attestation format is specified', async () => {
   const fmt = 'fizzbuzz';
 
-  const realAtteObj = decodeAttestationObject.default(
+  const realAtteObj = modDecodeAttestationObject.decodeAttestationObject(
     base64url.toBuffer(attestationNone.response.attestationObject),
   );
 
@@ -240,10 +240,10 @@ test('should throw if an unexpected attestation format is specified', async () =
 });
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
-  const { authData } = decodeAttestationObject.default(
+  const { authData } = modDecodeAttestationObject.decodeAttestationObject(
     base64url.toBuffer(attestationNone.response.attestationObject),
   );
-  const actualAuthData = parseAuthenticatorData.default(authData);
+  const actualAuthData = modParseAuthenticatorData.parseAuthenticatorData(authData);
 
   mockParseAuthData.mockReturnValue({
     ...actualAuthData,
