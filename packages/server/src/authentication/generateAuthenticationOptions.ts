@@ -30,7 +30,7 @@ export type GenerateAuthenticationOptionsOpts = {
  * @param extensions Additional plugins the authenticator or browser should use during authentication
  * @param rpID Valid domain name (after `https://`)
  */
-export default function generateAuthenticationOptions(
+export function generateAuthenticationOptions(
   options: GenerateAuthenticationOptionsOpts = {},
 ): PublicKeyCredentialRequestOptionsJSON {
   const {

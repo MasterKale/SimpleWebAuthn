@@ -4,7 +4,7 @@
  */
 import generateRegistrationOptions from './registration/generateRegistrationOptions';
 import verifyRegistrationResponse from './registration/verifyRegistrationResponse';
-import generateAuthenticationOptions from './authentication/generateAuthenticationOptions';
+import { generateAuthenticationOptions } from './authentication/generateAuthenticationOptions';
 import verifyAuthenticationResponse from './authentication/verifyAuthenticationResponse';
 import MetadataService from './services/metadataService';
 import SettingsService from './services/settingsService';
