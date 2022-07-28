@@ -6,11 +6,11 @@ import {
 } from '@simplewebauthn/typescript-types';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
-import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
+import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
-import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
+import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 
 import { startRegistration } from './startRegistration';
 

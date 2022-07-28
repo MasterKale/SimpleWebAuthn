@@ -1,4 +1,4 @@
-import decodeClientDataJSON from './decodeClientDataJSON';
+import { decodeClientDataJSON } from './decodeClientDataJSON';
 
 test('should convert base64url-encoded attestation clientDataJSON to JSON', () => {
   expect(

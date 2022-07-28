@@ -1,4 +1,4 @@
-import convertCertBufferToPEM from "./convertCertBufferToPEM";
+import { convertCertBufferToPEM } from "./convertCertBufferToPEM";
 
 test('should return pem when input is base64URLString', () => {
   const input = "Y2VydEJ1ZmZlclN0cmluZyBjZXJ0QnVmZmVyU3RyaW5nIGNlcnRCdWZmZXJTdHJpbmcgY2VydEJ1ZmZlclN0cmluZyBjZXJ0QnVmZmVyU3RyaW5nIGNlcnRCdWZmZXJTdHJpbmcgY2VydEJ1ZmZlclN0cmluZw";

@@ -7,8 +7,8 @@ import {
 
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
-import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
-import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
+import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
+import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';

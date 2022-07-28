@@ -1,7 +1,7 @@
 import base64url from "base64url";
 import cbor from "cbor";
 import { COSEKEYS } from "./convertCOSEtoPKCS";
-import convertPublicKeyToPEM from "./convertPublicKeyToPEM";
+import { convertPublicKeyToPEM } from "./convertPublicKeyToPEM";
 
 test('should return pem when input is base64URLString', () => {
   const mockCOSEKey = new Map<number, number | Buffer>();

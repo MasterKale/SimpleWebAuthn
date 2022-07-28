@@ -1,6 +1,6 @@
 import cbor from 'cbor';
 
-import parseAuthenticatorData from './parseAuthenticatorData';
+import { parseAuthenticatorData } from './parseAuthenticatorData';
 
 // Grabbed this from a Conformance test, contains attestation data
 const authDataWithAT = Buffer.from(

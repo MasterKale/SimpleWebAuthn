@@ -1,16 +1,16 @@
 import base64url from 'base64url';
 
-import verifyRegistrationResponse from './verifyRegistrationResponse';
+import { verifyRegistrationResponse } from './verifyRegistrationResponse';
 
 import * as decodeAttestationObject from '../helpers/decodeAttestationObject';
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
-import SettingsService from '../services/settingsService';
+import { SettingsService } from '../services/settingsService';
 
 import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
 
-import toHash from '../helpers/toHash';
+import { toHash } from '../helpers/toHash';
 import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 /**

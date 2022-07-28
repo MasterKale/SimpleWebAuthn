@@ -1,9 +1,9 @@
 import base64url from 'base64url';
-import verifyAuthenticationResponse from './verifyAuthenticationResponse';
+import { verifyAuthenticationResponse } from './verifyAuthenticationResponse';
 
 import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
-import toHash from '../helpers/toHash';
+import { toHash } from '../helpers/toHash';
 import {
   AuthenticatorDevice,
   AuthenticationCredentialJSON,

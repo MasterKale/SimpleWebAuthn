@@ -1,6 +1,6 @@
 import * as decodeCbor from './decodeCbor';
 
-import convertCOSEtoPKCS, { COSEKEYS } from './convertCOSEtoPKCS';
+import { convertCOSEtoPKCS, COSEKEYS } from './convertCOSEtoPKCS';
 
 test('should throw an error curve if, somehow, curve coordinate x is missing', () => {
   const mockCOSEKey = new Map<number, number | Buffer>();
