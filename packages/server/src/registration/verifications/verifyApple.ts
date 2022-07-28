@@ -8,7 +8,7 @@ import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { toHash } from '../../helpers/toHash';
 import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
 
-export default async function verifyApple(
+export async function verifyApple(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const { attStmt, authData, clientDataHash, credentialPublicKey, rootCertificates } = options;
