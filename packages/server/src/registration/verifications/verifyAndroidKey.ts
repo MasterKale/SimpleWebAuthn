@@ -14,7 +14,7 @@ import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationW
 /**
  * Verify an attestation response with fmt 'android-key'
  */
-export default async function verifyAttestationAndroidKey(
+export async function verifyAttestationAndroidKey(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid, rootCertificates } =
