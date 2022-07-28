@@ -13,7 +13,7 @@ import type {
 import SettingsService from '../services/settingsService';
 import { getLogger } from '../helpers/logging';
 
-import parseJWT from '../metadata/parseJWT';
+import { parseJWT } from '../metadata/parseJWT';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
