@@ -3,7 +3,7 @@ import jwkToPem from 'jwk-to-pem';
 
 import { COSEKEYS, COSEKTY, COSECRV } from './convertCOSEtoPKCS';
 
-export default function convertPublicKeyToPEM(publicKey: Buffer): string {
+export function convertPublicKeyToPEM(publicKey: Buffer): string {
   let struct;
   try {
     struct = cbor.decodeAllSync(publicKey)[0];
