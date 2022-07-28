@@ -1,4 +1,4 @@
-import * as decodeCbor from './decodeCbor';
+import * as esmDecodeCbor from './decodeCbor';
 
 import { convertCOSEtoPKCS, COSEKEYS } from './convertCOSEtoPKCS';
 
@@ -7,7 +7,7 @@ test('should throw an error curve if, somehow, curve coordinate x is missing', (
 
   mockCOSEKey.set(COSEKEYS.y, 1);
 
-  jest.spyOn(decodeCbor, 'decodeCborFirst').mockReturnValue(mockCOSEKey);
+  jest.spyOn(esmDecodeCbor, 'decodeCborFirst').mockReturnValue(mockCOSEKey);
 
   expect(() => {
     convertCOSEtoPKCS(Buffer.from('123', 'ascii'));
@@ -19,7 +19,7 @@ test('should throw an error curve if, somehow, curve coordinate y is missing', (
 
   mockCOSEKey.set(COSEKEYS.x, 1);
 
-  jest.spyOn(decodeCbor, 'decodeCborFirst').mockReturnValue(mockCOSEKey);
+  jest.spyOn(esmDecodeCbor, 'decodeCborFirst').mockReturnValue(mockCOSEKey);
 
   expect(() => {
     convertCOSEtoPKCS(Buffer.from('123', 'ascii'));
