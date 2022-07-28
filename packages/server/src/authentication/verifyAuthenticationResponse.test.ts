@@ -1,8 +1,8 @@
 import base64url from 'base64url';
 import { verifyAuthenticationResponse } from './verifyAuthenticationResponse';
 
-import * as decodeClientDataJSON from '../helpers/decodeClientDataJSON';
-import * as parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import * as modDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import * as modParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
 import {
   AuthenticatorDevice,
@@ -13,8 +13,8 @@ let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
 
 beforeEach(() => {
-  mockDecodeClientData = jest.spyOn(decodeClientDataJSON, 'default');
-  mockParseAuthData = jest.spyOn(parseAuthenticatorData, 'default');
+  mockDecodeClientData = jest.spyOn(modDecodeClientDataJSON, 'decodeClientDataJSON');
+  mockParseAuthData = jest.spyOn(modParseAuthenticatorData, 'parseAuthenticatorData');
 });
 
 afterEach(() => {
@@ -156,7 +156,7 @@ test('should not compare counters if both are 0', () => {
 });
 
 test('should throw an error if user verification is required but user was not verified', () => {
-  const actualData = parseAuthenticatorData.default(
+  const actualData = modParseAuthenticatorData.parseAuthenticatorData(
     base64url.toBuffer(assertionResponse.response.authenticatorData),
   );
 

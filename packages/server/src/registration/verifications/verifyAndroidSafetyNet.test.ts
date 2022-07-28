@@ -1,12 +1,13 @@
 import base64url from 'base64url';
 
-import verifyAndroidSafetyNet from './verifyAndroidSafetyNet';
+import { verifyAttestationAndroidSafetyNet } from './verifyAndroidSafetyNet';
 
-import decodeAttestationObject, {
+import {
+  decodeAttestationObject,
   AttestationStatement,
 } from '../../helpers/decodeAttestationObject';
-import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
-import toHash from '../../helpers/toHash';
+import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData';
+import { toHash } from '../../helpers/toHash';
 import { SettingsService } from '../../services/settingsService';
 
 const rootCertificates = SettingsService.getRootCertificates({
@@ -51,7 +52,7 @@ test('should verify Android SafetyNet attestation', async () => {
   // notAfter: 2021-12-15T00:00:42.000Z
   spyDate.mockReturnValue(new Date('2021-11-15T00:00:42.000Z'));
 
-  const verified = await verifyAndroidSafetyNet({
+  const verified = await verifyAttestationAndroidSafetyNet({
     attStmt,
     authData,
     clientDataHash,
@@ -68,7 +69,7 @@ test('should verify Android SafetyNet attestation', async () => {
 
 test('should throw error when timestamp is not within one minute of now', async () => {
   await expect(
-    verifyAndroidSafetyNet({
+    verifyAttestationAndroidSafetyNet({
       attStmt,
       authData,
       clientDataHash,
@@ -96,7 +97,7 @@ test('should validate response with cert path completed with GlobalSign R1 root 
   const parsedAuthData = parseAuthenticatorData(_authData);
   const _aaguid = parsedAuthData.aaguid!;
 
-  const verified = await verifyAndroidSafetyNet({
+  const verified = await verifyAttestationAndroidSafetyNet({
     attStmt: _attStmt,
     authData: _authData,
     clientDataHash: _clientDataHash,

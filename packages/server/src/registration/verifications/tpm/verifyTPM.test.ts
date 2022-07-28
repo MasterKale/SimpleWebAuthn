@@ -1,4 +1,4 @@
-import verifyRegistrationResponse from '../../verifyRegistrationResponse';
+import { verifyRegistrationResponse } from '../../verifyRegistrationResponse';
 import base64url from 'base64url';
 
 test('should verify TPM response', async () => {
