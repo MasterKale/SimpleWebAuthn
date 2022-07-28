@@ -37,7 +37,7 @@ export type VerifyAuthenticationResponseOpts = {
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  */
-export default function verifyAuthenticationResponse(
+export function verifyAuthenticationResponse(
   options: VerifyAuthenticationResponseOpts,
 ): VerifiedAuthenticationResponse {
   const {
