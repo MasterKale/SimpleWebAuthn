@@ -1,7 +1,7 @@
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
-import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import verifySignature from '../../helpers/verifySignature';
 

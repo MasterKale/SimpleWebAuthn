@@ -4,7 +4,7 @@ import { Certificate } from '@peculiar/asn1-x509';
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import validateCertificatePath from '../../helpers/validateCertificatePath';
-import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import toHash from '../../helpers/toHash';
 import convertCOSEtoPKCS from '../../helpers/convertCOSEtoPKCS';
 

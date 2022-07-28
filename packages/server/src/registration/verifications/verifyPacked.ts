@@ -11,7 +11,7 @@ import convertCOSEtoPKCS, {
   COSERSASCHEME,
 } from '../../helpers/convertCOSEtoPKCS';
 import toHash from '../../helpers/toHash';
-import convertCertBufferToPEM from '../../helpers/convertCertBufferToPEM';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import getCertificateInfo from '../../helpers/getCertificateInfo';
 import verifySignature from '../../helpers/verifySignature';

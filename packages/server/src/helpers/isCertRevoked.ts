@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import { AsnParser } from '@peculiar/asn1-schema';
 import { CertificateList } from '@peculiar/asn1-x509';
 
-import convertCertBufferToPEM from './convertCertBufferToPEM';
+import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID

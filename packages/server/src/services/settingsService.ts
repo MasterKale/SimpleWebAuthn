@@ -1,5 +1,5 @@
 import { AttestationFormat } from '../helpers/decodeAttestationObject';
-import convertCertBufferToPEM from '../helpers/convertCertBufferToPEM';
+import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
 
 import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet';
 import {
