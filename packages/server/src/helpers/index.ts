@@ -2,7 +2,7 @@ import { convertAAGUIDToString } from './convertAAGUIDToString';
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { convertCOSEtoPKCS } from './convertCOSEtoPKCS';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
-import decodeAttestationObject from './decodeAttestationObject';
+import { decodeAttestationObject } from './decodeAttestationObject';
 import { decodeCborFirst } from './decodeCbor';
 import decodeClientDataJSON from './decodeClientDataJSON';
 import decodeCredentialPublicKey from './decodeCredentialPublicKey';

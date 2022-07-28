@@ -5,9 +5,10 @@ import {
   CredentialDeviceType,
 } from '@simplewebauthn/typescript-types';
 
-import decodeAttestationObject, {
+import {
   AttestationFormat,
   AttestationStatement,
+  decodeAttestationObject,
 } from '../helpers/decodeAttestationObject';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
 import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
