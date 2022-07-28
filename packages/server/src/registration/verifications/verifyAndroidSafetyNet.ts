@@ -4,7 +4,7 @@ import type { AttestationFormatVerifierOpts } from '../verifyRegistrationRespons
 
 import toHash from '../../helpers/toHash';
 import verifySignature from '../../helpers/verifySignature';
-import getCertificateInfo from '../../helpers/getCertificateInfo';
+import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import validateCertificatePath from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import MetadataService from '../../services/metadataService';

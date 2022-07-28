@@ -15,7 +15,7 @@ import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
 import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../../../helpers/validateCertificatePath';
-import getCertificateInfo from '../../../helpers/getCertificateInfo';
+import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
 import verifySignature from '../../../helpers/verifySignature';
 import MetadataService from '../../../services/metadataService';
 import verifyAttestationWithMetadata from '../../../metadata/verifyAttestationWithMetadata';

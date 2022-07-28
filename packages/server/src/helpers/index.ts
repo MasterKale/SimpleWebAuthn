@@ -7,7 +7,7 @@ import { decodeCborFirst } from './decodeCbor';
 import { decodeClientDataJSON } from './decodeClientDataJSON';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
 import { generateChallenge } from './generateChallenge';
-import getCertificateInfo from './getCertificateInfo';
+import { getCertificateInfo } from './getCertificateInfo';
 import isBase64URLString from './isBase64URLString';
 import isCertRevoked from './isCertRevoked';
 import parseAuthenticatorData from './parseAuthenticatorData';
