@@ -6,7 +6,7 @@ import {
 
 import utf8StringToBuffer from '../helpers/utf8StringToBuffer';
 import bufferToBase64URLString from '../helpers/bufferToBase64URLString';
-import base64URLStringToBuffer from '../helpers/base64URLStringToBuffer';
+import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
 import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
 import toPublicKeyCredentialDescriptor from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyRegistrationError } from '../helpers/identifyRegistrationError';

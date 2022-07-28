@@ -5,7 +5,7 @@
  *
  * Helper method to compliment `bufferToBase64URLString`
  */
-export default function base64URLStringToBuffer(base64URLString: string): ArrayBuffer {
+export function base64URLStringToBuffer(base64URLString: string): ArrayBuffer {
   // Convert from Base64URL to Base64
   const base64 = base64URLString.replace(/-/g, '+').replace(/_/g, '/');
   /**
