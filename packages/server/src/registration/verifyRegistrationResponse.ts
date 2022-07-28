@@ -23,7 +23,7 @@ import settingsService from '../services/settingsService';
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
 import verifyFIDOU2F from './verifications/verifyFIDOU2F';
 import verifyPacked from './verifications/verifyPacked';
-import verifyAndroidSafetynet from './verifications/verifyAndroidSafetyNet';
+import { verifyAttestationAndroidSafetyNet as verifyAndroidSafetynet } from './verifications/verifyAndroidSafetyNet';
 import verifyTPM from './verifications/tpm/verifyTPM';
 import { verifyAttestationAndroidKey as verifyAndroidKey } from './verifications/verifyAndroidKey';
 import verifyApple from './verifications/verifyApple';

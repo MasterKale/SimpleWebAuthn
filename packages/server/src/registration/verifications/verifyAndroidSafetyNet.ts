@@ -13,7 +13,7 @@ import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationW
 /**
  * Verify an attestation response with fmt 'android-safetynet'
  */
-export default async function verifyAttestationAndroidSafetyNet(
+export async function verifyAttestationAndroidSafetyNet(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const {
