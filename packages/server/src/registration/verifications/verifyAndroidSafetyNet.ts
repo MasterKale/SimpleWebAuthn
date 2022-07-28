@@ -3,7 +3,7 @@ import base64url from 'base64url';
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import { toHash } from '../../helpers/toHash';
-import verifySignature from '../../helpers/verifySignature';
+import { verifySignature } from '../../helpers/verifySignature';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';

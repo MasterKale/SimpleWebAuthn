@@ -14,7 +14,7 @@ import { toHash } from '../../helpers/toHash';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
-import verifySignature from '../../helpers/verifySignature';
+import { verifySignature } from '../../helpers/verifySignature';
 import { decodeCredentialPublicKey } from '../../helpers/decodeCredentialPublicKey';
 import MetadataService from '../../services/metadataService';
 import verifyAttestationWithMetadata from '../../metadata/verifyAttestationWithMetadata';
