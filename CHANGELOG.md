@@ -1,5 +1,19 @@
 # Changelog
 
+## v5.4.0
+
+**Packages:**
+
+- @simplewebauthn/browser@5.4.0
+- @simplewebauthn/server@5.4.0
+- @simplewebauthn/typescript-types@5.4.0
+
+**Changes:**
+
+- **[server]** `verifyRegistrationResponse()` and `verifyAuthenticationResponse()` now return authenticator extension data upon successful verification as the new `authenticatorExtensionResults` property ([#230](https://github.com/MasterKale/SimpleWebAuthn/pull/230))
+- **[browser]** Code quality improvements
+- **[typescript-types]** Code quality improvements
+
 ## v5.3.0
 
 **Packages:**
