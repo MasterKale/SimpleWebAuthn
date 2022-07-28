@@ -8,7 +8,8 @@ import {
   COSEALGHASH,
   COSECRV,
   COSEKTY,
-  COSERSASCHEME,, convertCOSEtoPKCS
+  COSERSASCHEME,
+  convertCOSEtoPKCS,
 } from '../../helpers/convertCOSEtoPKCS';
 import { toHash } from '../../helpers/toHash';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
