@@ -9,7 +9,7 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import toHash from '../helpers/toHash';
 import { convertPublicKeyToPEM } from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
-import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
