@@ -3,7 +3,7 @@ import { Base64URLString } from '@simplewebauthn/typescript-types';
 import { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
 import validateCertificatePath from '../helpers/validateCertificatePath';
-import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEKTY } from '../helpers/convertCOSEtoPKCS';
 
 /**

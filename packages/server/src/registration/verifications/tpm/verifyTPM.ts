@@ -10,7 +10,7 @@ import {
 
 import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse';
 
-import decodeCredentialPublicKey from '../../../helpers/decodeCredentialPublicKey';
+import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey';
 import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
 import toHash from '../../../helpers/toHash';
 import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';

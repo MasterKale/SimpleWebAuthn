@@ -14,7 +14,7 @@ import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeA
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import parseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import toHash from '../helpers/toHash';
-import decodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
