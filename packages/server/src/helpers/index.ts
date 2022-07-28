@@ -12,7 +12,7 @@ import { isBase64URLString } from './isBase64URLString';
 import { isCertRevoked } from './isCertRevoked';
 import { parseAuthenticatorData } from './parseAuthenticatorData';
 import { toHash } from './toHash';
-import validateCertificatePath from './validateCertificatePath';
+import { validateCertificatePath } from './validateCertificatePath';
 import verifySignature from './verifySignature';
 
 export {

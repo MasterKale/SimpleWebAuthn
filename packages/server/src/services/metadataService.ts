@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { KJUR } from 'jsrsasign';
 
-import validateCertificatePath from '../helpers/validateCertificatePath';
+import { validateCertificatePath } from '../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import type {
