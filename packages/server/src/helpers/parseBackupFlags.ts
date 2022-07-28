@@ -8,9 +8,9 @@ import { CredentialDeviceType } from '@simplewebauthn/typescript-types';
  *
  * Invalid configurations will raise an `Error`
  */
-export function parseBackupFlags({ be, bs }: { be: boolean, bs: boolean }): {
-  credentialDeviceType: CredentialDeviceType,
-  credentialBackedUp: boolean,
+export function parseBackupFlags({ be, bs }: { be: boolean; bs: boolean }): {
+  credentialDeviceType: CredentialDeviceType;
+  credentialBackedUp: boolean;
 } {
   const credentialBackedUp = bs;
   let credentialDeviceType: CredentialDeviceType = 'singleDevice';
@@ -21,8 +21,8 @@ export function parseBackupFlags({ be, bs }: { be: boolean, bs: boolean }): {
 
   if (credentialDeviceType === 'singleDevice' && credentialBackedUp) {
     throw new InvalidBackupFlags(
-      'Single-device credential indicated that it was backed up, which should be impossible.'
-    )
+      'Single-device credential indicated that it was backed up, which should be impossible.',
+    );
   }
 
   return { credentialDeviceType, credentialBackedUp };

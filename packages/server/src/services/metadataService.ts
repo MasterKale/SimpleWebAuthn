@@ -73,11 +73,7 @@ export class BaseMetadataService {
       verificationMode?: VerificationMode;
     } = {},
   ): Promise<void> {
-    const {
-      mdsServers = [defaultURLMDS],
-      statements,
-      verificationMode,
-    } = opts;
+    const { mdsServers = [defaultURLMDS], statements, verificationMode } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
 

@@ -1,8 +1,8 @@
 /**
  * Create "custom errors" to help emulate WebAuthn API errors
-*/
+ */
 type WebAuthnErrorName =
-  'AbortError'
+  | 'AbortError'
   | 'ConstraintError'
   | 'InvalidStateError'
   | 'NotAllowedError'

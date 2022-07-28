@@ -1,6 +1,9 @@
 import cbor from 'cbor';
 import { decodeCborFirst } from './decodeCbor';
-import { decodeAuthenticatorExtensions, AuthenticationExtensionsAuthenticatorOutputs } from './decodeAuthenticatorExtensions';
+import {
+  decodeAuthenticatorExtensions,
+  AuthenticationExtensionsAuthenticatorOutputs,
+} from './decodeAuthenticatorExtensions';
 
 /**
  * Make sense of the authData buffer contained in an Attestation
@@ -22,12 +25,12 @@ export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorDat
   // Bit positions can be referenced here:
   // https://www.w3.org/TR/webauthn-2/#flags
   const flags = {
-    up: !!(flagsInt & 1 << 0), // User Presence
-    uv: !!(flagsInt & 1 << 2), // User Verified
-    be: !!(flagsInt & 1 << 3), // Backup Eligibility
-    bs: !!(flagsInt & 1 << 4), // Backup State
-    at: !!(flagsInt & 1 << 6), // Attested Credential Data Present
-    ed: !!(flagsInt & 1 << 7), // Extension Data Present
+    up: !!(flagsInt & (1 << 0)), // User Presence
+    uv: !!(flagsInt & (1 << 2)), // User Verified
+    be: !!(flagsInt & (1 << 3)), // Backup Eligibility
+    bs: !!(flagsInt & (1 << 4)), // Backup State
+    at: !!(flagsInt & (1 << 6)), // Attested Credential Data Present
+    ed: !!(flagsInt & (1 << 7)), // Extension Data Present
     flagsInt,
   };
 

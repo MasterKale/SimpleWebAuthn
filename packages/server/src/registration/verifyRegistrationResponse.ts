@@ -134,15 +134,8 @@ export async function verifyRegistrationResponse(
   const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const {
-    aaguid,
-    rpIdHash,
-    flags,
-    credentialID,
-    counter,
-    credentialPublicKey,
-    extensionsData,
-  } = parsedAuthData;
+  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsData } =
+    parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
@@ -296,7 +289,7 @@ export type VerifiedRegistrationResponse = {
     aaguid: string;
     credentialID: Buffer;
     credentialPublicKey: Buffer;
-    credentialType: "public-key";
+    credentialType: 'public-key';
     attestationObject: Buffer;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;

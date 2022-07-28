@@ -27,13 +27,13 @@ export function identifyRegistrationError({
       // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 4)
       return new WebAuthnError(
         'Discoverable credentials were required but no available authenticator supported it',
-        'ConstraintError'
+        'ConstraintError',
       );
     } else if (publicKey.authenticatorSelection?.userVerification === 'required') {
       // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 5)
       return new WebAuthnError(
         'User verification was required but no available authenticator supported it',
-        'ConstraintError'
+        'ConstraintError',
       );
     }
   } else if (error.name === 'InvalidStateError') {
@@ -44,7 +44,8 @@ export function identifyRegistrationError({
     // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 20)
     // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 21)
     return new WebAuthnError(
-      'User clicked cancel, or the registration ceremony timed out', 'NotAllowedError'
+      'User clicked cancel, or the registration ceremony timed out',
+      'NotAllowedError',
     );
   } else if (error.name === 'NotSupportedError') {
     const validPubKeyCredParams = publicKey.pubKeyCredParams.filter(
@@ -55,14 +56,14 @@ export function identifyRegistrationError({
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 10)
       return new WebAuthnError(
         'No entry in pubKeyCredParams was of type "public-key"',
-        'NotSupportedError'
+        'NotSupportedError',
       );
     }
 
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 2)
     return new WebAuthnError(
       'No available authenticator supported any of the specified pubKeyCredParams algorithms',
-      'NotSupportedError'
+      'NotSupportedError',
     );
   } else if (error.name === 'SecurityError') {
     const effectiveDomain = window.location.hostname;
@@ -73,7 +74,7 @@ export function identifyRegistrationError({
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 8)
       return new WebAuthnError(
         `The RP ID "${publicKey.rp.id}" is invalid for this domain`,
-        'SecurityError'
+        'SecurityError',
       );
     }
   } else if (error.name === 'TypeError') {
@@ -86,7 +87,7 @@ export function identifyRegistrationError({
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 8)
     return new WebAuthnError(
       'The authenticator was unable to process the specified options, or could not create a new credential',
-      'UnknownError'
+      'UnknownError',
     );
   }
 

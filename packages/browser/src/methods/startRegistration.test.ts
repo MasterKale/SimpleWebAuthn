@@ -106,7 +106,7 @@ test('should return base64url-encoded response values', async () => {
   expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWU');
 });
 
-test('should throw error if WebAuthn isn\'t supported', async () => {
+test("should throw error if WebAuthn isn't supported", async () => {
   mockSupportsWebauthn.mockReturnValue(false);
 
   await expect(startRegistration(goodOpts1)).rejects.toThrow(
@@ -183,15 +183,16 @@ test('should support "cable" transport in excludeCredentials', async () => {
     excludeCredentials: [
       {
         ...goodOpts1.excludeCredentials![0],
-        transports: ["cable"],
+        transports: ['cable'],
       },
-    ]
+    ],
   };
 
   await startRegistration(opts);
 
-  expect(mockNavigatorCreate.mock.calls[0][0].publicKey.excludeCredentials[0].transports[0])
-    .toEqual("cable");
+  expect(
+    mockNavigatorCreate.mock.calls[0][0].publicKey.excludeCredentials[0].transports[0],
+  ).toEqual('cable');
 });
 
 test('should return "cable" transport from response', async () => {
@@ -201,7 +202,7 @@ test('should return "cable" transport from response', async () => {
     response: {
       attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
       clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
-      getTransports: () => (["cable"]),
+      getTransports: () => ['cable'],
     },
     getClientExtensionResults: () => ({}),
     type: 'webauthn.create',
@@ -209,7 +210,7 @@ test('should return "cable" transport from response', async () => {
 
   const response = await startRegistration(goodOpts1);
 
-  expect(response.transports).toEqual(["cable"]);
+  expect(response.transports).toEqual(['cable']);
 });
 
 test('should cancel an existing call when executed again', async () => {

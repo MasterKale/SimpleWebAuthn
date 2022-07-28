@@ -6,7 +6,7 @@ import cbor from 'cbor';
  * @param extensionData Authenticator Extension Data buffer
  */
 export function decodeAuthenticatorExtensions(
-  extensionData: Buffer
+  extensionData: Buffer,
 ): AuthenticationExtensionsAuthenticatorOutputs | undefined {
   let toCBOR: AuthenticationExtensionsAuthenticatorOutputs | undefined;
   try {
@@ -21,17 +21,17 @@ export function decodeAuthenticatorExtensions(
 export type AuthenticationExtensionsAuthenticatorOutputs = {
   devicePublicKey?: DevicePublicKeyAuthenticatorOutput;
   uvm?: UVMAuthenticatorOutput;
-}
+};
 
 export type DevicePublicKeyAuthenticatorOutput = {
   dpk?: Buffer;
   scp?: Buffer;
   sig?: string;
   aaguid?: Buffer;
-}
+};
 
 // TODO: Need to verify this format
 // https://w3c.github.io/webauthn/#sctn-uvm-extension.
 export type UVMAuthenticatorOutput = {
-  uvm?: Buffer[]
-}
+  uvm?: Buffer[];
+};

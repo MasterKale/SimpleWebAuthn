@@ -94,15 +94,15 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     if (notBefore > now || notAfter < now) {
       if (isLeafCert) {
         throw new CertificateNotYetValidOrExpired(
-          `Leaf certificate is not yet valid or expired: ${issuerPem}`
+          `Leaf certificate is not yet valid or expired: ${issuerPem}`,
         );
       } else if (isRootCert) {
         throw new CertificateNotYetValidOrExpired(
-          `Root certificate is not yet valid or expired: ${issuerPem}`
+          `Root certificate is not yet valid or expired: ${issuerPem}`,
         );
       } else {
         throw new CertificateNotYetValidOrExpired(
-          `Intermediate certificate is not yet valid or expired: ${issuerPem}`
+          `Intermediate certificate is not yet valid or expired: ${issuerPem}`,
         );
       }
     }
