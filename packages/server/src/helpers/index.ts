@@ -4,7 +4,7 @@ import { convertCOSEtoPKCS } from './convertCOSEtoPKCS';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
 import { decodeAttestationObject } from './decodeAttestationObject';
 import { decodeCborFirst } from './decodeCbor';
-import decodeClientDataJSON from './decodeClientDataJSON';
+import { decodeClientDataJSON } from './decodeClientDataJSON';
 import decodeCredentialPublicKey from './decodeCredentialPublicKey';
 import generateChallenge from './generateChallenge';
 import getCertificateInfo from './getCertificateInfo';

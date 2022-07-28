@@ -5,7 +5,7 @@ import {
   CredentialDeviceType,
 } from '@simplewebauthn/typescript-types';
 
-import decodeClientDataJSON from '../helpers/decodeClientDataJSON';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import toHash from '../helpers/toHash';
 import { convertPublicKeyToPEM } from '../helpers/convertPublicKeyToPEM';
 import verifySignature from '../helpers/verifySignature';
