@@ -3,7 +3,7 @@
 // @ts-ignore 2305
 import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
 
-import isCertRevoked from './isCertRevoked';
+import { isCertRevoked } from './isCertRevoked';
 
 const { crypto } = KJUR;
 
