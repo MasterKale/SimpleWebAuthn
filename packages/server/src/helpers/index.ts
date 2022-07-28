@@ -1,4 +1,4 @@
-import convertAAGUIDToString from './convertAAGUIDToString';
+import { convertAAGUIDToString } from './convertAAGUIDToString';
 import convertCertBufferToPEM from './convertCertBufferToPEM';
 import convertCOSEtoPKCS from './convertCOSEtoPKCS';
 import convertPublicKeyToPEM from './convertPublicKeyToPEM';
