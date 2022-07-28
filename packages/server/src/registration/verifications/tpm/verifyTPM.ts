@@ -24,7 +24,7 @@ import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
 import { parseCertInfo } from './parseCertInfo';
 import { parsePubArea } from './parsePubArea';
 
-export default async function verifyTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
+export async function verifyTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
     options;
   const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
