@@ -22,7 +22,7 @@ import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationW
 /**
  * Verify an attestation response with fmt 'packed'
  */
-export default async function verifyAttestationPacked(
+export async function verifyAttestationPacked(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid, rootCertificates } =
