@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import { verifyAttestationAndroidSafetyNet } from './verifyAndroidSafetyNet';
+import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet';
 
 import {
   decodeAttestationObject,

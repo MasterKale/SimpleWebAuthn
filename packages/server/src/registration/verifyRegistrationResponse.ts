@@ -21,12 +21,12 @@ import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
-import { verifyAttestationFIDOU2F as verifyFIDOU2F } from './verifications/verifyFIDOU2F';
-import { verifyAttestationPacked as verifyPacked } from './verifications/verifyPacked';
-import { verifyAttestationAndroidSafetyNet as verifyAndroidSafetynet } from './verifications/verifyAndroidSafetyNet';
-import { verifyTPM } from './verifications/tpm/verifyTPM';
-import { verifyAttestationAndroidKey as verifyAndroidKey } from './verifications/verifyAndroidKey';
-import { verifyApple } from './verifications/verifyApple';
+import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F';
+import { verifyAttestationPacked } from './verifications/verifyAttestationPacked';
+import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet';
+import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM';
+import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey';
+import { verifyAttestationApple } from './verifications/verifyAttestationApple';
 
 export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
@@ -219,17 +219,17 @@ export async function verifyRegistrationResponse(
    */
   let verified = false;
   if (fmt === 'fido-u2f') {
-    verified = await verifyFIDOU2F(verifierOpts);
+    verified = await verifyAttestationFIDOU2F(verifierOpts);
   } else if (fmt === 'packed') {
-    verified = await verifyPacked(verifierOpts);
+    verified = await verifyAttestationPacked(verifierOpts);
   } else if (fmt === 'android-safetynet') {
-    verified = await verifyAndroidSafetynet(verifierOpts);
+    verified = await verifyAttestationAndroidSafetyNet(verifierOpts);
   } else if (fmt === 'android-key') {
-    verified = await verifyAndroidKey(verifierOpts);
+    verified = await verifyAttestationAndroidKey(verifierOpts);
   } else if (fmt === 'tpm') {
-    verified = await verifyTPM(verifierOpts);
+    verified = await verifyAttestationTPM(verifierOpts);
   } else if (fmt === 'apple') {
-    verified = await verifyApple(verifierOpts);
+    verified = await verifyAttestationApple(verifierOpts);
   } else if (fmt === 'none') {
     if (Object.keys(attStmt).length > 0) {
       throw new Error('None attestation had unexpected attestation statement');

@@ -8,7 +8,7 @@ import * as modParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as modDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { SettingsService } from '../services/settingsService';
 
-import * as verifyFIDOU2F from './verifications/verifyFIDOU2F';
+import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
 
 import { toHash } from '../helpers/toHash';
 import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
@@ -30,7 +30,7 @@ beforeEach(() => {
   mockDecodeClientData = jest.spyOn(modDecodeClientDataJSON, 'decodeClientDataJSON');
   mockParseAuthData = jest.spyOn(modParseAuthenticatorData, 'parseAuthenticatorData');
   mockDecodePubKey = jest.spyOn(modDecodeCredentialPublicKey, 'decodeCredentialPublicKey');
-  mockVerifyFIDOU2F = jest.spyOn(verifyFIDOU2F, 'verifyAttestationFIDOU2F');
+  mockVerifyFIDOU2F = jest.spyOn(esmVerifyAttestationFIDOU2F, 'verifyAttestationFIDOU2F');
 });
 
 afterEach(() => {
