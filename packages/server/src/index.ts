@@ -7,7 +7,7 @@ import { verifyRegistrationResponse } from './registration/verifyRegistrationRes
 import { generateAuthenticationOptions } from './authentication/generateAuthenticationOptions';
 import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
 import { MetadataService } from './services/metadataService';
-import SettingsService from './services/settingsService';
+import { SettingsService } from './services/settingsService';
 
 export {
   generateRegistrationOptions,

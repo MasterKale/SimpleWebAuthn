@@ -10,7 +10,7 @@ import type {
   MetadataStatement,
   MetadataBLOBPayloadEntry,
 } from '../metadata/mdsTypes';
-import SettingsService from '../services/settingsService';
+import { SettingsService } from '../services/settingsService';
 import { getLogger } from '../helpers/logging';
 
 import { parseJWT } from '../metadata/parseJWT';

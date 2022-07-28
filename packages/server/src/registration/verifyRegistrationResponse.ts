@@ -18,7 +18,7 @@ import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey'
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import settingsService from '../services/settingsService';
+import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
 import { verifyAttestationFIDOU2F as verifyFIDOU2F } from './verifications/verifyFIDOU2F';
@@ -200,7 +200,7 @@ export async function verifyRegistrationResponse(
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const rootCertificates = settingsService.getRootCertificates({ identifier: fmt });
+  const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
 
   // Prepare arguments to pass to the relevant verification method
   const verifierOpts: AttestationFormatVerifierOpts = {

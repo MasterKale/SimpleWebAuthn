@@ -7,9 +7,9 @@ import decodeAttestationObject, {
 } from '../../helpers/decodeAttestationObject';
 import parseAuthenticatorData from '../../helpers/parseAuthenticatorData';
 import toHash from '../../helpers/toHash';
-import settingsService from '../../services/settingsService';
+import { SettingsService } from '../../services/settingsService';
 
-const rootCertificates = settingsService.getRootCertificates({
+const rootCertificates = SettingsService.getRootCertificates({
   identifier: 'android-safetynet',
 });
 

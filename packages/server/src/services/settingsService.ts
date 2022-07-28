@@ -11,7 +11,7 @@ import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds';
 
 type RootCertIdentifier = AttestationFormat | 'mds';
 
-class SettingsService {
+class BaseSettingsService {
   // Certificates are stored as PEM-formatted strings
   private pemCertificates: Map<RootCertIdentifier, string[]>;
 
@@ -53,27 +53,25 @@ class SettingsService {
   }
 }
 
-const settingsService = new SettingsService();
+export const SettingsService = new BaseSettingsService();
 
 // Initialize default certificates
-settingsService.setRootCertificates({
+SettingsService.setRootCertificates({
   identifier: 'android-key',
   certificates: [Google_Hardware_Attestation_Root_1, Google_Hardware_Attestation_Root_2],
 });
 
-settingsService.setRootCertificates({
+SettingsService.setRootCertificates({
   identifier: 'android-safetynet',
   certificates: [GlobalSign_Root_CA],
 });
 
-settingsService.setRootCertificates({
+SettingsService.setRootCertificates({
   identifier: 'apple',
   certificates: [Apple_WebAuthn_Root_CA],
 });
 
-settingsService.setRootCertificates({
+SettingsService.setRootCertificates({
   identifier: 'mds',
   certificates: [GlobalSign_Root_CA_R3],
 });
-
-export default settingsService;
