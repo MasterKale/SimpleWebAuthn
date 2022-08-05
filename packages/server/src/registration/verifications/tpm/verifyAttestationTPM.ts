@@ -93,10 +93,6 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
     }
   } else if (pubType === 'TPM_ALG_ECC') {
-    /**
-     * TODO: Confirm this all works fine. Conformance tools v1.3.4 don't currently test ECC so I
-     * had to eyeball it based on the **duo-labs/webauthn** library
-     */
     const crv = cosePublicKey.get(COSEKEYS.crv);
     const x = cosePublicKey.get(COSEKEYS.x);
     const y = cosePublicKey.get(COSEKEYS.y);
