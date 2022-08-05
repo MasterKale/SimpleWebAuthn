@@ -20,7 +20,7 @@ import { verifySignature } from '../../../helpers/verifySignature';
 import { MetadataService } from '../../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 
-import { TPM_ECC_CURVE, TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants';
+import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants';
 import { parseCertInfo } from './parseCertInfo';
 import { parsePubArea } from './parsePubArea';
 

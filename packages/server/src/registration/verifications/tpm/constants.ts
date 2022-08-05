@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { COSECRV } from '../../../helpers/convertCOSEtoPKCS';
-
 /**
  * A whole lotta domain knowledge is captured here, with hazy connections to source
  * documents. Good places to start searching for more info on these values are the
