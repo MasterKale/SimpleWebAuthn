@@ -21,7 +21,7 @@ class CustomTestEnvironment extends Environment {
      * Add support for TextDecoder to JSDOM
      */
     if (typeof this.global.TextDecoder === 'undefined') {
-      const { TextEncoder } = await import('util');
+      const { TextDecoder } = await import('util');
       this.global.TextDecoder = TextDecoder;
     }
   }
