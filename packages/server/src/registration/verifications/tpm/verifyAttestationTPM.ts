@@ -20,7 +20,7 @@ import { verifySignature } from '../../../helpers/verifySignature';
 import { MetadataService } from '../../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 
-import { TPM_ECC_CURVE, TPM_MANUFACTURERS } from './constants';
+import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants';
 import { parseCertInfo } from './parseCertInfo';
 import { parsePubArea } from './parsePubArea';
 
@@ -93,10 +93,6 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
     }
   } else if (pubType === 'TPM_ALG_ECC') {
-    /**
-     * TODO: Confirm this all works fine. Conformance tools v1.3.4 don't currently test ECC so I
-     * had to eyeball it based on the **duo-labs/webauthn** library
-     */
     const crv = cosePublicKey.get(COSEKEYS.crv);
     const x = cosePublicKey.get(COSEKEYS.x);
     const y = cosePublicKey.get(COSEKEYS.y);
@@ -120,10 +116,10 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
     }
 
     const pubAreaCurveID = parameters.ecc.curveID;
-    const pubKeyCurveID = TPM_ECC_CURVE[(crv as Buffer).readUInt16BE(0)];
-    if (pubAreaCurveID !== pubKeyCurveID) {
+    const pubAreaCurveIDMapToCOSECRV = TPM_ECC_CURVE_COSE_CRV_MAP[pubAreaCurveID]
+    if (pubAreaCurveIDMapToCOSECRV !== crv) {
       throw new Error(
-        `Unexpected public key curve ID "${pubKeyCurveID}", expected "${pubAreaCurveID}" (TPM|ECC)`,
+        `Public area key curve ID "${pubAreaCurveID}" mapped to "${pubAreaCurveIDMapToCOSECRV}" which did not match public key crv of "${crv}" (TPM|ECC)`,
       );
     }
   } else {

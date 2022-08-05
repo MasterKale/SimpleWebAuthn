@@ -1,4 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/**
+ * A whole lotta domain knowledge is captured here, with hazy connections to source
+ * documents. Good places to start searching for more info on these values are the
+ * following Trusted Computing Group TPM Library docs linked in the WebAuthn API:
+ *
+ * - https://www.trustedcomputinggroup.org/wp-content/uploads/TPM-Rev-2.0-Part-1-Architecture-01.38.pdf
+ * - https://www.trustedcomputinggroup.org/wp-content/uploads/TPM-Rev-2.0-Part-2-Structures-01.38.pdf
+ * - https://www.trustedcomputinggroup.org/wp-content/uploads/TPM-Rev-2.0-Part-3-Commands-01.38.pdf
+ */
+
+/**
+ * 6.9 TPM_ST (Structure Tags)
+ */
 export const TPM_ST: { [key: number]: string } = {
   0x00c4: 'TPM_ST_RSP_COMMAND',
   0x8000: 'TPM_ST_NULL',
@@ -19,6 +32,9 @@ export const TPM_ST: { [key: number]: string } = {
   0x8029: 'TPM_ST_FU_MANIFEST',
 };
 
+/**
+ * 6.3 TPM_ALG_ID
+ */
 export const TPM_ALG: { [key: number]: string } = {
   0x0000: 'TPM_ALG_ERROR',
   0x0001: 'TPM_ALG_RSA',
@@ -59,6 +75,9 @@ export const TPM_ALG: { [key: number]: string } = {
   0x0044: 'TPM_ALG_ECB',
 };
 
+/**
+ * 6.4 TPM_ECC_CURVE
+ */
 export const TPM_ECC_CURVE: { [key: number]: string } = {
   0x0000: 'TPM_ECC_NONE',
   0x0001: 'TPM_ECC_NIST_P192',
@@ -76,6 +95,12 @@ type ManufacturerInfo = {
   id: string;
 };
 
+/**
+ * Sourced from https://trustedcomputinggroup.org/resource/vendor-id-registry/
+ *
+ * Latest version:
+ * https://trustedcomputinggroup.org/wp-content/uploads/TCG-TPM-Vendor-ID-Registry-Version-1.02-Revision-1.00.pdf
+ */
 export const TPM_MANUFACTURERS: { [key: string]: ManufacturerInfo } = {
   'id:414D4400': {
     name: 'AMD',
@@ -153,4 +178,15 @@ export const TPM_MANUFACTURERS: { [key: string]: ManufacturerInfo } = {
     name: 'FIDO Alliance',
     id: 'FIDO',
   },
+};
+
+/**
+ * Match TPM public area curve ID's to `crv` numbers used in COSE public keys
+ */
+export const TPM_ECC_CURVE_COSE_CRV_MAP: { [key: string]: number } = {
+  TPM_ECC_NIST_P256: 1, // p256
+  TPM_ECC_NIST_P384: 2, // p384
+  TPM_ECC_NIST_P521: 3, // p521
+  TPM_ECC_BN_P256: 1,   // p256
+  TPM_ECC_SM2_P256: 1,  // p256
 };
