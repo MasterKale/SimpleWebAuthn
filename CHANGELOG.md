@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.4.1
+
+**Packages:**
+
+- @simplewebauthn/browser@5.4.1
+- @simplewebauthn/server@5.4.1
+
+**Changes:**
+
+- **[browser]** `"type": "module"` has been added to package.json to appease modern front end tooling that expects this value to be present when using the ESM build ([#237](https://github.com/MasterKale/SimpleWebAuthn/pull/237))
+- **[server]** TPM attestation statement verification now properly verifies statements with ECC public area type ([#239](https://github.com/MasterKale/SimpleWebAuthn/pull/239))
+
 ## v5.4.0
 
 **Packages:**
