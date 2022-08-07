@@ -107,6 +107,9 @@ type COSEInfo = {
 
 /**
  * Convert ALG_SIGN values to COSE info
+ *
+ * Values pulled from `ALG_KEY_COSE` definitions in the FIDO Registry of Predefined Values
+ *
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authentication-algorithms
  */
 function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
