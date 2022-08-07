@@ -141,7 +141,7 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
       return { kty: 1, alg: -8, crv: 6 };
     case 'rsa_emsa_pkcs1_sha256_raw':
     case 'rsa_emsa_pkcs1_sha256_der':
-      return { kty: 3, alg: -999 };
+      return { kty: 3, alg: -257 };
     // TODO: COSE info wasn't readily available for these, these seem rare...
     // case 'sm2_sm3_raw':
     //   return {};
