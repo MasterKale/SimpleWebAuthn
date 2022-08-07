@@ -136,11 +136,11 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
       return { kty: 2, alg: -36, crv: 3 };
     case 'ed25519_eddsa_sha512_raw':
       return { kty: 1, alg: -8, crv: 6 };
-    // TODO: COSE info in FIDO Registry v2.1 isn't readily available for these, these seem rare...
+    case 'rsa_emsa_pkcs1_sha256_raw':
+    case 'rsa_emsa_pkcs1_sha256_der':
+      return { kty: 3, alg: -999 };
+    // TODO: COSE info wasn't readily available for these, these seem rare...
     // case 'sm2_sm3_raw':
-    //   return {};
-    // case 'rsa_emsa_pkcs1_sha256_raw':
-    // case 'rsa_emsa_pkcs1_sha256_der':
     //   return {};
     default:
       return undefined;
