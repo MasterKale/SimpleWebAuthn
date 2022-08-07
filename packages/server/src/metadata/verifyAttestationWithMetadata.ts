@@ -65,9 +65,22 @@ export async function verifyAttestationWithMetadata(
 
   // Make sure the public key is one of the allowed algorithms
   if (!foundMatch) {
-    const debugAlgs = Array.from(keypairCOSEAlgs).join(', ');
+    const debugMDSAlgs = Array.from(keypairCOSEAlgs);
+    // Construct some useful error output about the public key
+    const debugPubKeyAlgInfo: COSEInfo = {
+      kty: publicKeyCOSEInfo.kty,
+      alg: publicKeyCOSEInfo.alg,
+    };
+    // Don't output a bunch of bytes for `crv` when the public key is an RSA key
+    if (publicKeyCOSEInfo.kty !== COSEKTY.RSA) {
+      debugPubKeyAlgInfo.crv = publicKeyCOSEInfo.crv;
+    }
+
+    const strPubKeyAlg = JSON.stringify(debugPubKeyAlgInfo);
+    const strMDSAlgs = JSON.stringify(debugMDSAlgs);
+
     throw new Error(
-      `Public key algorithm ${publicKeyCOSEInfo} did not match any metadata algorithms [${debugAlgs}]`,
+      `Public key algorithm ${strPubKeyAlg} did not match any metadata algorithms [${strMDSAlgs}]`,
     );
   }
 
