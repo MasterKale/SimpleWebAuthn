@@ -119,7 +119,7 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
       return { kty: 3, alg: -37 };
     case 'secp256k1_ecdsa_sha256_raw':
     case 'secp256k1_ecdsa_sha256_der':
-      return { kty: 2, alg: -7, crv: 8 };
+      return { kty: 2, alg: 7, crv: 8 };
     case 'rsassa_pss_sha384_raw':
       return { kty: 3, alg: -38 };
     case 'rsassa_pkcsv15_sha256_raw':
