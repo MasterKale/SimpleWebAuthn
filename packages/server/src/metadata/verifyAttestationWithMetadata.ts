@@ -65,9 +65,22 @@ export async function verifyAttestationWithMetadata(
 
   // Make sure the public key is one of the allowed algorithms
   if (!foundMatch) {
-    const debugAlgs = Array.from(keypairCOSEAlgs).join(', ');
+    const debugMDSAlgs = Array.from(keypairCOSEAlgs);
+    // Construct some useful error output about the public key
+    const debugPubKeyAlgInfo: COSEInfo = {
+      kty: publicKeyCOSEInfo.kty,
+      alg: publicKeyCOSEInfo.alg,
+    };
+    // Don't output a bunch of bytes for `crv` when the public key is an RSA key
+    if (publicKeyCOSEInfo.kty !== COSEKTY.RSA) {
+      debugPubKeyAlgInfo.crv = publicKeyCOSEInfo.crv;
+    }
+
+    const strPubKeyAlg = JSON.stringify(debugPubKeyAlgInfo);
+    const strMDSAlgs = JSON.stringify(debugMDSAlgs);
+
     throw new Error(
-      `Public key algorithm ${publicKeyCOSEInfo} did not match any metadata algorithms [${debugAlgs}]`,
+      `Public key algorithm ${strPubKeyAlg} did not match any metadata algorithms ${strMDSAlgs}`,
     );
   }
 
@@ -94,6 +107,9 @@ type COSEInfo = {
 
 /**
  * Convert ALG_SIGN values to COSE info
+ *
+ * Values pulled from `ALG_KEY_COSE` definitions in the FIDO Registry of Predefined Values
+ *
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authentication-algorithms
  */
 function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
@@ -106,7 +122,7 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
       return { kty: 3, alg: -37 };
     case 'secp256k1_ecdsa_sha256_raw':
     case 'secp256k1_ecdsa_sha256_der':
-      return { kty: 2, alg: -7, crv: 8 };
+      return { kty: 2, alg: 7, crv: 8 };
     case 'rsassa_pss_sha384_raw':
       return { kty: 3, alg: -38 };
     case 'rsassa_pkcsv15_sha256_raw':
@@ -123,11 +139,11 @@ function algSignToCOSEInfo(algSign: AlgSign): COSEInfo | undefined {
       return { kty: 2, alg: -36, crv: 3 };
     case 'ed25519_eddsa_sha512_raw':
       return { kty: 1, alg: -8, crv: 6 };
-    // TODO: COSE info in FIDO Registry v2.1 isn't readily available for these, these seem rare...
+    case 'rsa_emsa_pkcs1_sha256_raw':
+    case 'rsa_emsa_pkcs1_sha256_der':
+      return { kty: 3, alg: -257 };
+    // TODO: COSE info wasn't readily available for these, these seem rare...
     // case 'sm2_sm3_raw':
-    //   return {};
-    // case 'rsa_emsa_pkcs1_sha256_raw':
-    // case 'rsa_emsa_pkcs1_sha256_der':
     //   return {};
     default:
       return undefined;
