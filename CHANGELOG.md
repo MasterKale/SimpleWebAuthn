@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.4.2
+
+**Packages:**
+
+- @simplewebauthn/server@5.4.2
+
+**Changes:**
+
+- **[server]** Add support for `"rsa_emsa_pkcs1_sha256_raw"` and `"rsa_emsa_pkcs1_sha256_der"` authentication algorithms in FIDO MDS metadata statements ([#241](https://github.com/MasterKale/SimpleWebAuthn/pull/241))
+
 ## v5.4.1
 
 **Packages:**
