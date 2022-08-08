@@ -80,7 +80,7 @@ export async function verifyAttestationWithMetadata(
     const strMDSAlgs = JSON.stringify(debugMDSAlgs);
 
     throw new Error(
-      `Public key algorithm ${strPubKeyAlg} did not match any metadata algorithms [${strMDSAlgs}]`,
+      `Public key algorithm ${strPubKeyAlg} did not match any metadata algorithms ${strMDSAlgs}`,
     );
   }
 
