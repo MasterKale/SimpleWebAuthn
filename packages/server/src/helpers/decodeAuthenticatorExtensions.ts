@@ -19,7 +19,7 @@ export function decodeAuthenticatorExtensions(
 }
 
 export type AuthenticationExtensionsAuthenticatorOutputs = {
-  devicePublicKey?: DevicePublicKeyAuthenticatorOutput;
+  devicePubKey?: DevicePublicKeyAuthenticatorOutput;
   uvm?: UVMAuthenticatorOutput;
 };
 
