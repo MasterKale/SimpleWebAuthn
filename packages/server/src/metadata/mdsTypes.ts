@@ -176,7 +176,7 @@ export type MetadataStatement = {
 
 /**
  * USER_VERIFY
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#user-verification-methods
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html
  */
 export type UserVerify =
   | 'presence_internal'
@@ -195,55 +195,60 @@ export type UserVerify =
 
 /**
  * ALG_SIGN
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authentication-algorithms
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#authentication-algorithms
+ *
+ * Using this helpful TS pattern here so that we can strongly enforce the existence of COSE info
+ * mappings in `algSignToCOSEInfoMap` in verifyAttestationWithMetadata.ts
  */
-export type AlgSign =
-  | 'secp256r1_ecdsa_sha256_raw'
-  | 'secp256r1_ecdsa_sha256_der'
-  | 'rsassa_pss_sha256_raw'
-  | 'rsassa_pss_sha256_der'
-  | 'secp256k1_ecdsa_sha256_raw'
-  | 'secp256k1_ecdsa_sha256_der'
-  | 'sm2_sm3_raw'
-  | 'rsa_emsa_pkcs1_sha256_raw'
-  | 'rsa_emsa_pkcs1_sha256_der'
-  | 'rsassa_pss_sha384_raw'
-  | 'rsassa_pss_sha256_raw'
-  | 'rsassa_pkcsv15_sha256_raw'
-  | 'rsassa_pkcsv15_sha384_raw'
-  | 'rsassa_pkcsv15_sha512_raw'
-  | 'rsassa_pkcsv15_sha1_raw'
-  | 'secp384r1_ecdsa_sha384_raw'
-  | 'secp512r1_ecdsa_sha256_raw'
-  | 'ed25519_eddsa_sha512_raw';
+export type AlgSign = typeof AlgSign[number];
+const AlgSign = [
+  'secp256r1_ecdsa_sha256_raw',
+  'secp256r1_ecdsa_sha256_der',
+  'rsassa_pss_sha256_raw',
+  'rsassa_pss_sha256_der',
+  'secp256k1_ecdsa_sha256_raw',
+  'secp256k1_ecdsa_sha256_der',
+  'sm2_sm3_raw',
+  'rsa_emsa_pkcs1_sha256_raw',
+  'rsa_emsa_pkcs1_sha256_der',
+  'rsassa_pss_sha384_raw',
+  'rsassa_pss_sha256_raw',
+  'rsassa_pkcsv15_sha256_raw',
+  'rsassa_pkcsv15_sha384_raw',
+  'rsassa_pkcsv15_sha512_raw',
+  'rsassa_pkcsv15_sha1_raw',
+  'secp384r1_ecdsa_sha384_raw',
+  'secp512r1_ecdsa_sha256_raw',
+  'ed25519_eddsa_sha512_raw',
+] as const;
 
 /**
  * ALG_KEY
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#public-key-representation-formats
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#public-key-representation-formats
  */
 export type AlgKey = 'ecc_x962_raw' | 'ecc_x962_der' | 'rsa_2048_raw' | 'rsa_2048_der' | 'cose';
 
 /**
  * ATTESTATION
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authenticator-attestation-types
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#authenticator-attestation-types
  */
-export type Attestation = 'basic_full' | 'basic_surrogate' | 'ecdaa' | 'attca';
+export type Attestation = 'basic_full' | 'basic_surrogate' | 'ecdaa' | 'attca' | 'anonca' | 'none';
 
 /**
  * KEY_PROTECTION
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#key-protection-types
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#key-protection-types
  */
 export type KeyProtection = 'software' | 'hardware' | 'tee' | 'secure_element' | 'remote_handle';
 
 /**
  * MATCHER_PROTECTION
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#matcher-protection-types
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#matcher-protection-types
  */
 export type MatcherProtection = 'software' | 'tee' | 'on_chip';
 
 /**
  * ATTACHMENT_HINT
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#authenticator-attachment-hints
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#authenticator-attachment-hints
  */
 export type AttachmentHint =
   | 'internal'
@@ -258,7 +263,7 @@ export type AttachmentHint =
 
 /**
  * TRANSACTION_CONFIRMATION_DISPLAY
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.1-ps-20191217.html#transaction-confirmation-display-types
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#transaction-confirmation-display-types
  */
 export type TransactionConfirmationDisplay =
   | 'any'
