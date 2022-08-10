@@ -176,7 +176,7 @@ export type MetadataStatement = {
 
 /**
  * USER_VERIFY
- * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html
+ * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#user-verification-methods
  */
 export type UserVerify =
   | 'presence_internal'
