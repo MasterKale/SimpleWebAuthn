@@ -209,7 +209,6 @@ const AlgSign = [
   'secp256k1_ecdsa_sha256_raw',
   'secp256k1_ecdsa_sha256_der',
   'rsassa_pss_sha384_raw',
-  'rsassa_pss_sha256_raw',
   'rsassa_pkcsv15_sha256_raw',
   'rsassa_pkcsv15_sha384_raw',
   'rsassa_pkcsv15_sha512_raw',
