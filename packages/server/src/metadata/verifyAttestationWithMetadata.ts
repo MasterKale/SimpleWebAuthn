@@ -128,8 +128,4 @@ export const algSignToCOSEInfoMap: { [key in AlgSign]: COSEInfo } = {
   secp384r1_ecdsa_sha384_raw: { kty: 2, alg: -35, crv: 2 },
   secp512r1_ecdsa_sha256_raw: { kty: 2, alg: -36, crv: 3 },
   ed25519_eddsa_sha512_raw: { kty: 1, alg: -8, crv: 6 },
-  rsa_emsa_pkcs1_sha256_raw: { kty: 3, alg: -257 },
-  rsa_emsa_pkcs1_sha256_der: { kty: 3, alg: -257 },
-  // TODO: COSE info wasn't readily available for this, it seems rare...
-  sm2_sm3_raw: { kty: 999, alg: 999, crv: 999 },
 };
