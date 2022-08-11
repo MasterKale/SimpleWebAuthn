@@ -65,7 +65,7 @@ test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator alg
     'protocolFamily': 'fido2',
     'schema': 3,
     'upv': [{ 'major': 1, 'minor': 0 }],
-    'authenticationAlgorithms': ['rsa_emsa_pkcs1_sha256_raw'],
+    'authenticationAlgorithms': ['rsassa_pkcsv15_sha256_raw'],
     'publicKeyAlgAndEncodings': ['cose'],
     'attestationTypes': ['attca'],
     'userVerificationDetails': [

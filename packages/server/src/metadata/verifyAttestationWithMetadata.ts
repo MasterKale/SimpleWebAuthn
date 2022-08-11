@@ -66,22 +66,29 @@ export async function verifyAttestationWithMetadata(
 
   // Make sure the public key is one of the allowed algorithms
   if (!foundMatch) {
-    const debugMDSAlgs = Array.from(keypairCOSEAlgs);
-    // Construct some useful error output about the public key
-    const debugPubKeyAlgInfo: COSEInfo = {
-      kty: publicKeyCOSEInfo.kty,
-      alg: publicKeyCOSEInfo.alg,
-    };
-    // Don't output a bunch of bytes for `crv` when the public key is an RSA key
-    if (publicKeyCOSEInfo.kty !== COSEKTY.RSA) {
-      debugPubKeyAlgInfo.crv = publicKeyCOSEInfo.crv;
-    }
+    /**
+     * Craft some useful error output from the MDS algorithms
+     *
+     * Example:
+     *
+     * ```
+     * [
+     *   'rsassa_pss_sha256_raw' (COSE info: { kty: 3, alg: -37 }),
+     *   'secp256k1_ecdsa_sha256_raw' (COSE info: { kty: 2, alg: -47, crv: 8 })
+     * ]
+     * ```
+     */
+    const debugMDSAlgs = statement.authenticationAlgorithms
+      .map((algSign) => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`);
+    const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, '');
 
-    const strPubKeyAlg = JSON.stringify(debugPubKeyAlgInfo);
-    const strMDSAlgs = JSON.stringify(debugMDSAlgs);
+    /**
+     * Construct useful error output about the public key
+     */
+    const strPubKeyAlg = stringifyCOSEInfo(publicKeyCOSEInfo);
 
     throw new Error(
-      `Public key algorithm ${strPubKeyAlg} did not match any metadata algorithms ${strMDSAlgs}`,
+      `Public key parameters ${strPubKeyAlg} did not match any of the following metadata algorithms:\n${strMDSAlgs}`,
     );
   }
 
@@ -128,8 +135,24 @@ export const algSignToCOSEInfoMap: { [key in AlgSign]: COSEInfo } = {
   secp384r1_ecdsa_sha384_raw: { kty: 2, alg: -35, crv: 2 },
   secp512r1_ecdsa_sha256_raw: { kty: 2, alg: -36, crv: 3 },
   ed25519_eddsa_sha512_raw: { kty: 1, alg: -8, crv: 6 },
-  rsa_emsa_pkcs1_sha256_raw: { kty: 3, alg: -257 },
-  rsa_emsa_pkcs1_sha256_der: { kty: 3, alg: -257 },
-  // TODO: COSE info wasn't readily available for this, it seems rare...
-  sm2_sm3_raw: { kty: 999, alg: 999, crv: 999 },
 };
+
+/**
+ * A helper to format COSEInfo a little nicer than we can achieve with JSON.stringify()
+ *
+ * Input: `{ "kty": 3, "alg": -257 }`
+ *
+ * Output: `"{ kty: 3, alg: -257 }"`
+ */
+function stringifyCOSEInfo(info: COSEInfo): string {
+  const { kty, alg, crv } = info;
+
+  let toReturn = '';
+  if (kty !== COSEKTY.RSA) {
+    toReturn = `{ kty: ${kty}, alg: ${alg}, crv: ${crv} }`;
+  } else {
+    toReturn = `{ kty: ${kty}, alg: ${alg} }`;
+  }
+
+  return toReturn;
+}
