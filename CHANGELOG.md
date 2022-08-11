@@ -1,5 +1,16 @@
 # Changelog
 
+## v5.4.3
+
+**Packages:**
+
+- @simplewebauthn/server@5.4.3
+
+**Changes:**
+
+- **[server]** Remove support for the following defunct FIDO metadata authentication algorithms: `"rsa_emsa_pkcs1_sha256_raw"`, `"rsa_emsa_pkcs1_sha256_der"`, `"sm2_sm3_raw"` ([#245](https://github.com/MasterKale/SimpleWebAuthn/pull/245))
+- **[server]** Update remaining FIDO metadata constants to match v2.2 of the FIDO Registry of Predefined Values ([#244](https://github.com/MasterKale/SimpleWebAuthn/pull/244))
+
 ## v5.4.2
 
 **Packages:**
