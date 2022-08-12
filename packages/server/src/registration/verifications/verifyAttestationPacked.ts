@@ -91,7 +91,7 @@ export async function verifyAttestationPacked(
 
     // If available, validate attestation alg and x5c with info in the metadata statement
     const statement = await MetadataService.getStatement(aaguid);
-    if (statement) {
+    if (statement && !(statement.attestationTypes.indexOf('basic_full') === 0 && statement.attestationTypes.length === 1)) {
       // The presence of x5c means this is a full attestation. Check to see if attestationTypes
       // includes packed attestations.
       if (statement.attestationTypes.indexOf('basic_full') < 0) {
