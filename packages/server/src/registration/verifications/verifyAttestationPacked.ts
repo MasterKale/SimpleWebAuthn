@@ -99,7 +99,7 @@ export async function verifyAttestationPacked(
       }
 
       try {
-        await verifyAttestationWithMetadata(statement, credentialPublicKey, x5c);
+        await verifyAttestationWithMetadata(statement, credentialPublicKey, x5c, alg);
       } catch (err) {
         const _err = err as Error;
         throw new Error(`${_err.message} (Packed|Full)`);

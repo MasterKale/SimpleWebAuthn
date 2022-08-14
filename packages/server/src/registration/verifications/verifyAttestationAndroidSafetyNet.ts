@@ -25,7 +25,7 @@ export async function verifyAttestationAndroidSafetyNet(
     verifyTimestampMS = true,
     credentialPublicKey,
   } = options;
-  const { response, ver } = attStmt;
+  const { alg, response, ver } = attStmt;
 
   if (!ver) {
     throw new Error('No ver value in attestation (SafetyNet)');
@@ -95,7 +95,7 @@ export async function verifyAttestationAndroidSafetyNet(
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
     try {
-      await verifyAttestationWithMetadata(statement, credentialPublicKey, HEADER.x5c);
+      await verifyAttestationWithMetadata(statement, credentialPublicKey, HEADER.x5c, alg);
     } catch (err) {
       const _err = err as Error;
       throw new Error(`${_err.message} (SafetyNet)`);
