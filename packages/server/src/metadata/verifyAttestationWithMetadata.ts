@@ -14,7 +14,7 @@ export async function verifyAttestationWithMetadata(
   statement: MetadataStatement,
   credentialPublicKey: Buffer,
   x5c: Buffer[] | Base64URLString[],
-  attStmtAlg?: number,
+  attestationStatementAlg: number,
 ): Promise<boolean> {
   const {
     authenticationAlgorithms,
@@ -102,11 +102,11 @@ export async function verifyAttestationWithMetadata(
   /**
    * Confirm the attestation statement's algorithm is one supported according to metadata
    */
-  if (attStmtAlg !== undefined && authenticatorGetInfo?.algorithms !== undefined) {
+  if (authenticatorGetInfo?.algorithms !== undefined) {
     const getInfoAlgs = authenticatorGetInfo.algorithms.map(_alg => _alg.alg);
-    if (getInfoAlgs.indexOf(attStmtAlg) < 0) {
+    if (getInfoAlgs.indexOf(attestationStatementAlg) < 0) {
       throw new Error(
-        `Attestation statement alg ${attStmtAlg} did not match one of ${getInfoAlgs}`,
+        `Attestation statement alg ${attestationStatementAlg} did not match one of ${getInfoAlgs}`,
       );
     }
   }
