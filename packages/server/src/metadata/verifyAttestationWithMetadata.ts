@@ -14,10 +14,17 @@ export async function verifyAttestationWithMetadata(
   statement: MetadataStatement,
   credentialPublicKey: Buffer,
   x5c: Buffer[] | Base64URLString[],
+  attStmtAlg?: number,
 ): Promise<boolean> {
+  const {
+    authenticationAlgorithms,
+    authenticatorGetInfo,
+    attestationRootCertificates,
+  } = statement;
+
   // Make sure the alg in the attestation statement matches one of the ones specified in metadata
   const keypairCOSEAlgs: Set<COSEInfo> = new Set();
-  statement.authenticationAlgorithms.forEach(algSign => {
+  authenticationAlgorithms.forEach(algSign => {
     // Map algSign string to { kty, alg, crv }
     const algSignCOSEINFO = algSignToCOSEInfoMap[algSign];
 
@@ -78,7 +85,7 @@ export async function verifyAttestationWithMetadata(
      * ]
      * ```
      */
-    const debugMDSAlgs = statement.authenticationAlgorithms
+    const debugMDSAlgs = authenticationAlgorithms
       .map((algSign) => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`);
     const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, '');
 
@@ -92,9 +99,21 @@ export async function verifyAttestationWithMetadata(
     );
   }
 
+  /**
+   * Confirm the attestation statement's algorithm is one supported according to metadata
+   */
+  if (attStmtAlg !== undefined && authenticatorGetInfo?.algorithms !== undefined) {
+    const getInfoAlgs = authenticatorGetInfo.algorithms.map(_alg => _alg.alg);
+    if (getInfoAlgs.indexOf(attStmtAlg) < 0) {
+      throw new Error(
+        `Attestation statement alg ${attStmtAlg} did not match one of ${getInfoAlgs}`,
+      );
+    }
+  }
+
   // Prepare to check the certificate chain
   const authenticatorCerts = x5c.map(convertCertBufferToPEM);
-  const statementRootCerts = statement.attestationRootCertificates.map(convertCertBufferToPEM);
+  const statementRootCerts = attestationRootCertificates.map(convertCertBufferToPEM);
 
   /**
    * If an authenticator returns exactly one certificate in its x5c, and that cert is found in the
