@@ -92,16 +92,32 @@ export async function verifyAttestationWithMetadata(
     );
   }
 
-  try {
-    await validateCertificatePath(
-      x5c.map(convertCertBufferToPEM),
-      statement.attestationRootCertificates.map(convertCertBufferToPEM),
-    );
-  } catch (err) {
-    const _err = err as Error;
-    throw new Error(
-      `Could not validate certificate path with any metadata root certificates: ${_err.message}`,
-    );
+  // Prepare to check the certificate chain
+  const authenticatorCerts = x5c.map(convertCertBufferToPEM);
+  const statementRootCerts = statement.attestationRootCertificates.map(convertCertBufferToPEM);
+
+  /**
+   * If an authenticator returns exactly one certificate in its x5c, and that cert is found in the
+   * metadata statement then the authenticator is "self-referencing". In this case we forego
+   * certificate chain validation.
+   */
+  let authenticatorIsSelfReferencing = false;
+  if (
+    authenticatorCerts.length === 1 &&
+    statementRootCerts.indexOf(authenticatorCerts[0]) >= 0
+  ) {
+    authenticatorIsSelfReferencing = true;
+  }
+
+  if (!authenticatorIsSelfReferencing) {
+    try {
+      await validateCertificatePath(authenticatorCerts, statementRootCerts);
+    } catch (err) {
+      const _err = err as Error;
+      throw new Error(
+        `Could not validate certificate path with any metadata root certificates: ${_err.message}`,
+      );
+    }
   }
 
   return true;
