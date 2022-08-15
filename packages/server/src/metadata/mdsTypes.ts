@@ -292,4 +292,5 @@ export type AuthenticatorGetInfo = {
   };
   maxMsgSize?: number;
   pinProtocols?: number[];
+  algorithms?: { type: 'public-key', alg: number }[];
 };

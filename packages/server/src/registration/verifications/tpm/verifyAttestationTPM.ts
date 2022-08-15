@@ -257,7 +257,12 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   const statement = await MetadataService.getStatement(aaguid);
   if (statement) {
     try {
-      await verifyAttestationWithMetadata(statement, credentialPublicKey, x5c);
+      await verifyAttestationWithMetadata({
+        statement,
+        credentialPublicKey,
+        x5c,
+        attestationStatementAlg: alg,
+      });
     } catch (err) {
       const _err = err as Error;
       throw new Error(`${_err.message} (TPM)`);
