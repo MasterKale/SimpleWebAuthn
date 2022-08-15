@@ -47,11 +47,11 @@ test('should verify attestation with metadata (android-safetynet)', async () => 
   const credentialPublicKey =
     'pQECAyYgASFYIAKH2NrGZT-lUEA3tbBXR9owjW_7OnA1UqoL1UuKY_VCIlggpjeOH0xyBCpGDya55JLXXKrzyOieQN3dvG1pV-Qs-Gs';
 
-  const verified = await verifyAttestationWithMetadata(
-    metadataStatementJSONSafetyNet,
-    base64url.toBuffer(credentialPublicKey),
+  const verified = await verifyAttestationWithMetadata({
+    statement: metadataStatementJSONSafetyNet,
+    credentialPublicKey: base64url.toBuffer(credentialPublicKey),
     x5c,
-  );
+  });
 
   expect(verified).toEqual(true);
 });
@@ -97,11 +97,11 @@ test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator alg
   ];
   const credentialPublicKey = 'pAEDAzkBACBZAQC3X5SKwYUkxFxxyvCnz_37Z57eSdsgQuiBLDaBOd1R6VEZReAV3nVr_7jiRgmWfu1C-S3Aro65eSG5shcDCgIvY3KdEI8K5ENEPlmucjnFILBAE_MZtPmZlkEDmVCDcVspHX2iKqiVWYV6IFzVX1QUf0SAlWijV9NEfKDbij34ddV0qfG2nEMA0_xVpN2OK2BVXonFg6tS3T00XlFh4MdzIauIHTDT63eAdHlkFrMqU53T5IqDvL3VurBmBjYRJ3VDT9mA2sm7fSrJNXhSVLPst-ZsiOioVKrpzFE9sJmyCQvq2nGZ2RhDo8FfAKiw0kvJRkCSSe1ddxryk9_VSCprIUMBAAE';
 
-  const verified = await verifyAttestationWithMetadata(
-    metadataStatement,
-    base64url.toBuffer(credentialPublicKey),
+  const verified = await verifyAttestationWithMetadata({
+    statement: metadataStatement,
+    credentialPublicKey: base64url.toBuffer(credentialPublicKey),
     x5c,
-  );
+  });
 
   expect(verified).toEqual(true);
 });
@@ -154,11 +154,11 @@ test('should not validate certificate path when authenticator is self-referencin
   ];
   const credentialPublicKey = 'pQECAyYgASFYIBdmUVOxrn-OOtkVwGP_vAspH3VkgzcGXVlu3-acb7EZIlggKgDTs0fr2d51sLR6uL3KP2cqR3iIUkKMCjyMJhYOkf4';
 
-  const verified = await verifyAttestationWithMetadata(
-    metadataStatement,
-    base64url.toBuffer(credentialPublicKey),
+  const verified = await verifyAttestationWithMetadata({
+    statement: metadataStatement,
+    credentialPublicKey: base64url.toBuffer(credentialPublicKey),
     x5c,
-  );
+  });
 
   expect(verified).toEqual(true);
 });

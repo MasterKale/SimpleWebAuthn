@@ -10,12 +10,17 @@ import { COSEKEYS, COSEKTY } from '../helpers/convertCOSEtoPKCS';
  * Match properties of the authenticator's attestation statement against expected values as
  * registered with the FIDO Alliance Metadata Service
  */
-export async function verifyAttestationWithMetadata(
-  statement: MetadataStatement,
-  credentialPublicKey: Buffer,
-  x5c: Buffer[] | Base64URLString[],
-  attestationStatementAlg: number,
-): Promise<boolean> {
+export async function verifyAttestationWithMetadata({
+  statement,
+  credentialPublicKey,
+  x5c,
+  attestationStatementAlg,
+}: {
+  statement: MetadataStatement;
+  credentialPublicKey: Buffer;
+  x5c: Buffer[] | Base64URLString[];
+  attestationStatementAlg?: number;
+}): Promise<boolean> {
   const {
     authenticationAlgorithms,
     authenticatorGetInfo,
@@ -102,7 +107,7 @@ export async function verifyAttestationWithMetadata(
   /**
    * Confirm the attestation statement's algorithm is one supported according to metadata
    */
-  if (authenticatorGetInfo?.algorithms !== undefined) {
+  if (attestationStatementAlg !== undefined && authenticatorGetInfo?.algorithms !== undefined) {
     const getInfoAlgs = authenticatorGetInfo.algorithms.map(_alg => _alg.alg);
     if (getInfoAlgs.indexOf(attestationStatementAlg) < 0) {
       throw new Error(
