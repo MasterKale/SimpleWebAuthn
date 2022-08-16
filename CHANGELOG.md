@@ -1,5 +1,16 @@
 # Changelog
 
+## v5.4.4
+
+**Packages:**
+
+- @simplewebauthn/server@5.4.4
+
+**Changes:**
+
+- **[server]** Enhance compliance with current FIDO conformance requirements ([#249](https://github.com/MasterKale/SimpleWebAuthn/pull/249), [#251](https://github.com/MasterKale/SimpleWebAuthn/pull/251))
+- **[server]** Minor performance improvements ([#150](https://github.com/MasterKale/SimpleWebAuthn/pull/250))
+
 ## v5.4.3
 
 **Packages:**
