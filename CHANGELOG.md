@@ -1,5 +1,40 @@
 # Changelog
 
+## v5.4.5
+
+**Packages:**
+
+- @simplewebauthn/server@5.4.5
+
+**Changes:**
+
+- **[server]** Support FIDO Conformance user verification requirements ([#254](https://github.com/MasterKale/SimpleWebAuthn/pull/254))
+
+To leverage these requirements (as might be the case for RP's seeking FIDO certification), update your calls to `verifyAuthenticationResponse()` to **replace** `requireUserVerification` with the new `advancedFIDOConfig.userVerification` option:
+
+**Before:**
+```ts
+const verification = verifyAuthenticationResponse({
+  // ...
+  requireUserVerification: true
+});
+```
+
+**After**
+```ts
+const verification = verifyAuthenticationResponse({
+  // ...
+  advancedFIDOConfig: {
+    // UserVerificationRequirement: 'required' | 'preferred' | 'discouraged'
+    userVerification: 'required',
+  },
+});
+```
+
+Setting `advancedFIDOConfig.userVerification` to `'required'` will only require the `uv` flag to be true; `up` flag may be `false`. Setting it to `'preferred'` or `'discouraged'` will allow both `up` and `uv` to be `false` during verification.
+
+- **[server]** Rename the `devicePublicKey` property on the `AuthenticationExtensionsAuthenticatorOutputs` type to `devicePubKey` ([#243](https://github.com/MasterKale/SimpleWebAuthn/pull/243); no one supports this yet so it's not a breaking change)
+
 ## v5.4.4
 
 **Packages:**
