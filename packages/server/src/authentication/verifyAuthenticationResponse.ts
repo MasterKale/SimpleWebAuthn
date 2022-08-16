@@ -3,6 +3,7 @@ import {
   AuthenticationCredentialJSON,
   AuthenticatorDevice,
   CredentialDeviceType,
+  UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
@@ -21,6 +22,9 @@ export type VerifyAuthenticationResponseOpts = {
   expectedRPID: string | string[];
   authenticator: AuthenticatorDevice;
   requireUserVerification?: boolean;
+  advancedFIDOConfig?: {
+    userVerification?: UserVerificationRequirement,
+  },
 };
 
 /**
@@ -36,6 +40,11 @@ export type VerifyAuthenticationResponseOpts = {
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
+ * @param advancedFIDOConfig (Optional) Options for satisfying more stringent FIDO RP feature
+ * requirements
+ * @param advancedFIDOConfig.userVerification (Optional) Enable alternative rules for evaluating the
+ * User Presence and User Verified flags in authenticator data: UV (and UP) flags are optional
+ * unless this value is `"required"`
  */
 export function verifyAuthenticationResponse(
   options: VerifyAuthenticationResponseOpts,
@@ -47,6 +56,7 @@ export function verifyAuthenticationResponse(
     expectedRPID,
     authenticator,
     requireUserVerification,
+    advancedFIDOConfig,
   } = options;
   const { id, rawId, type: credentialType, response } = credential;
 
@@ -155,14 +165,35 @@ export function verifyAuthenticationResponse(
     }
   }
 
-  // WebAuthn only requires the user presence flag be true
-  if (!flags.up) {
-    throw new Error('User not present during authentication');
-  }
+  if (advancedFIDOConfig !== undefined) {
+    const {
+      userVerification: fidoUserVerification,
+    } = advancedFIDOConfig;
 
-  // Enforce user verification if required
-  if (requireUserVerification && !flags.uv) {
-    throw new Error('User verification required, but user could not be verified');
+    /**
+     * Use FIDO Conformance-defined rules for verifying UP and UV flags
+     */
+    if (fidoUserVerification === 'required') {
+      // Require `flags.uv` be true (implies `flags.up` is true)
+      if (!flags.uv) {
+        throw new Error('User verification required, but user could not be verified');
+      }
+    } else if (fidoUserVerification === 'preferred' || fidoUserVerification === 'discouraged') {
+      // Ignore `flags.uv`
+    }
+  } else {
+    /**
+     * Use WebAuthn spec-defined rules for verifying UP and UV flags
+     */
+    // WebAuthn only requires the user presence flag be true
+    if (!flags.up) {
+      throw new Error('User not present during authentication');
+    }
+
+    // Enforce user verification if required
+    if (requireUserVerification && !flags.uv) {
+      throw new Error('User verification required, but user could not be verified');
+    }
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
