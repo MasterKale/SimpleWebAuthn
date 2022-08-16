@@ -64,14 +64,15 @@ export const COSECRV: { [key: number]: string } = {
 };
 
 export const COSEALGHASH: { [key: string]: string } = {
-  '-257': 'sha256',
-  '-258': 'sha384',
-  '-259': 'sha512',
   '-65535': 'sha1',
+  '-259': 'sha512',
+  '-258': 'sha384',
+  '-257': 'sha256',
   '-39': 'sha512',
   '-38': 'sha384',
   '-37': 'sha256',
-  '-7': 'sha256',
-  '-8': 'sha512',
   '-36': 'sha512',
+  '-35': 'sha384',
+  '-8': 'sha512',
+  '-7': 'sha256',
 };
