@@ -124,8 +124,11 @@ export async function verifyAttestationAndroidSafetyNet(
   const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
-  const leafCertPEM = convertCertBufferToPEM(leafCertBuffer);
-  const verified = verifySignature(signatureBuffer, signatureBaseBuffer, leafCertPEM);
+  const verified = await verifySignature({
+    signature: signatureBuffer,
+    signatureBase: signatureBaseBuffer,
+    leafCert: leafCertBuffer,
+  });
   /**
    * END Verify Signature
    */
