@@ -1,4 +1,3 @@
-import type { SigningSchemeHash } from 'node-rsa';
 import { COSEAlgorithmIdentifier } from '@simplewebauthn/typescript-types';
 import { decodeCborFirst } from './decodeCbor';
 
@@ -76,3 +75,26 @@ export const COSEALGHASH: { [key: string]: string } = {
   '-8': 'sha512',
   '-7': 'sha256',
 };
+
+/**
+ * Imported from node-rsa's types
+ */
+type SigningSchemeHash =
+  | 'pkcs1-ripemd160'
+  | 'pkcs1-md4'
+  | 'pkcs1-md5'
+  | 'pkcs1-sha'
+  | 'pkcs1-sha1'
+  | 'pkcs1-sha224'
+  | 'pkcs1-sha256'
+  | 'pkcs1-sha384'
+  | 'pkcs1-sha512'
+  | 'pss-ripemd160'
+  | 'pss-md4'
+  | 'pss-md5'
+  | 'pss-sha'
+  | 'pss-sha1'
+  | 'pss-sha224'
+  | 'pss-sha256'
+  | 'pss-sha384'
+  | 'pss-sha512';
