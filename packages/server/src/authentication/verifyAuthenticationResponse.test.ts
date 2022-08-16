@@ -372,6 +372,115 @@ test('should return credential backup info', async () => {
   expect(verification.authenticationInfo?.credentialBackedUp).toEqual(false);
 });
 
+test('[FIDO Conformance] should verify if user verification is required and user was verified but not present', () => {
+  const actualData = esmParseAuthenticatorData.parseAuthenticatorData(
+    base64url.toBuffer(assertionResponse.response.authenticatorData),
+  );
+
+  mockParseAuthData.mockReturnValue({
+    ...actualData,
+    flags: {
+      up: false,
+      uv: true,
+    },
+  });
+
+  const verification = verifyAuthenticationResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+    advancedFIDOConfig: {
+      userVerification: 'required',
+    }
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
+test('[FIDO Conformance] should verify if user verification is preferred and user was not verified or present', () => {
+  const actualData = esmParseAuthenticatorData.parseAuthenticatorData(
+    base64url.toBuffer(assertionResponse.response.authenticatorData),
+  );
+
+  mockParseAuthData.mockReturnValue({
+    ...actualData,
+    flags: {
+      up: false,
+      uv: false,
+    },
+  });
+
+  const verification = verifyAuthenticationResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+    requireUserVerification: false,
+    advancedFIDOConfig: {
+      userVerification: 'preferred',
+    },
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
+test('[FIDO Conformance] should verify if user verification is discouraged and user was verified but not present', () => {
+  const actualData = esmParseAuthenticatorData.parseAuthenticatorData(
+    base64url.toBuffer(assertionResponse.response.authenticatorData),
+  );
+
+  mockParseAuthData.mockReturnValue({
+    ...actualData,
+    flags: {
+      up: false,
+      uv: true,
+    },
+  });
+
+  const verification = verifyAuthenticationResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+    advancedFIDOConfig: {
+      userVerification: 'discouraged',
+    },
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
+test('[FIDO Conformance] should verify if user verification is discouraged and user was not verified or present', () => {
+  const actualData = esmParseAuthenticatorData.parseAuthenticatorData(
+    base64url.toBuffer(assertionResponse.response.authenticatorData),
+  );
+
+  mockParseAuthData.mockReturnValue({
+    ...actualData,
+    flags: {
+      up: false,
+      uv: false,
+    },
+  });
+
+  const verification = verifyAuthenticationResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+    advancedFIDOConfig: {
+      userVerification: 'discouraged',
+    },
+  });
+
+  expect(verification.verified).toEqual(true);
+});
+
 /**
  * Assertion examples below
  */
