@@ -134,6 +134,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
+    supportedAlgorithmIDs: [-7, -8, -36, -37, -38, -39, -257, -258, -259, -65535],
   });
 
   user.currentChallenge = opts.challenge;
@@ -257,6 +258,7 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
       expectedRPID: rpID,
       authenticator: existingDevice,
       requireUserVerification,
+      advancedFIDOConfig: { userVerification },
     });
   } catch (error) {
     const _error = error as Error;
