@@ -7,17 +7,17 @@ import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
 
 type VerifySignatureOptsLeafCert = {
-  signature: Buffer,
-  signatureBase: Buffer,
-  leafCert: Buffer,
-  hashAlgorithm?: string,
+  signature: Buffer;
+  signatureBase: Buffer;
+  leafCert: Buffer;
+  hashAlgorithm?: string;
 };
 
 type VerifySignatureOptsCredentialPublicKey = {
-  signature: Buffer,
-  signatureBase: Buffer,
-  credentialPublicKey: Buffer,
-  hashAlgorithm?: string,
+  signature: Buffer;
+  signatureBase: Buffer;
+  credentialPublicKey: Buffer;
+  hashAlgorithm?: string;
 };
 
 /**
@@ -28,21 +28,19 @@ type VerifySignatureOptsCredentialPublicKey = {
  * @param publicKey Authenticator's public key as a PEM certificate
  * @param algo Which algorithm to use to verify the signature (default: `'sha256'`)
  */
-export async function verifySignature(opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey): Promise<boolean> {
-  const {
-    signature,
-    signatureBase,
-    hashAlgorithm = 'sha256',
-  } = opts;
+export async function verifySignature(
+  opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
+): Promise<boolean> {
+  const { signature, signatureBase, hashAlgorithm = 'sha256' } = opts;
   const _isLeafcertOpts = isLeafCertOpts(opts);
   const _isCredPubKeyOpts = isCredPubKeyOpts(opts);
 
   if (!_isLeafcertOpts && !_isCredPubKeyOpts) {
-    throw new Error('Must declare either `leafCert` or `credentialPublicKey`')
+    throw new Error('Must declare either "leafCert" or "credentialPublicKey"');
   }
 
   if (_isLeafcertOpts && _isCredPubKeyOpts) {
-    throw new Error('Must not declare both `leafCert` and `credentialPublicKey`');
+    throw new Error('Must not declare both "leafCert" and "credentialPublicKey"');
   }
 
   let publicKeyPEM = '';
@@ -89,10 +87,16 @@ export async function verifySignature(opts: VerifySignatureOptsLeafCert | Verify
   return crypto.createVerify(hashAlgorithm).update(signatureBase).verify(publicKeyPEM, signature);
 }
 
-function isLeafCertOpts(opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey): opts is VerifySignatureOptsLeafCert {
+function isLeafCertOpts(
+  opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
+): opts is VerifySignatureOptsLeafCert {
   return Object.keys(opts as VerifySignatureOptsLeafCert).indexOf('leafCert') >= 0;
 }
 
-function isCredPubKeyOpts(opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey): opts is VerifySignatureOptsCredentialPublicKey {
-  return Object.keys(opts as VerifySignatureOptsCredentialPublicKey).indexOf('credentialPublicKey') >= 0;
+function isCredPubKeyOpts(
+  opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
+): opts is VerifySignatureOptsCredentialPublicKey {
+  return (
+    Object.keys(opts as VerifySignatureOptsCredentialPublicKey).indexOf('credentialPublicKey') >= 0
+  );
 }

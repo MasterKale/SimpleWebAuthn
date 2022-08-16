@@ -22,8 +22,8 @@ export type VerifyAuthenticationResponseOpts = {
   authenticator: AuthenticatorDevice;
   requireUserVerification?: boolean;
   advancedFIDOConfig?: {
-    userVerification?: UserVerificationRequirement,
-  },
+    userVerification?: UserVerificationRequirement;
+  };
 };
 
 /**
@@ -165,9 +165,7 @@ export async function verifyAuthenticationResponse(
   }
 
   if (advancedFIDOConfig !== undefined) {
-    const {
-      userVerification: fidoUserVerification,
-    } = advancedFIDOConfig;
+    const { userVerification: fidoUserVerification } = advancedFIDOConfig;
 
     /**
      * Use FIDO Conformance-defined rules for verifying UP and UV flags

@@ -139,7 +139,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
-    })
+    }),
   ).rejects.toThrow(/rp id/i);
 });
 
