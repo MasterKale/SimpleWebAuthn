@@ -1,5 +1,5 @@
 {
-  "version": "5.4.5",
+  "version": "6.0.0",
   "npmClient": "npm",
   "useNx": true,
   "command": {
