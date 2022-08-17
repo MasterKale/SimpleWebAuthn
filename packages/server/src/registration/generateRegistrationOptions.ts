@@ -120,7 +120,8 @@ export function generateRegistrationOptions(
   }));
 
   /**
-   *
+   * Capture some of the nuances of how `residentKey` and `requireResidentKey` how either is set
+   * depending on when either is defined in the options
    */
   if (authenticatorSelection.residentKey === undefined) {
     /**
@@ -132,7 +133,11 @@ export function generateRegistrationOptions(
     if (authenticatorSelection.requireResidentKey) {
       authenticatorSelection.residentKey = 'required';
     } else {
-      authenticatorSelection.residentKey = 'discouraged';
+      /**
+       * FIDO Conformance v1.7.2 fails the first test if we do this, even though this is
+       * technically compatible with the WebAuthn L2 spec...
+       */
+      // authenticatorSelection.residentKey = 'discouraged';
     }
   } else {
     /**

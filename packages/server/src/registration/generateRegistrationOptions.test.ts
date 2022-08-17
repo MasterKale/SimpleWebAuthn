@@ -49,7 +49,6 @@ test('should generate credential request options suitable for sending via JSON',
     excludeCredentials: [],
     authenticatorSelection: {
       requireResidentKey: false,
-      residentKey: 'discouraged',
       userVerification: 'preferred',
     },
   });
@@ -121,7 +120,6 @@ test('should set authenticatorSelection if specified', () => {
   expect(options.authenticatorSelection).toEqual({
     authenticatorAttachment: 'cross-platform',
     requireResidentKey: false,
-    residentKey: 'discouraged',
     userVerification: 'preferred',
   });
 });
@@ -196,10 +194,10 @@ test('should discourage resident key if residentKey option is absent but require
   });
 
   expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
-  expect(options.authenticatorSelection?.residentKey).toEqual('discouraged');
+  expect(options.authenticatorSelection?.residentKey).toBeUndefined();
 });
 
-test('should discourage resident key if both residentKey and requireResidentKey options are absent', () => {
+test('should not set resident key if both residentKey and requireResidentKey options are absent', () => {
   const options = generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
@@ -208,7 +206,7 @@ test('should discourage resident key if both residentKey and requireResidentKey 
   });
 
   expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
-  expect(options.authenticatorSelection?.residentKey).toEqual('discouraged');
+  expect(options.authenticatorSelection?.residentKey).toBeUndefined();
 });
 
 test('should set requireResidentKey to true if residentKey if set to required', () => {
