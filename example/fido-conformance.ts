@@ -97,6 +97,8 @@ const inMemoryUserDeviceDB: { [username: string]: LoggedInFIDOUser } = {
 // A cheap way of remembering who's "logged in" between the request for options and the response
 let loggedInUsername: string | undefined = undefined;
 
+const supportedAlgorithmIDs = [-7, -8, -35, -36, -37, -38, -39, -257, -258, -259, -65535];
+
 /**
  * [FIDO2] Server Tests > MakeCredential Request
  */
@@ -134,7 +136,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
-    supportedAlgorithmIDs: [-7, -8, -36, -37, -38, -39, -257, -258, -259, -65535],
+    supportedAlgorithmIDs,
   });
 
   user.currentChallenge = opts.challenge;
@@ -162,6 +164,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
+      supportedAlgorithmIDs,
     });
   } catch (error) {
     const _error: Error = error as Error;
@@ -227,7 +230,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
   });
 });
 
-fidoConformanceRouter.post('/assertion/result', (req, res) => {
+fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const body: AuthenticationCredentialJSON = req.body;
   const { id } = body;
 
@@ -237,27 +240,29 @@ fidoConformanceRouter.post('/assertion/result', (req, res) => {
   const expectedChallenge = user.currentChallenge;
   const userVerification = user.currentAuthenticationUserVerification;
 
+  if (!id) {
+    const msg = `Invalid id: ${id}`;
+    console.error(`RP - authentication: ${msg}`);
+    return res.status(400).send({ errorMessage: msg });
+  }
+
   const credIDBuffer = base64url.toBuffer(id);
   const existingDevice = user.devices.find(device => device.credentialID.equals(credIDBuffer));
 
   if (!existingDevice) {
-    throw new Error(`Could not find device matching ${id}`);
-  }
-
-  let requireUserVerification = false;
-  if (userVerification === 'required') {
-    requireUserVerification = true;
+    const msg = `Could not find device matching ${id}`;
+    console.error(`RP - authentication: ${msg}`);
+    return res.status(400).send({ errorMessage: msg });
   }
 
   let verification;
   try {
-    verification = verifyAuthenticationResponse({
+    verification = await verifyAuthenticationResponse({
       credential: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: existingDevice,
-      requireUserVerification,
       advancedFIDOConfig: { userVerification },
     });
   } catch (error) {

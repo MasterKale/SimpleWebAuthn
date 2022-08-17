@@ -230,7 +230,7 @@ app.get('/generate-authentication-options', (req, res) => {
   res.send(options);
 });
 
-app.post('/verify-authentication', (req, res) => {
+app.post('/verify-authentication', async (req, res) => {
   const body: AuthenticationCredentialJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
@@ -261,7 +261,7 @@ app.post('/verify-authentication', (req, res) => {
       authenticator: dbAuthenticator,
       requireUserVerification: true,
     };
-    verification = verifyAuthenticationResponse(opts);
+    verification = await verifyAuthenticationResponse(opts);
   } catch (error) {
     const _error = error as Error;
     console.error(_error);
