@@ -5,7 +5,7 @@ import {
   RegistrationCredential,
 } from '@simplewebauthn/typescript-types';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
-import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/structs';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
@@ -14,10 +14,10 @@ import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 
 import { startRegistration } from './startRegistration';
 
-jest.mock('../helpers/browserSupportsWebauthn');
+jest.mock('../helpers/browserSupportsWebAuthn');
 
 const mockNavigatorCreate = window.navigator.credentials.create as jest.Mock;
-const mockSupportsWebauthn = browserSupportsWebauthn as jest.Mock;
+const mockSupportsWebauthn = browserSupportsWebAuthn as jest.Mock;
 
 const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';
