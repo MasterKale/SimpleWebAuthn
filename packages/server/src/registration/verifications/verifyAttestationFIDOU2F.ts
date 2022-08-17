@@ -56,7 +56,9 @@ export async function verifyAttestationFIDOU2F(
     throw new Error(`${_err.message} (FIDOU2F)`);
   }
 
-  const leafCertPEM = convertCertBufferToPEM(x5c[0]);
-
-  return verifySignature(sig, signatureBase, leafCertPEM);
+  return verifySignature({
+    signature: sig,
+    signatureBase,
+    leafCert: x5c[0],
+  });
 }

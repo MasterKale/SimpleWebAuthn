@@ -8,7 +8,6 @@ import {
 
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { toHash } from '../helpers/toHash';
-import { convertPublicKeyToPEM } from '../helpers/convertPublicKeyToPEM';
 import { verifySignature } from '../helpers/verifySignature';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
@@ -23,8 +22,8 @@ export type VerifyAuthenticationResponseOpts = {
   authenticator: AuthenticatorDevice;
   requireUserVerification?: boolean;
   advancedFIDOConfig?: {
-    userVerification?: UserVerificationRequirement,
-  },
+    userVerification?: UserVerificationRequirement;
+  };
 };
 
 /**
@@ -46,9 +45,9 @@ export type VerifyAuthenticationResponseOpts = {
  * User Presence and User Verified flags in authenticator data: UV (and UP) flags are optional
  * unless this value is `"required"`
  */
-export function verifyAuthenticationResponse(
+export async function verifyAuthenticationResponse(
   options: VerifyAuthenticationResponseOpts,
-): VerifiedAuthenticationResponse {
+): Promise<VerifiedAuthenticationResponse> {
   const {
     credential,
     expectedChallenge,
@@ -166,9 +165,7 @@ export function verifyAuthenticationResponse(
   }
 
   if (advancedFIDOConfig !== undefined) {
-    const {
-      userVerification: fidoUserVerification,
-    } = advancedFIDOConfig;
+    const { userVerification: fidoUserVerification } = advancedFIDOConfig;
 
     /**
      * Use FIDO Conformance-defined rules for verifying UP and UV flags
@@ -199,7 +196,6 @@ export function verifyAuthenticationResponse(
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
 
-  const publicKey = convertPublicKeyToPEM(authenticator.credentialPublicKey);
   const signature = base64url.toBuffer(response.signature);
 
   if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
@@ -215,7 +211,11 @@ export function verifyAuthenticationResponse(
   const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
 
   const toReturn = {
-    verified: verifySignature(signature, signatureBase, publicKey),
+    verified: await verifySignature({
+      signature,
+      signatureBase,
+      credentialPublicKey: authenticator.credentialPublicKey,
+    }),
     authenticationInfo: {
       newCounter: counter,
       credentialID: authenticator.credentialID,

@@ -67,7 +67,7 @@ test('should return pem when input is base64URLString', () => {
   }
 });
 
-test('should return pem when input is base64URLString', () => {
+test('should raise error when kty is OKP (1)', () => {
   const mockCOSEKey = new Map<number, number | Buffer>();
 
   mockCOSEKey.set(COSEKEYS.kty, 1);

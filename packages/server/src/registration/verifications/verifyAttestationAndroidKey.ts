@@ -99,8 +99,12 @@ export async function verifyAttestationAndroidKey(
   }
 
   const signatureBase = Buffer.concat([authData, clientDataHash]);
-  const leafCertPEM = convertCertBufferToPEM(x5c[0]);
   const hashAlg = COSEALGHASH[alg as number];
 
-  return verifySignature(sig, signatureBase, leafCertPEM, hashAlg);
+  return verifySignature({
+    signature: sig,
+    signatureBase,
+    leafCert: x5c[0],
+    hashAlgorithm: hashAlg
+  });
 }

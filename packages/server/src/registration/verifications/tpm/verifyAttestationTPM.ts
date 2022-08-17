@@ -279,8 +279,12 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
 
   // Verify signature over certInfo with the public key extracted from AIK certificate.
   // In the wise words of Yuriy Ackermann: "Get Martini friend, you are done!"
-  const leafCertPEM = convertCertBufferToPEM(x5c[0]);
-  return verifySignature(sig, certInfo, leafCertPEM, hashAlg);
+  return verifySignature({
+    signature: sig,
+    signatureBase: certInfo,
+    leafCert: x5c[0],
+    hashAlgorithm: hashAlg
+  });
 }
 
 /**
