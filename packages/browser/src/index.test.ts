@@ -8,10 +8,10 @@ test('should export method `startAuthentication`', () => {
   expect(index.startAuthentication).toBeDefined();
 });
 
-test('should export method `browserSupportsWebauthn`', () => {
-  expect(index.browserSupportsWebauthn).toBeDefined();
+test('should export method `browserSupportsWebAuthn`', () => {
+  expect(index.browserSupportsWebAuthn).toBeDefined();
 });
 
 test('should export method `platformAuthenticatorIsAvailable`', () => {
-  expect(index.browserSupportsWebauthn).toBeDefined();
+  expect(index.browserSupportsWebAuthn).toBeDefined();
 });

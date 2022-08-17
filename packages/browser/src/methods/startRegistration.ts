@@ -7,7 +7,7 @@ import {
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
-import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyRegistrationError } from '../helpers/identifyRegistrationError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
@@ -20,7 +20,7 @@ import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 export async function startRegistration(
   creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
 ): Promise<RegistrationCredentialJSON> {
-  if (!browserSupportsWebauthn()) {
+  if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
 

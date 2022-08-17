@@ -5,7 +5,7 @@ import {
   AuthenticationExtensionsClientOutputs,
 } from '@simplewebauthn/typescript-types';
 
-import { browserSupportsWebauthn } from '../helpers/browserSupportsWebauthn';
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
@@ -15,11 +15,11 @@ import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
 import { startAuthentication } from './startAuthentication';
 
-jest.mock('../helpers/browserSupportsWebauthn');
+jest.mock('../helpers/browserSupportsWebAuthn');
 jest.mock('../helpers/browserSupportsWebAuthnAutofill');
 
 const mockNavigatorGet = window.navigator.credentials.get as jest.Mock;
-const mockSupportsWebauthn = browserSupportsWebauthn as jest.Mock;
+const mockSupportsWebAuthn = browserSupportsWebAuthn as jest.Mock;
 const mockSupportsAutofill = browserSupportsWebAuthnAutofill as jest.Mock;
 
 const mockAuthenticatorData = 'mockAuthenticatorData';
@@ -58,13 +58,13 @@ beforeEach(() => {
     });
   });
 
-  mockSupportsWebauthn.mockReturnValue(true);
+  mockSupportsWebAuthn.mockReturnValue(true);
   mockSupportsAutofill.mockResolvedValue(true);
 });
 
 afterEach(() => {
   mockNavigatorGet.mockReset();
-  mockSupportsWebauthn.mockReset();
+  mockSupportsWebAuthn.mockReset();
   mockSupportsAutofill.mockReset();
 });
 
@@ -126,7 +126,7 @@ test('should return base64url-encoded response values', async () => {
 });
 
 test("should throw error if WebAuthn isn't supported", async () => {
-  mockSupportsWebauthn.mockReturnValue(false);
+  mockSupportsWebAuthn.mockReturnValue(false);
 
   await expect(startAuthentication(goodOpts1)).rejects.toThrow(
     'WebAuthn is not supported in this browser',
