@@ -1,5 +1,60 @@
 # Changelog
 
+## v6.0.0 - The one with Ed25519 Support
+
+This release also marks the return of the library's ability to pass FIDO Conformance! Adding Ed25519 signature verification (see below) finally allowed the library to pass all required tests, and nearly all optional tests.
+
+**Packages:**
+
+ - @simplewebauthn/browser@6.0.0
+ - @simplewebauthn/server@6.0.0
+ - @simplewebauthn/testing@6.0.0
+ - @simplewebauthn/typescript-types@6.0.0
+
+**Changes:**
+
+- **[server]** Signatures can now be verified with OKP public keys that use the Ed25519 curve and EDDSA algorithm ([#256](https://github.com/MasterKale/SimpleWebAuthn/pull/256))
+- **[testing]** Version sync
+- **[typescript-types]** Version sync
+
+### Breaking Changes
+
+- **[server]** `verifyAuthenticationResponse()` now returns `Promise<VerifiedAuthenticationResponse>` instead of `VerifiedAuthenticationResponse` ([#256](https://github.com/MasterKale/SimpleWebAuthn/pull/256))
+
+Update your existing calls to `verifyAuthenticationResponse()` to handle the values resolved by the promises, whether with `.then()` or `await` depending on your code structure:
+
+**Before:**
+```js
+const verification = verifyAuthenticationResponse({
+  // ...
+});
+```
+
+**After:**
+```js
+const verification = await verifyAuthenticationResponse({
+  // ...
+});
+```
+
+- **[browser]** `browserSupportsWebauthn()` has been renamed to `browserSupportsWebAuthn()` ([#257](https://github.com/MasterKale/SimpleWebAuthn/pull/257))
+
+Update calls to `browserSupportsWebauthn()` to capitalize the "A" in "WebAuthn":
+
+**Before:**
+```js
+if (browserSupportsWebauthn()) {
+  // ...
+}
+```
+
+**After:**
+```js
+if (browserSupportsWebAuthn()) {
+  // ...
+}
+```
+
 ## v5.4.5
 
 **Packages:**
