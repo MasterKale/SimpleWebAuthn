@@ -1,19 +1,20 @@
 import base64url from "base64url";
-import { convertPublicKeyToPEM } from "../helpers/convertPublicKeyToPEM";
 import { toHash } from "../helpers/toHash";
 import { verifySignature } from "../helpers/verifySignature";
+import { convertPublicKeyToPEM } from "../helpers/convertPublicKeyToPEM";
 
 export function verifyDevicePublicKey(
+  credentialID: string,
   clientDataJSON: string,
-  authDataBuffer: Buffer,
-  publicKey: Buffer,
-  encodedSignature: string,
+  nonce: string,
+  dpk: Buffer,
+  signature: Buffer,
 ): boolean {
+  const _credentialID = base64url.toBuffer(credentialID);
   const clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
-  const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
+  const _nonce = base64url.toBuffer(nonce);
+  const signatureBase = Buffer.concat([_credentialID, clientDataHash, _nonce]);
+  const publicKey = convertPublicKeyToPEM(dpk);
 
-  const PEM = convertPublicKeyToPEM(publicKey);
-  const signature = base64url.toBuffer(encodedSignature);
-
-  return verifySignature(signature, signatureBase, PEM);
+  return verifySignature(signature, signatureBase, publicKey);
 }
