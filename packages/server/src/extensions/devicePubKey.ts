@@ -1,7 +1,6 @@
 import base64url from "base64url";
 import { toHash } from "../helpers/toHash";
 import { verifySignature } from "../helpers/verifySignature";
-import { convertPublicKeyToPEM } from "../helpers/convertPublicKeyToPEM";
 import { DevicePublicKeyAuthenticatorOutput } from "helpers/decodeAuthenticatorExtensions";
 
 /**
@@ -14,23 +13,23 @@ import { DevicePublicKeyAuthenticatorOutput } from "helpers/decodeAuthenticatorE
  * @param nonce 
  * @param dpk 
  * @param signature 
- * @returns 
+ * @returns Promise<boolean>
  */
-export function verifyDpkSignature(
+export async function verifyDpkSignature(
   credentialID: string,
   clientDataJSON: string,
   devicePubKey: DevicePublicKeyAuthenticatorOutput,
   signature: Buffer,
-): boolean {
+): Promise<boolean> {
   const rawId = base64url.toBuffer(credentialID);
   const clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
   const nonce = devicePubKey.nonce ? devicePubKey.nonce : Buffer.from('');
   const signatureBase = Buffer.concat([rawId, clientDataHash, nonce]);
-  const publicKey = convertPublicKeyToPEM(devicePubKey.dpk);
+  const credentialPublicKey = devicePubKey.dpk;
 
   // TODO: Implement a logic to verify attestation signatures
 
-  return verifySignature(signature, signatureBase, publicKey);
+  return verifySignature({ signature, signatureBase, credentialPublicKey });
 }
 
 /**
@@ -40,12 +39,9 @@ export function verifyDpkSignature(
  *    `fmt`, and `attStmt` values corresponding to the extracted
  *    *attObjForDevicePublicKey* fields, then perform binary equality checks
  *    between the corresponding stored values and the extracted field values.
- *    The Relying Party may have more than one set of `{aaguid, dpk, scope, fmt,
- *    attStmt}` values mapped to the user account and *credential*.id pair and
- *    each set must be checked.
  * @param devicePubKey 
  * @param expectedDPK 
- * @returns 
+ * @returns boolean
  */
 export function verifyDevicePublicKey(
   devicePubKey: DevicePublicKeyAuthenticatorOutput,
