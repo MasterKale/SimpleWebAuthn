@@ -24,10 +24,13 @@ export type AuthenticationExtensionsAuthenticatorOutputs = {
 };
 
 export type DevicePublicKeyAuthenticatorOutput = {
-  dpk?: Buffer;
-  scp?: Buffer;
-  sig?: string;
-  aaguid?: Buffer;
+  aaguid: Buffer;
+  dpk: Buffer;
+  scope: Buffer;
+  nonce?: Buffer;
+  fmt?: Buffer;
+  attStmt?: Buffer;
+  sig?: Buffer;
 };
 
 // TODO: Need to verify this format
