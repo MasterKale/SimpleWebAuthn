@@ -1,4 +1,5 @@
 import cbor from 'cbor';
+import { AttestationFormat, AttestationStatement } from './decodeAttestationObject';
 
 /**
  * Convert authenticator extension data buffer to a proper object
@@ -28,8 +29,8 @@ export type DevicePublicKeyAuthenticatorOutput = {
   dpk: Buffer;
   scope: Buffer;
   nonce?: Buffer;
-  fmt?: Buffer;
-  attStmt?: Buffer;
+  fmt?: AttestationFormat;
+  attStmt?: AttestationStatement;
   sig?: Buffer;
 };
 
