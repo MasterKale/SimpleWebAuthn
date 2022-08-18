@@ -17,10 +17,9 @@ import { verifyAttestationApple } from '../registration/verifications/verifyAtte
  * 3. Verify that `signature` is a valid signature over the assertion signature
  *    input by the device public key *dpk*. (The signature algorithm is the same
  *    as for the user credential.)
- * @param credentialID 
  * @param clientDataJSON 
- * @param nonce 
- * @param dpk 
+ * @param authData 
+ * @param devicePubKey
  * @param signature 
  * @returns Promise<boolean>
  */
@@ -31,8 +30,7 @@ export async function verifyDpkSignature(
   signature: Buffer,
 ): Promise<boolean> {
   const clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
-  const parsedAuthData = parseAuthenticatorData(authData);
-  const { rpIdHash, credentialID } = parsedAuthData;
+  const { rpIdHash, credentialID } = parseAuthenticatorData(authData);
   
   if (!credentialID) {
     // `authData` without `credentialID` can't be verified.
@@ -114,13 +112,12 @@ export function verifyDevicePublicKey(
   if (!devicePubKey.scope.equals(expectedDPK.scope)) {
     return false;
   }
-  if ((devicePubKey.fmt || expectedDPK.fmt) &&
-      devicePubKey.fmt !== expectedDPK.fmt) {
+  if (devicePubKey.fmt !== expectedDPK.fmt) {
     return false;
   }
   if (devicePubKey.attStmt ||
       expectedDPK.attStmt) {
-    // TODO: Examine if comparing properties is a good idea.
+    // TODO: Implement deep equal comparison logic
     return false;
   }
   return true;
