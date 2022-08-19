@@ -1,5 +1,16 @@
 # Changelog
 
+## v6.1.0
+
+**Packages:**
+
+- @simplewebauthn/server@6.1.0
+
+**Changes:**
+
+- **[server]** Improve support for requiring resident keys when targeting WebAuthn L1 ([#259](https://github.com/MasterKale/SimpleWebAuthn/pull/259))
+- **[server]** Encourage authenticators to produce Ed25519 credential keypairs when supported ([#261](https://github.com/MasterKale/SimpleWebAuthn/pull/261))
+
 ## v6.0.0 - The one with Ed25519 Support
 
 This release also marks the return of the library's ability to pass FIDO Conformance! Adding Ed25519 signature verification (see below) finally allowed the library to pass all required tests, and nearly all optional tests.
