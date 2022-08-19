@@ -32,10 +32,10 @@ export type GenerateRegistrationOptionsOpts = {
  * and https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
 export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
+  // EdDSA (In first position to encourage authenticators to use this over ES256)
+  -8,
   // ECDSA w/ SHA-256
   -7,
-  // EdDSA
-  -8,
   // ECDSA w/ SHA-512
   -36,
   // RSASSA-PSS w/ SHA-256
