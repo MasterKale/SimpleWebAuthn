@@ -8,6 +8,8 @@ import { generateAuthenticationOptions } from './authentication/generateAuthenti
 import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
 import { MetadataService } from './services/metadataService';
 import { SettingsService } from './services/settingsService';
+import { verifyDpkSignature, verifyDevicePublicKey } from 'extensions/devicePubKey';
+import { DevicePublicKeyAuthenticatorOutput } from 'helpers/decodeAuthenticatorExtensions';
 
 export {
   generateRegistrationOptions,
@@ -16,6 +18,8 @@ export {
   verifyAuthenticationResponse,
   MetadataService,
   SettingsService,
+  verifyDpkSignature,
+  verifyDevicePublicKey,
 };
 
 import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions';
@@ -38,4 +42,5 @@ export type {
   VerifyAuthenticationResponseOpts,
   VerifiedRegistrationResponse,
   VerifiedAuthenticationResponse,
+  DevicePublicKeyAuthenticatorOutput,
 };
