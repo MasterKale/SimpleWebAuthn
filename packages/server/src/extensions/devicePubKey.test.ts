@@ -15,3 +15,5 @@ it('should verify a device public key extension', async () => {
   const result = await verifyDpkSignature(clientDataJSON, authData, devicePubKey, signature);
   expect(result).toEqual(true);
 });
+
+// TODO: Implement a test for `verifyDevicePublicKey`
