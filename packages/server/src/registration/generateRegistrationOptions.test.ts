@@ -34,8 +34,8 @@ test('should generate credential request options suitable for sending via JSON',
       displayName: userName,
     },
     pubKeyCredParams: [
-      { alg: -7, type: 'public-key' },
       { alg: -8, type: 'public-key' },
+      { alg: -7, type: 'public-key' },
       { alg: -36, type: 'public-key' },
       { alg: -37, type: 'public-key' },
       { alg: -38, type: 'public-key' },
@@ -252,4 +252,16 @@ test('should set requireResidentKey to false if residentKey if set to discourage
 
   expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
   expect(options.authenticatorSelection?.residentKey).toEqual('discouraged');
+});
+
+test('should prefer Ed25519 in pubKeyCredParams', () => {
+  const options = generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
+
+  expect(options.pubKeyCredParams[0].alg).toEqual(-8);
 });
