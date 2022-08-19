@@ -120,15 +120,35 @@ export function generateRegistrationOptions(
   }));
 
   /**
-   * "Relying Parties SHOULD set [requireResidentKey] to true if, and only if, residentKey is set
-   * to "required""
-   *
-   * See https://www.w3.org/TR/webauthn-2/#dom-authenticatorselectioncriteria-requireresidentkey
+   * Capture some of the nuances of how `residentKey` and `requireResidentKey` how either is set
+   * depending on when either is defined in the options
    */
-  if (authenticatorSelection.residentKey === 'required') {
-    authenticatorSelection.requireResidentKey = true;
+  if (authenticatorSelection.residentKey === undefined) {
+    /**
+     * `residentKey`: "If no value is given then the effective value is `required` if
+     * requireResidentKey is true or `discouraged` if it is false or absent."
+     *
+     * See https://www.w3.org/TR/webauthn-2/#dom-authenticatorselectioncriteria-residentkey
+     */
+    if (authenticatorSelection.requireResidentKey) {
+      authenticatorSelection.residentKey = 'required';
+    } else {
+      /**
+       * FIDO Conformance v1.7.2 fails the first test if we do this, even though this is
+       * technically compatible with the WebAuthn L2 spec...
+       */
+      // authenticatorSelection.residentKey = 'discouraged';
+    }
   } else {
-    authenticatorSelection.requireResidentKey = false;
+    /**
+     * `requireResidentKey`: "Relying Parties SHOULD set it to true if, and only if, residentKey is
+     * set to "required""
+     *
+     * Spec says this property defaults to `false` so we should still be okay to assign `false` too
+     *
+     * See https://www.w3.org/TR/webauthn-2/#dom-authenticatorselectioncriteria-requireresidentkey
+     */
+    authenticatorSelection.requireResidentKey = authenticatorSelection.residentKey === 'required';
   }
 
   return {

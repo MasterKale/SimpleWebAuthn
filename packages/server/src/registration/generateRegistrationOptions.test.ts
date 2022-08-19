@@ -166,3 +166,90 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
     { alg: -65535, type: 'public-key' },
   ]);
 });
+
+test('should require resident key if residentKey option is absent but requireResidentKey is set to true', () => {
+  const options = generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    authenticatorSelection: {
+      requireResidentKey: true,
+    }
+  });
+
+  expect(options.authenticatorSelection?.requireResidentKey).toEqual(true);
+  expect(options.authenticatorSelection?.residentKey).toEqual('required');
+});
+
+test('should discourage resident key if residentKey option is absent but requireResidentKey is set to false', () => {
+  const options = generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    authenticatorSelection: {
+      requireResidentKey: false,
+    }
+  });
+
+  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
+  expect(options.authenticatorSelection?.residentKey).toBeUndefined();
+});
+
+test('should not set resident key if both residentKey and requireResidentKey options are absent', () => {
+  const options = generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
+
+  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
+  expect(options.authenticatorSelection?.residentKey).toBeUndefined();
+});
+
+test('should set requireResidentKey to true if residentKey if set to required', () => {
+  const options = generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    authenticatorSelection: {
+      residentKey: 'required',
+    },
+  });
+
+  expect(options.authenticatorSelection?.requireResidentKey).toEqual(true);
+  expect(options.authenticatorSelection?.residentKey).toEqual('required');
+});
+
+test('should set requireResidentKey to false if residentKey if set to preferred', () => {
+  const options = generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    authenticatorSelection: {
+      residentKey: 'preferred',
+    },
+  });
+
+  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
+  expect(options.authenticatorSelection?.residentKey).toEqual('preferred');
+});
+
+test('should set requireResidentKey to false if residentKey if set to discouraged', () => {
+  const options = generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    authenticatorSelection: {
+      residentKey: 'discouraged',
+    },
+  });
+
+  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
+  expect(options.authenticatorSelection?.residentKey).toEqual('discouraged');
+});
