@@ -117,8 +117,40 @@ export function verifyDevicePublicKey(
   }
   if (devicePubKey.attStmt ||
       expectedDPK.attStmt) {
-    // TODO: Implement deep equal comparison logic
-    return false;
+    const { attStmt } = devicePubKey;
+    const expectedAttStmt = expectedDPK.attStmt;
+    if (!attStmt || !expectedAttStmt) {
+      return false;
+    }
+    if (!attStmt.sig || !expectedAttStmt.sig || !attStmt.sig.equals(expectedAttStmt.sig)) {
+      return false;
+    }
+    if (!attStmt.x5c || !expectedAttStmt.x5c) {
+      return false;
+    }
+    if (attStmt.x5c.length !== expectedAttStmt.x5c.length) {
+      return false;
+    }
+    for (let i = 0; i < attStmt.x5c.length; i++) {
+      if (!attStmt.x5c[i].equals(expectedAttStmt.x5c[i])) {
+        return false;
+      }
+    }
+    if (!attStmt.response || !expectedAttStmt.response || !attStmt.response.equals(expectedAttStmt.response)) {
+      return false;
+    }
+    if (attStmt.alg !== expectedAttStmt.alg) {
+      return false;
+    }
+    if (attStmt.ver !== expectedAttStmt.ver) {
+      return false;
+    }
+    if (!attStmt.certInfo || !expectedAttStmt.certInfo || !attStmt.certInfo.equals(expectedAttStmt.certInfo)) {
+      return false;
+    }
+    if (!attStmt.pubArea || !expectedAttStmt.pubArea || !attStmt.pubArea.equals(expectedAttStmt.pubArea)) {
+      return false;
+    }
   }
   return true;
 }
