@@ -1,4 +1,4 @@
-import { verifyDpkSignature } from './devicePubKey';
+import { verifyDpkSignature } from './verifyDpkSignature';
 
 it('should verify a device public key extension', async () => {
   const clientDataJSON = 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoicTh1SVR0d0czMkhUU3RmdlVxVTcwWXNGNFJfS1A4WnZEYkVESVpZekNDdyIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9';
@@ -15,5 +15,3 @@ it('should verify a device public key extension', async () => {
   const result = await verifyDpkSignature(clientDataJSON, authData, devicePubKey, signature);
   expect(result).toEqual(true);
 });
-
-// TODO: Implement a test for `verifyDevicePublicKey`
