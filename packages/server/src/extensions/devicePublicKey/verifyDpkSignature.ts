@@ -11,24 +11,52 @@ import { verifyAttestationAndroidSafetyNet } from '../../registration/verificati
 import { verifyAttestationTPM } from '../../registration/verifications/tpm/verifyAttestationTPM';
 import { verifyAttestationAndroidKey } from '../../registration/verifications/verifyAttestationAndroidKey';
 import { verifyAttestationApple } from '../../registration/verifications/verifyAttestationApple';
+import {
+  AuthenticationCredentialJSON,
+  AuthenticatorAssertionResponseJSON,
+  RegistrationCredentialJSON,
+  AuthenticatorAttestationResponseJSON
+} from "@simplewebauthn/typescript-types";
+import { decodeAttestationObject } from "../../helpers/decodeAttestationObject";
+
+export type VerifyDpkSignatureOpts = {
+  credential: RegistrationCredentialJSON | AuthenticationCredentialJSON
+  devicePubKey: DevicePublicKeyAuthenticatorOutput;
+  signature: Buffer;
+};
 
 /**
  * https://pr-preview.s3.amazonaws.com/w3c/webauthn/pull/1663.html#sctn-device-publickey-extension-verification-create
  * 3. Verify that `signature` is a valid signature over the assertion signature
  *    input by the device public key *dpk*. (The signature algorithm is the same
  *    as for the user credential.)
- * @param clientDataJSON 
- * @param authData 
- * @param devicePubKey
- * @param signature 
+ * @param options 
  * @returns Promise<boolean>
  */
 export async function verifyDpkSignature(
   options: VerifyDpkSignatureOpts
 ): Promise<boolean> {
-  const { clientDataJSON, authData, devicePubKey, signature } = options;
+  const { credential, devicePubKey, signature } = options;
+
+  let authData;
+  if (isAuthenticationResponse(credential)) {
+    const { authenticatorData } = credential.response;
+    authData = base64url.toBuffer(authenticatorData);
+  }
+  if (isRegistrationResponse(credential)) {
+    const attestationObject = base64url.toBuffer(credential.response.attestationObject);
+    const { authData: authenticatorData } = decodeAttestationObject(attestationObject);
+    authData = authenticatorData;
+  }
+  if (authData === undefined) {
+    throw new Error("AuthenticatorResponse doesn't include authenticatorData");
+  }
+
+  const { clientDataJSON } = credential.response;
   const clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
-  const { rpIdHash, credentialID } = parseAuthenticatorData(authData);
+  const { id } = credential;
+  const credentialID = base64url.toBuffer(id);
+  const { rpIdHash } = parseAuthenticatorData(authData);
   
   if (!credentialID) {
     // `authData` without `credentialID` can't be verified.
@@ -91,9 +119,14 @@ export async function verifyDpkSignature(
   return verifySignature({ signature, signatureBase, credentialPublicKey });
 }
 
-export type VerifyDpkSignatureOpts = {
-  clientDataJSON: string;
-  authData: Buffer;
-  devicePubKey: DevicePublicKeyAuthenticatorOutput;
-  signature: Buffer;
-};
+function isAuthenticationResponse(
+  cred: AuthenticationCredentialJSON | RegistrationCredentialJSON 
+): cred is AuthenticationCredentialJSON {
+  return Object.keys(cred.response as AuthenticatorAssertionResponseJSON).indexOf('authenticatorData') >= 0;
+}
+
+function isRegistrationResponse(
+  cred: AuthenticationCredentialJSON | RegistrationCredentialJSON 
+): cred is RegistrationCredentialJSON {
+  return Object.keys(cred.response as  AuthenticatorAttestationResponseJSON).indexOf('attestationObject') >= 0;
+}
