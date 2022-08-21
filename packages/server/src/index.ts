@@ -8,9 +8,9 @@ import { generateAuthenticationOptions } from './authentication/generateAuthenti
 import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
 import { MetadataService } from './services/metadataService';
 import { SettingsService } from './services/settingsService';
-import { verifyDpkSignature } from 'extensions/devicePublicKey/verifyDpkSignature';
-import { verifyDevicePublicKey } from 'extensions/devicePublicKey/verifyDevicePublicKey';
-import { DevicePublicKeyAuthenticatorOutput } from 'helpers/decodeAuthenticatorExtensions';
+import { verifyDpkSignature } from './extensions/devicePublicKey/verifyDpkSignature';
+import { verifyDevicePublicKey } from './extensions/devicePublicKey/verifyDevicePublicKey';
+import { DevicePublicKeyAuthenticatorOutput } from './helpers/decodeAuthenticatorExtensions';
 
 export {
   generateRegistrationOptions,
