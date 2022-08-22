@@ -2,7 +2,7 @@ import { AuthenticationCredentialJSON, AuthenticatorAssertionResponseJSON, Authe
 import { verifyDpkSignature } from './verifyDpkSignature';
 
 it("should verify a registration response's device public key signature", async () => {
-  const credential = {
+  const credential: RegistrationCredentialJSON = {
     response: {
       clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNFF3dmdUVjhlaTF5TzYyaDF2bVFNWFM2SDZ3UGc0YWt2eDNKcF9VakF3cyIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
       attestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBaQ11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzExQAAAAAAAAAAAAAAAAAAAAAAAAAAABBzGMMHWHmcbqOlBbcR55k0pQECAyYgASFYIIukb9t-EtGUOa2t6YiJEAgz7GyqBN4DFTCzkcMiUGqIIlggmm6GzBPSzP9IYJnX-89R_zmKl6-qQSeQ2qomEC6Cr32hbGRldmljZVB1YktleaVjZHBrWE2lAQIDJiABIVgg7erT_TV2nCPTQN3Bgwp_8g5zVfKdHHWqDcK2rBgup9MiWCA0UdyZkq-UaCW0QZRfydE04Xtzql_qlYA1HnyT9dNlE2NzaWdYRjBEAiALHwldj84eCsg9f0fHD9hylpUK8N_TGOBKBQPoNvfWjQIgChIUfdbO1HBavxbZGQxIt4v23FqFLB2nzwip-avJ6etlbm9uY2VAZXNjb3BlQQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAAA=',
@@ -12,7 +12,7 @@ it("should verify a registration response's device public key signature", async 
     type: 'public-key',
     transports: [],
     clientExtensionResults: ''
-  } as RegistrationCredentialJSON;
+  };
 
   const devicePubKey = {
     aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
