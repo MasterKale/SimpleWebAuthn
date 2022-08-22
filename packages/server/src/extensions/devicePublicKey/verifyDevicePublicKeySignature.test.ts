@@ -1,5 +1,5 @@
 import { AuthenticationCredentialJSON, AuthenticatorAssertionResponseJSON, AuthenticatorAttestationResponseJSON, RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
-import { verifyDpkSignature } from './verifyDpkSignature';
+import { verifyDevicePublicKeySignature } from './verifyDevicePublicKeySignature';
 
 it("should verify a registration response's device public key signature", async () => {
   const credential: RegistrationCredentialJSON = {
@@ -11,7 +11,7 @@ it("should verify a registration response's device public key signature", async 
     rawId: 'cxjDB1h5nG6jpQW3EeeZNA',
     type: 'public-key',
     transports: [],
-    clientExtensionResults: ''
+    clientExtensionResults: {}
   };
 
   const devicePubKey = {
@@ -23,7 +23,7 @@ it("should verify a registration response's device public key signature", async 
   }
   const signature = devicePubKey.sig;
   
-  const result = await verifyDpkSignature({ credential, devicePubKey, signature });
+  const result = await verifyDevicePublicKeySignature({ credential, devicePubKey, signature });
   expect(result).toEqual(true);
 });
 
@@ -49,6 +49,6 @@ it("should verify an authentication response's device public key signature", asy
   }
   const signature = devicePubKey.sig;
   
-  const result = await verifyDpkSignature({ credential, devicePubKey, signature });
+  const result = await verifyDevicePublicKeySignature({ credential, devicePubKey, signature });
   expect(result).toEqual(true);
 });
