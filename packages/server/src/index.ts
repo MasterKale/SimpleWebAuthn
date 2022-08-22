@@ -8,7 +8,7 @@ import { generateAuthenticationOptions } from './authentication/generateAuthenti
 import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
 import { MetadataService } from './services/metadataService';
 import { SettingsService } from './services/settingsService';
-import { verifyDpkSignature } from './extensions/devicePublicKey/verifyDpkSignature';
+import { verifyDevicePublicKeySignature } from './extensions/devicePublicKey/verifyDevicePublicKeySignature';
 import { verifyDevicePublicKey } from './extensions/devicePublicKey/verifyDevicePublicKey';
 import { DevicePublicKeyAuthenticatorOutput } from './helpers/decodeAuthenticatorExtensions';
 
@@ -19,7 +19,7 @@ export {
   verifyAuthenticationResponse,
   MetadataService,
   SettingsService,
-  verifyDpkSignature,
+  verifyDevicePublicKeySignature as verifyDpkSignature,
   verifyDevicePublicKey,
 };
 

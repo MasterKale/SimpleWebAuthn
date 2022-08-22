@@ -19,7 +19,7 @@ import {
 } from "@simplewebauthn/typescript-types";
 import { decodeAttestationObject } from "../../helpers/decodeAttestationObject";
 
-export type VerifyDpkSignatureOpts = {
+export type VerifyDevicePublicKeySignatureOpts = {
   credential: RegistrationCredentialJSON | AuthenticationCredentialJSON
   devicePubKey: DevicePublicKeyAuthenticatorOutput;
   signature: Buffer;
@@ -33,8 +33,8 @@ export type VerifyDpkSignatureOpts = {
  * @param options 
  * @returns Promise<boolean>
  */
-export async function verifyDpkSignature(
-  options: VerifyDpkSignatureOpts
+export async function verifyDevicePublicKeySignature(
+  options: VerifyDevicePublicKeySignatureOpts
 ): Promise<boolean> {
   const { credential, devicePubKey, signature } = options;
 
@@ -56,15 +56,12 @@ export async function verifyDpkSignature(
   const credentialID = base64url.toBuffer(credential.id);
   const { rpIdHash } = parseAuthenticatorData(authData);
   
-  if (!credentialID) {
-    // `authData` without `credentialID` can't be verified.
-    return false;
-  }
-
   const nonce = devicePubKey.nonce ? devicePubKey.nonce : Buffer.from('');
   // According to the spec, `authData` and `clientDataHash` are concatenated as
   // the signature base, but this is an interim implementation.
   const signatureBase = Buffer.concat([credentialID, clientDataHash, nonce]);
+  // It's a device public key and not a credential public key, but to align with
+  // the `verifySinature` signature, we name it `credentialPublicKey`.
   const credentialPublicKey = devicePubKey.dpk;
 
   if (devicePubKey.fmt && devicePubKey.attStmt) {
