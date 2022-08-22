@@ -210,7 +210,7 @@ export async function verifyAuthenticationResponse(
 
   const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
 
-  const toReturn = {
+  const toReturn: VerifiedAuthenticationResponse = {
     verified: await verifySignature({
       signature,
       signatureBase,
