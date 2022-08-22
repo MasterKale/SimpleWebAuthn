@@ -54,8 +54,7 @@ export async function verifyDpkSignature(
 
   const { clientDataJSON } = credential.response;
   const clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
-  const { id } = credential;
-  const credentialID = base64url.toBuffer(id);
+  const credentialID = base64url.toBuffer(credential.id);
   const { rpIdHash } = parseAuthenticatorData(authData);
   
   if (!credentialID) {
