@@ -432,3 +432,16 @@ const authenticatorFirstTimeUsed: AuthenticatorDevice = {
   ),
   counter: 0,
 };
+
+test('should return user verified flag after successful auth', async () => {
+  const verification = await verifyAuthenticationResponse({
+    credential: assertionResponse,
+    expectedChallenge: assertionChallenge,
+    expectedOrigin: assertionOrigin,
+    expectedRPID: 'dev.dontneeda.pw',
+    authenticator: authenticator,
+  });
+
+  expect(verification.authenticationInfo?.userVerified).toBeDefined();
+  expect(verification.authenticationInfo?.userVerified).toEqual(false);
+});

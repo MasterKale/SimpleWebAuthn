@@ -219,6 +219,7 @@ export async function verifyAuthenticationResponse(
     authenticationInfo: {
       newCounter: counter,
       credentialID: authenticator.credentialID,
+      userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
       authenticatorExtensionResults: extensionsData,
@@ -251,6 +252,7 @@ export type VerifiedAuthenticationResponse = {
   authenticationInfo: {
     credentialID: Buffer;
     newCounter: number;
+    userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
     authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
