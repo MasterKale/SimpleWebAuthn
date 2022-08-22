@@ -1,5 +1,15 @@
 # Changelog
 
+## v6.2.0
+
+**Packages:**
+
+- @simplewebauthn/server@6.2.0
+
+**Changes:**
+
+- **[server]** The value of the user verification flag is now returned from `verifyAuthenticationResponse()` as `authenticationInfo.userVerified`, similar to how `verifyRegistrationResponse()` currently returns this value.
+
 ## v6.1.0
 
 **Packages:**
