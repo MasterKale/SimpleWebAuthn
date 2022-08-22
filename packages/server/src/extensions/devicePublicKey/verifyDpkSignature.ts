@@ -42,8 +42,7 @@ export async function verifyDpkSignature(
   if (isAuthenticationResponse(credential)) {
     const { authenticatorData } = credential.response;
     authData = base64url.toBuffer(authenticatorData);
-  }
-  if (isRegistrationResponse(credential)) {
+  } else if (isRegistrationResponse(credential)) {
     const attestationObject = base64url.toBuffer(credential.response.attestationObject);
     const { authData: authenticatorData } = decodeAttestationObject(attestationObject);
     authData = authenticatorData;
