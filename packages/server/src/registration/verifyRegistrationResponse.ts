@@ -27,6 +27,8 @@ import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttesta
 import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM';
 import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey';
 import { verifyAttestationApple } from './verifications/verifyAttestationApple';
+import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
+import { verifyDevicePublicKeyAttestation } from 'extensions/devicePublicKey/verifyDevicePublicKeyAttestation';
 
 export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
@@ -63,7 +65,7 @@ export async function verifyRegistrationResponse(
     requireUserVerification = false,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
-  const { id, rawId, type: credentialType, response } = credential;
+  const { id, rawId, type: credentialType, response, clientExtensionResults } = credential;
 
   // Ensure credential specified an ID
   if (!id) {
@@ -190,6 +192,41 @@ export async function verifyRegistrationResponse(
   if (!supportedAlgorithmIDs.includes(alg as number)) {
     const supported = supportedAlgorithmIDs.join(', ');
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
+  }
+
+  if (flags.ed) {
+    if (!extensionsData && !clientExtensionResults) {
+      throw new Error('Extension results are not included despite the flag.');
+    }
+
+    // TODO: Find a good way to check that returned extension outputs match what
+    // was requested in extension inputs. See 7.1 step 18 in the spec.
+
+    // Device public key sample currently provides the data through
+    // authenticator extension results. 
+    if (extensionsData?.devicePubKey) {
+      const { devicePubKey } = extensionsData;
+      const signature = devicePubKey.sig;
+      if (!signature) {
+        throw new Error('DevicePublicKey signature is missing.');
+      }
+      const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
+        credential,
+        devicePubKey,
+        signature,
+      };
+      const sigResult = await verifyDevicePublicKeySignature(dpkOptions);
+      if (!sigResult) {
+        throw new Error('Invalid device public key signature.');
+      }
+
+      // Optionally verify device public key attestation here as per
+      // 10.2.2.3.1. step 4 in the spec.
+      const attResult = await verifyDevicePublicKeyAttestation(devicePubKey);
+      if (!attResult) {
+        throw new Error('Invalid device public key attestation.');
+      }
+    }
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
