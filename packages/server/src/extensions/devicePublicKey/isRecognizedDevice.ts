@@ -1,3 +1,4 @@
+import { AttestationStatement } from "helpers";
 import { DevicePublicKeyAuthenticatorOutput } from "../../helpers/decodeAuthenticatorExtensions";
 import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttestation";
 
@@ -37,34 +38,6 @@ export async function isRecognizedDevice(
       throw new Error('It is undetermined whether this is a known device.');
     }
 
-    // exactly one match
-    if (matchedDPKs.length === 1) {
-      // This is likely a known device. 
-
-      // If fmt’s value is "none" then there
-      // is no attestation signature to verify and this is a known device public
-      // key with a valid signature and thus a known device. Terminate these
-      // verification steps.
-      if (!responseDevicePublicKey.fmt || responseDevicePublicKey.fmt === 'none') {
-        return;
-      } else {
-        // Perform a binary equality check of `attStmt`.
-        // TODO: if equality check succeeds, 
-        if (!equalityCheck()) {
-          // This authenticator is not generating a fresh per-response random nonce.
-          return;
-        } else {
-          // Otherwise, verify attestation
-          const isValidDPKAttestation = await verifyDevicePublicKeyAttestation(responseDevicePublicKey);
-          if (!isValidDPKAttestation) {
-            throw new Error('Device Public Key attestation is invalid.');
-          }
-        }
-        // This is a valid and a known device.
-        return;
-      }
-    }
-
     // zero matches
     if (matchedDPKs.length === 0) {
       // This is possibly a new device.
@@ -89,6 +62,28 @@ export async function isRecognizedDevice(
         throw new Error('It is undetermined whether this is a known device.');
       }
     }
+
+    // Everything else is exactly one match
+    // This is likely a known device. 
+
+    // If fmt’s value is "none" then there
+    // is no attestation signature to verify and this is a known device public
+    // key with a valid signature and thus a known device. Terminate these
+    // verification steps.
+    if (responseDevicePublicKey.fmt && responseDevicePublicKey.fmt !== 'none') {
+      // Perform a binary equality check of `attStmt`.
+      const knownAttStmt = matchedDPKs[0].attStmt;
+      if (!checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, knownAttStmt)) {
+        // Otherwise, verify attestation
+        const isValidDPKAttestation = await verifyDevicePublicKeyAttestation(responseDevicePublicKey);
+        if (!isValidDPKAttestation) {
+          throw new Error('Device Public Key attestation is invalid.');
+        }
+      }
+    }
+    // This is a valid and a known device.
+    return;
+
   } else {
     // Otherwise, the Relying Party does not have `attObjForDevicePublicKey`
     // fields presently mapped to this user account and credential.id pair:
@@ -98,5 +93,45 @@ export async function isRecognizedDevice(
     }
     return responseDevicePublicKey;
   }
-  return;
+}
+
+function checkAttStmtBinaryEquality(
+  responseAttStmt?: AttestationStatement,
+  knownAttStmt?: AttestationStatement
+): boolean {
+  // `attStmt` in device public key is not optional, but for an interim solution:
+  if (!responseAttStmt || ! knownAttStmt) {
+    return false;
+  }
+
+  if (!responseAttStmt.sig || !knownAttStmt.sig || !responseAttStmt.sig.equals(knownAttStmt.sig)) {
+    return false;
+  }
+  if (!responseAttStmt.x5c || !knownAttStmt.x5c) {
+    return false;
+  }
+  if (responseAttStmt.x5c.length !== knownAttStmt.x5c.length) {
+    return false;
+  }
+  for (let i = 0; i < responseAttStmt.x5c.length; i++) {
+    if (!responseAttStmt.x5c[i].equals(knownAttStmt.x5c[i])) {
+      return false;
+    }
+  }
+  if (!responseAttStmt.response || !knownAttStmt.response || !responseAttStmt.response.equals(knownAttStmt.response)) {
+    return false;
+  }
+  if (responseAttStmt.alg !== knownAttStmt.alg) {
+    return false;
+  }
+  if (responseAttStmt.ver !== knownAttStmt.ver) {
+    return false;
+  }
+  if (!responseAttStmt.certInfo || !knownAttStmt.certInfo || !responseAttStmt.certInfo.equals(knownAttStmt.certInfo)) {
+    return false;
+  }
+  if (!responseAttStmt.pubArea || !knownAttStmt.pubArea || !responseAttStmt.pubArea.equals(knownAttStmt.pubArea)) {
+    return false;
+  }
+  return true;
 }
