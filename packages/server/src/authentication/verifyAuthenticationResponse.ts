@@ -12,7 +12,7 @@ import { verifySignature } from '../helpers/verifySignature';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import { AuthenticationExtensionsAuthenticatorOutputs, DevicePublicKeyAuthenticatorOutput } from '../helpers/decodeAuthenticatorExtensions';
+import { DevicePublicKeyAuthenticatorOutput } from '../helpers/decodeAuthenticatorExtensions';
 import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
 import { isRecognizedDevice } from '../extensions/devicePublicKey/isRecognizedDevice';
 
@@ -197,6 +197,8 @@ export async function verifyAuthenticationResponse(
     }
   }
 
+  const extensionOutputs: ExtensionOutputs = {};
+
   if (flags.ed) {
     if (!extensionsData && !clientExtensionResults) {
       throw new Error('Extension results are not included despite the flag.');
@@ -223,7 +225,8 @@ export async function verifyAuthenticationResponse(
       if (!result) {
         throw new Error('Verifying DevicePublicKey signature failed.');
       }
-      await isRecognizedDevice(devicePubKey, userDevicePublicKey);
+      const devicePubKeyToStore = await isRecognizedDevice(devicePubKey, userDevicePublicKey);
+      extensionOutputs.devicePubKeyToStore = devicePubKeyToStore;
     }
   }
 
@@ -256,8 +259,8 @@ export async function verifyAuthenticationResponse(
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
-      authenticatorExtensionResults: extensionsData,
     },
+    extensionOutputs,
   };
 
   return toReturn;
@@ -289,6 +292,10 @@ export type VerifiedAuthenticationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
-    authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
+  extensionOutputs: ExtensionOutputs;
 };
+
+export type ExtensionOutputs = {
+  devicePubKeyToStore?: DevicePublicKeyAuthenticatorOutput;
+}
