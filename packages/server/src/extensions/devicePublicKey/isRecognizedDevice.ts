@@ -3,7 +3,10 @@ import { DevicePublicKeyAuthenticatorOutput } from "../../helpers/decodeAuthenti
 import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttestation";
 
 /**
- * 
+ * Checks if the device public key matches one of stored DPKs as per described
+ * at 10.2.2.3.2 of the spec. If it's a known device, returns undefined. If it's
+ * a new but valid device, returns the device public key so that the RP can
+ * store it. Throws when it's an invalid device or any unexpected issue occurs.
  * @param responseDevicePublicKey 
  * @param knownDevicePublicKeys
  * @returns DevicePublicKeyAuthenticatorOutput | undefined
