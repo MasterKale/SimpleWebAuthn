@@ -12,7 +12,9 @@ import { verifySignature } from '../helpers/verifySignature';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
+import { AuthenticationExtensionsAuthenticatorOutputs, DevicePublicKeyAuthenticatorOutput } from '../helpers/decodeAuthenticatorExtensions';
+import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
+import { isRecognizedDevice } from '../extensions/devicePublicKey/isRecognizedDevice';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -24,6 +26,7 @@ export type VerifyAuthenticationResponseOpts = {
   advancedFIDOConfig?: {
     userVerification?: UserVerificationRequirement;
   };
+  userDevicePublicKey?: DevicePublicKeyAuthenticatorOutput[];
 };
 
 /**
@@ -56,8 +59,9 @@ export async function verifyAuthenticationResponse(
     authenticator,
     requireUserVerification,
     advancedFIDOConfig,
+    userDevicePublicKey,
   } = options;
-  const { id, rawId, type: credentialType, response } = credential;
+  const { id, rawId, type: credentialType, response, clientExtensionResults } = credential;
 
   // Ensure credential specified an ID
   if (!id) {
@@ -190,6 +194,36 @@ export async function verifyAuthenticationResponse(
     // Enforce user verification if required
     if (requireUserVerification && !flags.uv) {
       throw new Error('User verification required, but user could not be verified');
+    }
+  }
+
+  if (flags.ed) {
+    if (!extensionsData && !clientExtensionResults) {
+      throw new Error('Extension results are not included despite the flag.');
+    }
+
+    // TODO: Find a good way to check that returned extension outputs match what
+    // was requested in extension inputs. See 7.1 step 18 in the spec.
+
+    // DevicePublicKey sample currently provides the data through authenticator
+    // extension results. 
+    if (extensionsData?.devicePubKey) {
+      const { devicePubKey } = extensionsData;
+      const { sig: signature } = devicePubKey;
+
+      if (!signature) {
+        throw new Error('DevicePublicKey signature is missing.');
+      }
+      const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
+        credential,
+        devicePubKey,
+        signature,
+      };
+      const result = await verifyDevicePublicKeySignature(dpkOptions);
+      if (!result) {
+        throw new Error('Verifying DevicePublicKey signature failed.');
+      }
+      await isRecognizedDevice(devicePubKey, userDevicePublicKey);
     }
   }
 
