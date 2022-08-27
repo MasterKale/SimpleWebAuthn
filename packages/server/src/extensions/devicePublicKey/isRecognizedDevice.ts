@@ -98,7 +98,7 @@ export async function isRecognizedDevice(
   }
 }
 
-function checkAttStmtBinaryEquality(
+export function checkAttStmtBinaryEquality(
   responseAttStmt?: AttestationStatement,
   knownAttStmt?: AttestationStatement
 ): boolean {
