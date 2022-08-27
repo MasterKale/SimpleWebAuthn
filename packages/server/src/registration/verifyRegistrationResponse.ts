@@ -28,7 +28,7 @@ import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM';
 import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey';
 import { verifyAttestationApple } from './verifications/verifyAttestationApple';
 import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
-import { verifyDevicePublicKeyAttestation } from 'extensions/devicePublicKey/verifyDevicePublicKeyAttestation';
+import { verifyDevicePublicKeyAttestation } from '../extensions/devicePublicKey/verifyDevicePublicKeyAttestation';
 
 export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
