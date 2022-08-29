@@ -8,7 +8,6 @@ import { generateAuthenticationOptions } from './authentication/generateAuthenti
 import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
 import { MetadataService } from './services/metadataService';
 import { SettingsService } from './services/settingsService';
-import { isRecognizedDevice } from './extensions/devicePublicKey/isRecognizedDevice';
 import { DevicePublicKeyAuthenticatorOutput } from './helpers/decodeAuthenticatorExtensions';
 
 export {
@@ -18,7 +17,6 @@ export {
   verifyAuthenticationResponse,
   MetadataService,
   SettingsService,
-  isRecognizedDevice,
 };
 
 import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions';
