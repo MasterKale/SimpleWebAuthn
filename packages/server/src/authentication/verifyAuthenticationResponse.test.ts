@@ -353,7 +353,7 @@ test('should throw if multiple device public key matches', async () => {
       credentialPublicKey,
       counter: 0,
     },
-    userDevicePublicKey: [sameDevicePubKey, sameDevicePubKey],
+    userDevicePublicKeys: [sameDevicePubKey, sameDevicePubKey],
   })).rejects.toThrowError(new Error('It is undetermined whether this is a known device.'));
 });
 
@@ -368,8 +368,8 @@ test('should return the new device public key when no device public key matches'
       credentialPublicKey,
       counter: 0,
     },
-    userDevicePublicKey: [differentDevicePubKey, differentDevicePubKey],
-  }).then(verification => verification.extensionOutputs?.devicePubKeyToStore)).resolves.toMatchObject(devicePubKey);
+    userDevicePublicKeys: [differentDevicePubKey, differentDevicePubKey],
+  }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKeyToStore)).resolves.toMatchObject(devicePubKey);
 });
 
 test('should return undefined when one device public key matches', async () => {
@@ -383,8 +383,8 @@ test('should return undefined when one device public key matches', async () => {
       credentialPublicKey,
       counter: 0,
     },
-    userDevicePublicKey: [sameDevicePubKey, differentDevicePubKey]
-  }).then(verification => verification.extensionOutputs?.devicePubKeyToStore)).resolves.toBeUndefined();
+    userDevicePublicKeys: [sameDevicePubKey, differentDevicePubKey]
+  }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKeyToStore)).resolves.toBeUndefined();
 });
 
 test('should return credential backup info', async () => {

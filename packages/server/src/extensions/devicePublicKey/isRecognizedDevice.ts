@@ -54,8 +54,9 @@ export async function isRecognizedDevice(
         // pair then:
         const isValidDPKAttestation = await verifyDevicePublicKeyAttestation(responseDevicePublicKey);
         if (!isValidDPKAttestation) {
-          throw new Error('Device public key attestation is invalid.');
+          throw new Error('DevicePublicKey attestation could not be verified');
         }
+        // When `fmt` is `none` or the device public key attestation is valid, store the DPK.
         return responseDevicePublicKey;
       } else {
         // Otherwise there is some form of error: we recieved a known dpk
@@ -75,13 +76,22 @@ export async function isRecognizedDevice(
     // verification steps.
     if (responseDevicePublicKey.fmt && responseDevicePublicKey.fmt !== 'none') {
       // Perform a binary equality check of `attStmt`.
-      const knownAttStmt = matchedDPKs[0].attStmt;
-      if (!checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, knownAttStmt)) {
+      const recognizedDPKAttStmt = matchedDPKs[0].attStmt;
+      let dpksAreBinaryEqual = false;
+      try {
+        dpksAreBinaryEqual = checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, recognizedDPKAttStmt);
+      } catch (err) {
+        // const _err = err as Error;
+        // How do we message the error cause?
+        // throw new Error(`DevicePublicKey attStmt's were not equal: ${_err.message}`);
         // Otherwise, verify attestation
         const isValidDPKAttestation = await verifyDevicePublicKeyAttestation(responseDevicePublicKey);
         if (!isValidDPKAttestation) {
-          throw new Error('Device Public Key attestation is invalid.');
+          throw new Error('DevicePublicKey attestation could not be verified.');
         }
+      }
+
+      if (!dpksAreBinaryEqual) {
       }
     }
     // This is a valid and a known device.
@@ -92,49 +102,50 @@ export async function isRecognizedDevice(
     // fields presently mapped to this user account and credential.id pair:
     const isValidDPKAttestation = await verifyDevicePublicKeyAttestation(responseDevicePublicKey);
     if (!isValidDPKAttestation) {
-      throw new Error('Device Public Key attestation is invalid.');
+      throw new Error('DevicePublicKey attestation could not be verified');
     }
+    // When `fmt` is `none` or the device public key attestation is valid, store the DPK.
     return responseDevicePublicKey;
   }
 }
 
 export function checkAttStmtBinaryEquality(
-  responseAttStmt?: AttestationStatement,
-  knownAttStmt?: AttestationStatement
+  responseDPKAttStmt?: AttestationStatement,
+  recognizedDPKAttStmt?: AttestationStatement
 ): boolean {
   // `attStmt` in device public key is not optional, but for an interim solution:
-  if (!responseAttStmt || ! knownAttStmt) {
-    return false;
+  if (!responseDPKAttStmt || ! recognizedDPKAttStmt) {
+    throw new Error('attStmt in a DevicePublicKey is missing.');
   }
 
-  if (!responseAttStmt.sig || !knownAttStmt.sig || !responseAttStmt.sig.equals(knownAttStmt.sig)) {
-    return false;
+  if (!responseDPKAttStmt.sig || !recognizedDPKAttStmt.sig || !responseDPKAttStmt.sig.equals(recognizedDPKAttStmt.sig)) {
+    throw new Error("Response DPK sig and recognized DPK sig did not match.")
   }
-  if (!responseAttStmt.x5c || !knownAttStmt.x5c) {
-    return false;
+  if (!responseDPKAttStmt.x5c || !recognizedDPKAttStmt.x5c) {
+    throw new Error("Response DPK x5c and recognized DPK x5c did not match.")
   }
-  if (responseAttStmt.x5c.length !== knownAttStmt.x5c.length) {
-    return false;
+  if (responseDPKAttStmt.x5c.length !== recognizedDPKAttStmt.x5c.length) {
+    throw new Error("Response DPK x5c length and recognized DPK x5c length did not match.")
   }
-  for (let i = 0; i < responseAttStmt.x5c.length; i++) {
-    if (!responseAttStmt.x5c[i].equals(knownAttStmt.x5c[i])) {
-      return false;
+  for (let i = 0; i < responseDPKAttStmt.x5c.length; i++) {
+    if (!responseDPKAttStmt.x5c[i].equals(recognizedDPKAttStmt.x5c[i])) {
+      throw new Error("Response DPK x5c length and recognized DPK x5c length did not match.")
     }
   }
-  if (!responseAttStmt.response || !knownAttStmt.response || !responseAttStmt.response.equals(knownAttStmt.response)) {
-    return false;
+  if (!responseDPKAttStmt.response || !recognizedDPKAttStmt.response || !responseDPKAttStmt.response.equals(recognizedDPKAttStmt.response)) {
+    throw new Error("Response DPK response and recognized DPK response did not match.")
   }
-  if (responseAttStmt.alg !== knownAttStmt.alg) {
-    return false;
+  if (responseDPKAttStmt.alg !== recognizedDPKAttStmt.alg) {
+    throw new Error("Response DPK alg and recognized DPK alg did not match.")
   }
-  if (responseAttStmt.ver !== knownAttStmt.ver) {
-    return false;
+  if (responseDPKAttStmt.ver !== recognizedDPKAttStmt.ver) {
+    throw new Error("Response DPK ver and recognized DPK ver did not match.")
   }
-  if (!responseAttStmt.certInfo || !knownAttStmt.certInfo || !responseAttStmt.certInfo.equals(knownAttStmt.certInfo)) {
-    return false;
+  if (!responseDPKAttStmt.certInfo || !recognizedDPKAttStmt.certInfo || !responseDPKAttStmt.certInfo.equals(recognizedDPKAttStmt.certInfo)) {
+    throw new Error("Response DPK certInfo and recognized DPK certInfo did not match.")
   }
-  if (!responseAttStmt.pubArea || !knownAttStmt.pubArea || !responseAttStmt.pubArea.equals(knownAttStmt.pubArea)) {
-    return false;
+  if (!responseDPKAttStmt.pubArea || !recognizedDPKAttStmt.pubArea || !responseDPKAttStmt.pubArea.equals(recognizedDPKAttStmt.pubArea)) {
+    throw new Error("Response DPK pubArea and recognized DPK pubArea did not match.")
   }
   return true;
 }

@@ -26,7 +26,7 @@ export type VerifyAuthenticationResponseOpts = {
   advancedFIDOConfig?: {
     userVerification?: UserVerificationRequirement;
   };
-  userDevicePublicKey?: DevicePublicKeyAuthenticatorOutput[];
+  userDevicePublicKeys?: DevicePublicKeyAuthenticatorOutput[];
 };
 
 /**
@@ -59,7 +59,7 @@ export async function verifyAuthenticationResponse(
     authenticator,
     requireUserVerification,
     advancedFIDOConfig,
-    userDevicePublicKey,
+    userDevicePublicKeys,
   } = options;
   const { id, rawId, type: credentialType, response, clientExtensionResults } = credential;
 
@@ -201,31 +201,32 @@ export async function verifyAuthenticationResponse(
 
   if (flags.ed) {
     if (!extensionsData && !clientExtensionResults) {
-      throw new Error('Extension results are not included despite the flag.');
+      throw new Error('Authenticator data indicated extension data was present,'+
+        ' but no client or authenticator extension data were found');
     }
 
     // TODO: Find a good way to check that returned extension outputs match what
     // was requested in extension inputs. See 7.1 step 18 in the spec.
 
     // DevicePublicKey sample currently provides the data through authenticator
-    // extension results. 
+    // extension results.
     if (extensionsData?.devicePubKey) {
       const { devicePubKey } = extensionsData;
-      const { sig: signature } = devicePubKey;
+      const { sig: dpkSig } = devicePubKey;
 
-      if (!signature) {
-        throw new Error('DevicePublicKey signature is missing.');
+      if (!dpkSig) {
+        throw new Error('DevicePublicKey was missing signature.');
       }
       const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
         credential,
         devicePubKey,
-        signature,
+        signature: dpkSig,
       };
       const result = await verifyDevicePublicKeySignature(dpkOptions);
       if (!result) {
-        throw new Error('Verifying DevicePublicKey signature failed.');
+        throw new Error('DevicePublicKey signature could not be verified');
       }
-      const devicePubKeyToStore = await isRecognizedDevice(devicePubKey, userDevicePublicKey);
+      const devicePubKeyToStore = await isRecognizedDevice(devicePubKey, userDevicePublicKeys);
       extensionOutputs.devicePubKeyToStore = devicePubKeyToStore;
     }
   }
@@ -259,8 +260,8 @@ export async function verifyAuthenticationResponse(
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
+      extensionOutputs,
     },
-    extensionOutputs,
   };
 
   return toReturn;
@@ -292,8 +293,8 @@ export type VerifiedAuthenticationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
+    extensionOutputs: ExtensionOutputs;
   };
-  extensionOutputs: ExtensionOutputs;
 };
 
 export type ExtensionOutputs = {
