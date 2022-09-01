@@ -8,6 +8,7 @@ import {
   AuthenticatorDevice,
   AuthenticationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
+import { DevicePublicKeyAuthenticatorOutput } from '../helpers/decodeAuthenticatorExtensions';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -311,52 +312,79 @@ test('should fail verification if custom challenge verifier returns false', asyn
   ).rejects.toThrow(/custom challenge verifier returned false/i);
 });
 
-test('should return authenticator extension output', async () => {
-  const verification = await verifyAuthenticationResponse({
-    credential: {
-      response: {
-        clientDataJSON:
-          'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiaVpzVkN6dHJEVzdEMlVfR0hDSWxZS0x3VjJiQ3NCVFJxVlFVbkpYbjlUayIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
-        authenticatorData:
-          'DXX8xWP9p3nbLjQ-6kiYiHWLeFSdSTpP2-oc2WqjHMSFAAAAAKFvZGV2aWNlUHVibGljS2V5pWNkcGtYTaUBAgMmIAEhWCCZGqvtneQnGp7erYgG-dyW1tzNDEdiU6VRBInsg3m-WyJYIKCXPP3tu3nif-9O50gWc_szElBN3KVDTP0jQx1q0p7aY3NpZ1hHMEUCIElSbNKK72tOYhp9WTbStQSVL8CuIxOk8DV6r_-uqWR0AiEAnVE6yu-wsyx2Wq5v66jClGhe_2P_HL8R7PIQevT-uPhlbm9uY2VAZXNjb3BlQQBmYWFndWlkULk_2WHy5kYvsSKCACJH3ng=',
-        signature:
-          'MEYCIQDlRuxY7cYre0sb3T6TovQdfYIUb72cRZYOQv_zS9wN_wIhAOvN-fwjtyIhWRceqJV4SX74-z6oALERbC7ohk8EdVPO',
-        userHandle: 'b2FPajFxcmM4MWo3QkFFel9RN2lEakh5RVNlU2RLNDF0Sl92eHpQYWV5UQ==',
-      },
-      id: 'E_Pko4wN1BXE23S0ftN3eQ',
-      rawId: 'E_Pko4wN1BXE23S0ftN3eQ',
-      type: 'public-key',
-      clientExtensionResults: {},
-    },
+const devicePubKey: DevicePublicKeyAuthenticatorOutput = {
+  "dpk": Buffer.from('A5010203262001215820EDEAD3FD35769C23D340DDC1830A7FF20E7355F29D1C75AA0DC2B6AC182EA7D32258203451DC9992AF946825B441945FC9D134E17B73AA5FEA9580351E7C93F5D36513', 'hex'),
+  "sig": Buffer.from('3045022100BC6DD9AF5E47BB3AB82731299EAE82A779189E4E416E3A0E37A3BA64C38F991202205671EFAC0E8CD6DE1D3640CE7E4E89D3A97E0517B603D8AC28F23E4E1F74E639', 'hex'),
+  "nonce": Buffer.from('', 'hex'),
+  "scope": Buffer.from('00', 'hex'),
+  "aaguid": Buffer.from('B93FD961F2E6462FB12282002247DE78', 'hex'),
+};
+const sameDevicePubKey = devicePubKey;
+const differentDevicePubKey: DevicePublicKeyAuthenticatorOutput = {
+  "dpk": Buffer.from('A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA', 'hex'),
+  "sig": Buffer.from('3045022049526CD28AEF6B4E621A7D5936D2B504952FC0AE2313A4F0357AAFFFAEA964740221009D513ACAEFB0B32C765AAE6FEBA8C294685EFF63FF1CBF11ECF2107AF4FEB8F8', 'hex'),
+  "nonce": Buffer.from('', 'hex'),
+  "scope": Buffer.from('00', 'hex'),
+  "aaguid": Buffer.from('B93FD961F2E6462FB12282002247DE78', 'hex'),
+};
+const authenticationCredentialWithDevicePublicKey: AuthenticationCredentialJSON = {
+  response: {
+    "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoicTh1SVR0d0czMkhUU3RmdlVxVTcwWXNGNFJfS1A4WnZEYkVESVpZekNDdyIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9",
+    "authenticatorData": "DXX8xWP9p3nbLjQ-6kiYiHWLeFSdSTpP2-oc2WqjHMSFAAAAAKFsZGV2aWNlUHViS2V5pWNkcGtYTaUBAgMmIAEhWCDt6tP9NXacI9NA3cGDCn_yDnNV8p0cdaoNwrasGC6n0yJYIDRR3JmSr5RoJbRBlF_J0TThe3OqX-qVgDUefJP102UTY3NpZ1hHMEUCIQC8bdmvXke7OrgnMSmeroKneRieTkFuOg43o7pkw4-ZEgIgVnHvrA6M1t4dNkDOfk6J06l-BRe2A9isKPI-Th905jllbm9uY2VAZXNjb3BlQQBmYWFndWlkULk_2WHy5kYvsSKCACJH3ng=",
+    "signature": "MEUCIEXJbR9-0cpcUdGAJi25Qf3z22lnCidx3box2b0bWKhwAiEAkp5zCbVbN2CEtIyezQEa9SOG62xm8YHdE1G5qov64j8=",
+    "userHandle": "b2FPajFxcmM4MWo3QkFFel9RN2lEakh5RVNlU2RLNDF0Sl92eHpQYWV5UQ=="
+  },
+  id: "cxjDB1h5nG6jpQW3EeeZNA",
+  rawId: "cxjDB1h5nG6jpQW3EeeZNA",
+  type: "public-key",
+  clientExtensionResults: {}
+};
+const credentialID = base64url.toBuffer('cxjDB1h5nG6jpQW3EeeZNA');
+const credentialPublicKey = base64url.toBuffer('pQECAyYgASFYIIukb9t-EtGUOa2t6YiJEAgz7GyqBN4DFTCzkcMiUGqIIlggmm6GzBPSzP9IYJnX-89R_zmKl6-qQSeQ2qomEC6Cr30');
+
+test('should throw if multiple device public key matches', async () => {
+  await expect(verifyAuthenticationResponse({
+    credential: authenticationCredentialWithDevicePublicKey,
     expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
     expectedRPID: 'try-webauthn.appspot.com',
-    expectedChallenge: 'iZsVCztrDW7D2U_GHCIlYKLwV2bCsBTRqVQUnJXn9Tk',
+    expectedChallenge: 'q8uITtwG32HTStfvUqU70YsF4R_KP8ZvDbEDIZYzCCw',
     authenticator: {
-      credentialID: base64url.toBuffer(
-        'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
-      ),
-      credentialPublicKey: base64url.toBuffer(
-        'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
-      ),
+      credentialID,
+      credentialPublicKey,
       counter: 0,
     },
-  });
+    userDevicePublicKeys: [sameDevicePubKey, sameDevicePubKey],
+  })).rejects.toThrowError(new Error('It is undetermined whether this is a known device.'));
+});
 
-  expect(verification.authenticationInfo?.authenticatorExtensionResults).toMatchObject({
-    devicePublicKey: {
-      dpk: Buffer.from(
-        'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
-        'hex',
-      ),
-      sig: Buffer.from(
-        '3045022049526CD28AEF6B4E621A7D5936D2B504952FC0AE2313A4F0357AAFFFAEA964740221009D513ACAEFB0B32C765AAE6FEBA8C294685EFF63FF1CBF11ECF2107AF4FEB8F8',
-        'hex',
-      ),
-      nonce: Buffer.from('', 'hex'),
-      scope: Buffer.from('00', 'hex'),
-      aaguid: Buffer.from('B93FD961F2E6462FB12282002247DE78', 'hex'),
+test('should return the new device public key when no device public key matches', async () => {
+  await expect(verifyAuthenticationResponse({
+    credential: authenticationCredentialWithDevicePublicKey,
+    expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
+    expectedRPID: 'try-webauthn.appspot.com',
+    expectedChallenge: 'q8uITtwG32HTStfvUqU70YsF4R_KP8ZvDbEDIZYzCCw',
+    authenticator: {
+      credentialID,
+      credentialPublicKey,
+      counter: 0,
     },
-  });
+    userDevicePublicKeys: [differentDevicePubKey, differentDevicePubKey],
+  }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKeyToStore)).resolves.toMatchObject(devicePubKey);
+});
+
+test('should return undefined when one device public key matches', async () => {
+  await expect(verifyAuthenticationResponse({
+    credential: authenticationCredentialWithDevicePublicKey,
+    expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
+    expectedRPID: 'try-webauthn.appspot.com',
+    expectedChallenge: 'q8uITtwG32HTStfvUqU70YsF4R_KP8ZvDbEDIZYzCCw',
+    authenticator: {
+      credentialID,
+      credentialPublicKey,
+      counter: 0,
+    },
+    userDevicePublicKeys: [sameDevicePubKey, differentDevicePubKey]
+  }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKeyToStore)).resolves.toBeUndefined();
 });
 
 test('should return credential backup info', async () => {

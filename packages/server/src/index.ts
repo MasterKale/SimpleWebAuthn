@@ -8,6 +8,7 @@ import { generateAuthenticationOptions } from './authentication/generateAuthenti
 import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
 import { MetadataService } from './services/metadataService';
 import { SettingsService } from './services/settingsService';
+import { DevicePublicKeyAuthenticatorOutput } from './helpers/decodeAuthenticatorExtensions';
 
 export {
   generateRegistrationOptions,
@@ -38,4 +39,5 @@ export type {
   VerifyAuthenticationResponseOpts,
   VerifiedRegistrationResponse,
   VerifiedAuthenticationResponse,
+  DevicePublicKeyAuthenticatorOutput,
 };

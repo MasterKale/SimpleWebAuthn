@@ -1,4 +1,5 @@
 import cbor from 'cbor';
+import { AttestationFormat, AttestationStatement } from './decodeAttestationObject';
 
 /**
  * Convert authenticator extension data buffer to a proper object
@@ -24,10 +25,13 @@ export type AuthenticationExtensionsAuthenticatorOutputs = {
 };
 
 export type DevicePublicKeyAuthenticatorOutput = {
-  dpk?: Buffer;
-  scp?: Buffer;
-  sig?: string;
-  aaguid?: Buffer;
+  aaguid: Buffer;
+  dpk: Buffer;
+  scope: Buffer;
+  nonce?: Buffer;
+  fmt?: AttestationFormat;
+  attStmt?: AttestationStatement;
+  sig?: Buffer;
 };
 
 // TODO: Need to verify this format
