@@ -197,7 +197,7 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const extensionOutputs: ExtensionOutputs = {};
+  const extensionOutputs: AuthenticationExtensionOutputs = {};
 
   if (flags.ed) {
     if (!extensionsData && !clientExtensionResults) {
@@ -293,10 +293,10 @@ export type VerifiedAuthenticationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
-    extensionOutputs: ExtensionOutputs;
+    extensionOutputs: AuthenticationExtensionOutputs;
   };
 };
 
-export type ExtensionOutputs = {
+export type AuthenticationExtensionOutputs = {
   devicePubKeyToStore?: DevicePublicKeyAuthenticatorOutput;
 }
