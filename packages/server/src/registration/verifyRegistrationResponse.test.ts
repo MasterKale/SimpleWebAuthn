@@ -602,7 +602,7 @@ test('should return authenticator extension output', async () => {
     expectedRPID: 'try-webauthn.appspot.com',
   });
 
-  expect(verification.registrationInfo?.authenticatorExtensionResults).toMatchObject({
+  expect(verification.registrationInfo?.extensionOutputs).toMatchObject({
     devicePubKey: {
       dpk: Buffer.from(
         'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
