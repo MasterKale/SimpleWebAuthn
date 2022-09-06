@@ -31,7 +31,6 @@ export type DevicePublicKeyAuthenticatorOutput = {
   nonce?: Buffer;
   fmt?: AttestationFormat;
   attStmt?: AttestationStatement;
-  sig?: Buffer;
 };
 
 // TODO: Need to verify this format

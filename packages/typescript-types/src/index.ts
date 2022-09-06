@@ -28,7 +28,7 @@ export interface PublicKeyCredentialCreationOptionsJSON
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64URLString;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
-  extensions?: AuthenticationExtensionsClientInputs;
+  extensions?: AuthenticationExtensionsClientInputsFuture;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface PublicKeyCredentialRequestOptionsJSON
   extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
   challenge: Base64URLString;
   allowCredentials?: PublicKeyCredentialDescriptorJSON[];
-  extensions?: AuthenticationExtensionsClientInputs;
+  extensions?: AuthenticationExtensionsClientInputsFuture;
 }
 
 export interface PublicKeyCredentialDescriptorJSON
@@ -68,7 +68,7 @@ export interface RegistrationCredentialJSON
   extends Omit<RegistrationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
-  clientExtensionResults: AuthenticationExtensionsClientOutputs;
+  clientExtensionResults: AuthenticationExtensionsClientOutputsFuture;
   transports?: AuthenticatorTransportFuture[];
 }
 
@@ -87,7 +87,25 @@ export interface AuthenticationCredentialJSON
   extends Omit<AuthenticationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
-  clientExtensionResults: AuthenticationExtensionsClientOutputs;
+  clientExtensionResults: AuthenticationExtensionsClientOutputsFuture;
+}
+
+export interface AuthenticationExtensionsDevicePublicKeyInputs {
+  attestation: string;
+  attestationFormats: string[];
+}
+
+export interface AuthenticationExtensionsClientInputsFuture extends AuthenticationExtensionsClientInputs {
+  devicePubKey: AuthenticationExtensionsDevicePublicKeyInputs;
+}
+
+export interface AuthenticationExtensionsDevicePublicKeyOutputs {
+  authenticatorOutput: Buffer;
+  signature: Buffer;
+}
+
+export interface AuthenticationExtensionsClientOutputsFuture extends AuthenticationExtensionsClientOutputs {
+  devicePubKey: AuthenticationExtensionsDevicePublicKeyOutputs
 }
 
 /**
