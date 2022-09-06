@@ -15,6 +15,7 @@ import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { DevicePublicKeyAuthenticatorOutput } from '../helpers/decodeAuthenticatorExtensions';
 import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
 import { isRecognizedDevice } from '../extensions/devicePublicKey/isRecognizedDevice';
+import { decodeDevicePubKey, decodeDevicePubKeyAuthenticatorOutput } from 'extensions/devicePublicKey/decodeDevicePubKey';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -148,7 +149,7 @@ export async function verifyAuthenticationResponse(
 
   const authDataBuffer = base64url.toBuffer(response.authenticatorData);
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
-  const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
+  const { rpIdHash, flags, counter } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   if (typeof expectedRPID === 'string') {
@@ -200,32 +201,42 @@ export async function verifyAuthenticationResponse(
   const extensionOutputs: AuthenticationExtensionOutputs = {};
 
   if (flags.ed) {
-    if (!extensionsData && !clientExtensionResults) {
+    if (!clientExtensionResults) {
       throw new Error('Authenticator data indicated extension data was present,'+
-        ' but no client or authenticator extension data were found');
+        ' but no client extension data were found');
     }
 
     // TODO: Find a good way to check that returned extension outputs match what
     // was requested in extension inputs. See 7.1 step 18 in the spec.
 
     // DevicePublicKey sample currently provides the data through authenticator
-    // extension results.
-    if (extensionsData?.devicePubKey) {
-      const { devicePubKey } = extensionsData;
-      const { sig: dpkSig } = devicePubKey;
-
-      if (!dpkSig) {
-        throw new Error('DevicePublicKey was missing signature.');
+    // extension results. 
+    if (clientExtensionResults.devicePubKey) {
+      const { devicePubKey: encodedDevicePubKey } = clientExtensionResults;
+      const devicePubKey =  decodeDevicePubKey(encodedDevicePubKey);
+      if (!devicePubKey) {
+        throw new Error('No device public key was provided in the client extension results.');
       }
+      const { authenticatorOutput: encodedAuthenticatorOutput, signature } = devicePubKey;
+      if (!signature) {
+        throw new Error('Device public key signature is missing.');
+      }
+
+      const authenticatorOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
+      if (!authenticatorOutput) {
+        throw new Error('Device public key authenticator output is corrupt.');
+      }
+
       const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
         credential,
-        devicePubKey,
-        signature: dpkSig,
+        authenticatorOutput,
+        signature,
       };
       const result = await verifyDevicePublicKeySignature(dpkOptions);
       if (!result) {
-        throw new Error('DevicePublicKey signature could not be verified');
+        throw new Error('Invalid device public key signature.');
       }
+
       const devicePubKeyToStore = await isRecognizedDevice(devicePubKey, userDevicePublicKeys);
       extensionOutputs.devicePubKeyToStore = devicePubKeyToStore;
     }
