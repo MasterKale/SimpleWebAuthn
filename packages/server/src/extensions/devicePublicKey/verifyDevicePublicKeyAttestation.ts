@@ -1,4 +1,4 @@
-import { DevicePublicKeyAuthenticatorOutput } from "../../helpers/decodeAuthenticatorExtensions";
+import { DevicePublicKeyAuthenticatorOutput } from "./decodeDevicePubKey";
 import {
   AuthenticationCredentialJSON,
   RegistrationCredentialJSON,

@@ -10,7 +10,6 @@ import {
   AttestationStatement,
   decodeAttestationObject,
 } from '../helpers/decodeAttestationObject';
-import { DevicePublicKeyAuthenticatorOutput } from '../helpers/decodeAuthenticatorExtensions';
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
@@ -29,7 +28,11 @@ import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAn
 import { verifyAttestationApple } from './verifications/verifyAttestationApple';
 import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
 import { verifyDevicePublicKeyAttestation } from '../extensions/devicePublicKey/verifyDevicePublicKeyAttestation';
-import { decodeDevicePubKey, decodeDevicePubKeyAuthenticatorOutput } from '../extensions/devicePublicKey/decodeDevicePubKey';
+import {
+  DevicePublicKeyAuthenticatorOutput,
+  decodeDevicePubKey,
+  decodeDevicePubKeyAuthenticatorOutput
+} from '../extensions/devicePublicKey/decodeDevicePubKey';
 
 export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
@@ -209,39 +212,30 @@ export async function verifyRegistrationResponse(
     // Device public key sample currently provides the data through
     // authenticator extension results. 
     if (clientExtensionResults.devicePubKey) {
-      const { devicePubKey: encodedDevicePubKey } = clientExtensionResults;
-      const devicePubKey =  decodeDevicePubKey(encodedDevicePubKey);
-      if (!devicePubKey) {
-        throw new Error('No device public key was provided in the client extension results.');
-      }
+      const devicePubKey = decodeDevicePubKey(clientExtensionResults.devicePubKey);
       const { authenticatorOutput: encodedAuthenticatorOutput, signature } = devicePubKey;
-      if (!signature) {
-        throw new Error('Device public key signature is missing.');
-      }
+      const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
 
-      const authenticatorOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
-      if (!authenticatorOutput) {
-        throw new Error('Device public key authenticator output is corrupt.');
-      }
-
-      const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
+      const dpkOpts: VerifyDevicePublicKeySignatureOpts = {
         credential,
-        authenticatorOutput,
-        signature,
-      };
-      const result = await verifyDevicePublicKeySignature(dpkOptions);
+        authenticatorOutput: dpkAuthOutput,
+        signature
+      }
+
+      const result = await verifyDevicePublicKeySignature(dpkOpts);
+
       if (!result) {
         throw new Error('DevicePublicKey signature could not be verified');
       }
 
       // Optionally verify device public key attestation here as per
       // 10.2.2.3.1. step 4 in the spec.
-      const attResult = await verifyDevicePublicKeyAttestation(encodedDevicePubKey);
+      const attResult = await verifyDevicePublicKeyAttestation(dpkAuthOutput);
       if (!attResult) {
         throw new Error('Invalid device public key attestation.');
       }
 
-      extensionOutputs.devicePubKeyToStore = devicePubKey;
+      extensionOutputs.devicePubKeyToStore = dpkAuthOutput;
     }
   }
 
