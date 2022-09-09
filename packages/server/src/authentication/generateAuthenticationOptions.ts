@@ -1,5 +1,5 @@
 import type {
-  AuthenticationExtensionsClientInputs,
+  AuthenticationExtensionsClientInputsFuture,
   PublicKeyCredentialRequestOptionsJSON,
   PublicKeyCredentialDescriptorFuture,
   UserVerificationRequirement,
@@ -13,7 +13,7 @@ export type GenerateAuthenticationOptionsOpts = {
   challenge?: string | Buffer;
   timeout?: number;
   userVerification?: UserVerificationRequirement;
-  extensions?: AuthenticationExtensionsClientInputs;
+  extensions?: AuthenticationExtensionsClientInputsFuture;
   rpID?: string;
 };
 

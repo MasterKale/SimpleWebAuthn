@@ -583,38 +583,37 @@ test('should return credential backup info', async () => {
 test('should return authenticator extension output', async () => {
   const verification = await verifyRegistrationResponse({
     credential: {
-      id: 'E_Pko4wN1BXE23S0ftN3eQ',
-      rawId: 'E_Pko4wN1BXE23S0ftN3eQ',
       response: {
-        attestationObject:
-          'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBag11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzExQAAAAAAAAAAAAAAAAAAAAAAAAAAABAT8-SjjA3UFcTbdLR-03d5pQECAyYgASFYIJIkX8fs9wjKUv5HWBUop--6ig4Szsxj8gBgJJmaX-_5IlggJ5XVdjUfCMlVlUZuHJRxCLFLzZCeK8Fg3l6OLfAIHnKhbGRldmljZVB1YktleaVjZHBrWE2lAQIDJiABIVggmRqr7Z3kJxqe3q2IBvncltbczQxHYlOlUQSJ7IN5vlsiWCCglzz97bt54n_vTudIFnP7MxJQTdylQ0z9I0MdatKe2mNzaWdYRzBFAiEA77OAdL0VuMgs8J-H-8b7PHFp6k8YBrfpCTc3QwI0W3oCICtxEwQHMaDnJ9M41IVChjzmWICqeeXqdArIzNlDR5iOZW5vbmNlQGVzY29wZUEAZmFhZ3VpZFAAAAAAAAAAAAAAAAAAAAAA',
-        clientDataJSON:
-          'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQXJrcmxfRnhfTXZjSl9lSXFDVFE3LXRiRVNJ' +
-          'U1IxNC1weVBSaDBLLTFBOCIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5' +
-          'ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxl' +
-          'LmZpZG8yYXBpZXhhbXBsZSJ9',
+        clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNkM0QUptNmJyTVJwSF9JZVhDVmtHTTUydnVwTy14Y1huNldlcWIyVjJtTSIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
+        attestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBMA11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzE3QAAAAAAAAAAAAAAAAAAAAAAAAAAABAHFimPeuzlYZbxRWdeyYzOpQECAyYgASFYIPLEylOIRiI7z7q6zuYjWB9TcOj9yNwmawogQJ4ZKpNAIlggd9ZqIjd30p1tIU6A8ue5wEZl9q_AsKR_leaHFZ_bwWmhbGRldmljZVB1YktleViMpmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
       },
-      clientExtensionResults: {},
+      id: 'BxYpj3rs5WGW8UVnXsmMzg',
+      rawId: 'BxYpj3rs5WGW8UVnXsmMzg',
       type: 'public-key',
+      transports: [],
+      clientExtensionResults: {
+        devicePubKey: {
+          authenticatorOutput: 'pmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
+          signature: 'MEUCIQDTf2ImngEOi3qHws6gxf6CpquI97oDIl8m_4T2xQO-YwIgdWN7elqNuU-yMZtGpy8hQtL_E-qmZ1_rM2u2nhXYw7A=',
+        }
+      }
     },
-    expectedChallenge: 'Arkrl_Fx_MvcJ_eIqCTQ7-tbESISR14-pyPRh0K-1A8',
+    expectedChallenge: '6C4AJm6brMRpH_IeXCVkGM52vupO-xcXn6Weqb2V2mM',
     expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
     expectedRPID: 'try-webauthn.appspot.com',
   });
 
   expect(verification.registrationInfo?.extensionOutputs).toMatchObject({
-    devicePubKey: {
+    devicePubKeyToStore: {
       dpk: Buffer.from(
-        'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
-        'hex',
-      ),
-      sig: Buffer.from(
-        '3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E',
+        'A50102032620012158204DC1989D0C2F1040D01F7EC15AC542B14DB54BC5EA5D57ED7F6B383EBB4FABB02258205B61B7D9752FC83686A40EA3CA269C177D7D18F66F22739F5250AA7A75F6855B',
         'hex',
       ),
       nonce: Buffer.from('', 'hex'),
-      scope: Buffer.from('00', 'hex'),
+      scope: 0,
       aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+      fmt: 'none',
+      attStmt: {}
     },
   });
 });

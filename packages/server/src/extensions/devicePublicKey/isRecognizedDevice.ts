@@ -1,5 +1,5 @@
-import { AttestationStatement } from "helpers";
-import { DevicePublicKeyAuthenticatorOutput } from "../../helpers/decodeAuthenticatorExtensions";
+import { AttestationStatement } from "../../helpers/decodeAttestationObject";
+import { DevicePublicKeyAuthenticatorOutput } from './decodeDevicePubKey';
 import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttestation";
 
 /**
@@ -30,7 +30,7 @@ export async function isRecognizedDevice(
       if (!responseDevicePublicKey.dpk.equals(userDPK.dpk)) {
         return false;
       }
-      if (!responseDevicePublicKey.scope.equals(userDPK.scope)) {
+      if (responseDevicePublicKey.scope !== userDPK.scope) {
         return false;
       }
       return true;
@@ -92,6 +92,7 @@ export async function isRecognizedDevice(
       }
 
       if (!dpksAreBinaryEqual) {
+        // TODO:
       }
     }
     // This is a valid and a known device.

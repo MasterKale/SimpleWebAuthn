@@ -68,7 +68,7 @@ export interface RegistrationCredentialJSON
   extends Omit<RegistrationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
-  clientExtensionResults: AuthenticationExtensionsClientOutputsFuture;
+  clientExtensionResults: AuthenticationExtensionsClientOutputsJSON;
   transports?: AuthenticatorTransportFuture[];
 }
 
@@ -87,7 +87,7 @@ export interface AuthenticationCredentialJSON
   extends Omit<AuthenticationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
-  clientExtensionResults: AuthenticationExtensionsClientOutputsFuture;
+  clientExtensionResults: AuthenticationExtensionsClientOutputsJSON;
 }
 
 export interface AuthenticationExtensionsDevicePublicKeyInputs {
@@ -96,7 +96,7 @@ export interface AuthenticationExtensionsDevicePublicKeyInputs {
 }
 
 export interface AuthenticationExtensionsClientInputsFuture extends AuthenticationExtensionsClientInputs {
-  devicePubKey: AuthenticationExtensionsDevicePublicKeyInputs;
+  devicePubKey?: AuthenticationExtensionsDevicePublicKeyInputs;
 }
 
 export interface AuthenticationExtensionsDevicePublicKeyOutputs {
@@ -105,7 +105,16 @@ export interface AuthenticationExtensionsDevicePublicKeyOutputs {
 }
 
 export interface AuthenticationExtensionsClientOutputsFuture extends AuthenticationExtensionsClientOutputs {
-  devicePubKey: AuthenticationExtensionsDevicePublicKeyOutputs
+  devicePubKey?: AuthenticationExtensionsDevicePublicKeyOutputs
+}
+
+export interface AuthenticationExtensionsDevicePublicKeyOutputsJSON {
+  authenticatorOutput: Base64URLString;
+  signature: Base64URLString;
+}
+
+export interface AuthenticationExtensionsClientOutputsJSON extends AuthenticationExtensionsClientOutputs {
+  devicePubKey?: AuthenticationExtensionsDevicePublicKeyOutputsJSON
 }
 
 /**

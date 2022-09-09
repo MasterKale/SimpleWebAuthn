@@ -1,7 +1,6 @@
 import base64url from "base64url";
 import { toHash } from "../../helpers/toHash";
 import { verifySignature } from "../../helpers/verifySignature";
-import { DevicePublicKeyAuthenticatorOutput } from "../../helpers/decodeAuthenticatorExtensions";
 import {
   AuthenticationCredentialJSON,
   AuthenticatorAssertionResponseJSON,
@@ -9,6 +8,7 @@ import {
   AuthenticatorAttestationResponseJSON
 } from "@simplewebauthn/typescript-types";
 import { decodeAttestationObject } from "../../helpers/decodeAttestationObject";
+import { DevicePublicKeyAuthenticatorOutput } from "./decodeDevicePubKey";
 
 export type VerifyDevicePublicKeySignatureOpts = {
   credential: RegistrationCredentialJSON | AuthenticationCredentialJSON

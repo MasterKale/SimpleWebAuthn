@@ -1,5 +1,5 @@
 import { decodeCborFirst } from '../../helpers/decodeCbor';
-import { Base64URLString, AuthenticationExtensionsDevicePublicKeyOutputs } from '@simplewebauthn/typescript-types';
+import { AuthenticationExtensionsDevicePublicKeyOutputs, AuthenticationExtensionsDevicePublicKeyOutputsJSON } from '@simplewebauthn/typescript-types';
 import { AttestationFormat, AttestationStatement } from '../../helpers/decodeAttestationObject';
 import base64url from 'base64url';
 
@@ -9,23 +9,42 @@ import base64url from 'base64url';
  * @param devicePubKey Client Extension's device public key data buffer
  */
 export function decodeDevicePubKey(
-  devicePubKey: Base64URLString,
-): AuthenticationExtensionsDevicePublicKeyOutputs | undefined {
-  let toCBOR: AuthenticationExtensionsDevicePublicKeyOutputs | undefined;
+  devicePubKeyJSON: AuthenticationExtensionsDevicePublicKeyOutputsJSON,
+): AuthenticationExtensionsDevicePublicKeyOutputs {
+  const {
+    authenticatorOutput: base64AuthenticatorOutput,
+    signature: base64Signature,
+  } = devicePubKeyJSON;
+
+  let authenticatorOutput: Buffer | undefined;
+  let signature: Buffer | undefined;
+
   try {
-    const base64DevicePubKey = base64url.toBuffer(devicePubKey);
-    toCBOR = decodeCborFirst(base64DevicePubKey);
+    authenticatorOutput = base64url.toBuffer(base64AuthenticatorOutput);
+    if (!authenticatorOutput) {
+      throw new Error ('authenticatorOutput is missing');
+    }
+
+    signature = base64url.toBuffer(base64Signature);
+    if (!signature) {
+      throw new Error('signature is missing');
+    }
   } catch (err) {
     const _err = err as Error;
     throw new Error(`Error decoding device public key: ${_err.message}`);
   }
-  return toCBOR;
+
+  const devicePubKey: AuthenticationExtensionsDevicePublicKeyOutputs = {
+    authenticatorOutput,
+    signature,
+  }
+  return devicePubKey;
 }
 
 export function decodeDevicePubKeyAuthenticatorOutput(
   authenticatorOutput: Buffer,
-): DevicePublicKeyAuthenticatorOutput | undefined {
-  let toCBOR: DevicePublicKeyAuthenticatorOutput | undefined;
+): DevicePublicKeyAuthenticatorOutput {
+  let toCBOR: DevicePublicKeyAuthenticatorOutput;
   try {
     toCBOR = decodeCborFirst(authenticatorOutput);
   } catch (err) {
@@ -38,7 +57,7 @@ export function decodeDevicePubKeyAuthenticatorOutput(
 export type DevicePublicKeyAuthenticatorOutput = {
   aaguid: Buffer;
   dpk: Buffer;
-  scope: Buffer;
+  scope: number;
   nonce?: Buffer;
   fmt?: AttestationFormat;
   attStmt?: AttestationStatement;
