@@ -23,6 +23,7 @@
   "keywords": [
     "typescript",
     "webauthn",
+    "passkeys",
     "fido",
     "types"
   ],

@@ -26,6 +26,7 @@
   "keywords": [
     "typescript",
     "webauthn",
+    "passkeys",
     "fido",
     "umd"
   ],
