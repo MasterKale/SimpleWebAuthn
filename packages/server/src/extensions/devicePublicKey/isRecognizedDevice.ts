@@ -74,12 +74,12 @@ export async function isRecognizedDevice(
     // is no attestation signature to verify and this is a known device public
     // key with a valid signature and thus a known device. Terminate these
     // verification steps.
-    if (responseDevicePublicKey.fmt && responseDevicePublicKey.fmt !== 'none') {
+    if (responseDevicePublicKey.fmt !== 'none') {
       // Perform a binary equality check of `attStmt`.
       const recognizedDPKAttStmt = matchedDPKs[0].attStmt;
-      let dpksAreBinaryEqual = false;
       try {
-        dpksAreBinaryEqual = checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, recognizedDPKAttStmt);
+        // Unless thrown, this always returns `true`.
+        checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, recognizedDPKAttStmt);
       } catch (err) {
         // const _err = err as Error;
         // How do we message the error cause?
@@ -89,10 +89,6 @@ export async function isRecognizedDevice(
         if (!isValidDPKAttestation) {
           throw new Error('DevicePublicKey attestation could not be verified.');
         }
-      }
-
-      if (!dpksAreBinaryEqual) {
-        // TODO:
       }
     }
     // This is a valid and a known device.

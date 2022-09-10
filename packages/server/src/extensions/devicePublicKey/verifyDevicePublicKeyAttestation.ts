@@ -1,14 +1,4 @@
 import { DevicePublicKeyAuthenticatorOutput } from "./decodeDevicePubKey";
-import {
-  AuthenticationCredentialJSON,
-  RegistrationCredentialJSON,
-} from "@simplewebauthn/typescript-types";
-
-export type VerifyDevicePublicKeySignatureOpts = {
-  credential: RegistrationCredentialJSON | AuthenticationCredentialJSON
-  devicePubKey: DevicePublicKeyAuthenticatorOutput;
-  signature: Buffer;
-};
 
 /**
  * https://pr-preview.s3.amazonaws.com/w3c/webauthn/pull/1663.html#sctn-device-publickey-extension-verification-create
@@ -22,7 +12,7 @@ export async function verifyDevicePublicKeyAttestation(
   devicePubKey: DevicePublicKeyAuthenticatorOutput
 ): Promise<boolean> {
   const { fmt } = devicePubKey;
-  if (fmt === undefined || fmt === 'none') {
+  if (fmt === 'none') {
     return true;
   } else {
     throw new Error('Attestation verification on a device public key is not implemented yet.');

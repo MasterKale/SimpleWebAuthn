@@ -4,9 +4,10 @@ import { AttestationFormat, AttestationStatement } from '../../helpers/decodeAtt
 import base64url from 'base64url';
 
 /**
- * Convert device public key client extension data buffer to a proper object
+ * Convert base64url encoded device public key client extension data to buffer
  *
- * @param devicePubKey Client Extension's device public key data buffer
+ * @param devicePubKey Base64url encoded device public key data obtained from
+ * client extension results
  */
 export function decodeDevicePubKey(
   devicePubKeyJSON: AuthenticationExtensionsDevicePublicKeyOutputsJSON,
@@ -41,6 +42,12 @@ export function decodeDevicePubKey(
   return devicePubKey;
 }
 
+/**
+ * Decode device public key authenticator output data CBOR to JSON 
+ * @param authenticatorOutput CBOR encoded device public key authenticator
+ * output
+ * @returns JSON based device public key authenticator data
+ */
 export function decodeDevicePubKeyAuthenticatorOutput(
   authenticatorOutput: Buffer,
 ): DevicePublicKeyAuthenticatorOutput {
@@ -58,7 +65,7 @@ export type DevicePublicKeyAuthenticatorOutput = {
   aaguid: Buffer;
   dpk: Buffer;
   scope: number;
+  fmt: AttestationFormat;
+  attStmt: AttestationStatement;
   nonce?: Buffer;
-  fmt?: AttestationFormat;
-  attStmt?: AttestationStatement;
 };
