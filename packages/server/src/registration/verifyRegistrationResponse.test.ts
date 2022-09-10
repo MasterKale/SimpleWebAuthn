@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-import { verifyRegistrationResponse } from './verifyRegistrationResponse';
+import { verifyRegistrationResponse, VerifyRegistrationResponseOpts } from './verifyRegistrationResponse';
 
 import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject';
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -580,35 +580,39 @@ test('should return credential backup info', async () => {
   expect(verification.registrationInfo?.credentialBackedUp).toEqual(false);
 });
 
-test('should return authenticator extension output', async () => {
-  const verification = await verifyRegistrationResponse({
-    credential: {
-      response: {
-        clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNkM0QUptNmJyTVJwSF9JZVhDVmtHTTUydnVwTy14Y1huNldlcWIyVjJtTSIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
-        attestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBMA11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzE3QAAAAAAAAAAAAAAAAAAAAAAAAAAABAHFimPeuzlYZbxRWdeyYzOpQECAyYgASFYIPLEylOIRiI7z7q6zuYjWB9TcOj9yNwmawogQJ4ZKpNAIlggd9ZqIjd30p1tIU6A8ue5wEZl9q_AsKR_leaHFZ_bwWmhbGRldmljZVB1YktleViMpmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
-      },
-      id: 'BxYpj3rs5WGW8UVnXsmMzg',
-      rawId: 'BxYpj3rs5WGW8UVnXsmMzg',
-      type: 'public-key',
-      transports: [],
-      clientExtensionResults: {
-        devicePubKey: {
-          authenticatorOutput: 'pmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
-          signature: 'MEUCIQDTf2ImngEOi3qHws6gxf6CpquI97oDIl8m_4T2xQO-YwIgdWN7elqNuU-yMZtGpy8hQtL_E-qmZ1_rM2u2nhXYw7A=',
-        }
-      }
-    },
-    expectedChallenge: '6C4AJm6brMRpH_IeXCVkGM52vupO-xcXn6Weqb2V2mM',
-    expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
-    expectedRPID: 'try-webauthn.appspot.com',
-  });
+const DpkRegCred: RegistrationCredentialJSON = {
+  response: {
+    clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNkM0QUptNmJyTVJwSF9JZVhDVmtHTTUydnVwTy14Y1huNldlcWIyVjJtTSIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
+    attestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBMA11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzE3QAAAAAAAAAAAAAAAAAAAAAAAAAAABAHFimPeuzlYZbxRWdeyYzOpQECAyYgASFYIPLEylOIRiI7z7q6zuYjWB9TcOj9yNwmawogQJ4ZKpNAIlggd9ZqIjd30p1tIU6A8ue5wEZl9q_AsKR_leaHFZ_bwWmhbGRldmljZVB1YktleViMpmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA='
+  },
+  id: 'BxYpj3rs5WGW8UVnXsmMzg',
+  rawId: 'BxYpj3rs5WGW8UVnXsmMzg',
+  type: 'public-key',
+  transports: [],
+  clientExtensionResults: {
+    devicePubKey: {
+      authenticatorOutput: 'pmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
+      signature: 'MEUCIQDTf2ImngEOi3qHws6gxf6CpquI97oDIl8m_4T2xQO-YwIgdWN7elqNuU-yMZtGpy8hQtL_E-qmZ1_rM2u2nhXYw7A='
+    }
+  }
+};
 
+if (!DpkRegCred?.clientExtensionResults?.devicePubKey) {
+  throw new Error('This exception will not happen.');
+}
+
+const DpkVerifyRegRespOpts: VerifyRegistrationResponseOpts = {
+  credential: DpkRegCred,
+  expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
+  expectedRPID: 'try-webauthn.appspot.com',
+  expectedChallenge: '6C4AJm6brMRpH_IeXCVkGM52vupO-xcXn6Weqb2V2mM',
+}
+
+test('should return authenticator extension output', async () => {
+  const verification = await verifyRegistrationResponse(DpkVerifyRegRespOpts);
   expect(verification.registrationInfo?.extensionOutputs).toMatchObject({
     devicePubKeyToStore: {
-      dpk: Buffer.from(
-        'A50102032620012158204DC1989D0C2F1040D01F7EC15AC542B14DB54BC5EA5D57ED7F6B383EBB4FABB02258205B61B7D9752FC83686A40EA3CA269C177D7D18F66F22739F5250AA7A75F6855B',
-        'hex',
-      ),
+      dpk: Buffer.from('A50102032620012158204DC1989D0C2F1040D01F7EC15AC542B14DB54BC5EA5D57ED7F6B383EBB4FABB02258205B61B7D9752FC83686A40EA3CA269C177D7D18F66F22739F5250AA7A75F6855B', 'hex'),
       nonce: Buffer.from('', 'hex'),
       scope: 0,
       aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),

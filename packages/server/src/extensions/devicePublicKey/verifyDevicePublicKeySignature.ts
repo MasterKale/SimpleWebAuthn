@@ -45,8 +45,7 @@ export async function verifyDevicePublicKeySignature(
   const { clientDataJSON } = credential.response;
   const clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
   
-  const nonce = authenticatorOutput.nonce ? authenticatorOutput.nonce : Buffer.from('');
-  const signatureBase = Buffer.concat([authData, clientDataHash, nonce]);
+  const signatureBase = Buffer.concat([authData, clientDataHash]);
   // It's a device public key and not a credential public key, but to align with
   // the `verifySinature` signature, we name it `credentialPublicKey`.
   const credentialPublicKey = authenticatorOutput.dpk;
