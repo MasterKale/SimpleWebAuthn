@@ -34,20 +34,14 @@ export {
   verifySignature,
 };
 
-import type {
-  AttestationFormat,
-  AttestationObject,
-  AttestationStatement,
-} from './decodeAttestationObject';
+import type { AttestationObject } from './decodeAttestationObject';
 import type { CertificateInfo } from './getCertificateInfo';
 import type { ClientDataJSON } from './decodeClientDataJSON';
 import type { COSEPublicKey } from './convertCOSEtoPKCS';
 import type { ParsedAuthenticatorData } from './parseAuthenticatorData';
 
 export type {
-  AttestationFormat,
   AttestationObject,
-  AttestationStatement,
   CertificateInfo,
   ClientDataJSON,
   COSEPublicKey,

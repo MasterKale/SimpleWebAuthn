@@ -15,6 +15,7 @@ import type {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   AuthenticatorAttachment,
+  AttestationConveyancePreference,
 } from './dom';
 
 export * from './dom';
@@ -90,9 +91,28 @@ export interface AuthenticationCredentialJSON
   clientExtensionResults: AuthenticationExtensionsClientOutputsJSON;
 }
 
+export type AttestationFormat =
+  | 'fido-u2f'
+  | 'packed'
+  | 'android-safetynet'
+  | 'android-key'
+  | 'tpm'
+  | 'apple'
+  | 'none';
+
+export type AttestationStatement = {
+  sig?: Buffer;
+  x5c?: Buffer[];
+  response?: Buffer;
+  alg?: number;
+  ver?: string;
+  certInfo?: Buffer;
+  pubArea?: Buffer;
+};
+
 export interface AuthenticationExtensionsDevicePublicKeyInputs {
-  attestation: string;
-  attestationFormats: string[];
+  attestation?: AttestationConveyancePreference;
+  attestationFormats?: AttestationFormat[];
 }
 
 export interface AuthenticationExtensionsClientInputsFuture extends AuthenticationExtensionsClientInputs {
@@ -104,13 +124,13 @@ export interface AuthenticationExtensionsDevicePublicKeyOutputs {
   signature: Buffer;
 }
 
-export interface AuthenticationExtensionsClientOutputsFuture extends AuthenticationExtensionsClientOutputs {
-  devicePubKey?: AuthenticationExtensionsDevicePublicKeyOutputs
-}
-
 export interface AuthenticationExtensionsDevicePublicKeyOutputsJSON {
   authenticatorOutput: Base64URLString;
   signature: Base64URLString;
+}
+
+export interface AuthenticationExtensionsClientOutputsFuture extends AuthenticationExtensionsClientOutputs {
+  devicePubKey?: AuthenticationExtensionsDevicePublicKeyOutputs
 }
 
 export interface AuthenticationExtensionsClientOutputsJSON extends AuthenticationExtensionsClientOutputs {

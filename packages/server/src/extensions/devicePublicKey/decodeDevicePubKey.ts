@@ -1,6 +1,10 @@
 import { decodeCborFirst } from '../../helpers/decodeCbor';
-import { AuthenticationExtensionsDevicePublicKeyOutputs, AuthenticationExtensionsDevicePublicKeyOutputsJSON } from '@simplewebauthn/typescript-types';
-import { AttestationFormat, AttestationStatement } from '../../helpers/decodeAttestationObject';
+import {
+  AuthenticationExtensionsDevicePublicKeyOutputs,
+  AuthenticationExtensionsDevicePublicKeyOutputsJSON,
+  AttestationFormat,
+  AttestationStatement,
+} from '@simplewebauthn/typescript-types';
 import base64url from 'base64url';
 
 /**

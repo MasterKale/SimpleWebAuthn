@@ -1,4 +1,4 @@
-import { AttestationStatement } from "../../helpers/decodeAttestationObject";
+import { AttestationStatement } from "@simplewebauthn/typescript-types";
 import { DevicePublicKeyAuthenticatorOutput } from './decodeDevicePubKey';
 import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttestation";
 
