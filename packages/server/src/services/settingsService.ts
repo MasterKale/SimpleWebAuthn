@@ -1,4 +1,4 @@
-import { AttestationFormat } from '../helpers/decodeAttestationObject';
+import { AttestationFormat } from '@simplewebauthn/typescript-types';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
 
 import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet';

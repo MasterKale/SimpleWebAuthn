@@ -3,13 +3,11 @@ import {
   RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
-} from '@simplewebauthn/typescript-types';
-
-import {
   AttestationFormat,
   AttestationStatement,
-  decodeAttestationObject,
-} from '../helpers/decodeAttestationObject';
+} from '@simplewebauthn/typescript-types';
+
+import { decodeAttestationObject } from '../helpers/decodeAttestationObject';
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';

@@ -2,13 +2,11 @@ import base64url from 'base64url';
 
 import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet';
 
-import {
-  decodeAttestationObject,
-  AttestationStatement,
-} from '../../helpers/decodeAttestationObject';
+import { decodeAttestationObject } from '../../helpers/decodeAttestationObject';
 import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import { toHash } from '../../helpers/toHash';
 import { SettingsService } from '../../services/settingsService';
+import { AttestationStatement } from '@simplewebauthn/typescript-types';
 
 const rootCertificates = SettingsService.getRootCertificates({
   identifier: 'android-safetynet',

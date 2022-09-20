@@ -1,4 +1,5 @@
 import cbor from 'cbor';
+import { AttestationFormat, AttestationStatement } from '@simplewebauthn/typescript-types';
 
 /**
  * Convert an AttestationObject buffer to a proper object
@@ -10,27 +11,8 @@ export function decodeAttestationObject(attestationObject: Buffer): AttestationO
   return toCBOR;
 }
 
-export type AttestationFormat =
-  | 'fido-u2f'
-  | 'packed'
-  | 'android-safetynet'
-  | 'android-key'
-  | 'tpm'
-  | 'apple'
-  | 'none';
-
 export type AttestationObject = {
   fmt: AttestationFormat;
   attStmt: AttestationStatement;
   authData: Buffer;
-};
-
-export type AttestationStatement = {
-  sig?: Buffer;
-  x5c?: Buffer[];
-  response?: Buffer;
-  alg?: number;
-  ver?: string;
-  certInfo?: Buffer;
-  pubArea?: Buffer;
 };
