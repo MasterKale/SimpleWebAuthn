@@ -20,23 +20,3 @@ test('should call abort() on existing controller when creating a new signal', ()
   webauthnAbortService.createNewAbortSignal();
   expect(abortSpy).toHaveBeenCalledTimes(1);
 });
-
-test('should reset controller', () => {
-  // Reset the service
-  webauthnAbortService.reset();
-
-  // Populate `.controller`
-  webauthnAbortService.createNewAbortSignal();
-
-  // Spy on the existing instance of AbortController
-  const abortSpy = jest.fn();
-  // @ts-ignore
-  webauthnAbortService.controller?.abort = abortSpy;
-
-  // Reset the service
-  webauthnAbortService.reset();
-
-  // Generate a new signal, which should NOT call `abort()` because the controller was cleared
-  webauthnAbortService.createNewAbortSignal();
-  expect(abortSpy).toHaveBeenCalledTimes(0);
-});
