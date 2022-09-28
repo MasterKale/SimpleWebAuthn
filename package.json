@@ -6,7 +6,7 @@
     "bootstrap:ci": "lerna bootstrap --hoist",
     "clean": "lerna clean -y && rm ./packages/**/package-lock.json",
     "lint": "prettier --write packages/**/src/**/*.ts example/**/*.ts && eslint --fix packages/**/src/**/*.ts example/**/*.ts",
-    "docs": "npm run bootstrap && typedoc --tsconfig tsconfigdoc.json",
+    "docs": "npm run bootstrap:ci && typedoc --tsconfig tsconfigdoc.json",
     "test": "lerna run test",
     "build:types": "lerna run build --scope=@simplewebauthn/typescript-types",
     "build:testing": "lerna run build --scope=@simplewebauthn/testing",
