@@ -9,5 +9,5 @@ example/*.key
 example/*.crt
 example/fido-conformance-mds/*
 !example/fido-conformance-mds/.gitkeep
-src/*/package-lock.json
+packages/*/package-lock.json
 packages/typescript-types/src/dom.ts
