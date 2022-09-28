@@ -12,7 +12,7 @@ class WebAuthnAbortService {
   createNewAbortSignal() {
     // Abort any existing calls to navigator.credentials.create() or navigator.credentials.get()
     if (this.controller) {
-      this.controller.abort();
+      this.controller.abort('Cancelling existing WebAuthn API call for new one');
     }
 
     this.controller = new AbortController();
