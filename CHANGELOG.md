@@ -1,5 +1,21 @@
 # Changelog
 
+## v6.2.1
+
+**Packages:**
+
+- @simplewebauthn/browser@6.2.1
+- @simplewebauthn/server@6.2.1
+- @simplewebauthn/testing@6.2.1
+- @simplewebauthn/typescript-types@6.2.1
+
+**Changes:**
+
+- [browser] Multiple calls to `startRegistration()` and `startAuthentication()` will now more reliably cancel the preceding call ([#275](https://github.com/MasterKale/SimpleWebAuthn/pull/275))
+- [server] Version sync
+- [testing] Version sync
+- [typescript-types] Version sync
+
 ## v6.2.0
 
 **Packages:**
@@ -8,7 +24,7 @@
 
 **Changes:**
 
-- **[server]** The value of the user verification flag is now returned from `verifyAuthenticationResponse()` as `authenticationInfo.userVerified`, similar to how `verifyRegistrationResponse()` currently returns this value.
+- **[server]** The value of the user verification flag is now returned from `verifyAuthenticationResponse()` as `authenticationInfo.userVerified`, similar to how `verifyRegistrationResponse()` currently returns this value ([#263](https://github.com/MasterKale/SimpleWebAuthn/pull/263))
 
 ## v6.1.0
 
