@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/testing",
-  "version": "6.0.0",
+  "version": "6.2.1",
   "description": "Sample WebAuthn values for testing projects leveraging SimpleWebAuthn.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
