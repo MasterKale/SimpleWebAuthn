@@ -46,8 +46,6 @@ export async function startRegistration(
     credential = (await navigator.credentials.create(options)) as RegistrationCredential;
   } catch (err) {
     throw identifyRegistrationError({ error: err as Error, options });
-  } finally {
-    webauthnAbortService.reset();
   }
 
   if (!credential) {
