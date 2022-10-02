@@ -12,6 +12,7 @@ import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAu
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { parseClientExtensionResults } from '../helpers/parseClientExtensionResults';
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
@@ -104,7 +105,7 @@ export async function startAuthentication(
       userHandle,
     },
     type,
-    clientExtensionResults: credential.getClientExtensionResults(),
+    clientExtensionResults: parseClientExtensionResults(credential),
     authenticatorAttachment: credential.authenticatorAttachment,
   };
 }

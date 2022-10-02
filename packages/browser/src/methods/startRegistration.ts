@@ -11,6 +11,7 @@ import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyRegistrationError } from '../helpers/identifyRegistrationError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { parseClientExtensionResults } from '../helpers/parseClientExtensionResults';
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
@@ -63,7 +64,7 @@ export async function startRegistration(
       clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
     },
     type,
-    clientExtensionResults: credential.getClientExtensionResults(),
+    clientExtensionResults: parseClientExtensionResults(credential),
     authenticatorAttachment: credential.authenticatorAttachment,
   };
 
