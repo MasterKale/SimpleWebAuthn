@@ -51,7 +51,6 @@
     "@peculiar/asn1-android": "^2.1.7",
     "@peculiar/asn1-schema": "^2.1.7",
     "@peculiar/asn1-x509": "^2.1.7",
-    "@simplewebauthn/typescript-types": "^6.2.1",
     "base64url": "^3.0.1",
     "cbor": "^5.1.0",
     "debug": "^4.3.2",
@@ -61,6 +60,7 @@
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
   "devDependencies": {
+    "@simplewebauthn/typescript-types": "*",
     "@types/cbor": "^5.0.1",
     "@types/debug": "^4.1.7",
     "@types/jsrsasign": "^8.0.13",
