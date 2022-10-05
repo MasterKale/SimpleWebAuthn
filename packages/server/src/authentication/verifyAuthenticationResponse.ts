@@ -209,7 +209,7 @@ export async function verifyAuthenticationResponse(
   if (flags.ed) {
     if (!clientExtensionResults) {
       throw new Error('Authenticator data indicated extension data was present,'+
-        ' but no client extension data were found');
+        ' but no authenticator extension data were found');
     }
 
     // TODO: Find a good way to check that returned extension outputs match what
