@@ -81,13 +81,11 @@ export async function isRecognizedDevice(
         // Unless thrown, this always returns `true`.
         checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, recognizedDPKAttStmt);
       } catch (err) {
-        // const _err = err as Error;
-        // How do we message the error cause?
-        // throw new Error(`DevicePublicKey attStmt's were not equal: ${_err.message}`);
         // Otherwise, verify attestation
         const isValidDPKAttestation = await verifyDevicePublicKeyAttestation(responseDevicePublicKey);
         if (!isValidDPKAttestation) {
-          throw new Error('DevicePublicKey attestation could not be verified.');
+          const _err = err as Error;
+          throw new Error(`DevicePublicKey attStmt's were not equal: ${_err.message}`);
         }
       }
     }
