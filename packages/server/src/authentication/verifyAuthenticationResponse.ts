@@ -206,12 +206,7 @@ export async function verifyAuthenticationResponse(
 
   const extensionOutputs: AuthenticationExtensionOutputs = {};
 
-  if (flags.ed) {
-    if (!clientExtensionResults) {
-      throw new Error('Authenticator data indicated extension data was present,'+
-        ' but no authenticator extension data were found');
-    }
-
+  if (clientExtensionResults) {
     // TODO: Find a good way to check that returned extension outputs match what
     // was requested in extension inputs. See 7.1 step 18 in the spec.
 
@@ -219,8 +214,8 @@ export async function verifyAuthenticationResponse(
     // extension results. 
     if (clientExtensionResults.devicePubKey) {
       const devicePubKey =  decodeDevicePubKey(clientExtensionResults.devicePubKey);
-      const { authenticatorOutput: encodedAuthenticatorOutput, signature } = devicePubKey;
-      const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
+      const { authenticatorOutput, signature } = devicePubKey;
+      const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(authenticatorOutput);
 
       const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
         credential,
