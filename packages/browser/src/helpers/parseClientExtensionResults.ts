@@ -12,20 +12,25 @@ export function parseClientExtensionResults(
   const clientExtensionResults: AuthenticationExtensionsClientOutputsFuture = credential.getClientExtensionResults()
   const clientExtensionResultsJSON: AuthenticationExtensionsClientOutputsJSON = {};
 
-  for (const key in clientExtensionResults) {
-    if (key === 'appid') {
-      clientExtensionResultsJSON.appid = clientExtensionResults.appid;
-    } else if (key === 'credProps') {
-      clientExtensionResultsJSON.credProps = clientExtensionResults.credProps;
-    } else if (key === 'devicePubKey') {
-      const { devicePubKey } = clientExtensionResults;
-      if (!devicePubKey) continue;
-      const authenticatorOutput = bufferToBase64URLString(devicePubKey.authenticatorOutput);
-      const signature = bufferToBase64URLString(devicePubKey.signature);
-      clientExtensionResultsJSON.devicePubKey = { authenticatorOutput, signature };
-    } else if (key === 'uvm') {
-      clientExtensionResultsJSON.uvm = clientExtensionResults.uvm;
-    }
+  const { appid, credProps, devicePubKey, uvm } = clientExtensionResults;
+
+  if (appid) {
+    clientExtensionResultsJSON.appid = appid;
+  }
+
+  if (credProps) {
+    clientExtensionResultsJSON.credProps = credProps;
+  }
+
+  if (uvm) {
+    clientExtensionResultsJSON.uvm = clientExtensionResults.uvm;
+  }
+
+  if (devicePubKey) {
+    clientExtensionResultsJSON.devicePubKey = {
+      authenticatorOutput: bufferToBase64URLString(devicePubKey.authenticatorOutput),
+      signature: bufferToBase64URLString(devicePubKey.signature),
+    };
   }
 
   return clientExtensionResultsJSON;
