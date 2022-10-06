@@ -1,5 +1,5 @@
-import { AttestationStatement } from "helpers";
-import { DevicePublicKeyAuthenticatorOutput } from "../../helpers/decodeAuthenticatorExtensions";
+import { AttestationStatement } from "@simplewebauthn/typescript-types";
+import { DevicePublicKeyAuthenticatorOutput } from './decodeDevicePubKey';
 import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttestation";
 
 /**
@@ -30,7 +30,7 @@ export async function isRecognizedDevice(
       if (!responseDevicePublicKey.dpk.equals(userDPK.dpk)) {
         return false;
       }
-      if (!responseDevicePublicKey.scope.equals(userDPK.scope)) {
+      if (responseDevicePublicKey.scope !== userDPK.scope) {
         return false;
       }
       return true;
@@ -74,24 +74,19 @@ export async function isRecognizedDevice(
     // is no attestation signature to verify and this is a known device public
     // key with a valid signature and thus a known device. Terminate these
     // verification steps.
-    if (responseDevicePublicKey.fmt && responseDevicePublicKey.fmt !== 'none') {
+    if (responseDevicePublicKey.fmt !== 'none') {
       // Perform a binary equality check of `attStmt`.
       const recognizedDPKAttStmt = matchedDPKs[0].attStmt;
-      let dpksAreBinaryEqual = false;
       try {
-        dpksAreBinaryEqual = checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, recognizedDPKAttStmt);
+        // Unless thrown, this always returns `true`.
+        checkAttStmtBinaryEquality(responseDevicePublicKey.attStmt, recognizedDPKAttStmt);
       } catch (err) {
-        // const _err = err as Error;
-        // How do we message the error cause?
-        // throw new Error(`DevicePublicKey attStmt's were not equal: ${_err.message}`);
         // Otherwise, verify attestation
         const isValidDPKAttestation = await verifyDevicePublicKeyAttestation(responseDevicePublicKey);
         if (!isValidDPKAttestation) {
-          throw new Error('DevicePublicKey attestation could not be verified.');
+          const _err = err as Error;
+          throw new Error(`DevicePublicKey attStmt's were not equal: ${_err.message}`);
         }
-      }
-
-      if (!dpksAreBinaryEqual) {
       }
     }
     // This is a valid and a known device.

@@ -15,6 +15,7 @@ import type {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   AuthenticatorAttachment,
+  AttestationConveyancePreference,
 } from './dom';
 
 export * from './dom';
@@ -28,7 +29,7 @@ export interface PublicKeyCredentialCreationOptionsJSON
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64URLString;
   excludeCredentials: PublicKeyCredentialDescriptorJSON[];
-  extensions?: AuthenticationExtensionsClientInputs;
+  extensions?: AuthenticationExtensionsClientInputsFuture;
 }
 
 /**
@@ -39,7 +40,7 @@ export interface PublicKeyCredentialRequestOptionsJSON
   extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
   challenge: Base64URLString;
   allowCredentials?: PublicKeyCredentialDescriptorJSON[];
-  extensions?: AuthenticationExtensionsClientInputs;
+  extensions?: AuthenticationExtensionsClientInputsFuture;
 }
 
 export interface PublicKeyCredentialDescriptorJSON
@@ -68,7 +69,7 @@ export interface RegistrationCredentialJSON
   extends Omit<RegistrationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
-  clientExtensionResults: AuthenticationExtensionsClientOutputs;
+  clientExtensionResults: AuthenticationExtensionsClientOutputsJSON;
   transports?: AuthenticatorTransportFuture[];
 }
 
@@ -87,7 +88,53 @@ export interface AuthenticationCredentialJSON
   extends Omit<AuthenticationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
-  clientExtensionResults: AuthenticationExtensionsClientOutputs;
+  clientExtensionResults: AuthenticationExtensionsClientOutputsJSON;
+}
+
+export type AttestationFormat =
+  | 'fido-u2f'
+  | 'packed'
+  | 'android-safetynet'
+  | 'android-key'
+  | 'tpm'
+  | 'apple'
+  | 'none';
+
+export type AttestationStatement = {
+  sig?: Buffer;
+  x5c?: Buffer[];
+  response?: Buffer;
+  alg?: number;
+  ver?: string;
+  certInfo?: Buffer;
+  pubArea?: Buffer;
+};
+
+export interface AuthenticationExtensionsDevicePublicKeyInputs {
+  attestation?: AttestationConveyancePreference;
+  attestationFormats?: AttestationFormat[];
+}
+
+export interface AuthenticationExtensionsClientInputsFuture extends AuthenticationExtensionsClientInputs {
+  devicePubKey?: AuthenticationExtensionsDevicePublicKeyInputs;
+}
+
+export interface AuthenticationExtensionsDevicePublicKeyOutputs {
+  authenticatorOutput: Buffer;
+  signature: Buffer;
+}
+
+export interface AuthenticationExtensionsDevicePublicKeyOutputsJSON {
+  authenticatorOutput: Base64URLString;
+  signature: Base64URLString;
+}
+
+export interface AuthenticationExtensionsClientOutputsFuture extends AuthenticationExtensionsClientOutputs {
+  devicePubKey?: AuthenticationExtensionsDevicePublicKeyOutputs
+}
+
+export interface AuthenticationExtensionsClientOutputsJSON extends AuthenticationExtensionsClientOutputs {
+  devicePubKey?: AuthenticationExtensionsDevicePublicKeyOutputsJSON
 }
 
 /**

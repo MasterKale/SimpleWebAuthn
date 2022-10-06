@@ -232,7 +232,7 @@ test('should return authenticatorAttachment if present', async () => {
     return new Promise(resolve => {
       resolve({
         response: {},
-        getClientExtensionResults: () => {},
+        getClientExtensionResults: () => ({}),
         authenticatorAttachment: 'cross-platform',
       });
     });

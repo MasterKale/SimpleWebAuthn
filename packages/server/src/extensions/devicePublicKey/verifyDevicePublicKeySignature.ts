@@ -1,16 +1,6 @@
 import base64url from "base64url";
 import { toHash } from "../../helpers/toHash";
 import { verifySignature } from "../../helpers/verifySignature";
-import { DevicePublicKeyAuthenticatorOutput } from "../../helpers/decodeAuthenticatorExtensions";
-import { SettingsService } from "../../services/settingsService";
-import { AttestationFormatVerifierOpts } from "../../registration/verifyRegistrationResponse";
-import { parseAuthenticatorData } from "../../helpers/parseAuthenticatorData";
-import { verifyAttestationFIDOU2F } from '../../registration/verifications/verifyAttestationFIDOU2F';
-import { verifyAttestationPacked } from '../../registration/verifications/verifyAttestationPacked';
-import { verifyAttestationAndroidSafetyNet } from '../../registration/verifications/verifyAttestationAndroidSafetyNet';
-import { verifyAttestationTPM } from '../../registration/verifications/tpm/verifyAttestationTPM';
-import { verifyAttestationAndroidKey } from '../../registration/verifications/verifyAttestationAndroidKey';
-import { verifyAttestationApple } from '../../registration/verifications/verifyAttestationApple';
 import {
   AuthenticationCredentialJSON,
   AuthenticatorAssertionResponseJSON,
@@ -18,10 +8,11 @@ import {
   AuthenticatorAttestationResponseJSON
 } from "@simplewebauthn/typescript-types";
 import { decodeAttestationObject } from "../../helpers/decodeAttestationObject";
+import { DevicePublicKeyAuthenticatorOutput } from "./decodeDevicePubKey";
 
 export type VerifyDevicePublicKeySignatureOpts = {
   credential: RegistrationCredentialJSON | AuthenticationCredentialJSON
-  devicePubKey: DevicePublicKeyAuthenticatorOutput;
+  authenticatorOutput: DevicePublicKeyAuthenticatorOutput;
   signature: Buffer;
 };
 
@@ -36,7 +27,7 @@ export type VerifyDevicePublicKeySignatureOpts = {
 export async function verifyDevicePublicKeySignature(
   options: VerifyDevicePublicKeySignatureOpts
 ): Promise<boolean> {
-  const { credential, devicePubKey, signature } = options;
+  const { credential, authenticatorOutput, signature } = options;
 
   let authData;
   if (isAuthenticationResponse(credential)) {
@@ -53,63 +44,11 @@ export async function verifyDevicePublicKeySignature(
 
   const { clientDataJSON } = credential.response;
   const clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
-  const credentialID = base64url.toBuffer(credential.id);
-  const { rpIdHash } = parseAuthenticatorData(authData);
   
-  const nonce = devicePubKey.nonce ? devicePubKey.nonce : Buffer.from('');
-  // According to the spec, `authData` and `clientDataHash` are concatenated as
-  // the signature base, but this is an interim implementation.
-  const signatureBase = Buffer.concat([credentialID, clientDataHash, nonce]);
+  const signatureBase = Buffer.concat([authData, clientDataHash]);
   // It's a device public key and not a credential public key, but to align with
   // the `verifySinature` signature, we name it `credentialPublicKey`.
-  const credentialPublicKey = devicePubKey.dpk;
-
-  if (devicePubKey.fmt && devicePubKey.attStmt) {
-    const rootCertificates = SettingsService.getRootCertificates({ identifier: devicePubKey.fmt });
-
-    // Prepare arguments to pass to the relevant verification method
-    const verifierOpts: AttestationFormatVerifierOpts = {
-      aaguid: devicePubKey.aaguid,
-      attStmt: devicePubKey.attStmt,
-      authData,
-      clientDataHash,
-      credentialID,
-      credentialPublicKey,
-      rootCertificates,
-      rpIdHash,
-    };
-
-    // TODO: Implement logics to verify attestation signatures
-    let verified = false;
-    if (devicePubKey.fmt === 'fido-u2f') {
-      verified = await verifyAttestationFIDOU2F(verifierOpts);
-    } else if (devicePubKey.fmt === 'packed') {
-      verified = await verifyAttestationPacked(verifierOpts);
-    } else if (devicePubKey.fmt === 'android-safetynet') {
-      verified = await verifyAttestationAndroidSafetyNet(verifierOpts);
-    } else if (devicePubKey.fmt === 'android-key') {
-      verified = await verifyAttestationAndroidKey(verifierOpts);
-    } else if (devicePubKey.fmt === 'tpm') {
-      verified = await verifyAttestationTPM(verifierOpts);
-    } else if (devicePubKey.fmt === 'apple') {
-      verified = await verifyAttestationApple(verifierOpts);
-    } else if (devicePubKey.fmt === 'none') {
-      if (Object.keys(devicePubKey.attStmt).length > 0) {
-        throw new Error('None attestation had unexpected attestation statement');
-      }
-      // This is the weaker of the attestations, so there's nothing else to really check
-      verified = true;
-    } else {
-      throw new Error(`Unsupported Attestation Format: ${devicePubKey.fmt}`);
-    }
-    if (!verified) {
-      return false;
-    }
-  } else {
-    // `fmt` and `attStmt` are required fields, though at the moment, as the test
-    // attestation omits it. Ignore this case intentionally.
-    // return false;
-  }
+  const credentialPublicKey = authenticatorOutput.dpk;
 
   return verifySignature({ signature, signatureBase, credentialPublicKey });
 }

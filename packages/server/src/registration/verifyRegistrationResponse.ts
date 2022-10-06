@@ -3,14 +3,11 @@ import {
   RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
-} from '@simplewebauthn/typescript-types';
-
-import {
   AttestationFormat,
   AttestationStatement,
-  decodeAttestationObject,
-} from '../helpers/decodeAttestationObject';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
+} from '@simplewebauthn/typescript-types';
+
+import { decodeAttestationObject } from '../helpers/decodeAttestationObject';
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
@@ -29,6 +26,11 @@ import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAn
 import { verifyAttestationApple } from './verifications/verifyAttestationApple';
 import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
 import { verifyDevicePublicKeyAttestation } from '../extensions/devicePublicKey/verifyDevicePublicKeyAttestation';
+import {
+  DevicePublicKeyAuthenticatorOutput,
+  decodeDevicePubKey,
+  decodeDevicePubKeyAuthenticatorOutput
+} from '../extensions/devicePublicKey/decodeDevicePubKey';
 
 export type VerifyRegistrationResponseOpts = {
   credential: RegistrationCredentialJSON;
@@ -136,7 +138,7 @@ export async function verifyRegistrationResponse(
   const { fmt, authData, attStmt } = decodedAttestationObject;
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsData } =
+  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey } =
     parsedAuthData;
 
   // Make sure the response's RP ID is ours
@@ -194,38 +196,39 @@ export async function verifyRegistrationResponse(
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
-  if (flags.ed) {
-    if (!extensionsData && !clientExtensionResults) {
-      throw new Error('Extension results are not included despite the flag.');
-    }
+  const extensionOutputs: RegistrationExtensionOutputs = {};
 
+  if (clientExtensionResults) {
     // TODO: Find a good way to check that returned extension outputs match what
     // was requested in extension inputs. See 7.1 step 18 in the spec.
 
     // Device public key sample currently provides the data through
     // authenticator extension results. 
-    if (extensionsData?.devicePubKey) {
-      const { devicePubKey } = extensionsData;
-      const signature = devicePubKey.sig;
-      if (!signature) {
-        throw new Error('DevicePublicKey signature is missing.');
-      }
-      const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
+    if (clientExtensionResults.devicePubKey) {
+      const devicePubKey = decodeDevicePubKey(clientExtensionResults.devicePubKey);
+      const { authenticatorOutput: encodedAuthenticatorOutput, signature } = devicePubKey;
+      const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
+
+      const dpkOpts: VerifyDevicePublicKeySignatureOpts = {
         credential,
-        devicePubKey,
-        signature,
-      };
-      const sigResult = await verifyDevicePublicKeySignature(dpkOptions);
-      if (!sigResult) {
-        throw new Error('Invalid device public key signature.');
+        authenticatorOutput: dpkAuthOutput,
+        signature
+      }
+
+      const result = await verifyDevicePublicKeySignature(dpkOpts);
+
+      if (!result) {
+        throw new Error('DevicePublicKey signature could not be verified');
       }
 
       // Optionally verify device public key attestation here as per
       // 10.2.2.3.1. step 4 in the spec.
-      const attResult = await verifyDevicePublicKeyAttestation(devicePubKey);
+      const attResult = await verifyDevicePublicKeyAttestation(dpkAuthOutput);
       if (!attResult) {
         throw new Error('Invalid device public key attestation.');
       }
+
+      extensionOutputs.devicePubKeyToStore = dpkAuthOutput;
     }
   }
 
@@ -288,7 +291,7 @@ export async function verifyRegistrationResponse(
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
-      authenticatorExtensionResults: extensionsData,
+      extensionOutputs,
     };
   }
 
@@ -331,7 +334,7 @@ export type VerifiedRegistrationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
-    authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
+    extensionOutputs?: RegistrationExtensionOutputs;
   };
 };
 
@@ -349,3 +352,7 @@ export type AttestationFormatVerifierOpts = {
   rpIdHash: Buffer;
   verifyTimestampMS?: boolean;
 };
+
+export type RegistrationExtensionOutputs = {
+  devicePubKeyToStore?: DevicePublicKeyAuthenticatorOutput;
+}
