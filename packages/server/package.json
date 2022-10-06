@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/server",
-  "version": "6.3.0-alpha.0",
+  "version": "6.3.0-alpha.1",
   "description": "SimpleWebAuthn for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -60,7 +60,7 @@
   },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
   "devDependencies": {
-    "@simplewebauthn/typescript-types": "*",
+    "@simplewebauthn/typescript-types": "^6.3.0-alpha.1",
     "@types/cbor": "^5.0.1",
     "@types/debug": "^4.1.7",
     "@types/jsrsasign": "^8.0.13",
