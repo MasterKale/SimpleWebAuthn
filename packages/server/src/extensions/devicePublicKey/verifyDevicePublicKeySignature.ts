@@ -17,7 +17,7 @@ export type VerifyDevicePublicKeySignatureOpts = {
 };
 
 /**
- * https://pr-preview.s3.amazonaws.com/w3c/webauthn/pull/1663.html#sctn-device-publickey-extension-verification-create
+ * https://w3c.github.io/webauthn/#sctn-device-publickey-extension-verification-create
  * 3. Verify that `signature` is a valid signature over the assertion signature
  *    input by the device public key *dpk*. (The signature algorithm is the same
  *    as for the user credential.)

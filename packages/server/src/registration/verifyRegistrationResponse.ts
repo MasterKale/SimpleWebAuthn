@@ -27,9 +27,10 @@ import { verifyAttestationApple } from './verifications/verifyAttestationApple';
 import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
 import { verifyDevicePublicKeyAttestation } from '../extensions/devicePublicKey/verifyDevicePublicKeyAttestation';
 import {
-  DevicePublicKeyAuthenticatorOutput,
   decodeDevicePubKey,
-  decodeDevicePubKeyAuthenticatorOutput
+  deserializeDevicePubKeyAuthenticatorOutput,
+  encodeDevicePubKeyAuthenticatorOutput,
+  DevicePublicKeyAuthenticatorOutputJSON,
 } from '../extensions/devicePublicKey/decodeDevicePubKey';
 
 export type VerifyRegistrationResponseOpts = {
@@ -207,7 +208,7 @@ export async function verifyRegistrationResponse(
     if (clientExtensionResults.devicePubKey) {
       const devicePubKey = decodeDevicePubKey(clientExtensionResults.devicePubKey);
       const { authenticatorOutput: encodedAuthenticatorOutput, signature } = devicePubKey;
-      const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
+      const dpkAuthOutput = deserializeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
 
       const dpkOpts: VerifyDevicePublicKeySignatureOpts = {
         credential,
@@ -228,7 +229,8 @@ export async function verifyRegistrationResponse(
         throw new Error('Invalid device public key attestation.');
       }
 
-      extensionOutputs.devicePubKeyToStore = dpkAuthOutput;
+      const unregisteredDevicePubKey = encodeDevicePubKeyAuthenticatorOutput(dpkAuthOutput);
+      extensionOutputs.unregisteredDevicePubKey = unregisteredDevicePubKey;
     }
   }
 
@@ -354,5 +356,5 @@ export type AttestationFormatVerifierOpts = {
 };
 
 export type RegistrationExtensionOutputs = {
-  devicePubKeyToStore?: DevicePublicKeyAuthenticatorOutput;
+  unregisteredDevicePubKey?: DevicePublicKeyAuthenticatorOutputJSON;
 }
