@@ -1,6 +1,6 @@
 import type {
   AttestationConveyancePreference,
-  AuthenticationExtensionsClientInputs,
+  AuthenticationExtensionsClientInputsFuture,
   AuthenticatorSelectionCriteria,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
@@ -22,7 +22,7 @@ export type GenerateRegistrationOptionsOpts = {
   attestationType?: AttestationConveyancePreference;
   excludeCredentials?: PublicKeyCredentialDescriptorFuture[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
-  extensions?: AuthenticationExtensionsClientInputs;
+  extensions?: AuthenticationExtensionsClientInputsFuture;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
 
