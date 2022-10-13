@@ -611,11 +611,11 @@ const DpkVerifyRegRespOpts: VerifyRegistrationResponseOpts = {
 test('should return authenticator extension output', async () => {
   const verification = await verifyRegistrationResponse(DpkVerifyRegRespOpts);
   expect(verification.registrationInfo?.extensionOutputs).toMatchObject({
-    devicePubKeyToStore: {
-      dpk: Buffer.from('A50102032620012158204DC1989D0C2F1040D01F7EC15AC542B14DB54BC5EA5D57ED7F6B383EBB4FABB02258205B61B7D9752FC83686A40EA3CA269C177D7D18F66F22739F5250AA7A75F6855B', 'hex'),
-      nonce: Buffer.from('', 'hex'),
+    unregisteredDevicePubKey: {
+      dpk: 'pQECAyYgASFYIE3BmJ0MLxBA0B9-wVrFQrFNtUvF6l1X7X9rOD67T6uwIlggW2G32XUvyDaGpA6jyiacF319GPZvInOfUlCqenX2hVs',
+      nonce: '',
       scope: 0,
-      aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+      aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
       fmt: 'none',
       attStmt: {}
     },

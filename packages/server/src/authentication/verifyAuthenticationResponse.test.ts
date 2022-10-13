@@ -9,9 +9,7 @@ import {
   AuthenticationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 import {
-  DevicePublicKeyAuthenticatorOutput,
-  decodeDevicePubKey,
-  decodeDevicePubKeyAuthenticatorOutput
+  DevicePublicKeyAuthenticatorOutputJSON,
 } from '../extensions/devicePublicKey/decodeDevicePubKey';
 
 let mockDecodeClientData: jest.SpyInstance;
@@ -350,13 +348,20 @@ if (!DpkAuthCred?.clientExtensionResults?.devicePubKey) {
   throw new Error('This exception will not happen.');
 }
 
-const encodedDevicePubKey = decodeDevicePubKey(DpkAuthCred.clientExtensionResults.devicePubKey);
-const sameDevicePubKey = decodeDevicePubKeyAuthenticatorOutput(encodedDevicePubKey.authenticatorOutput);
-const differentDevicePubKey: DevicePublicKeyAuthenticatorOutput = {
-  dpk: Buffer.from('A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA', 'hex'),
-  nonce: Buffer.from('', 'hex'),
+const sameDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
+  dpk: 'pQECAyYgASFYIE3BmJ0MLxBA0B9-wVrFQrFNtUvF6l1X7X9rOD67T6uwIlggW2G32XUvyDaGpA6jyiacF319GPZvInOfUlCqenX2hVs',
+  nonce: '',
   scope: 0,
-  aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+  aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
+  fmt: 'none',
+  attStmt: {}
+}
+
+const differentDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
+  dpk: 'pQECAyYgASFYIJkaq-2d5Ccant6tiAb53JbW3M0MR2JTpVEEieyDeb5bIlggoJc8_e27eeJ_707nSBZz-zMSUE3cpUNM_SNDHWrSnto',
+  nonce: '',
+  scope: 0,
+  aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
   fmt: 'none',
   attStmt: {},
 };
@@ -372,14 +377,14 @@ test('should return the new device public key when no device public key matches'
   await expect(verifyAuthenticationResponse({
     ...DpkVerifyAuthRespOpts,
     userDevicePublicKeys: [differentDevicePubKey, differentDevicePubKey],
-  }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKeyToStore)).resolves.toMatchObject(sameDevicePubKey);
+  }).then(verification => verification.authenticationInfo.extensionOutputs?.unregisteredDevicePubKey)).resolves.toMatchObject(sameDevicePubKey);
 });
 
 test('should return undefined when one device public key matches', async () => {
   await expect(verifyAuthenticationResponse({
     ...DpkVerifyAuthRespOpts,
     userDevicePublicKeys: [sameDevicePubKey, differentDevicePubKey]
-  }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKeyToStore)).resolves.toBeUndefined();
+  }).then(verification => verification.authenticationInfo.extensionOutputs?.unregisteredDevicePubKey)).resolves.toBeUndefined();
 });
 
 test('should return credential backup info', async () => {

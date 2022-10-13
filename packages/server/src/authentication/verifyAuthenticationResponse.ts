@@ -14,12 +14,13 @@ import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import {
   verifyDevicePublicKeySignature,
-  VerifyDevicePublicKeySignatureOpts
+  VerifyDevicePublicKeySignatureOpts,
 } from '../extensions/devicePublicKey/verifyDevicePublicKeySignature';
 import {
-  DevicePublicKeyAuthenticatorOutput,
+  DevicePublicKeyAuthenticatorOutputJSON,
   decodeDevicePubKey,
-  decodeDevicePubKeyAuthenticatorOutput
+  deserializeDevicePubKeyAuthenticatorOutput,
+  encodeDevicePubKeyAuthenticatorOutput,
 } from '../extensions/devicePublicKey/decodeDevicePubKey';
 import { isRecognizedDevice } from '../extensions/devicePublicKey/isRecognizedDevice';
 
@@ -33,7 +34,7 @@ export type VerifyAuthenticationResponseOpts = {
   advancedFIDOConfig?: {
     userVerification?: UserVerificationRequirement;
   };
-  userDevicePublicKeys?: DevicePublicKeyAuthenticatorOutput[];
+  userDevicePublicKeys?: DevicePublicKeyAuthenticatorOutputJSON[];
 };
 
 /**
@@ -215,7 +216,7 @@ export async function verifyAuthenticationResponse(
     if (clientExtensionResults.devicePubKey) {
       const devicePubKey =  decodeDevicePubKey(clientExtensionResults.devicePubKey);
       const { authenticatorOutput, signature } = devicePubKey;
-      const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(authenticatorOutput);
+      const dpkAuthOutput = deserializeDevicePubKeyAuthenticatorOutput(authenticatorOutput);
 
       const dpkOptions: VerifyDevicePublicKeySignatureOpts = {
         credential,
@@ -227,8 +228,10 @@ export async function verifyAuthenticationResponse(
         throw new Error('Invalid device public key signature.');
       }
 
-      const devicePubKeyToStore = await isRecognizedDevice(dpkAuthOutput, userDevicePublicKeys);
-      extensionOutputs.devicePubKeyToStore = devicePubKeyToStore;
+      const unregisteredDevicePubKey = await isRecognizedDevice(dpkAuthOutput, userDevicePublicKeys);
+      if (unregisteredDevicePubKey) {
+        extensionOutputs.unregisteredDevicePubKey = encodeDevicePubKeyAuthenticatorOutput(unregisteredDevicePubKey);
+      }
     }
   }
 
@@ -299,5 +302,5 @@ export type VerifiedAuthenticationResponse = {
 };
 
 export type AuthenticationExtensionOutputs = {
-  devicePubKeyToStore?: DevicePublicKeyAuthenticatorOutput;
+  unregisteredDevicePubKey?: DevicePublicKeyAuthenticatorOutputJSON;
 }

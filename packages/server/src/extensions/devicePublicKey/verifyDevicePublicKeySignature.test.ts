@@ -1,5 +1,5 @@
 import { AuthenticationCredentialJSON, RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
-import { decodeDevicePubKey, decodeDevicePubKeyAuthenticatorOutput } from './decodeDevicePubKey';
+import { decodeDevicePubKey, deserializeDevicePubKeyAuthenticatorOutput } from './decodeDevicePubKey';
 import { verifyDevicePublicKeySignature, VerifyDevicePublicKeySignatureOpts } from './verifyDevicePublicKeySignature';
 
 it("should verify a registration response's device public key signature", async () => {
@@ -26,7 +26,7 @@ it("should verify a registration response's device public key signature", async 
 
   const devicePubKey =  decodeDevicePubKey(credential.clientExtensionResults.devicePubKey);
   const { authenticatorOutput: encodedAuthenticatorOutput, signature } = devicePubKey;
-  const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
+  const dpkAuthOutput = deserializeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
 
   const dpkOpts: VerifyDevicePublicKeySignatureOpts = {
     credential,
@@ -62,7 +62,7 @@ it("should verify an authentication response's device public key signature", asy
 
   const devicePubKey =  decodeDevicePubKey(credential.clientExtensionResults.devicePubKey);
   const {authenticatorOutput: encodedAuthenticatorOutput, signature } = devicePubKey;
-  const dpkAuthOutput = decodeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
+  const dpkAuthOutput = deserializeDevicePubKeyAuthenticatorOutput(encodedAuthenticatorOutput);
 
   const dpkOpts: VerifyDevicePublicKeySignatureOpts = {
     credential,

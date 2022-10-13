@@ -1,5 +1,9 @@
 import { AttestationStatement } from "@simplewebauthn/typescript-types";
-import { DevicePublicKeyAuthenticatorOutput } from './decodeDevicePubKey';
+import {
+  DevicePublicKeyAuthenticatorOutput,
+  DevicePublicKeyAuthenticatorOutputJSON,
+  decodeDevicePubKeyAuthenticatorOutput,
+} from './decodeDevicePubKey';
 import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttestation";
 
 /**
@@ -13,9 +17,13 @@ import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttesta
  */
 export async function isRecognizedDevice(
   responseDevicePublicKey: DevicePublicKeyAuthenticatorOutput,
-  userDevicePublicKeys?: DevicePublicKeyAuthenticatorOutput[]
+  userDevicePublicKeys?: DevicePublicKeyAuthenticatorOutputJSON[]
 ): Promise<DevicePublicKeyAuthenticatorOutput | undefined> {
   if (userDevicePublicKeys && userDevicePublicKeys.length > 0) {
+    // Decode all DPKs
+    const decodedDPKs = userDevicePublicKeys.map(userDPK => {
+      return decodeDevicePubKeyAuthenticatorOutput(userDPK);
+    });
     // If the Relying Party's user account mapped to the credential.id in play
     // (i.e., for the user being authenticated) holds aaguid, dpk and scope
     // values corresponding to the extracted attObjForDevicePublicKey fields,
@@ -23,7 +31,7 @@ export async function isRecognizedDevice(
     // values and the extracted field values. The Relying Party MAY have more
     // than one set of {aaguid, dpk, scope} values mapped to the user account
     // and credential.id pair and each set MUST be checked.
-    const matchedDPKs = userDevicePublicKeys.filter(userDPK => {
+    const matchedDPKs = decodedDPKs.filter(userDPK => {
       if (!responseDevicePublicKey.aaguid.equals(userDPK.aaguid)) {
         return false;
       }
@@ -45,7 +53,7 @@ export async function isRecognizedDevice(
     if (matchedDPKs.length === 0) {
       // This is possibly a new device.
 
-      const index = userDevicePublicKeys.findIndex(userDPK => {
+      const index = decodedDPKs.findIndex(userDPK => {
         return responseDevicePublicKey.dpk.equals(userDPK.dpk)
       });
       if (index === -1) {

@@ -29,6 +29,9 @@ import type {
   VerifiedAuthenticationResponse,
   VerifyAuthenticationResponseOpts,
 } from './authentication/verifyAuthenticationResponse';
+import type {
+  DevicePublicKeyAuthenticatorOutputJSON
+} from './extensions/devicePublicKey/decodeDevicePubKey';
 
 export type {
   GenerateRegistrationOptionsOpts,
@@ -38,4 +41,5 @@ export type {
   VerifyAuthenticationResponseOpts,
   VerifiedRegistrationResponse,
   VerifiedAuthenticationResponse,
+  DevicePublicKeyAuthenticatorOutputJSON,
 };
