@@ -1,5 +1,17 @@
 # Changelog
 
+## v6.2.2
+
+**Packages:**
+
+- @simplewebauthn/browser@6.2.2
+- @simplewebauthn/server@6.2.2
+
+**Changes:**
+
+- [browser] `browserSupportsWebAuthnAutofill()` no longer supports the old Chrome Canary way of testing for conditional UI support ([#298](https://github.com/MasterKale/SimpleWebAuthn/pull/298))
+- [server] Version sync
+
 ## v6.2.1
 
 **Packages:**
