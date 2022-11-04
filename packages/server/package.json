@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/server",
-  "version": "6.2.1",
+  "version": "6.2.2",
   "description": "SimpleWebAuthn for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
