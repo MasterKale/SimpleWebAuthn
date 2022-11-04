@@ -58,7 +58,7 @@
     "jwk-to-pem": "^2.0.4",
     "node-fetch": "^2.6.0"
   },
-  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498",
+  "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb",
   "devDependencies": {
     "@simplewebauthn/typescript-types": "*",
     "@types/cbor": "^5.0.1",

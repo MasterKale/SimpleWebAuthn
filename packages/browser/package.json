@@ -39,5 +39,5 @@
     "rollup-plugin-version-injector": "^1.3.3"
   },
   "type": "module",
-  "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
+  "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb"
 }
