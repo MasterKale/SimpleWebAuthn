@@ -6,12 +6,6 @@ import { PublicKeyCredentialFuture } from '@simplewebauthn/typescript-types';
  * be shown to the user in the browser's typical password autofill popup.
  */
 export async function browserSupportsWebAuthnAutofill(): Promise<boolean> {
-  // Just for Chrome Canary right now; the PublicKeyCredential logic below is the real API
-  // @ts-ignore
-  if (navigator.credentials.conditionalMediationSupported) {
-    return true;
-  }
-
   /**
    * I don't like the `as unknown` here but there's a `declare var PublicKeyCredential` in
    * TS' DOM lib that's making it difficult for me to just go `as PublicKeyCredentialFuture` as I
