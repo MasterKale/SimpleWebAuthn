@@ -5,7 +5,7 @@
     "bootstrap": "lerna bootstrap",
     "bootstrap:ci": "lerna bootstrap --hoist",
     "clean": "lerna clean -y && rm ./packages/**/package-lock.json",
-    "publish": "lerna bootstrap && rm ./packages/**/package-lock.json && lerna publish",
+    "get-it-onto-npm": "lerna bootstrap && rm ./packages/**/package-lock.json && lerna publish",
     "lint": "prettier --write packages/**/src/**/*.ts example/**/*.ts && eslint --fix packages/**/src/**/*.ts example/**/*.ts",
     "docs": "npm run bootstrap:ci && typedoc --tsconfig tsconfigdoc.json",
     "test": "lerna run test",
