@@ -12,16 +12,16 @@ export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
     throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);
   }
 
-  const kty = struct.get(COSEKEYS.kty);
+  const kty = struct[COSEKEYS.kty];
 
   if (!kty) {
     throw new Error('Public key was missing kty');
   }
 
   if (kty === COSEKTY.EC2) {
-    const crv = struct.get(COSEKEYS.crv);
-    const x = struct.get(COSEKEYS.x);
-    const y = struct.get(COSEKEYS.y);
+    const crv = struct[COSEKEYS.crv];
+    const x = struct[COSEKEYS.x];
+    const y = struct[COSEKEYS.y];
 
     if (!crv) {
       throw new Error('Public key was missing crv (EC2)');
@@ -45,8 +45,8 @@ export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
 
     return ecPEM;
   } else if (kty === COSEKTY.RSA) {
-    const n = struct.get(COSEKEYS.n);
-    const e = struct.get(COSEKEYS.e);
+    const n = struct[COSEKEYS.n];
+    const e = struct[COSEKEYS.e];
 
     if (!n) {
       throw new Error('Public key was missing n (RSA)');

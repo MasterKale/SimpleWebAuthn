@@ -57,7 +57,7 @@ export async function verifySignature(
       throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);
     }
 
-    const kty = struct.get(COSEKEYS.kty);
+    const kty = struct[COSEKEYS.kty];
 
     if (!kty) {
       throw new Error('Public key was missing kty');
@@ -66,7 +66,7 @@ export async function verifySignature(
     // Check key type
     if (kty === COSEKTY.OKP) {
       // Verify Ed25519 slightly differently
-      const x = struct.get(COSEKEYS.x);
+      const x = struct[COSEKEYS.x];
 
       if (!x) {
         throw new Error('Public key was missing x (OKP)');

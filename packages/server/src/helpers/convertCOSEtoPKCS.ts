@@ -8,9 +8,9 @@ import uint8Array from './uint8array';
 export function convertCOSEtoPKCS(cosePublicKey: Uint8Array): Uint8Array {
   const struct: COSEPublicKey = decodeCborFirst(cosePublicKey);
 
-  const x = struct.get(COSEKEYS.x);
-  const y = struct.get(COSEKEYS.y);
   const tag = Uint8Array.from([0x04]);
+  const x = struct[COSEKEYS.x];
+  const y = struct[COSEKEYS.y];
 
   if (!x) {
     throw new Error('COSE public key was missing x');
@@ -23,7 +23,7 @@ export function convertCOSEtoPKCS(cosePublicKey: Uint8Array): Uint8Array {
   return uint8Array.concat([tag, x as Uint8Array]);
 }
 
-export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Buffer>;
+export type COSEPublicKey = { [key: COSEAlgorithmIdentifier]: number | Uint8Array};
 
 export enum COSEKEYS {
   kty = 1,

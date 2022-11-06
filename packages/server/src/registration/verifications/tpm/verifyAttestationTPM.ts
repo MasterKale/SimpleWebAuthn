@@ -64,8 +64,8 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
   if (pubType === 'TPM_ALG_RSA') {
-    const n = cosePublicKey.get(COSEKEYS.n);
-    const e = cosePublicKey.get(COSEKEYS.e);
+    const n = cosePublicKey[COSEKEYS.n];
+    const e = cosePublicKey[COSEKEYS.e];
 
     if (!n) {
       throw new Error('COSE public key missing n (TPM|RSA)');
@@ -93,9 +93,9 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
     }
   } else if (pubType === 'TPM_ALG_ECC') {
-    const crv = cosePublicKey.get(COSEKEYS.crv);
-    const x = cosePublicKey.get(COSEKEYS.x);
-    const y = cosePublicKey.get(COSEKEYS.y);
+    const crv = cosePublicKey[COSEKEYS.crv];
+    const x = cosePublicKey[COSEKEYS.x];
+    const y = cosePublicKey[COSEKEYS.y];
 
     if (!crv) {
       throw new Error('COSE public key missing crv (TPM|ECC)');

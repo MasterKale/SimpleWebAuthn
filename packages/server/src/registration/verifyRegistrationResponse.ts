@@ -181,7 +181,7 @@ export async function verifyRegistrationResponse(
   }
 
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
-  const alg = decodedPublicKey.get(COSEKEYS.alg);
+  const alg = decodedPublicKey[COSEKEYS.alg];
 
   if (typeof alg !== 'number') {
     throw new Error('Credential public key was missing numeric alg');
