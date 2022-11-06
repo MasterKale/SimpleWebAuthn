@@ -7,9 +7,9 @@ import type {
   PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
-import base64url from 'base64url';
 
 import { generateChallenge } from '../helpers/generateChallenge';
+import base64url from '../helpers/base64url';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
@@ -152,7 +152,7 @@ export function generateRegistrationOptions(
   }
 
   return {
-    challenge: base64url.encode(challenge),
+    challenge: base64url.fromBuffer(_challenge),
     rp: {
       name: rpName,
       id: rpID,
@@ -167,7 +167,7 @@ export function generateRegistrationOptions(
     attestation: attestationType,
     excludeCredentials: excludeCredentials.map(cred => ({
       ...cred,
-      id: base64url.encode(cred.id as Buffer),
+      id: base64url.fromBuffer(cred.id as Uint8Array),
     })),
     authenticatorSelection,
     extensions,

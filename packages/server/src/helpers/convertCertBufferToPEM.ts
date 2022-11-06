@@ -1,5 +1,6 @@
-import base64url from 'base64url';
 import type { Base64URLString } from '@simplewebauthn/typescript-types';
+
+import base64url from './base64url';
 
 /**
  * Convert buffer to an OpenSSL-compatible PEM text format.

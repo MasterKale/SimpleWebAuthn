@@ -4,7 +4,7 @@ import type {
   PublicKeyCredentialDescriptorFuture,
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
-import base64url from 'base64url';
+import base64url from '../helpers/base64url'
 
 import { generateChallenge } from '../helpers/generateChallenge';
 
@@ -43,10 +43,10 @@ export function generateAuthenticationOptions(
   } = options;
 
   return {
-    challenge: base64url.encode(challenge),
+    challenge: base64url.fromBuffer(_challenge),
     allowCredentials: allowCredentials?.map(cred => ({
       ...cred,
-      id: base64url.encode(cred.id as Buffer),
+      id: base64url.fromBuffer(cred.id as Uint8Array),
     })),
     timeout,
     userVerification,

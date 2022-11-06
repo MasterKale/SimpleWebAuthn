@@ -1,4 +1,3 @@
-import base64url from 'base64url';
 import {
   AuthenticationCredentialJSON,
   AuthenticatorDevice,
@@ -13,6 +12,7 @@ import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
+import base64url from '../helpers/base64url';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;

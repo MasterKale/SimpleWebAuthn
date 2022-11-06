@@ -1,9 +1,13 @@
 jest.mock('../helpers/generateChallenge');
 
+import base64url from '../helpers/base64url';
+
 import { generateAuthenticationOptions } from './generateAuthenticationOptions';
 
+const challengeString = 'dG90YWxseXJhbmRvbXZhbHVl';
+const challengeBuffer = base64url.toBuffer(challengeString)
+
 test('should generate credential request options suitable for sending via JSON', () => {
-  const challenge = 'totallyrandomvalue';
 
   const options = generateAuthenticationOptions({
     allowCredentials: [
@@ -19,12 +23,12 @@ test('should generate credential request options suitable for sending via JSON',
       },
     ],
     timeout: 1,
-    challenge,
+    challenge: challengeBuffer,
   });
 
   expect(options).toEqual({
     // base64url-encoded
-    challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
+    challenge: challengeString,
     allowCredentials: [
       {
         id: 'MTIzNA',
@@ -43,7 +47,7 @@ test('should generate credential request options suitable for sending via JSON',
 
 test('defaults to 60 seconds if no timeout is specified', () => {
   const options = generateAuthenticationOptions({
-    challenge: 'totallyrandomvalue',
+    challenge: challengeBuffer,
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
       { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
@@ -55,7 +59,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
 
 test('should not set userVerification if not specified', () => {
   const options = generateAuthenticationOptions({
-    challenge: 'totallyrandomvalue',
+    challenge: challengeBuffer,
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
       { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
@@ -86,7 +90,7 @@ test('should generate without params', () => {
 
 test('should set userVerification if specified', () => {
   const options = generateAuthenticationOptions({
-    challenge: 'totallyrandomvalue',
+    challenge: challengeBuffer,
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
       { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
@@ -99,7 +103,7 @@ test('should set userVerification if specified', () => {
 
 test('should set extensions if specified', () => {
   const options = generateAuthenticationOptions({
-    challenge: 'totallyrandomvalue',
+    challenge: challengeBuffer,
     allowCredentials: [
       { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
       { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
