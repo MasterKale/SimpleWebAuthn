@@ -1,7 +1,7 @@
 /**
  * Convert the aaguid buffer in authData into a UUID string
  */
-export function convertAAGUIDToString(aaguid: Buffer): string {
+export function convertAAGUIDToString(aaguid: Uint8Array): string {
   // Raw Hex: adce000235bcc60a648b0b25f1f05503
   const hex = aaguid.toString('hex');
 

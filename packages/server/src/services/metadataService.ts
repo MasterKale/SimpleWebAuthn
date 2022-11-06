@@ -139,7 +139,7 @@ export class BaseMetadataService {
    * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
    * BLOB download.
    */
-  async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
+  async getStatement(aaguid: string | Uint8Array): Promise<MetadataStatement | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
       return;
     }
@@ -148,7 +148,7 @@ export class BaseMetadataService {
       return;
     }
 
-    if (aaguid instanceof Buffer) {
+    if (aaguid instanceof Uint8Array) {
       aaguid = convertAAGUIDToString(aaguid);
     }
 

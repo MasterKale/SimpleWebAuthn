@@ -8,7 +8,7 @@ import {
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
-export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorData {
+export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticatorData {
   if (authData.byteLength < 37) {
     throw new Error(
       `Authenticator data was ${authData.byteLength} bytes, expected at least 37 bytes`,
@@ -87,8 +87,8 @@ export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorDat
 }
 
 export type ParsedAuthenticatorData = {
-  rpIdHash: Buffer;
-  flagsBuf: Buffer;
+  rpIdHash: Uint8Array;
+  flagsBuf: Uint8Array;
   flags: {
     up: boolean;
     uv: boolean;
@@ -99,10 +99,10 @@ export type ParsedAuthenticatorData = {
     flagsInt: number;
   };
   counter: number;
-  counterBuf: Buffer;
-  aaguid?: Buffer;
-  credentialID?: Buffer;
-  credentialPublicKey?: Buffer;
+  counterBuf: Uint8Array;
+  aaguid?: Uint8Array;
+  credentialID?: Uint8Array;
+  credentialPublicKey?: Uint8Array;
   extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
-  extensionsDataBuffer?: Buffer;
+  extensionsDataBuffer?: Uint8Array;
 };

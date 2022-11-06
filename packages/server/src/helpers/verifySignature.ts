@@ -7,16 +7,16 @@ import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
 
 type VerifySignatureOptsLeafCert = {
-  signature: Buffer;
-  signatureBase: Buffer;
-  leafCert: Buffer;
+  signature: Uint8Array;
+  signatureBase: Uint8Array;
+  leafCert: Uint8Array;
   hashAlgorithm?: string;
 };
 
 type VerifySignatureOptsCredentialPublicKey = {
-  signature: Buffer;
-  signatureBase: Buffer;
-  credentialPublicKey: Buffer;
+  signature: Uint8Array;
+  signatureBase: Uint8Array;
+  credentialPublicKey: Uint8Array;
   hashAlgorithm?: string;
 };
 

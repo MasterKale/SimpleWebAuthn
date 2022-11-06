@@ -10,7 +10,7 @@ import { generateChallenge } from '../helpers/generateChallenge';
 
 export type GenerateAuthenticationOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptorFuture[];
-  challenge?: string | Buffer;
+  challenge?: string | Uint8Array;
   timeout?: number;
   userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;

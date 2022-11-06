@@ -287,10 +287,10 @@ export type VerifiedRegistrationResponse = {
     fmt: AttestationFormat;
     counter: number;
     aaguid: string;
-    credentialID: Buffer;
-    credentialPublicKey: Buffer;
+    credentialID: Uint8Array;
+    credentialPublicKey: Uint8Array;
     credentialType: 'public-key';
-    attestationObject: Buffer;
+    attestationObject: Uint8Array;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
@@ -302,13 +302,13 @@ export type VerifiedRegistrationResponse = {
  * Values passed to all attestation format verifiers, from which they are free to use as they please
  */
 export type AttestationFormatVerifierOpts = {
-  aaguid: Buffer;
+  aaguid: Uint8Array;
   attStmt: AttestationStatement;
-  authData: Buffer;
-  clientDataHash: Buffer;
-  credentialID: Buffer;
-  credentialPublicKey: Buffer;
+  authData: Uint8Array;
+  clientDataHash: Uint8Array;
+  credentialID: Uint8Array;
+  credentialPublicKey: Uint8Array;
   rootCertificates: string[];
-  rpIdHash: Buffer;
+  rpIdHash: Uint8Array;
   verifyTimestampMS?: boolean;
 };

@@ -14,13 +14,13 @@ const rootCertificates = SettingsService.getRootCertificates({
   identifier: 'android-safetynet',
 });
 
-let authData: Buffer;
+let authData: Uint8Array;
 let attStmt: AttestationStatement;
-let clientDataHash: Buffer;
-let aaguid: Buffer;
-let credentialID: Buffer;
-let credentialPublicKey: Buffer;
-let rpIdHash: Buffer;
+let clientDataHash: Uint8Array;
+let aaguid: Uint8Array;
+let credentialID: Uint8Array;
+let credentialPublicKey: Uint8Array;
+let rpIdHash: Uint8Array;
 let spyDate: jest.SpyInstance;
 
 beforeEach(() => {

@@ -17,7 +17,7 @@ export async function verifyAttestationWithMetadata({
   attestationStatementAlg,
 }: {
   statement: MetadataStatement;
-  credentialPublicKey: Buffer;
+  credentialPublicKey: Uint8Array;
   x5c: Buffer[] | Base64URLString[];
   attestationStatementAlg?: number;
 }): Promise<boolean> {

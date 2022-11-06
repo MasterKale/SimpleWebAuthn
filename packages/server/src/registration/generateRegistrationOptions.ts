@@ -16,7 +16,7 @@ export type GenerateRegistrationOptionsOpts = {
   rpID: string;
   userID: string;
   userName: string;
-  challenge?: string | Buffer;
+  challenge?: string | Uint8Array;
   userDisplayName?: string;
   timeout?: number;
   attestationType?: AttestationConveyancePreference;
