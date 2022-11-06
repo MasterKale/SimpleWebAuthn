@@ -1,9 +1,11 @@
+import uint8Array from './uint8Array';
+
 /**
  * Convert the aaguid buffer in authData into a UUID string
  */
 export function convertAAGUIDToString(aaguid: Uint8Array): string {
   // Raw Hex: adce000235bcc60a648b0b25f1f05503
-  const hex = aaguid.toString('hex');
+  const hex = uint8Array.toHex(aaguid);
 
   const segments: string[] = [
     hex.slice(0, 8), // 8

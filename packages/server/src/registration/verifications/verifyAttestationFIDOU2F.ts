@@ -4,6 +4,7 @@ import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
+import uint8Array from '../../helpers/uint8Array';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
@@ -17,7 +18,7 @@ export async function verifyAttestationFIDOU2F(
     rpIdHash,
     credentialID,
     credentialPublicKey,
-    aaguid = '',
+    aaguid,
     rootCertificates,
   } = options;
 
@@ -43,7 +44,7 @@ export async function verifyAttestationFIDOU2F(
   }
 
   // FIDO spec says that aaguid _must_ equal 0x00 here to be legit
-  const aaguidToHex = Number.parseInt(aaguid.toString('hex'), 16);
+  const aaguidToHex = Number.parseInt(uint8Array.toHex(aaguid), 16);
   if (aaguidToHex !== 0x00) {
     throw new Error(`AAGUID "${aaguidToHex}" was not expected value`);
   }

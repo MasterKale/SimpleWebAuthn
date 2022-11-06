@@ -7,6 +7,7 @@ import { verifySignature } from '../../helpers/verifySignature';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
+import uint8Array from '../../helpers/uint8Array';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
@@ -65,7 +66,7 @@ export async function verifyAttestationAndroidSafetyNet(
 
   const nonceBase = Buffer.concat([authData, clientDataHash]);
   const nonceBuffer = toHash(nonceBase);
-  const expectedNonce = nonceBuffer.toString('base64');
+  const expectedNonce = uint8Array.toBase64(nonceBuffer);
 
   if (nonce !== expectedNonce) {
     throw new Error('Could not verify payload nonce (SafetyNet)');

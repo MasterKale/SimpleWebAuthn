@@ -7,6 +7,7 @@ import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { toHash } from '../../helpers/toHash';
 import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
+import uint8Array from '../../helpers/uint8Array';
 
 export async function verifyAttestationApple(
   options: AttestationFormatVerifierOpts,
@@ -55,7 +56,7 @@ export async function verifyAttestationApple(
    */
   const extNonce = Buffer.from(extCertNonce.extnValue.buffer).slice(6);
 
-  if (!nonce.equals(extNonce)) {
+  if (!uint8Array.areEqual(nonce, extNonce)) {
     throw new Error(`credCert nonce was not expected value (Apple)`);
   }
 
@@ -65,7 +66,7 @@ export async function verifyAttestationApple(
   const credPubKeyPKCS = convertCOSEtoPKCS(credentialPublicKey);
   const credCertSubjectPublicKey = Buffer.from(subjectPublicKeyInfo.subjectPublicKey);
 
-  if (!credPubKeyPKCS.equals(credCertSubjectPublicKey)) {
+  if (!uint8Array.areEqual(credPubKeyPKCS, credCertSubjectPublicKey)) {
     throw new Error('Credential public key does not equal credCert public key (Apple)');
   }
 

@@ -12,6 +12,7 @@ import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
+import uint8Array from '../helpers/uint8Array';
 import base64url from '../helpers/base64url';
 
 export type VerifyAuthenticationResponseOpts = {
@@ -149,14 +150,14 @@ export async function verifyAuthenticationResponse(
   // Make sure the response's RP ID is ours
   if (typeof expectedRPID === 'string') {
     const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-    if (!rpIdHash.equals(expectedRPIDHash)) {
+    if (!uint8Array.areEqual(rpIdHash, expectedRPIDHash)) {
       throw new Error(`Unexpected RP ID hash`);
     }
   } else {
     // Go through each expected RP ID and try to find one that matches
     const foundMatch = expectedRPID.some(expected => {
       const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
-      return rpIdHash.equals(expectedRPIDHash);
+      return uint8Array.areEqual(rpIdHash, expectedRPIDHash);
     });
 
     if (!foundMatch) {

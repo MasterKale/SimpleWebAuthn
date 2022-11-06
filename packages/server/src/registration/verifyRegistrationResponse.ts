@@ -18,6 +18,7 @@ import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey'
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
+import uint8Array from '../helpers/uint8Array';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
@@ -141,14 +142,14 @@ export async function verifyRegistrationResponse(
   if (expectedRPID) {
     if (typeof expectedRPID === 'string') {
       const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-      if (!rpIdHash.equals(expectedRPIDHash)) {
+      if (!uint8Array.areEqual(rpIdHash, expectedRPIDHash)) {
         throw new Error(`Unexpected RP ID hash`);
       }
     } else {
       // Go through each expected RP ID and try to find one that matches
       const foundMatch = expectedRPID.some(expected => {
         const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
-        return rpIdHash.equals(expectedRPIDHash);
+        return uint8Array.areEqual(rpIdHash, expectedRPIDHash);
       });
 
       if (!foundMatch) {

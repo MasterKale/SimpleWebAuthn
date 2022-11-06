@@ -8,6 +8,7 @@ import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
 import { COSEALGHASH, convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
+import uint8Array from '../../helpers/uint8Array';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
@@ -36,14 +37,14 @@ export async function verifyAttestationAndroidKey(
   // Check that credentialPublicKey matches the public key in the attestation certificate
   // Find the public cert in the certificate as PKCS
   const parsedCert = AsnParser.parse(x5c[0], Certificate);
-  const parsedCertPubKey = Buffer.from(
+  const parsedCertPubKey = new Uint8Array(
     parsedCert.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey,
   );
 
   // Convert the credentialPublicKey to PKCS
   const credPubKeyPKCS = convertCOSEtoPKCS(credentialPublicKey);
 
-  if (!credPubKeyPKCS.equals(parsedCertPubKey)) {
+  if (!uint8Array.areEqual(credPubKeyPKCS, parsedCertPubKey)) {
     throw new Error('Credential public key does not equal leaf cert public key (AndroidKey)');
   }
 

@@ -10,6 +10,7 @@ import type {
 
 import { generateChallenge } from '../helpers/generateChallenge';
 import base64url from '../helpers/base64url';
+import uint8Array from '../helpers/uint8Array';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
@@ -149,6 +150,14 @@ export function generateRegistrationOptions(
      * See https://www.w3.org/TR/webauthn-2/#dom-authenticatorselectioncriteria-requireresidentkey
      */
     authenticatorSelection.requireResidentKey = authenticatorSelection.residentKey === 'required';
+  }
+
+  /**
+   * Preserve ability to specify `string` values for challenges
+   */
+  let _challenge = challenge;
+  if (typeof _challenge === 'string') {
+    _challenge = uint8Array.fromString(_challenge);
   }
 
   return {

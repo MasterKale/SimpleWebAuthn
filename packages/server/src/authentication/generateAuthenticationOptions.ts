@@ -5,6 +5,7 @@ import type {
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 import base64url from '../helpers/base64url'
+import uint8Array from '../helpers/uint8Array';
 
 import { generateChallenge } from '../helpers/generateChallenge';
 
@@ -41,6 +42,14 @@ export function generateAuthenticationOptions(
     extensions,
     rpID,
   } = options;
+
+  /**
+   * Preserve ability to specify `string` values for challenges
+   */
+   let _challenge = challenge;
+   if (typeof _challenge === 'string') {
+     _challenge = uint8Array.fromString(_challenge);
+   }
 
   return {
     challenge: base64url.fromBuffer(_challenge),
