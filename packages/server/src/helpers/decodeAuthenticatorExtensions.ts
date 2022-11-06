@@ -1,4 +1,4 @@
-import cbor from 'cbor';
+import { decodeCborFirst } from './decodeCbor';
 
 /**
  * Convert authenticator extension data buffer to a proper object
@@ -10,7 +10,7 @@ export function decodeAuthenticatorExtensions(
 ): AuthenticationExtensionsAuthenticatorOutputs | undefined {
   let toCBOR: AuthenticationExtensionsAuthenticatorOutputs | undefined;
   try {
-    toCBOR = cbor.decodeAllSync(extensionData)[0];
+    toCBOR = decodeCborFirst(extensionData);
   } catch (err) {
     const _err = err as Error;
     throw new Error(`Error decoding authenticator extensions: ${_err.message}`);

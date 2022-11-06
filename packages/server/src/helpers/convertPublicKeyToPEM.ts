@@ -1,12 +1,12 @@
-import cbor from 'cbor';
 import jwkToPem from 'jwk-to-pem';
 
 import { COSEKEYS, COSEKTY, COSECRV } from './convertCOSEtoPKCS';
+import { decodeCborFirst } from './decodeCbor';
 
 export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
   let struct;
   try {
-    struct = cbor.decodeAllSync(publicKey)[0];
+    struct = decodeCborFirst(publicKey);
   } catch (err) {
     const _err = err as Error;
     throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);
