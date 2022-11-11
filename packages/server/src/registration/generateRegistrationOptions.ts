@@ -157,7 +157,7 @@ export function generateRegistrationOptions(
    */
   let _challenge = challenge;
   if (typeof _challenge === 'string') {
-    _challenge = uint8Array.fromString(_challenge);
+    _challenge = uint8Array.fromASCIIString(_challenge);
   }
 
   return {

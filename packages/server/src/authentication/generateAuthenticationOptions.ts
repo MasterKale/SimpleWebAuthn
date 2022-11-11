@@ -48,7 +48,7 @@ export function generateAuthenticationOptions(
    */
    let _challenge = challenge;
    if (typeof _challenge === 'string') {
-     _challenge = uint8Array.fromString(_challenge);
+     _challenge = uint8Array.fromUTF8String(_challenge);
    }
 
   return {
