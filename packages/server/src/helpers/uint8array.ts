@@ -22,20 +22,24 @@ export function toHex(array: Uint8Array): string {
 }
 
 /**
- * Convert a Uint8Array to Base64.
+ * Convert a hexadecimal string to Uint8Array.
  *
- * A replacement for `Buffer.toString('base64')`
+ * A replacement for `Buffer.from('...', 'hex')`
  */
-export function toBase64(array: Uint8Array): string {
-  let str = '';
-
-  for (const charCode of array) {
-    str += String.fromCharCode(charCode);
+export function fromHex(hex: string): Uint8Array {
+  if (!hex) {
+    return Uint8Array.from([]);
   }
 
-  const base64String = btoa(str);
+  const isValid = hex.length !== 0 && hex.length % 2 === 0 && !/[^a-fA-F0-9]/u.test(hex);
 
-  return base64String;
+  if (!isValid) {
+    throw new Error('Invalid hex string');
+  }
+
+  const byteStrings = hex.match(/.{1,2}/g) ?? [];
+
+  return Uint8Array.from(byteStrings.map((byte) => parseInt(byte, 16)));
 }
 
 /**
@@ -56,16 +60,51 @@ export function concat(arrays: Uint8Array[]): Uint8Array {
 }
 
 /**
+ * Convert bytes into a UTF-8 string
+ */
+export function toUTF8String(array: Uint8Array): string {
+  type _TextDecoder = {
+    decode(value: Uint8Array): string;
+  }
+  /**
+   * The typing gets ugly here because I can't reference TS' DOM types, and I don't want to
+   * reference Node/Deno/Bun/... types in my quest to make this isomorphic. The fact is, the
+   * runtime that is "Web API"-compatible should expose `TextDecoder` globally. If not, then,
+   * well...I'll deal with that case if it happens.
+   */
+  // @ts-ignore 2304
+  const decoder: _TextDecoder = new TextDecoder("utf-8");
+  return decoder.decode(array);
+}
+
+/**
+ * Convert a UTF-8 string back into bytes
+ */
+export function fromUTF8String(utf8String: string): Uint8Array {
+  type _TextEncoder = {
+    encode(value: string): Uint8Array;
+  }
+  /**
+   * The typing gets ugly here because I can't reference TS' DOM types, and I don't want to
+   * reference Node/Deno/Bun/... types in my quest to make this isomorphic. The fact is, the
+   * runtime that is "Web API"-compatible should expose `TextEncoder` globally. If not, then,
+   * well...I'll deal with that case if it happens.
+   */
+  // @ts-ignore 2304
+  const encoder: _TextEncoder = new TextEncoder();
+  return encoder.encode(utf8String);
+}
+
+/**
  * Convert an ASCII string to Uint8Array
  */
-export function fromString(value: string): Uint8Array {
+export function fromASCIIString(value: string): Uint8Array {
   return Uint8Array.from(value.split("").map(x => x.charCodeAt(0)));
 }
 
-export default {
-  areEqual,
-  toHex,
-  toBase64,
-  concat,
-  fromString,
-};
+/**
+ * Prepare a DataView we can slice our way around in as we parse the bytes in a Uint8Array
+ */
+export function toDataView(array: Uint8Array): DataView {
+  return new DataView(array.buffer, array.byteOffset, array.length);
+}
