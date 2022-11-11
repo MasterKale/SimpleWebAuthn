@@ -1,16 +1,16 @@
 import { COSEAlgorithmIdentifier } from '@simplewebauthn/typescript-types';
-import { decodeCborFirst } from './decodeCbor';
+import * as cbor from './cbor';
 import * as uint8Array from './uint8Array';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
  */
 export function convertCOSEtoPKCS(cosePublicKey: Uint8Array): Uint8Array {
-  const struct: COSEPublicKey = decodeCborFirst(cosePublicKey);
+  const struct = cbor.decodeFirst<COSEPublicKey>(cosePublicKey);
 
   const tag = Uint8Array.from([0x04]);
-  const x = struct[COSEKEYS.x];
-  const y = struct[COSEKEYS.y];
+  const x = struct.get(COSEKEYS.x);
+  const y = struct.get(COSEKEYS.y);
 
   if (!x) {
     throw new Error('COSE public key was missing x');
@@ -23,7 +23,7 @@ export function convertCOSEtoPKCS(cosePublicKey: Uint8Array): Uint8Array {
   return uint8Array.concat([tag, x as Uint8Array]);
 }
 
-export type COSEPublicKey = { [key: COSEAlgorithmIdentifier]: number | Uint8Array};
+export type COSEPublicKey = Map<COSEAlgorithmIdentifier, number | Uint8Array>;
 
 export enum COSEKEYS {
   kty = 1,

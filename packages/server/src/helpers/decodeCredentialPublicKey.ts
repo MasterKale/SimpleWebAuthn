@@ -1,6 +1,6 @@
 import { COSEPublicKey } from './convertCOSEtoPKCS';
-import { decodeCborFirst } from './decodeCbor';
+import * as cbor from './cbor';
 
 export function decodeCredentialPublicKey(publicKey: Uint8Array): COSEPublicKey {
-  return decodeCborFirst(publicKey);
+  return cbor.decodeFirst<COSEPublicKey>(publicKey);
 }
