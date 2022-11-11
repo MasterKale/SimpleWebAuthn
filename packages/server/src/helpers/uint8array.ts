@@ -73,7 +73,7 @@ export function toUTF8String(array: Uint8Array): string {
    * well...I'll deal with that case if it happens.
    */
   // @ts-ignore 2304
-  const decoder: _TextDecoder = new TextDecoder("utf-8");
+  const decoder: _TextDecoder = new globalThis.TextDecoder("utf-8");
   return decoder.decode(array);
 }
 
@@ -91,7 +91,7 @@ export function fromUTF8String(utf8String: string): Uint8Array {
    * well...I'll deal with that case if it happens.
    */
   // @ts-ignore 2304
-  const encoder: _TextEncoder = new TextEncoder();
+  const encoder: _TextEncoder = new globalThis.TextEncoder();
   return encoder.encode(utf8String);
 }
 
