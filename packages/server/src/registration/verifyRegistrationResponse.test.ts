@@ -1,3 +1,4 @@
+import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse';
 
@@ -5,13 +6,13 @@ import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject'
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import { toHash } from '../helpers/toHash';
 import * as base64url from '../helpers/base64url';
+import * as uint8Array from '../helpers/uint8Array';
+import { COSEPublicKey, COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { SettingsService } from '../services/settingsService';
 
 import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
-
-import { toHash } from '../helpers/toHash';
-import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -19,10 +20,10 @@ import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
  */
 SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
 
-let mockDecodeAttestation: jest.SpyInstance;
+let mockDecodeAttestation: jest.SpyInstance<esmDecodeAttestationObject.AttestationObject>;
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
-let mockDecodePubKey: jest.SpyInstance;
+let mockDecodePubKey: jest.SpyInstance<COSEPublicKey>;
 let mockVerifyFIDOU2F: jest.SpyInstance;
 
 beforeEach(() => {
@@ -217,17 +218,13 @@ test('should throw when attestation type is not webauthn.create', async () => {
 });
 
 test('should throw if an unexpected attestation format is specified', async () => {
-  const fmt = 'fizzbuzz';
-
   const realAtteObj = esmDecodeAttestationObject.decodeAttestationObject(
     base64url.toBuffer(attestationNone.response.attestationObject),
   );
+  // Mangle the fmt
+  (realAtteObj as Map<unknown, unknown>).set('fmt', 'fizzbuzz');
 
-  mockDecodeAttestation.mockReturnValue({
-    ...realAtteObj,
-    // @ts-ignore 2322
-    fmt,
-  });
+  mockDecodeAttestation.mockReturnValue(realAtteObj);
 
   await expect(
     verifyRegistrationResponse({
@@ -240,9 +237,9 @@ test('should throw if an unexpected attestation format is specified', async () =
 });
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
-  const { authData } = esmDecodeAttestationObject.decodeAttestationObject(
+  const authData = esmDecodeAttestationObject.decodeAttestationObject(
     base64url.toBuffer(attestationNone.response.attestationObject),
-  );
+  ).get('authData');
   const actualAuthData = esmParseAuthenticatorData.parseAuthenticatorData(authData);
 
   mockParseAuthData.mockReturnValue({
@@ -318,11 +315,8 @@ test('should throw if the authenticator does not give back credential public key
 });
 
 test('should throw error if no alg is specified in public key', async () => {
-  mockDecodePubKey.mockReturnValue({
-    get: () => undefined,
-    credentialID: '',
-    credentialPublicKey: '',
-  });
+  const pubKey = new Map();
+  mockDecodePubKey.mockReturnValue(pubKey);
 
   await expect(
     verifyRegistrationResponse({
@@ -335,11 +329,9 @@ test('should throw error if no alg is specified in public key', async () => {
 });
 
 test('should throw error if unsupported alg is used', async () => {
-  mockDecodePubKey.mockReturnValue({
-    get: () => -999,
-    credentialID: '',
-    credentialPublicKey: '',
-  });
+  const pubKey = new Map();
+  pubKey.set(COSEKEYS.alg, -999);
+  mockDecodePubKey.mockReturnValue(pubKey);
 
   await expect(
     verifyRegistrationResponse({
@@ -604,17 +596,15 @@ test('should return authenticator extension output', async () => {
 
   expect(verification.registrationInfo?.authenticatorExtensionResults).toMatchObject({
     devicePubKey: {
-      dpk: Buffer.from(
+      dpk: uint8Array.fromHex(
         'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
-        'hex',
       ),
-      sig: Buffer.from(
+      sig: uint8Array.fromHex(
         '3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E',
-        'hex',
       ),
-      nonce: Buffer.from('', 'hex'),
-      scope: Buffer.from('00', 'hex'),
-      aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+      nonce: uint8Array.fromHex(''),
+      scope: uint8Array.fromHex('00'),
+      aaguid: uint8Array.fromHex('00000000000000000000000000000000'),
     },
   });
 });

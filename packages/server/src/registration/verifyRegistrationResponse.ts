@@ -132,7 +132,9 @@ export async function verifyRegistrationResponse(
 
   const attestationObject = base64url.toBuffer(response.attestationObject);
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
-  const { fmt, authData, attStmt } = decodedAttestationObject;
+  const fmt = decodedAttestationObject.get('fmt');
+  const authData = decodedAttestationObject.get('authData');
+  const attStmt = decodedAttestationObject.get('attStmt');
 
   const parsedAuthData = parseAuthenticatorData(authData);
   const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsData } =
@@ -181,7 +183,7 @@ export async function verifyRegistrationResponse(
   }
 
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
-  const alg = decodedPublicKey[COSEKEYS.alg];
+  const alg = decodedPublicKey.get(COSEKEYS.alg);
 
   if (typeof alg !== 'number') {
     throw new Error('Credential public key was missing numeric alg');
