@@ -119,8 +119,8 @@ export interface AuthenticatorAssertionResponseJSON
  * A WebAuthn-compatible device and the information needed to verify assertions by it
  */
 export type AuthenticatorDevice = {
-  credentialPublicKey: Buffer;
-  credentialID: Buffer;
+  credentialPublicKey: Uint8Array;
+  credentialID: Uint8Array;
   // Number of times this authenticator is expected to have been used
   counter: number;
   // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
