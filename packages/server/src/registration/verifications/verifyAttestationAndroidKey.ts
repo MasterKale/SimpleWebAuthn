@@ -20,7 +20,9 @@ export async function verifyAttestationAndroidKey(
 ): Promise<boolean> {
   const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid, rootCertificates } =
     options;
-  const { x5c, sig, alg } = attStmt;
+  const x5c = attStmt.get('x5c');
+  const sig = attStmt.get('sig');
+  const alg = attStmt.get('alg');
 
   if (!x5c) {
     throw new Error('No attestation certificate provided in attestation statement (AndroidKey)');

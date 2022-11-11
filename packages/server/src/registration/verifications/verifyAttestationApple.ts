@@ -13,7 +13,7 @@ export async function verifyAttestationApple(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
   const { attStmt, authData, clientDataHash, credentialPublicKey, rootCertificates } = options;
-  const { x5c } = attStmt;
+  const x5c = attStmt.get('x5c');
 
   if (!x5c) {
     throw new Error('No attestation certificate provided in attestation statement (Apple)');

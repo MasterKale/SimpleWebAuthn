@@ -25,7 +25,9 @@ export async function verifyAttestationAndroidSafetyNet(
     verifyTimestampMS = true,
     credentialPublicKey,
   } = options;
-  const { alg, response, ver } = attStmt;
+  const alg = attStmt.get('alg');
+  const response = attStmt.get('response');
+  const ver = attStmt.get('ver');
 
   if (!ver) {
     throw new Error('No ver value in attestation (SafetyNet)');
@@ -36,11 +38,11 @@ export async function verifyAttestationAndroidSafetyNet(
   }
 
   // Prepare to verify a JWT
-  const jwt = response.toString('utf8');
+  const jwt = uint8Array.toUTF8String(response);
   const jwtParts = jwt.split('.');
 
-  const HEADER: SafetyNetJWTHeader = JSON.parse(base64url.decode(jwtParts[0]));
-  const PAYLOAD: SafetyNetJWTPayload = JSON.parse(base64url.decode(jwtParts[1]));
+  const HEADER: SafetyNetJWTHeader = JSON.parse(base64url.toString(jwtParts[0]));
+  const PAYLOAD: SafetyNetJWTPayload = JSON.parse(base64url.toString(jwtParts[1]));
   const SIGNATURE: SafetyNetJWTSignature = jwtParts[2];
 
   /**
@@ -63,9 +65,9 @@ export async function verifyAttestationAndroidSafetyNet(
     }
   }
 
-  const nonceBase = Buffer.concat([authData, clientDataHash]);
+  const nonceBase = uint8Array.concat([authData, clientDataHash]);
   const nonceBuffer = toHash(nonceBase);
-  const expectedNonce = uint8Array.toBase64(nonceBuffer);
+  const expectedNonce = base64url.fromBuffer(nonceBuffer, 'base64');
 
   if (nonce !== expectedNonce) {
     throw new Error('Could not verify payload nonce (SafetyNet)');
@@ -81,7 +83,8 @@ export async function verifyAttestationAndroidSafetyNet(
   /**
    * START Verify Header
    */
-  const leafCertBuffer = base64url.toBuffer(HEADER.x5c[0]);
+  // `HEADER.x5c[0]` is definitely a base64 string
+  const leafCertBuffer = base64url.toBuffer(HEADER.x5c[0], 'base64');
   const leafCertInfo = getCertificateInfo(leafCertBuffer);
 
   const { subject } = leafCertInfo;
@@ -121,7 +124,7 @@ export async function verifyAttestationAndroidSafetyNet(
   /**
    * START Verify Signature
    */
-  const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
+  const signatureBaseBuffer = uint8Array.fromUTF8String(`${jwtParts[0]}.${jwtParts[1]}`);
   const signatureBuffer = base64url.toBuffer(SIGNATURE);
 
   const verified = await verifySignature({

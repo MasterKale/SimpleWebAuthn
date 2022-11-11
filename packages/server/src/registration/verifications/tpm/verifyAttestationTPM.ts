@@ -17,6 +17,7 @@ import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM'
 import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
 import { verifySignature } from '../../../helpers/verifySignature';
+import * as uint8Array from '../../../helpers/uint8Array';
 import { MetadataService } from '../../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 
@@ -27,7 +28,12 @@ import { parsePubArea } from './parsePubArea';
 export async function verifyAttestationTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
     options;
-  const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
+  const ver = attStmt.get('ver');
+  const sig = attStmt.get('sig');
+  const alg = attStmt.get('alg');
+  const x5c = attStmt.get('x5c');
+  const pubArea = attStmt.get('pubArea');
+  const certInfo = attStmt.get('certInfo');
 
   /**
    * Verify structures
@@ -64,8 +70,8 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
   if (pubType === 'TPM_ALG_RSA') {
-    const n = cosePublicKey[COSEKEYS.n];
-    const e = cosePublicKey[COSEKEYS.e];
+    const n = cosePublicKey.get(COSEKEYS.n);
+    const e = cosePublicKey.get(COSEKEYS.e);
 
     if (!n) {
       throw new Error('COSE public key missing n (TPM|RSA)');
@@ -93,9 +99,9 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
     }
   } else if (pubType === 'TPM_ALG_ECC') {
-    const crv = cosePublicKey[COSEKEYS.crv];
-    const x = cosePublicKey[COSEKEYS.x];
-    const y = cosePublicKey[COSEKEYS.y];
+    const crv = cosePublicKey.get(COSEKEYS.crv);
+    const x = cosePublicKey.get(COSEKEYS.x);
+    const y = cosePublicKey.get(COSEKEYS.y);
 
     if (!crv) {
       throw new Error('COSE public key missing crv (TPM|ECC)');

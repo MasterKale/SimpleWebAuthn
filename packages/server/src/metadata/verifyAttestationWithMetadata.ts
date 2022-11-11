@@ -18,7 +18,7 @@ export async function verifyAttestationWithMetadata({
 }: {
   statement: MetadataStatement;
   credentialPublicKey: Uint8Array;
-  x5c: Buffer[] | Base64URLString[];
+  x5c: Uint8Array[] | Base64URLString[];
   attestationStatementAlg?: number;
 }): Promise<boolean> {
   const {
@@ -43,9 +43,9 @@ export async function verifyAttestationWithMetadata({
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
   // Assume everything is a number because these values should be
   const publicKeyCOSEInfo: COSEInfo = {
-    kty: decodedPublicKey[COSEKEYS.kty] as number,
-    alg: decodedPublicKey[COSEKEYS.alg] as number,
-    crv: decodedPublicKey[COSEKEYS.crv] as number,
+    kty: decodedPublicKey.get(COSEKEYS.kty) as number,
+    alg: decodedPublicKey.get(COSEKEYS.alg) as number,
+    crv: decodedPublicKey.get(COSEKEYS.crv) as number,
   };
   if (!publicKeyCOSEInfo.crv) {
     delete publicKeyCOSEInfo.crv;

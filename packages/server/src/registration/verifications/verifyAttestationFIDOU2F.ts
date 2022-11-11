@@ -33,7 +33,8 @@ export async function verifyAttestationFIDOU2F(
     publicKey,
   ]);
 
-  const { sig, x5c } = attStmt;
+  const sig = attStmt.get('sig');
+  const x5c = attStmt.get('x5c');
 
   if (!x5c) {
     throw new Error('No attestation certificate provided in attestation statement (FIDOU2F)');

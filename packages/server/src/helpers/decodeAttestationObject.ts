@@ -1,13 +1,12 @@
-import { decodeCborFirst } from './decodeCbor';
+import * as cbor from './cbor';
 
 /**
  * Convert an AttestationObject buffer to a proper object
  *
  * @param base64AttestationObject Attestation Object buffer
  */
-export function decodeAttestationObject(attestationObject: Buffer): AttestationObject {
-  const toCBOR: AttestationObject = decodeCborFirst(attestationObject);
-  return toCBOR;
+export function decodeAttestationObject(attestationObject: Uint8Array): AttestationObject {
+  return cbor.decodeFirst<AttestationObject>(attestationObject);
 }
 
 export type AttestationFormat =
@@ -20,17 +19,17 @@ export type AttestationFormat =
   | 'none';
 
 export type AttestationObject = {
-  fmt: AttestationFormat;
-  attStmt: AttestationStatement;
-  authData: Buffer;
+  get(key: 'fmt'): AttestationFormat;
+  get(key: 'attStmt'): AttestationStatement;
+  get(key: 'authData'): Uint8Array;
 };
 
 export type AttestationStatement = {
-  sig?: Buffer;
-  x5c?: Buffer[];
-  response?: Buffer;
-  alg?: number;
-  ver?: string;
-  certInfo?: Buffer;
-  pubArea?: Buffer;
+  get(key: 'sig'): Uint8Array | undefined;
+  get(key: 'x5c'): Uint8Array[] | undefined;
+  get(key: 'response'): Uint8Array | undefined;
+  get(key: 'alg'): number | undefined;
+  get(key: 'ver'): string | undefined;
+  get(key: 'certInfo'): Uint8Array | undefined;
+  get(key: 'pubArea'): Uint8Array | undefined;
 };

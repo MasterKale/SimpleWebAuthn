@@ -26,8 +26,8 @@ beforeEach(() => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
   const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
 
-  authData = decodedAttestationObject.authData;
-  attStmt = decodedAttestationObject.attStmt;
+  authData = decodedAttestationObject.get('authData');
+  attStmt = decodedAttestationObject.get('attStmt');
   clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(authData);
@@ -89,8 +89,8 @@ test('should validate response with cert path completed with GlobalSign R1 root 
   const { attestationObject, clientDataJSON } = safetyNetUsingGSR1RootCert.response;
   const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
 
-  const _authData = decodedAttestationObject.authData;
-  const _attStmt = decodedAttestationObject.attStmt;
+  const _authData = decodedAttestationObject.get('authData');
+  const _attStmt = decodedAttestationObject.get('attStmt');
   const _clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(_authData);
