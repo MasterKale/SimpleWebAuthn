@@ -3,7 +3,6 @@ import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { convertCOSEtoPKCS } from './convertCOSEtoPKCS';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
 import { decodeAttestationObject } from './decodeAttestationObject';
-import { decodeCborFirst } from './decodeCbor';
 import { decodeClientDataJSON } from './decodeClientDataJSON';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
 import { generateChallenge } from './generateChallenge';
@@ -14,6 +13,9 @@ import { parseAuthenticatorData } from './parseAuthenticatorData';
 import { toHash } from './toHash';
 import { validateCertificatePath } from './validateCertificatePath';
 import { verifySignature } from './verifySignature';
+import * as cbor from './cbor';
+import * as base64url from './base64url';
+import * as uint8Array from './uint8Array';
 
 export {
   convertAAGUIDToString,
@@ -21,7 +23,6 @@ export {
   convertCOSEtoPKCS,
   convertPublicKeyToPEM,
   decodeAttestationObject,
-  decodeCborFirst,
   decodeClientDataJSON,
   decodeCredentialPublicKey,
   generateChallenge,
@@ -32,6 +33,9 @@ export {
   toHash,
   validateCertificatePath,
   verifySignature,
+  cbor,
+  base64url,
+  uint8Array,
 };
 
 import type {
