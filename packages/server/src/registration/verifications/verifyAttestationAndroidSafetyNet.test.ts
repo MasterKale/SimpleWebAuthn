@@ -1,5 +1,3 @@
-import base64url from 'base64url';
-
 import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet';
 
 import {
@@ -8,6 +6,7 @@ import {
 } from '../../helpers/decodeAttestationObject';
 import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import { toHash } from '../../helpers/toHash';
+import * as base64url from '../../helpers/base64url';
 import { SettingsService } from '../../services/settingsService';
 
 const rootCertificates = SettingsService.getRootCertificates({

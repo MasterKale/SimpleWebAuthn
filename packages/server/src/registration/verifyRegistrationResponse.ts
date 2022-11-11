@@ -1,4 +1,3 @@
-import base64url from 'base64url';
 import {
   RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
@@ -19,6 +18,7 @@ import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import * as uint8Array from '../helpers/uint8Array';
+import * as base64url from '../helpers/base64url';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';

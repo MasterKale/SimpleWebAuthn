@@ -1,4 +1,3 @@
-import base64url from 'base64url';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse';
 
@@ -6,6 +5,7 @@ import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject'
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import * as base64url from '../helpers/base64url';
 import { SettingsService } from '../services/settingsService';
 
 import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
@@ -546,7 +546,7 @@ test('should pass verification if custom challenge verifier returns true', async
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
-        base64url.decode(challenge),
+        base64url.toString(challenge),
       );
       return parsedChallenge.actualChallenge === 'xRsYdCQv5WZOqmxReiZl6C9q5SfrZne4lNSr9QVtPig';
     },
@@ -635,7 +635,7 @@ const attestationFIDOU2F: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationFIDOU2FChallenge = base64url.encode('totallyUniqueValueEveryAttestation');
+const attestationFIDOU2FChallenge = base64url.fromString('totallyUniqueValueEveryAttestation');
 
 const attestationPacked: RegistrationCredentialJSON = {
   id: 'bbb',
@@ -656,7 +656,7 @@ const attestationPacked: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationPackedChallenge = base64url.encode('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
+const attestationPackedChallenge = base64url.fromString('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
 
 const attestationPackedX5C: RegistrationCredentialJSON = {
   // TODO: Grab these from another iPhone attestation
@@ -687,7 +687,7 @@ const attestationPackedX5C: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationPackedX5CChallenge = base64url.encode('totallyUniqueValueEveryTime');
+const attestationPackedX5CChallenge = base64url.fromString('totallyUniqueValueEveryTime');
 
 const attestationNone: RegistrationCredentialJSON = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
@@ -706,4 +706,4 @@ const attestationNone: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationNoneChallenge = base64url.encode('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');
+const attestationNoneChallenge = base64url.fromString('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');

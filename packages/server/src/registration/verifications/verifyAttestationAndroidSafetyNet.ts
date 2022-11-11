@@ -1,5 +1,3 @@
-import base64url from 'base64url';
-
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import { toHash } from '../../helpers/toHash';
@@ -8,6 +6,7 @@ import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import * as uint8Array from '../../helpers/uint8Array';
+import * as base64url from '../../helpers/base64url';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 

@@ -1,7 +1,6 @@
-import base64url from 'base64url';
-
 import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata';
 import { MetadataStatement } from '../metadata/mdsTypes';
+import * as base64url from '../helpers/base64url';
 
 test('should verify attestation with metadata (android-safetynet)', async () => {
   const metadataStatementJSONSafetyNet: MetadataStatement = {
