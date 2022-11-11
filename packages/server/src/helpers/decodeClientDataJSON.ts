@@ -1,10 +1,10 @@
-import base64url from 'base64url';
+import * as base64url from "./base64url";
 
 /**
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON
  */
 export function decodeClientDataJSON(data: string): ClientDataJSON {
-  const toString = base64url.decode(data);
+  const toString = base64url.toString(data);
   const clientData: ClientDataJSON = JSON.parse(toString);
 
   return clientData;
