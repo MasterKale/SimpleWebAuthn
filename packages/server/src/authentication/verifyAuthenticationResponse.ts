@@ -149,14 +149,14 @@ export async function verifyAuthenticationResponse(
 
   // Make sure the response's RP ID is ours
   if (typeof expectedRPID === 'string') {
-    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+    const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expectedRPID));
     if (!uint8Array.areEqual(rpIdHash, expectedRPIDHash)) {
       throw new Error(`Unexpected RP ID hash`);
     }
   } else {
     // Go through each expected RP ID and try to find one that matches
     const foundMatch = expectedRPID.some(expected => {
-      const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
+      const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expected));
       return uint8Array.areEqual(rpIdHash, expectedRPIDHash);
     });
 
@@ -195,7 +195,7 @@ export async function verifyAuthenticationResponse(
   }
 
   const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
+  const signatureBase = uint8Array.concat([authDataBuffer, clientDataHash]);
 
   const signature = base64url.toBuffer(response.signature);
 
@@ -251,7 +251,7 @@ export async function verifyAuthenticationResponse(
 export type VerifiedAuthenticationResponse = {
   verified: boolean;
   authenticationInfo: {
-    credentialID: Buffer;
+    credentialID: Uint8Array;
     newCounter: number;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;

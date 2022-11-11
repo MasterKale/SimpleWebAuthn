@@ -22,10 +22,10 @@ export async function verifyAttestationFIDOU2F(
     rootCertificates,
   } = options;
 
-  const reservedByte = Buffer.from([0x00]);
+  const reservedByte = Uint8Array.from([0x00]);
   const publicKey = convertCOSEtoPKCS(credentialPublicKey);
 
-  const signatureBase = Buffer.concat([
+  const signatureBase = uint8Array.concat([
     reservedByte,
     rpIdHash,
     clientDataHash,

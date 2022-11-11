@@ -62,7 +62,7 @@ export async function verifyAttestationAndroidKey(
   // Verify extKeyStore values
   const { attestationChallenge, teeEnforced, softwareEnforced } = parsedExtKeyStore;
 
-  if (!Buffer.from(attestationChallenge.buffer).equals(clientDataHash)) {
+  if (!uint8Array.areEqual(new Uint8Array(attestationChallenge.buffer), clientDataHash)) {
     throw new Error('Attestation challenge was not equal to client data hash (AndroidKey)');
   }
 
@@ -99,7 +99,7 @@ export async function verifyAttestationAndroidKey(
     }
   }
 
-  const signatureBase = Buffer.concat([authData, clientDataHash]);
+  const signatureBase = uint8Array.concat([authData, clientDataHash]);
   const hashAlg = COSEALGHASH[alg as number];
 
   return verifySignature({

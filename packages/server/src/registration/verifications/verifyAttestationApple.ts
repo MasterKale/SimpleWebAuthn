@@ -45,7 +45,7 @@ export async function verifyAttestationApple(
     throw new Error('credCert missing "1.2.840.113635.100.8.2" extension (Apple)');
   }
 
-  const nonceToHash = Buffer.concat([authData, clientDataHash]);
+  const nonceToHash = uint8Array.concat([authData, clientDataHash]);
   const nonce = toHash(nonceToHash, 'SHA256');
   /**
    * Ignore the first six ASN.1 structure bytes that define the nonce as an OCTET STRING. Should
@@ -54,7 +54,7 @@ export async function verifyAttestationApple(
    * TODO: Try and get @peculiar (GitHub) to add a schema for "1.2.840.113635.100.8.2" when we
    * find out where it's defined (doesn't seem to be publicly documented at the moment...)
    */
-  const extNonce = Buffer.from(extCertNonce.extnValue.buffer).slice(6);
+  const extNonce = new Uint8Array(extCertNonce.extnValue.buffer).slice(6);
 
   if (!uint8Array.areEqual(nonce, extNonce)) {
     throw new Error(`credCert nonce was not expected value (Apple)`);
@@ -64,7 +64,7 @@ export async function verifyAttestationApple(
    * Verify credential public key matches the Subject Public Key of credCert
    */
   const credPubKeyPKCS = convertCOSEtoPKCS(credentialPublicKey);
-  const credCertSubjectPublicKey = Buffer.from(subjectPublicKeyInfo.subjectPublicKey);
+  const credCertSubjectPublicKey = new Uint8Array(subjectPublicKeyInfo.subjectPublicKey);
 
   if (!uint8Array.areEqual(credPubKeyPKCS, credCertSubjectPublicKey)) {
     throw new Error('Credential public key does not equal credCert public key (Apple)');

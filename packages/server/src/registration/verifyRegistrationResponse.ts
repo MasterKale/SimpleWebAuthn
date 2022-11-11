@@ -141,14 +141,14 @@ export async function verifyRegistrationResponse(
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
     if (typeof expectedRPID === 'string') {
-      const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
+      const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expectedRPID));
       if (!uint8Array.areEqual(rpIdHash, expectedRPIDHash)) {
         throw new Error(`Unexpected RP ID hash`);
       }
     } else {
       // Go through each expected RP ID and try to find one that matches
       const foundMatch = expectedRPID.some(expected => {
-        const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
+        const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expected));
         return uint8Array.areEqual(rpIdHash, expectedRPIDHash);
       });
 

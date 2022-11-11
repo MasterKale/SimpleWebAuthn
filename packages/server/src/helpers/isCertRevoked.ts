@@ -4,6 +4,7 @@ import { AsnParser } from '@peculiar/asn1-schema';
 import { CertificateList } from '@peculiar/asn1-x509';
 
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
+import * as uint8Array from './uint8Array';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID
@@ -68,7 +69,7 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
     return false;
   }
 
-  const data = AsnParser.parse(Buffer.from(crlCert.hex, 'hex'), CertificateList);
+  const data = AsnParser.parse(uint8Array.fromHex(crlCert.hex), CertificateList);
 
   const newCached: CAAuthorityInfo = {
     revokedCerts: [],
@@ -85,7 +86,7 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
 
   if (revokedCerts) {
     for (const cert of revokedCerts) {
-      const revokedHex = Buffer.from(cert.userCertificate).toString('hex');
+      const revokedHex = uint8Array.toHex(new Uint8Array(cert.userCertificate));
       newCached.revokedCerts.push(revokedHex);
     }
 

@@ -1,4 +1,3 @@
-import base64url from 'base64url';
 import { verifyAuthenticationResponse } from './verifyAuthenticationResponse';
 
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
@@ -8,6 +7,8 @@ import {
   AuthenticatorDevice,
   AuthenticationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
+import * as uint8Array from '../helpers/uint8array';
+import * as base64url from '../helpers/base64url';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -183,7 +184,7 @@ test('should throw an error if user verification is required but user was not ve
 // TODO: Get a real TPM authentication response in here
 test.skip('should verify TPM assertion', async () => {
   const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBc3NlcnRpb24';
-  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
+  jest.spyOn(base64url, 'toString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyAuthenticationResponse({
     credential: {
       id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
@@ -279,7 +280,7 @@ test('should pass verification if custom challenge verifier returns true', async
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
-        base64url.decode(challenge),
+        base64url.toString(challenge),
       );
       return parsedChallenge.actualChallenge === 'K3QxOjnVJLiGlnVEp5va5QJeMVWNf_7PYgutgbAtAUA';
     },
@@ -318,7 +319,7 @@ test('should return authenticator extension output', async () => {
         clientDataJSON:
           'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiaVpzVkN6dHJEVzdEMlVfR0hDSWxZS0x3VjJiQ3NCVFJxVlFVbkpYbjlUayIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
         authenticatorData:
-          'DXX8xWP9p3nbLjQ-6kiYiHWLeFSdSTpP2-oc2WqjHMSFAAAAAKFvZGV2aWNlUHVibGljS2V5pWNkcGtYTaUBAgMmIAEhWCCZGqvtneQnGp7erYgG-dyW1tzNDEdiU6VRBInsg3m-WyJYIKCXPP3tu3nif-9O50gWc_szElBN3KVDTP0jQx1q0p7aY3NpZ1hHMEUCIElSbNKK72tOYhp9WTbStQSVL8CuIxOk8DV6r_-uqWR0AiEAnVE6yu-wsyx2Wq5v66jClGhe_2P_HL8R7PIQevT-uPhlbm9uY2VAZXNjb3BlQQBmYWFndWlkULk_2WHy5kYvsSKCACJH3ng=',
+          'DXX8xWP9p3nbLjQ-6kiYiHWLeFSdSTpP2-oc2WqjHMSFAAAAAKFsZGV2aWNlUHViS2V5pWNkcGtYTaUBAgMmIAEhWCCZGqvtneQnGp7erYgG-dyW1tzNDEdiU6VRBInsg3m-WyJYIKCXPP3tu3nif-9O50gWc_szElBN3KVDTP0jQx1q0p7aY3NpZ1hHMEUCIElSbNKK72tOYhp9WTbStQSVL8CuIxOk8DV6r_-uqWR0AiEAnVE6yu-wsyx2Wq5v66jClGhe_2P_HL8R7PIQevT-uPhlbm9uY2VAZXNjb3BlQQBmYWFndWlkULk_2WHy5kYvsSKCACJH3ng',
         signature:
           'MEYCIQDlRuxY7cYre0sb3T6TovQdfYIUb72cRZYOQv_zS9wN_wIhAOvN-fwjtyIhWRceqJV4SX74-z6oALERbC7ohk8EdVPO',
         userHandle: 'b2FPajFxcmM4MWo3QkFFel9RN2lEakh5RVNlU2RLNDF0Sl92eHpQYWV5UQ==',
@@ -343,18 +344,16 @@ test('should return authenticator extension output', async () => {
   });
 
   expect(verification.authenticationInfo?.authenticatorExtensionResults).toMatchObject({
-    devicePublicKey: {
-      dpk: Buffer.from(
+    devicePubKey: {
+      dpk: uint8Array.fromHex(
         'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
-        'hex',
       ),
-      sig: Buffer.from(
+      sig: uint8Array.fromHex(
         '3045022049526CD28AEF6B4E621A7D5936D2B504952FC0AE2313A4F0357AAFFFAEA964740221009D513ACAEFB0B32C765AAE6FEBA8C294685EFF63FF1CBF11ECF2107AF4FEB8F8',
-        'hex',
       ),
-      nonce: Buffer.from('', 'hex'),
-      scope: Buffer.from('00', 'hex'),
-      aaguid: Buffer.from('B93FD961F2E6462FB12282002247DE78', 'hex'),
+      nonce: uint8Array.fromHex(''),
+      scope: uint8Array.fromHex('00'),
+      aaguid: uint8Array.fromHex('B93FD961F2E6462FB12282002247DE78'),
     },
   });
 });
@@ -392,7 +391,7 @@ const assertionResponse: AuthenticationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const assertionChallenge = base64url.encode('totallyUniqueValueEveryTime');
+const assertionChallenge = base64url.fromString('totallyUniqueValueEveryTime');
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator: AuthenticatorDevice = {
@@ -421,7 +420,7 @@ const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const assertionFirstTimeUsedChallenge = base64url.encode('totallyUniqueValueEveryAssertion');
+const assertionFirstTimeUsedChallenge = base64url.fromString('totallyUniqueValueEveryAssertion');
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
 const authenticatorFirstTimeUsed: AuthenticatorDevice = {
   credentialPublicKey: base64url.toBuffer(

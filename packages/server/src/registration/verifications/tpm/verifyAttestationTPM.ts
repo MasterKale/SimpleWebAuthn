@@ -74,7 +74,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error('COSE public key missing e (TPM|RSA)');
     }
 
-    if (!unique.equals(n as Buffer)) {
+    if (!uint8Array.areEqual(unique, (n as Buffer))) {
       throw new Error('PubArea unique is not same as credentialPublicKey (TPM|RSA)');
     }
 
@@ -107,7 +107,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error('COSE public key missing y (TPM|ECC)');
     }
 
-    if (!unique.equals(Buffer.concat([x as Buffer, y as Buffer]))) {
+    if (!uint8Array.areEqual(unique, uint8Array.concat([x as Uint8Array, y as Uint8Array]))) {
       throw new Error('PubArea unique is not same as public key x and y (TPM|ECC)');
     }
 
@@ -141,22 +141,22 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   const pubAreaHash = toHash(pubArea, attested.nameAlg.replace('TPM_ALG_', ''));
 
   // Concatenate attested.nameAlg and pubAreaHash to create attestedName.
-  const attestedName = Buffer.concat([attested.nameAlgBuffer, pubAreaHash]);
+  const attestedName = uint8Array.concat([attested.nameAlgBuffer, pubAreaHash]);
 
   // Check that certInfo.attested.name is equals to attestedName.
-  if (!attested.name.equals(attestedName)) {
+  if (!uint8Array.areEqual(attested.name, attestedName)) {
     throw new Error(`Attested name comparison failed (TPM)`);
   }
 
   // Concatenate authData with clientDataHash to create attToBeSigned
-  const attToBeSigned = Buffer.concat([authData, clientDataHash]);
+  const attToBeSigned = uint8Array.concat([authData, clientDataHash]);
 
   // Hash attToBeSigned using the algorithm specified in attStmt.alg to create attToBeSignedHash
   const hashAlg: string = COSEALGHASH[alg as number];
   const attToBeSignedHash = toHash(attToBeSigned, hashAlg);
 
   // Check that certInfo.extraData is equals to attToBeSignedHash.
-  if (!extraData.equals(attToBeSignedHash)) {
+  if (!uint8Array.areEqual(extraData, attToBeSignedHash)) {
     throw new Error('CertInfo extra data did not equal hashed attestation (TPM)');
   }
 

@@ -27,7 +27,7 @@ export async function verifyAttestationPacked(
     throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
   }
 
-  const signatureBase = Buffer.concat([authData, clientDataHash]);
+  const signatureBase = uint8Array.concat([authData, clientDataHash]);
 
   let verified = false;
 
