@@ -1,6 +1,5 @@
 import type { Base64URLString } from '@simplewebauthn/typescript-types';
 
-import uint8Array from './uint8Array';
 import * as base64url from './base64url';
 
 /**
@@ -13,9 +12,15 @@ export function convertCertBufferToPEM(certBuffer: Uint8Array | Base64URLString)
    * Get certBuffer to a base64 representation
    */
   if (typeof certBuffer === 'string') {
-    b64cert = base64url.toBase64(certBuffer);
+    if (base64url.isBase64url(certBuffer)) {
+      b64cert = base64url.toBase64(certBuffer);
+    } else if (base64url.isBase64(certBuffer)) {
+      b64cert = certBuffer
+    } else {
+      throw new Error('Certificate is not a valid base64 or base64url string');
+    }
   } else {
-    b64cert = uint8Array.toBase64(certBuffer);
+    b64cert = base64url.fromBuffer(certBuffer, 'base64');
   }
 
   let PEMKey = '';
