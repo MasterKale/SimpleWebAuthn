@@ -47,6 +47,7 @@
     "node"
   ],
   "dependencies": {
+    "@hexagon/base64": "^1.1.25",
     "@noble/ed25519": "^1.6.1",
     "@peculiar/asn1-android": "^2.1.7",
     "@peculiar/asn1-schema": "^2.1.7",
