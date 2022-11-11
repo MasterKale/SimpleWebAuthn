@@ -1,6 +1,6 @@
 import { COSEAlgorithmIdentifier } from '@simplewebauthn/typescript-types';
 import { decodeCborFirst } from './decodeCbor';
-import uint8Array from './uint8array';
+import * as uint8Array from './uint8Array';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key

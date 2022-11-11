@@ -4,8 +4,8 @@ import type {
   PublicKeyCredentialDescriptorFuture,
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
-import base64url from '../helpers/base64url'
-import uint8Array from '../helpers/uint8Array';
+import * as base64url from '../helpers/base64url'
+import * as uint8Array from '../helpers/uint8Array';
 
 import { generateChallenge } from '../helpers/generateChallenge';
 

@@ -7,7 +7,7 @@ import { verifySignature } from '../../helpers/verifySignature';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import uint8Array from '../../helpers/uint8Array';
+import * as uint8Array from '../../helpers/uint8Array';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 

@@ -18,7 +18,7 @@ import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey'
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import uint8Array from '../helpers/uint8Array';
+import * as uint8Array from '../helpers/uint8Array';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';

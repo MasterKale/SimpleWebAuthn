@@ -12,8 +12,8 @@ import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
-import uint8Array from '../helpers/uint8Array';
-import base64url from '../helpers/base64url';
+import * as uint8Array from '../helpers/uint8Array';
+import * as base64url from '../helpers/base64url';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;

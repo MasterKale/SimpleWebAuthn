@@ -7,7 +7,7 @@ import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { toHash } from '../../helpers/toHash';
 import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import uint8Array from '../../helpers/uint8Array';
+import * as uint8Array from '../../helpers/uint8Array';
 
 export async function verifyAttestationApple(
   options: AttestationFormatVerifierOpts,

@@ -1,6 +1,6 @@
 jest.mock('../helpers/generateChallenge');
 
-import base64url from '../helpers/base64url';
+import * as base64url from '../helpers/base64url';
 
 import { generateAuthenticationOptions } from './generateAuthenticationOptions';
 
