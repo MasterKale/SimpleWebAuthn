@@ -61,10 +61,8 @@
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb",
   "devDependencies": {
     "@simplewebauthn/typescript-types": "*",
-    "@types/cbor": "^5.0.1",
     "@types/debug": "^4.1.7",
     "@types/jsrsasign": "^8.0.13",
-    "@types/jwk-to-pem": "^2.0.1",
-    "@types/node-fetch": "^2.5.12"
+    "@types/jwk-to-pem": "^2.0.1"
   }
 }
