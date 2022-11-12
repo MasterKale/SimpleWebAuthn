@@ -12,6 +12,7 @@ import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
 import * as uint8Array from '../helpers/uint8Array';
 import * as base64url from '../helpers/base64url';
 
@@ -148,22 +149,14 @@ export async function verifyAuthenticationResponse(
   const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
+  let expectedRPIDs: string[] = [];
   if (typeof expectedRPID === 'string') {
-    const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expectedRPID));
-    if (!uint8Array.areEqual(rpIdHash, expectedRPIDHash)) {
-      throw new Error(`Unexpected RP ID hash`);
-    }
+    expectedRPIDs = [expectedRPID];
   } else {
-    // Go through each expected RP ID and try to find one that matches
-    const foundMatch = expectedRPID.some(expected => {
-      const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expected));
-      return uint8Array.areEqual(rpIdHash, expectedRPIDHash);
-    });
-
-    if (!foundMatch) {
-      throw new Error(`Unexpected RP ID hash`);
-    }
+    expectedRPIDs = expectedRPID;
   }
+
+  await matchExpectedRPID(rpIdHash, expectedRPIDs);
 
   if (advancedFIDOConfig !== undefined) {
     const { userVerification: fidoUserVerification } = advancedFIDOConfig;

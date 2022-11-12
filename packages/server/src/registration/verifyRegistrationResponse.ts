@@ -17,6 +17,7 @@ import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey'
 import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
 import * as uint8Array from '../helpers/uint8Array';
 import * as base64url from '../helpers/base64url';
 import { SettingsService } from '../services/settingsService';
@@ -142,22 +143,14 @@ export async function verifyRegistrationResponse(
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
+    let expectedRPIDs: string[] = [];
     if (typeof expectedRPID === 'string') {
-      const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expectedRPID));
-      if (!uint8Array.areEqual(rpIdHash, expectedRPIDHash)) {
-        throw new Error(`Unexpected RP ID hash`);
-      }
+      expectedRPIDs = [expectedRPID];
     } else {
-      // Go through each expected RP ID and try to find one that matches
-      const foundMatch = expectedRPID.some(expected => {
-        const expectedRPIDHash = toHash(uint8Array.fromASCIIString(expected));
-        return uint8Array.areEqual(rpIdHash, expectedRPIDHash);
-      });
-
-      if (!foundMatch) {
-        throw new Error(`Unexpected RP ID hash`);
-      }
+      expectedRPIDs = expectedRPID;
     }
+
+    await matchExpectedRPID(rpIdHash, expectedRPIDs);
   }
 
   // Make sure someone was physically present
