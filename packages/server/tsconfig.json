@@ -4,6 +4,9 @@
     "./src/**/*"
   ],
   "compilerOptions": {
+    "lib": [
+      "ES2021"
+    ],
     "baseUrl": "./src",
     "outDir": "./dist",
     "typeRoots": [
