@@ -63,17 +63,7 @@ export function concat(arrays: Uint8Array[]): Uint8Array {
  * Convert bytes into a UTF-8 string
  */
 export function toUTF8String(array: Uint8Array): string {
-  type _TextDecoder = {
-    decode(value: Uint8Array): string;
-  }
-  /**
-   * The typing gets ugly here because I can't reference TS' DOM types, and I don't want to
-   * reference Node/Deno/Bun/... types in my quest to make this isomorphic. The fact is, the
-   * runtime that is "Web API"-compatible should expose `TextDecoder` globally. If not, then,
-   * well...I'll deal with that case if it happens.
-   */
-  // @ts-ignore 2304
-  const decoder: _TextDecoder = new globalThis.TextDecoder("utf-8");
+  const decoder = new globalThis.TextDecoder("utf-8");
   return decoder.decode(array);
 }
 
@@ -81,17 +71,7 @@ export function toUTF8String(array: Uint8Array): string {
  * Convert a UTF-8 string back into bytes
  */
 export function fromUTF8String(utf8String: string): Uint8Array {
-  type _TextEncoder = {
-    encode(value: string): Uint8Array;
-  }
-  /**
-   * The typing gets ugly here because I can't reference TS' DOM types, and I don't want to
-   * reference Node/Deno/Bun/... types in my quest to make this isomorphic. The fact is, the
-   * runtime that is "Web API"-compatible should expose `TextEncoder` globally. If not, then,
-   * well...I'll deal with that case if it happens.
-   */
-  // @ts-ignore 2304
-  const encoder: _TextEncoder = new globalThis.TextEncoder();
+  const encoder = new globalThis.TextEncoder();
   return encoder.encode(utf8String);
 }
 
