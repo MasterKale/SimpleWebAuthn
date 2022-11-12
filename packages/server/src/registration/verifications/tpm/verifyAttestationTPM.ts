@@ -80,7 +80,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error('COSE public key missing e (TPM|RSA)');
     }
 
-    if (!uint8Array.areEqual(unique, (n as Buffer))) {
+    if (!uint8Array.areEqual(unique, (n as Uint8Array))) {
       throw new Error('PubArea unique is not same as credentialPublicKey (TPM|RSA)');
     }
 
@@ -88,7 +88,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error(`Parsed pubArea type is RSA, but missing parameters.rsa (TPM|RSA)`);
     }
 
-    const eBuffer = e as Buffer;
+    const eBuffer = e as Uint8Array;
     // If `exponent` is equal to 0x00, then exponent is the default RSA exponent of 2^16+1 (65537)
     const pubAreaExponent = parameters.rsa.exponent || 65537;
 
