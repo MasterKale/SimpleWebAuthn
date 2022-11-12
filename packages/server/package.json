@@ -56,7 +56,7 @@
     "debug": "^4.3.2",
     "jsrsasign": "^10.4.0",
     "jwk-to-pem": "^2.0.4",
-    "node-fetch": "^2.6.0"
+    "node-fetch-native": "^0.1.8"
   },
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb",
   "devDependencies": {
