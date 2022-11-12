@@ -286,7 +286,7 @@ export class BaseMetadataService {
       let iterations = totalTimeoutMS / intervalMS;
 
       // Check service state every `intervalMS` milliseconds
-      const intervalID: NodeJS.Timeout = global.setInterval(() => {
+      const intervalID: NodeJS.Timeout = globalThis.setInterval(() => {
         if (iterations < 1) {
           clearInterval(intervalID);
           reject(`State did not become ready in ${totalTimeoutMS / 1000} seconds`);

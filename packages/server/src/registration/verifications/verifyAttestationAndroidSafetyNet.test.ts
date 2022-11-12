@@ -35,7 +35,7 @@ beforeEach(() => {
   credentialID = parsedAuthData.credentialID!;
   credentialPublicKey = parsedAuthData.credentialPublicKey!;
 
-  spyDate = jest.spyOn(global.Date, 'now');
+  spyDate = jest.spyOn(globalThis.Date, 'now');
 });
 
 afterEach(() => {
