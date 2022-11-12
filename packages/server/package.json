@@ -30,7 +30,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "scripts": {
     "build": "rimraf dist && tsc",
