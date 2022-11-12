@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 /**
  * Generate a suitably random value to be used as an attestation or assertion challenge
  */
@@ -12,5 +10,8 @@ export function generateChallenge(): Uint8Array {
    *
    * Just in case, let's double it
    */
-  return crypto.randomBytes(32);
+  const challenge = new Uint8Array(32);
+  globalThis.crypto.getRandomValues(challenge);
+
+  return challenge;
 }
