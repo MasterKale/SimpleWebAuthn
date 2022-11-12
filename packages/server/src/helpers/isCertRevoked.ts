@@ -1,5 +1,5 @@
 import { X509 } from 'jsrsasign';
-import fetch from 'node-fetch';
+import fetch from 'node-fetch-native';
 import { AsnParser } from '@peculiar/asn1-schema';
 import { CertificateList } from '@peculiar/asn1-x509';
 
@@ -62,7 +62,7 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
   const crlCert = new X509();
   try {
     const respCRL = await fetch(crlURL[0]);
-    const dataCRL = await respCRL.buffer();
+    const dataCRL = await respCRL.arrayBuffer();
     const dataPEM = convertCertBufferToPEM(dataCRL);
     crlCert.readCertPEM(dataPEM);
   } catch (err) {
