@@ -1,4 +1,4 @@
-import fetch from 'node-fetch-native';
+import fetch from 'cross-fetch';
 import { KJUR } from 'jsrsasign';
 
 import { validateCertificatePath } from '../helpers/validateCertificatePath';

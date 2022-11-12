@@ -53,16 +53,17 @@
     "@peculiar/asn1-schema": "^2.1.7",
     "@peculiar/asn1-x509": "^2.1.7",
     "cbor-x": "^1.4.1",
+    "cross-fetch": "^3.1.5",
     "debug": "^4.3.2",
     "jsrsasign": "^10.4.0",
-    "jwk-to-pem": "^2.0.4",
-    "node-fetch-native": "^0.1.8"
+    "jwk-to-pem": "^2.0.4"
   },
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb",
   "devDependencies": {
     "@simplewebauthn/typescript-types": "*",
     "@types/debug": "^4.1.7",
     "@types/jsrsasign": "^8.0.13",
-    "@types/jwk-to-pem": "^2.0.1"
+    "@types/jwk-to-pem": "^2.0.1",
+    "@types/node": "^18.11.9"
   }
 }
