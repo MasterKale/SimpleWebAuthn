@@ -244,7 +244,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
 
   mockParseAuthData.mockReturnValue({
     ...actualAuthData,
-    rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('bad.url', 'ascii')),
   });
 
   await expect(
@@ -259,7 +259,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
 
 test('should throw error if user was not present', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: false,
     },
@@ -277,7 +277,7 @@ test('should throw error if user was not present', async () => {
 
 test('should throw if the authenticator does not give back credential ID', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: true,
     },
@@ -296,7 +296,7 @@ test('should throw if the authenticator does not give back credential ID', async
 
 test('should throw if the authenticator does not give back credential public key', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: true,
     },
@@ -359,7 +359,7 @@ test('should not include authenticator info if not verified', async () => {
 
 test('should throw an error if user verification is required but user was not verified', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: true,
       uv: false,

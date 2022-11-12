@@ -194,7 +194,7 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
+  const clientDataHash = await toHash(base64url.toBuffer(response.clientDataJSON));
   const signatureBase = uint8Array.concat([authDataBuffer, clientDataHash]);
 
   const signature = base64url.toBuffer(response.signature);

@@ -66,7 +66,7 @@ export async function verifyAttestationAndroidSafetyNet(
   }
 
   const nonceBase = uint8Array.concat([authData, clientDataHash]);
-  const nonceBuffer = toHash(nonceBase);
+  const nonceBuffer = await toHash(nonceBase);
   const expectedNonce = base64url.fromBuffer(nonceBuffer, 'base64');
 
   if (nonce !== expectedNonce) {

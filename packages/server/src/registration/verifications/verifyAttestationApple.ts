@@ -46,7 +46,7 @@ export async function verifyAttestationApple(
   }
 
   const nonceToHash = uint8Array.concat([authData, clientDataHash]);
-  const nonce = toHash(nonceToHash, 'SHA256');
+  const nonce = await toHash(nonceToHash, 'SHA256');
   /**
    * Ignore the first six ASN.1 structure bytes that define the nonce as an OCTET STRING. Should
    * trim off <Buffer 30 24 a1 22 04 20>

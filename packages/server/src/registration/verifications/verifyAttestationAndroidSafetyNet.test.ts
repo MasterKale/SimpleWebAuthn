@@ -22,13 +22,13 @@ let credentialPublicKey: Uint8Array;
 let rpIdHash: Uint8Array;
 let spyDate: jest.SpyInstance;
 
-beforeEach(() => {
+beforeEach(async () => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
   const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
 
   authData = decodedAttestationObject.get('authData');
   attStmt = decodedAttestationObject.get('attStmt');
-  clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
+  clientDataHash = await toHash(base64url.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(authData);
   aaguid = parsedAuthData.aaguid!;
@@ -91,7 +91,7 @@ test('should validate response with cert path completed with GlobalSign R1 root 
 
   const _authData = decodedAttestationObject.get('authData');
   const _attStmt = decodedAttestationObject.get('attStmt');
-  const _clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
+  const _clientDataHash = await toHash(base64url.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(_authData);
   const _aaguid = parsedAuthData.aaguid!;

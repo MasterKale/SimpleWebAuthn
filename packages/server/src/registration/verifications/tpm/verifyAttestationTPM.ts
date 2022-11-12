@@ -144,7 +144,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   }
 
   // Hash pubArea to create pubAreaHash using the nameAlg in attested
-  const pubAreaHash = toHash(pubArea, attested.nameAlg.replace('TPM_ALG_', ''));
+  const pubAreaHash = await toHash(pubArea, attested.nameAlg.replace('TPM_ALG_', ''));
 
   // Concatenate attested.nameAlg and pubAreaHash to create attestedName.
   const attestedName = uint8Array.concat([attested.nameAlgBuffer, pubAreaHash]);
@@ -159,7 +159,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
 
   // Hash attToBeSigned using the algorithm specified in attStmt.alg to create attToBeSignedHash
   const hashAlg: string = COSEALGHASH[alg as number];
-  const attToBeSignedHash = toHash(attToBeSigned, hashAlg);
+  const attToBeSignedHash = await toHash(attToBeSigned, hashAlg);
 
   // Check that certInfo.extraData is equals to attToBeSignedHash.
   if (!uint8Array.areEqual(extraData, attToBeSignedHash)) {

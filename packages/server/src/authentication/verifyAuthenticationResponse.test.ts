@@ -93,7 +93,7 @@ test('should throw when assertion type is not webauthn.create', async () => {
 
 test('should throw error if user was not present', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: 0,
   });
 
@@ -129,7 +129,7 @@ test('should throw error if previous counter value is not less than in response'
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('bad.url', 'ascii')),
     flags: 0,
   });
 

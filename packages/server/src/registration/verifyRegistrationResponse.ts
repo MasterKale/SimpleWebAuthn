@@ -195,7 +195,7 @@ export async function verifyRegistrationResponse(
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
-  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
+  const clientDataHash = await toHash(base64url.toBuffer(response.clientDataJSON));
   const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
 
   // Prepare arguments to pass to the relevant verification method
