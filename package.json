@@ -4,7 +4,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "bootstrap:ci": "lerna bootstrap --hoist",
-    "clean": "lerna clean -y && rm ./packages/**/package-lock.json",
+    "clean": "lerna clean -y && rm -f ./packages/**/package-lock.json && rm -rf ./packages/**/dist",
     "get-it-onto-npm": "lerna bootstrap && rm ./packages/**/package-lock.json && lerna publish",
     "lint": "prettier --write packages/**/src/**/*.ts example/**/*.ts && eslint --fix packages/**/src/**/*.ts example/**/*.ts",
     "docs": "npm run bootstrap:ci && typedoc --tsconfig tsconfigdoc.json",
