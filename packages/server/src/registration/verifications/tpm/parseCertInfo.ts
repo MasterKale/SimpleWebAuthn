@@ -1,5 +1,5 @@
 import { TPM_ST, TPM_ALG } from './constants';
-import * as uint8Array from '../../../helpers/uint8Array';
+import * as isoUint8Array from '../../../helpers/isoUint8Array';
 
 /**
  * Cut up a TPM attestation's certInfo into intelligible chunks

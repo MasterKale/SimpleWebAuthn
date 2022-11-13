@@ -1,5 +1,5 @@
 import { toHash } from './toHash';
-import * as uint8Array from './uint8Array';
+import * as isoUint8Array from './isoUint8Array';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Raises an Error if no

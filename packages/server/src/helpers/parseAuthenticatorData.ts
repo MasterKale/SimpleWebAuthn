@@ -1,9 +1,9 @@
-import * as cbor from './cbor';
+import * as isoCBOR from './isoCBOR';
 import {
   decodeAuthenticatorExtensions,
   AuthenticationExtensionsAuthenticatorOutputs,
 } from './decodeAuthenticatorExtensions';
-import * as uint8Array from './uint8Array';
+import * as isoUint8Array from './isoUint8Array';
 import { COSEPublicKey } from './convertCOSEtoPKCS';
 
 /**

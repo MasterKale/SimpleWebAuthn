@@ -1,4 +1,4 @@
-import * as base64url from "./base64url";
+import * as isoBase64URL from "./isoBase64URL";
 
 /**
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON

@@ -1,4 +1,4 @@
-import * as uint8Array from './uint8Array';
+import * as isoUint8Array from './isoUint8Array';
 
 /**
  * Convert the aaguid buffer in authData into a UUID string

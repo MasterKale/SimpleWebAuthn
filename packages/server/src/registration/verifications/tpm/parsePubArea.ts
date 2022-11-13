@@ -1,5 +1,5 @@
 import { TPM_ALG, TPM_ECC_CURVE } from './constants';
-import * as uint8Array from '../../../helpers/uint8Array';
+import * as isoUint8Array from '../../../helpers/isoUint8Array';
 
 /**
  * Break apart a TPM attestation's pubArea buffer

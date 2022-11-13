@@ -4,7 +4,7 @@ import { verify as ed25519Verify } from '@noble/ed25519';
 import { COSEKEYS, COSEKTY, COSEPublicKey } from './convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
-import * as cbor from './cbor';
+import * as isoCBOR from './isoCBOR';
 
 type VerifySignatureOptsLeafCert = {
   signature: Uint8Array;

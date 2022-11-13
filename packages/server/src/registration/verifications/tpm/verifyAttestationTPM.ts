@@ -17,7 +17,7 @@ import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM'
 import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
 import { verifySignature } from '../../../helpers/verifySignature';
-import * as uint8Array from '../../../helpers/uint8Array';
+import * as isoUint8Array from '../../../helpers/isoUint8Array';
 import { MetadataService } from '../../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 

@@ -13,8 +13,8 @@ import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import * as uint8Array from '../helpers/uint8Array';
-import * as base64url from '../helpers/base64url';
+import * as isoUint8Array from '../helpers/isoUint8Array';
+import * as isoBase64URL from '../helpers/isoBase64URL';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;

@@ -13,9 +13,9 @@ import { parseAuthenticatorData } from './parseAuthenticatorData';
 import { toHash } from './toHash';
 import { validateCertificatePath } from './validateCertificatePath';
 import { verifySignature } from './verifySignature';
-import * as cbor from './cbor';
-import * as base64url from './base64url';
-import * as uint8Array from './uint8Array';
+import * as isoCBOR from './isoCBOR';
+import * as isoBase64URL from './isoBase64URL';
+import * as isoUint8Array from './isoUint8Array';
 
 export {
   convertAAGUIDToString,

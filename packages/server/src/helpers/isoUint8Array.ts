@@ -1,4 +1,8 @@
 /**
+ * A collection of isomorphic methods for working with Uint8Array values
+ */
+
+/**
  * Make sure two Uint8Arrays are deeply equivalent
  */
 export function areEqual(array1: Uint8Array, array2: Uint8Array): boolean {

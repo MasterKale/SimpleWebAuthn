@@ -1,4 +1,4 @@
-import * as cbor from './cbor';
+import * as isoCBOR from './isoCBOR';
 
 /**
  * Convert authenticator extension data buffer to a proper object

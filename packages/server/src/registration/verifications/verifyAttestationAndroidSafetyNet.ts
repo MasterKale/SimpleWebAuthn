@@ -5,8 +5,8 @@ import { verifySignature } from '../../helpers/verifySignature';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import * as uint8Array from '../../helpers/uint8Array';
-import * as base64url from '../../helpers/base64url';
+import * as isoUint8Array from '../../helpers/isoUint8Array';
+import * as isoBase64URL from '../../helpers/isoBase64URL';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 

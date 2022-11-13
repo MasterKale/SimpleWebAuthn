@@ -1,3 +1,6 @@
+/**
+ * A collection of isomorphic methods for working with base64url and base64 values
+ */
 import base64 from '@hexagon/base64';
 
 /**

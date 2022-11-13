@@ -1,4 +1,4 @@
-import * as base64url from "../helpers/base64url";
+import * as isoBase64URL from "../helpers/isoBase64URL";
 
 /**
  * Process a JWT into Javascript-friendly data structures

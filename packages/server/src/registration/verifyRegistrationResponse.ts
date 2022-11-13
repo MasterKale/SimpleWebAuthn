@@ -18,8 +18,8 @@ import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import * as uint8Array from '../helpers/uint8Array';
-import * as base64url from '../helpers/base64url';
+import * as isoUint8Array from '../helpers/isoUint8Array';
+import * as isoBase64URL from '../helpers/isoBase64URL';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';

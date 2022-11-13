@@ -4,7 +4,7 @@ import { AsnParser } from '@peculiar/asn1-schema';
 import { CertificateList } from '@peculiar/asn1-x509';
 
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
-import * as uint8Array from './uint8Array';
+import * as isoUint8Array from './isoUint8Array';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID

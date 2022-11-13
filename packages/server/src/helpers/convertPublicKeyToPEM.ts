@@ -1,8 +1,8 @@
 import jwkToPem from 'jwk-to-pem';
 
 import { COSEKEYS, COSEKTY, COSECRV, COSEPublicKey } from './convertCOSEtoPKCS';
-import * as cbor from './cbor';
-import * as base64url from './base64url';
+import * as isoCBOR from './isoCBOR';
+import * as isoBase64URL from './isoBase64URL';
 
 export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
   let struct;
