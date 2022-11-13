@@ -1,4 +1,4 @@
-import { webcrypto } from 'node:crypto';
+import { isoCrypto } from './iso';
 
 /**
  * Generate a suitably random value to be used as an attestation or assertion challenge
@@ -14,13 +14,7 @@ export function generateChallenge(): Uint8Array {
    */
   const challenge = new Uint8Array(32);
 
-  if (globalThis.crypto) {
-    // We're in a browser-like runtime, use global Crypto
-    globalThis.crypto.getRandomValues(challenge);
-  } else {
-    // We're in Node, use Node's Crypto
-    webcrypto.getRandomValues(challenge);
-  }
+  isoCrypto.getRandomValues(challenge);
 
   return challenge;
 }
