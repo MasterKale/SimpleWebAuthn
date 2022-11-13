@@ -55,8 +55,10 @@ export function isBase64(input: string): boolean {
 }
 
 /**
- * Confirm that the string is encoded into base64url
+ * Confirm that the string is encoded into base64url, with support for optional padding
  */
 export function isBase64url(input: string): boolean {
+  // Trim padding characters from the string if present
+  input = input.replace(/=/g, '');
   return base64.validate(input, true);
 }

@@ -9,7 +9,6 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { toHash } from '../helpers/toHash';
 import { verifySignature } from '../helpers/verifySignature';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
-import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
@@ -121,11 +120,11 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  if (!isBase64URLString(response.authenticatorData)) {
+  if (!isoBase64URL.isBase64url(response.authenticatorData)) {
     throw new Error('Credential response authenticatorData was not a base64url string');
   }
 
-  if (!isBase64URLString(response.signature)) {
+  if (!isoBase64URL.isBase64url(response.signature)) {
     throw new Error('Credential response signature was not a base64url string');
   }
 
