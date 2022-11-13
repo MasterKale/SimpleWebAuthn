@@ -8,7 +8,7 @@
       "ES2018",
       "ES2021.Promise"
     ],
-    "moduleResolution": "node16",
+    "moduleResolution": "node",
     "baseUrl": "./src",
     "outDir": "./dist",
     "typeRoots": [
