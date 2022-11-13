@@ -5,10 +5,8 @@
   ],
   "compilerOptions": {
     "lib": [
-      "ES2018",
-      "ES2021.Promise"
+      "ES2021",
     ],
-    "moduleResolution": "node",
     "baseUrl": "./src",
     "outDir": "./dist",
     "typeRoots": [

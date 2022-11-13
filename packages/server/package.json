@@ -33,7 +33,8 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "build": "rimraf dist && tsc > output.txt; cat output.txt; rm output.txt",
+    "build": "rimraf dist && tsc",
+    "build:lerna-debug": "rimraf dist && tsc > output.txt; cat output.txt; rm output.txt",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "npm test -- --coverage",
