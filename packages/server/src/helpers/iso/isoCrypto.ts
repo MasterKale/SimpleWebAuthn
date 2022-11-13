@@ -22,10 +22,10 @@ export function getRandomValues(array: Uint8Array): Uint8Array {
  *
  * @param data The data to generate a digest of
  * @param algorithm Must be one of the following values:
- * - `'SHA-1'`
- * - `'SHA-256'`
- * - `'SHA-384'`
- * - `'SHA-512'`
+ * - `"SHA-1"`
+ * - `"SHA-256"`
+ * - `"SHA-384"`
+ * - `"SHA-512"`
  */
 export async function digest(data: Uint8Array, algorithm: string): Promise<Uint8Array> {
   algorithm = normalizeAlgorithm(algorithm);
