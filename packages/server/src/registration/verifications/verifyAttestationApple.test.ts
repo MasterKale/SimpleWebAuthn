@@ -1,5 +1,6 @@
-// TODO This test can take upwards of 7 seconds to complete...need to figure out why
-jest.setTimeout(10000);
+// TODO: This test can take upwards of 7 seconds to complete locally, more in CI...need to figure
+// out why
+jest.setTimeout(30000);
 
 import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
 
