@@ -1,3 +1,6 @@
+// TODO This test can take upwards of 7 seconds to complete...need to figure out why
+jest.setTimeout(10000);
+
 import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
 
 test('should verify Apple attestation', async () => {

@@ -117,6 +117,7 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
 
     const Signature = new crypto.Signature({ alg });
     Signature.init(issuerPem);
+    // TODO: `updateHex()` takes approximately two seconds per execution, can we improve this?
     Signature.updateHex(subjectCertStruct);
 
     if (!Signature.verify(signatureHex)) {
