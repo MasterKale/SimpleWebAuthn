@@ -1,4 +1,4 @@
-import * as isoCBOR from './isoCBOR';
+import { isoCBOR } from './iso';
 
 /**
  * Convert authenticator extension data buffer to a proper object
@@ -10,7 +10,7 @@ export function decodeAuthenticatorExtensions(
 ): AuthenticationExtensionsAuthenticatorOutputs | undefined {
   let toCBOR: Map<string, unknown>;
   try {
-    toCBOR = cbor.decodeFirst(extensionData);
+    toCBOR = isoCBOR.decodeFirst(extensionData);
   } catch (err) {
     const _err = err as Error;
     throw new Error(`Error decoding authenticator extensions: ${_err.message}`);

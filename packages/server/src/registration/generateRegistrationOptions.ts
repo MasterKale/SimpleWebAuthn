@@ -9,8 +9,7 @@ import type {
 } from '@simplewebauthn/typescript-types';
 
 import { generateChallenge } from '../helpers/generateChallenge';
-import * as isoBase64URL from '../helpers/isoBase64URL';
-import * as isoUint8Array from '../helpers/isoUint8Array';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
@@ -157,11 +156,11 @@ export function generateRegistrationOptions(
    */
   let _challenge = challenge;
   if (typeof _challenge === 'string') {
-    _challenge = uint8Array.fromASCIIString(_challenge);
+    _challenge = isoUint8Array.fromASCIIString(_challenge);
   }
 
   return {
-    challenge: base64url.fromBuffer(_challenge),
+    challenge: isoBase64URL.fromBuffer(_challenge),
     rp: {
       name: rpName,
       id: rpID,
@@ -176,7 +175,7 @@ export function generateRegistrationOptions(
     attestation: attestationType,
     excludeCredentials: excludeCredentials.map(cred => ({
       ...cred,
-      id: base64url.fromBuffer(cred.id as Uint8Array),
+      id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),
     authenticatorSelection,
     extensions,

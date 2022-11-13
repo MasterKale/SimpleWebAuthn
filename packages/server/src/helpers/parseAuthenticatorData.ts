@@ -1,9 +1,8 @@
-import * as isoCBOR from './isoCBOR';
 import {
   decodeAuthenticatorExtensions,
   AuthenticationExtensionsAuthenticatorOutputs,
 } from './decodeAuthenticatorExtensions';
-import * as isoUint8Array from './isoUint8Array';
+import { isoCBOR, isoUint8Array } from './iso';
 import { COSEPublicKey } from './convertCOSEtoPKCS';
 
 /**
@@ -17,7 +16,7 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
   }
 
   let pointer = 0;
-  const dataView = uint8Array.toDataView(authData);
+  const dataView = isoUint8Array.toDataView(authData);
 
   const rpIdHash = authData.slice(pointer, (pointer += 32));
 
@@ -53,8 +52,8 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
     credentialID = authData.slice(pointer, (pointer += credIDLen));
 
     // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
-    const firstDecoded = cbor.decodeFirst<COSEPublicKey>(authData.slice(pointer));
-    const firstEncoded = Uint8Array.from(cbor.encode(firstDecoded));
+    const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(authData.slice(pointer));
+    const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
 
     credentialPublicKey = firstEncoded;
     pointer += firstEncoded.byteLength;
@@ -64,8 +63,8 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
   let extensionsDataBuffer: Uint8Array | undefined = undefined;
 
   if (flags.ed) {
-    const firstDecoded = cbor.decodeFirst(authData.slice(pointer));
-    extensionsDataBuffer = Uint8Array.from(cbor.encode(firstDecoded));
+    const firstDecoded = isoCBOR.decodeFirst(authData.slice(pointer));
+    extensionsDataBuffer = Uint8Array.from(isoCBOR.encode(firstDecoded));
     extensionsData = decodeAuthenticatorExtensions(extensionsDataBuffer);
     pointer += extensionsDataBuffer.byteLength;
   }

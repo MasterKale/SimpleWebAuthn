@@ -7,8 +7,7 @@ import {
   AuthenticatorDevice,
   AuthenticationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
-import * as uint8Array from '../helpers/uint8array';
-import * as base64url from '../helpers/base64url';
+import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -158,7 +157,7 @@ test('should not compare counters if both are 0', async () => {
 
 test('should throw an error if user verification is required but user was not verified', async () => {
   const actualData = esmParseAuthenticatorData.parseAuthenticatorData(
-    base64url.toBuffer(assertionResponse.response.authenticatorData),
+    isoBase64URL.toBuffer(assertionResponse.response.authenticatorData),
   );
 
   mockParseAuthData.mockReturnValue({
@@ -184,7 +183,7 @@ test('should throw an error if user verification is required but user was not ve
 // TODO: Get a real TPM authentication response in here
 test.skip('should verify TPM assertion', async () => {
   const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBc3NlcnRpb24';
-  jest.spyOn(base64url, 'toString').mockReturnValueOnce(expectedChallenge);
+  jest.spyOn(isoBase64URL, 'toString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyAuthenticationResponse({
     credential: {
       id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
@@ -204,8 +203,8 @@ test.skip('should verify TPM assertion', async () => {
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: {
-      credentialPublicKey: base64url.toBuffer('BAEAAQ'),
-      credentialID: base64url.toBuffer('YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME'),
+      credentialPublicKey: isoBase64URL.toBuffer('BAEAAQ'),
+      credentialID: isoBase64URL.toBuffer('YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME'),
       counter: 0,
     },
   });
@@ -280,17 +279,17 @@ test('should pass verification if custom challenge verifier returns true', async
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
-        base64url.toString(challenge),
+        isoBase64URL.toString(challenge),
       );
       return parsedChallenge.actualChallenge === 'K3QxOjnVJLiGlnVEp5va5QJeMVWNf_7PYgutgbAtAUA';
     },
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
     authenticator: {
-      credentialID: base64url.toBuffer(
+      credentialID: isoBase64URL.toBuffer(
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
       ),
-      credentialPublicKey: base64url.toBuffer(
+      credentialPublicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
       counter: 0,
@@ -333,10 +332,10 @@ test('should return authenticator extension output', async () => {
     expectedRPID: 'try-webauthn.appspot.com',
     expectedChallenge: 'iZsVCztrDW7D2U_GHCIlYKLwV2bCsBTRqVQUnJXn9Tk',
     authenticator: {
-      credentialID: base64url.toBuffer(
+      credentialID: isoBase64URL.toBuffer(
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
       ),
-      credentialPublicKey: base64url.toBuffer(
+      credentialPublicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
       counter: 0,
@@ -345,15 +344,15 @@ test('should return authenticator extension output', async () => {
 
   expect(verification.authenticationInfo?.authenticatorExtensionResults).toMatchObject({
     devicePubKey: {
-      dpk: uint8Array.fromHex(
+      dpk: isoUint8Array.fromHex(
         'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
       ),
-      sig: uint8Array.fromHex(
+      sig: isoUint8Array.fromHex(
         '3045022049526CD28AEF6B4E621A7D5936D2B504952FC0AE2313A4F0357AAFFFAEA964740221009D513ACAEFB0B32C765AAE6FEBA8C294685EFF63FF1CBF11ECF2107AF4FEB8F8',
       ),
-      nonce: uint8Array.fromHex(''),
-      scope: uint8Array.fromHex('00'),
-      aaguid: uint8Array.fromHex('B93FD961F2E6462FB12282002247DE78'),
+      nonce: isoUint8Array.fromHex(''),
+      scope: isoUint8Array.fromHex('00'),
+      aaguid: isoUint8Array.fromHex('B93FD961F2E6462FB12282002247DE78'),
     },
   });
 });
@@ -391,14 +390,14 @@ const assertionResponse: AuthenticationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const assertionChallenge = base64url.fromString('totallyUniqueValueEveryTime');
+const assertionChallenge = isoBase64URL.fromString('totallyUniqueValueEveryTime');
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
 const authenticator: AuthenticatorDevice = {
-  credentialPublicKey: base64url.toBuffer(
+  credentialPublicKey: isoBase64URL.toBuffer(
     'pQECAyYgASFYIIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A1Ilgg8WGeA6hPmnab0HAViUYVRkwTNcN77QBf_RR0dv3lIvQ',
   ),
-  credentialID: base64url.toBuffer(
+  credentialID: isoBase64URL.toBuffer(
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   ),
   counter: 143,
@@ -420,13 +419,13 @@ const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const assertionFirstTimeUsedChallenge = base64url.fromString('totallyUniqueValueEveryAssertion');
+const assertionFirstTimeUsedChallenge = isoBase64URL.fromString('totallyUniqueValueEveryAssertion');
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
 const authenticatorFirstTimeUsed: AuthenticatorDevice = {
-  credentialPublicKey: base64url.toBuffer(
+  credentialPublicKey: isoBase64URL.toBuffer(
     'pQECAyYgASFYIGmaxR4mBbukc2QhtW2ldhAAd555r-ljlGQN8MbcTnPPIlgg9CyUlE-0AB2fbzZbNgBvJuRa7r6o2jPphOmtyNPR_kY',
   ),
-  credentialID: base64url.toBuffer(
+  credentialID: isoBase64URL.toBuffer(
     'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   ),
   counter: 0,

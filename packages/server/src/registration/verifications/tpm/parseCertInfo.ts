@@ -1,12 +1,12 @@
 import { TPM_ST, TPM_ALG } from './constants';
-import * as isoUint8Array from '../../../helpers/isoUint8Array';
+import { isoUint8Array } from '../../../helpers/iso';
 
 /**
  * Cut up a TPM attestation's certInfo into intelligible chunks
  */
 export function parseCertInfo(certInfo: Uint8Array): ParsedCertInfo {
   let pointer = 0;
-  const dataView = uint8Array.toDataView(certInfo);
+  const dataView = isoUint8Array.toDataView(certInfo);
 
   // Get a magic constant
   const magic = dataView.getUint32(pointer);
@@ -44,7 +44,7 @@ export function parseCertInfo(certInfo: Uint8Array): ParsedCertInfo {
   const attestedNameLength = dataView.getUint16(pointer);
   pointer += 2;
   const attestedName = certInfo.slice(pointer, (pointer += attestedNameLength));
-  const attestedNameDataView = uint8Array.toDataView(attestedName);
+  const attestedNameDataView = isoUint8Array.toDataView(attestedName);
 
   // Attested qualified name, can be ignored
   const qualifiedNameLength = dataView.getUint16(pointer);

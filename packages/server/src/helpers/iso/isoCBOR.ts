@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-/**
- * A collection of isomorphic methods for working with CBOR values
- */
 import * as cborx from 'cbor-x';
 
 /**

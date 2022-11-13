@@ -1,5 +1,5 @@
 import { TPM_ALG, TPM_ECC_CURVE } from './constants';
-import * as isoUint8Array from '../../../helpers/isoUint8Array';
+import { isoUint8Array } from '../../../helpers/iso';
 
 /**
  * Break apart a TPM attestation's pubArea buffer
@@ -9,7 +9,7 @@ import * as isoUint8Array from '../../../helpers/isoUint8Array';
  */
 export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
   let pointer = 0;
-  const dataView = uint8Array.toDataView(pubArea);
+  const dataView = isoUint8Array.toDataView(pubArea);
 
   const type = TPM_ALG[dataView.getUint16(pointer)];
   pointer += 2;
@@ -99,7 +99,7 @@ export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
 
     const uniqueY = pubArea.slice(pointer, (pointer += uniqueYLength));
 
-    unique = uint8Array.concat([uniqueX, uniqueY]);
+    unique = isoUint8Array.concat([uniqueX, uniqueY]);
   } else {
     throw new Error(`Unexpected type "${type}" (TPM)`);
   }

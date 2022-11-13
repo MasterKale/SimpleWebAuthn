@@ -1,5 +1,5 @@
 import { toHash } from './toHash';
-import * as isoUint8Array from './isoUint8Array';
+import { isoUint8Array } from './iso';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Raises an Error if no
@@ -8,8 +8,8 @@ export async function matchExpectedRPID(rpIDHash: Uint8Array, expectedRPIDs: str
   try {
     await Promise.any(expectedRPIDs.map((expected) => {
       return new Promise((resolve, reject) => {
-        toHash(uint8Array.fromASCIIString(expected)).then((expectedRPIDHash) => {
-          if (uint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
+        toHash(isoUint8Array.fromASCIIString(expected)).then((expectedRPIDHash) => {
+          if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
             resolve(true);
           } else {
             reject();

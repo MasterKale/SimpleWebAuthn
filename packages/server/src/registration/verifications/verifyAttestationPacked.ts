@@ -5,7 +5,7 @@ import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { verifySignature } from '../../helpers/verifySignature';
-import * as isoUint8Array from '../../helpers/isoUint8Array';
+import { isoUint8Array } from '../../helpers/iso';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
@@ -30,7 +30,7 @@ export async function verifyAttestationPacked(
     throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
   }
 
-  const signatureBase = uint8Array.concat([authData, clientDataHash]);
+  const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
 
   let verified = false;
 

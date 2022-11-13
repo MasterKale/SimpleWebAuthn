@@ -13,8 +13,7 @@ import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import * as isoUint8Array from '../helpers/isoUint8Array';
-import * as isoBase64URL from '../helpers/isoBase64URL';
+import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -144,7 +143,7 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const authDataBuffer = base64url.toBuffer(response.authenticatorData);
+  const authDataBuffer = isoBase64URL.toBuffer(response.authenticatorData);
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
   const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
 
@@ -187,10 +186,10 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const clientDataHash = await toHash(base64url.toBuffer(response.clientDataJSON));
-  const signatureBase = uint8Array.concat([authDataBuffer, clientDataHash]);
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(response.clientDataJSON));
+  const signatureBase = isoUint8Array.concat([authDataBuffer, clientDataHash]);
 
-  const signature = base64url.toBuffer(response.signature);
+  const signature = isoBase64URL.toBuffer(response.signature);
 
   if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
     // Error out when the counter in the DB is greater than or equal to the counter in the

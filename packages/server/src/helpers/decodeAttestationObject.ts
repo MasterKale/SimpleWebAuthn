@@ -1,4 +1,4 @@
-import * as isoCBOR from './isoCBOR';
+import { isoCBOR } from './iso';
 
 /**
  * Convert an AttestationObject buffer to a proper object
@@ -6,7 +6,7 @@ import * as isoCBOR from './isoCBOR';
  * @param base64AttestationObject Attestation Object buffer
  */
 export function decodeAttestationObject(attestationObject: Uint8Array): AttestationObject {
-  return cbor.decodeFirst<AttestationObject>(attestationObject);
+  return isoCBOR.decodeFirst<AttestationObject>(attestationObject);
 }
 
 export type AttestationFormat =

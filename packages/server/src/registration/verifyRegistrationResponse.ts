@@ -18,8 +18,7 @@ import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import * as isoUint8Array from '../helpers/isoUint8Array';
-import * as isoBase64URL from '../helpers/isoBase64URL';
+import { isoBase64URL }  from '../helpers/iso';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
@@ -131,7 +130,7 @@ export async function verifyRegistrationResponse(
     }
   }
 
-  const attestationObject = base64url.toBuffer(response.attestationObject);
+  const attestationObject = isoBase64URL.toBuffer(response.attestationObject);
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
   const fmt = decodedAttestationObject.get('fmt');
   const authData = decodedAttestationObject.get('authData');
@@ -188,7 +187,7 @@ export async function verifyRegistrationResponse(
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
-  const clientDataHash = await toHash(base64url.toBuffer(response.clientDataJSON));
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(response.clientDataJSON));
   const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
 
   // Prepare arguments to pass to the relevant verification method

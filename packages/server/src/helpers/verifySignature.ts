@@ -4,7 +4,7 @@ import { verify as ed25519Verify } from '@noble/ed25519';
 import { COSEKEYS, COSEKTY, COSEPublicKey } from './convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
-import * as isoCBOR from './isoCBOR';
+import { isoCBOR } from './iso';
 
 type VerifySignatureOptsLeafCert = {
   signature: Uint8Array;
@@ -51,7 +51,7 @@ export async function verifySignature(
     // Decode CBOR to COSE
     let struct;
     try {
-      struct = cbor.decodeFirst<COSEPublicKey>(credentialPublicKey);
+      struct = isoCBOR.decodeFirst<COSEPublicKey>(credentialPublicKey);
     } catch (err) {
       const _err = err as Error;
       throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);

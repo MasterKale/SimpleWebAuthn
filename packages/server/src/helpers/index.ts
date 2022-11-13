@@ -13,9 +13,7 @@ import { parseAuthenticatorData } from './parseAuthenticatorData';
 import { toHash } from './toHash';
 import { validateCertificatePath } from './validateCertificatePath';
 import { verifySignature } from './verifySignature';
-import * as isoCBOR from './isoCBOR';
-import * as isoBase64URL from './isoBase64URL';
-import * as isoUint8Array from './isoUint8Array';
+import { isoCBOR, isoBase64URL, isoUint8Array } from './iso';
 
 export {
   convertAAGUIDToString,
@@ -33,9 +31,9 @@ export {
   toHash,
   validateCertificatePath,
   verifySignature,
-  cbor,
-  base64url,
-  uint8Array,
+  isoCBOR,
+  isoBase64URL,
+  isoUint8Array,
 };
 
 import type {

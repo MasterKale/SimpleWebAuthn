@@ -6,7 +6,7 @@ import {
 } from '../../helpers/decodeAttestationObject';
 import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import { toHash } from '../../helpers/toHash';
-import * as base64url from '../../helpers/base64url';
+import { isoBase64URL } from '../../helpers/iso';
 import { SettingsService } from '../../services/settingsService';
 
 const rootCertificates = SettingsService.getRootCertificates({
@@ -24,11 +24,11 @@ let spyDate: jest.SpyInstance;
 
 beforeEach(async () => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
-  const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
+  const decodedAttestationObject = decodeAttestationObject(isoBase64URL.toBuffer(attestationObject));
 
   authData = decodedAttestationObject.get('authData');
   attStmt = decodedAttestationObject.get('attStmt');
-  clientDataHash = await toHash(base64url.toBuffer(clientDataJSON));
+  clientDataHash = await toHash(isoBase64URL.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(authData);
   aaguid = parsedAuthData.aaguid!;
@@ -87,11 +87,11 @@ test('should validate response with cert path completed with GlobalSign R1 root 
   spyDate.mockReturnValue(new Date('2021-11-15T00:00:42.000Z'));
 
   const { attestationObject, clientDataJSON } = safetyNetUsingGSR1RootCert.response;
-  const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
+  const decodedAttestationObject = decodeAttestationObject(isoBase64URL.toBuffer(attestationObject));
 
   const _authData = decodedAttestationObject.get('authData');
   const _attStmt = decodedAttestationObject.get('attStmt');
-  const _clientDataHash = await toHash(base64url.toBuffer(clientDataJSON));
+  const _clientDataHash = await toHash(isoBase64URL.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(_authData);
   const _aaguid = parsedAuthData.aaguid!;

@@ -1,11 +1,11 @@
 jest.mock('../helpers/generateChallenge');
 
-import * as base64url from '../helpers/base64url';
+import { isoBase64URL } from '../helpers/iso';
 
 import { generateAuthenticationOptions } from './generateAuthenticationOptions';
 
 const challengeString = 'dG90YWxseXJhbmRvbXZhbHVl';
-const challengeBuffer = base64url.toBuffer(challengeString)
+const challengeBuffer = isoBase64URL.toBuffer(challengeString)
 
 test('should generate credential request options suitable for sending via JSON', () => {
 

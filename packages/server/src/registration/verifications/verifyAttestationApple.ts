@@ -7,7 +7,7 @@ import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { toHash } from '../../helpers/toHash';
 import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import * as isoUint8Array from '../../helpers/isoUint8Array';
+import { isoUint8Array } from '../../helpers/iso';
 
 export async function verifyAttestationApple(
   options: AttestationFormatVerifierOpts,
@@ -45,7 +45,7 @@ export async function verifyAttestationApple(
     throw new Error('credCert missing "1.2.840.113635.100.8.2" extension (Apple)');
   }
 
-  const nonceToHash = uint8Array.concat([authData, clientDataHash]);
+  const nonceToHash = isoUint8Array.concat([authData, clientDataHash]);
   const nonce = await toHash(nonceToHash, 'SHA256');
   /**
    * Ignore the first six ASN.1 structure bytes that define the nonce as an OCTET STRING. Should
@@ -56,7 +56,7 @@ export async function verifyAttestationApple(
    */
   const extNonce = new Uint8Array(extCertNonce.extnValue.buffer).slice(6);
 
-  if (!uint8Array.areEqual(nonce, extNonce)) {
+  if (!isoUint8Array.areEqual(nonce, extNonce)) {
     throw new Error(`credCert nonce was not expected value (Apple)`);
   }
 
@@ -66,7 +66,7 @@ export async function verifyAttestationApple(
   const credPubKeyPKCS = convertCOSEtoPKCS(credentialPublicKey);
   const credCertSubjectPublicKey = new Uint8Array(subjectPublicKeyInfo.subjectPublicKey);
 
-  if (!uint8Array.areEqual(credPubKeyPKCS, credCertSubjectPublicKey)) {
+  if (!isoUint8Array.areEqual(credPubKeyPKCS, credCertSubjectPublicKey)) {
     throw new Error('Credential public key does not equal credCert public key (Apple)');
   }
 

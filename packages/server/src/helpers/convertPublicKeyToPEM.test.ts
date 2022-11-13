@@ -1,20 +1,19 @@
 import { COSEKEYS } from './convertCOSEtoPKCS';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
-import * as cbor from './cbor';
-import * as uint8Array from './uint8Array';
+import { isoCBOR, isoUint8Array } from './iso';
 
 test('should return pem - EC2', () => {
   const mockEC2Key = new Map<number, number | Uint8Array>();
 
-  const x = uint8Array.fromHex('821f4c9978ed99c1c57aca1fa9667a8aec52740620a0f56f7c9aa9bf5f35f25a');
-  const y = uint8Array.fromHex('dc10d91ec36f2946f955bc863ea70015fe051ae3e12765f2db5e68583c3fd637');
+  const x = isoUint8Array.fromHex('821f4c9978ed99c1c57aca1fa9667a8aec52740620a0f56f7c9aa9bf5f35f25a');
+  const y = isoUint8Array.fromHex('dc10d91ec36f2946f955bc863ea70015fe051ae3e12765f2db5e68583c3fd637');
   mockEC2Key.set(COSEKEYS.kty, 2);
   mockEC2Key.set(COSEKEYS.alg, -7);
   mockEC2Key.set(COSEKEYS.crv, 1);
   mockEC2Key.set(COSEKEYS.x, x);
   mockEC2Key.set(COSEKEYS.y, y);
 
-  const pubKeyCBOR = cbor.encode(mockEC2Key);
+  const pubKeyCBOR = isoCBOR.encode(mockEC2Key);
 
   const actual = convertPublicKeyToPEM(pubKeyCBOR);
   expect(actual).toEqual(`-----BEGIN PUBLIC KEY-----
@@ -37,7 +36,7 @@ test('should return pem - RSA', () => {
   mockRSAKey.set(COSEKEYS.n, n);
   mockRSAKey.set(COSEKEYS.e, e);
 
-  const pubKeyCBOR = cbor.encode(mockRSAKey);
+  const pubKeyCBOR = isoCBOR.encode(mockRSAKey);
 
   const actual = convertPublicKeyToPEM(pubKeyCBOR);
   expect(actual).toEqual(`-----BEGIN PUBLIC KEY-----
@@ -58,7 +57,7 @@ test('should return pem when input is base64URLString', () => {
   mockCOSEKey.set(COSEKEYS.kty, 0);
   mockCOSEKey.set(COSEKEYS.alg, -7);
 
-  const pubKeyCBOR = cbor.encode(mockCOSEKey);
+  const pubKeyCBOR = isoCBOR.encode(mockCOSEKey);
 
   try {
     convertPublicKeyToPEM(pubKeyCBOR);
@@ -73,7 +72,7 @@ test('should raise error when kty is OKP (1)', () => {
   mockOKPKey.set(COSEKEYS.kty, 1);
   mockOKPKey.set(COSEKEYS.alg, -7);
 
-  const pubKeyCBOR = cbor.encode(mockOKPKey);
+  const pubKeyCBOR = isoCBOR.encode(mockOKPKey);
 
   try {
     convertPublicKeyToPEM(pubKeyCBOR);

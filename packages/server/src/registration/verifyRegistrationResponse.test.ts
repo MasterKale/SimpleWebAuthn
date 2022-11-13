@@ -7,8 +7,7 @@ import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { toHash } from '../helpers/toHash';
-import * as base64url from '../helpers/base64url';
-import * as uint8Array from '../helpers/uint8Array';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso';
 import { COSEPublicKey, COSEKEYS } from '../helpers/convertCOSEtoPKCS';
 import { SettingsService } from '../services/settingsService';
 
@@ -54,12 +53,12 @@ test('should verify FIDO U2F attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('fido-u2f');
   expect(verification.registrationInfo?.counter).toEqual(0);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
     ),
   );
@@ -67,7 +66,7 @@ test('should verify FIDO U2F attestation', async () => {
   expect(verification.registrationInfo?.credentialType).toEqual('public-key');
   expect(verification.registrationInfo?.userVerified).toEqual(false);
   expect(verification.registrationInfo?.attestationObject).toEqual(
-    base64url.toBuffer(attestationFIDOU2F.response.attestationObject),
+    isoBase64URL.toBuffer(attestationFIDOU2F.response.attestationObject),
   );
 });
 
@@ -83,12 +82,12 @@ test('should verify Packed (EC2) attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('packed');
   expect(verification.registrationInfo?.counter).toEqual(1589874425);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIEoxVVqK-oIGmqoDEyO4KjmMx5R2HeMM4LQQXh8sE01PIlggtzuuoMN5fWnAIuuXdlfshOGu1k3ApBUtDJ8eKiuo_6c',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
         'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
     ),
@@ -107,12 +106,12 @@ test('should verify Packed (X5C) attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('packed');
   expect(verification.registrationInfo?.counter).toEqual(28);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIGwlsYCNyRb4AD9cyTw6cH5VS-uzflmmO1UldGGe9eIaIlggvadzKD8p6wKLjgYfxRxldjCMGRV0YyM13osWbKIPrF8',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
     ),
   );
@@ -130,12 +129,12 @@ test('should verify None attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('none');
   expect(verification.registrationInfo?.counter).toEqual(0);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
     ),
   );
@@ -165,12 +164,12 @@ test('should verify None attestation w/RSA public key', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('none');
   expect(verification.registrationInfo?.counter).toEqual(0);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQDxfpXrj0ba_AH30JJ_-W7BHSOPugOD8aEDdNBKc1gjB9AmV3FPl2aL0fwiOMKtM_byI24qXb2FzcyjC7HUVkHRtzkAQnahXckI4wY_01koaY6iwXuIE3Ya0Zjs2iZyz6u4G_abGnWdObqa_kHxc3CHR7Xy5MDkAkKyX6TqU0tgHZcEhDd_Lb5ONJDwg4wvKlZBtZYElfMuZ6lonoRZ7qR_81rGkDZyFaxp6RlyvzEbo4ijeIaHQylqCz-oFm03ifZMOfRHYuF4uTjJDRH-g4BW1f3rdi7DTHk1hJnIw1IyL_VFIQ9NifkAguYjNCySCUNpYli2eMrPhAu5dYJFFjINIUMBAAE',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
+    isoBase64URL.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
   );
 });
 
@@ -219,7 +218,7 @@ test('should throw when attestation type is not webauthn.create', async () => {
 
 test('should throw if an unexpected attestation format is specified', async () => {
   const realAtteObj = esmDecodeAttestationObject.decodeAttestationObject(
-    base64url.toBuffer(attestationNone.response.attestationObject),
+    isoBase64URL.toBuffer(attestationNone.response.attestationObject),
   );
   // Mangle the fmt
   (realAtteObj as Map<unknown, unknown>).set('fmt', 'fizzbuzz');
@@ -238,7 +237,7 @@ test('should throw if an unexpected attestation format is specified', async () =
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
   const authData = esmDecodeAttestationObject.decodeAttestationObject(
-    base64url.toBuffer(attestationNone.response.attestationObject),
+    isoBase64URL.toBuffer(attestationNone.response.attestationObject),
   ).get('authData');
   const actualAuthData = esmParseAuthenticatorData.parseAuthenticatorData(authData);
 
@@ -401,12 +400,12 @@ test('should validate TPM RSA response (SHA256)', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('tpm');
   expect(verification.registrationInfo?.counter).toEqual(30);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQCtxzw59Wsl8xWP97wPTu2TSDlushwshL8GedHAHO1R62m3nNy21hCLJlQabfLepRUQ_v9mq3PCmV81tBSqtRGU5_YlK0R2yeu756SnT39c6hKC3PBPt_xdjL_ccz4H_73DunfB63QZOtdeAsswV7WPLqMARofuM-LQ_LHnNguCypDcxhADuUqQtogfwZsknTVIPxzGcfqnQ7ERF9D9AOWIQ8YjOsTi_B2zS8SOySKIFUGwwYcPG7DiCE-QJcI-fpydRDnEq6UxbkYgB7XK4BlmPKlwuXkBDX9egl_Ma4B7W2WJvYbKevu6Z8Kc5y-OITpNVDYKbBK3qKyh4yIUpB1NIUMBAAE',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
+    isoBase64URL.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
   );
 });
 
@@ -434,12 +433,12 @@ test('should validate TPM RSA response (SHA1)', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('tpm');
   expect(verification.registrationInfo?.counter).toEqual(97);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pAEDAzn__iBZAQCzl_wD24PZ5z-po2FrwoQVdd13got_CkL8p4B_NvJBC5OwAYKDilii_wj-0CA8ManbpSInx9Tdnz6t91OhudwUT0-W_BHSLK_MqFcjZWrR5LYVmVpz1EgH3DrOTra4AlogEq2D2CYktPrPe7joE-oT3vAYXK8vzQDLRyaxI_Z1qS4KLlLCdajW8PGpw1YRjMDw6s69GZU8mXkgNPMCUh1TZ1bnCvJTO9fnmLjDjqdQGRU4bWo8tFjCL8g1-2WD_2n0-twt6n-Uox5VnR1dQJG4awMlanBCkGGpOb3WBDQ8K10YJJ2evPhJKGJahBvu2Dxmq6pLCAXCv0ma3EHj-PmDIUMBAAE',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
+    isoBase64URL.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
   );
 });
 
@@ -467,12 +466,12 @@ test('should validate Android-Key response', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('android-key');
   expect(verification.registrationInfo?.counter).toEqual(108);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239oIlgg6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
+    isoBase64URL.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
   );
 });
 
@@ -538,7 +537,7 @@ test('should pass verification if custom challenge verifier returns true', async
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
-        base64url.toString(challenge),
+        isoBase64URL.toString(challenge),
       );
       return parsedChallenge.actualChallenge === 'xRsYdCQv5WZOqmxReiZl6C9q5SfrZne4lNSr9QVtPig';
     },
@@ -596,15 +595,15 @@ test('should return authenticator extension output', async () => {
 
   expect(verification.registrationInfo?.authenticatorExtensionResults).toMatchObject({
     devicePubKey: {
-      dpk: uint8Array.fromHex(
+      dpk: isoUint8Array.fromHex(
         'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
       ),
-      sig: uint8Array.fromHex(
+      sig: isoUint8Array.fromHex(
         '3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E',
       ),
-      nonce: uint8Array.fromHex(''),
-      scope: uint8Array.fromHex('00'),
-      aaguid: uint8Array.fromHex('00000000000000000000000000000000'),
+      nonce: isoUint8Array.fromHex(''),
+      scope: isoUint8Array.fromHex('00'),
+      aaguid: isoUint8Array.fromHex('00000000000000000000000000000000'),
     },
   });
 });
@@ -625,7 +624,7 @@ const attestationFIDOU2F: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationFIDOU2FChallenge = base64url.fromString('totallyUniqueValueEveryAttestation');
+const attestationFIDOU2FChallenge = isoBase64URL.fromString('totallyUniqueValueEveryAttestation');
 
 const attestationPacked: RegistrationCredentialJSON = {
   id: 'bbb',
@@ -646,7 +645,7 @@ const attestationPacked: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationPackedChallenge = base64url.fromString('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
+const attestationPackedChallenge = isoBase64URL.fromString('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
 
 const attestationPackedX5C: RegistrationCredentialJSON = {
   // TODO: Grab these from another iPhone attestation
@@ -677,7 +676,7 @@ const attestationPackedX5C: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationPackedX5CChallenge = base64url.fromString('totallyUniqueValueEveryTime');
+const attestationPackedX5CChallenge = isoBase64URL.fromString('totallyUniqueValueEveryTime');
 
 const attestationNone: RegistrationCredentialJSON = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
@@ -696,4 +695,4 @@ const attestationNone: RegistrationCredentialJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationNoneChallenge = base64url.fromString('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');
+const attestationNoneChallenge = isoBase64URL.fromString('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');

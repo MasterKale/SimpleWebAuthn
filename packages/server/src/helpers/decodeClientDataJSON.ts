@@ -1,10 +1,10 @@
-import * as isoBase64URL from "./isoBase64URL";
+import { isoBase64URL } from "./iso";
 
 /**
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON
  */
 export function decodeClientDataJSON(data: string): ClientDataJSON {
-  const toString = base64url.toString(data);
+  const toString = isoBase64URL.toString(data);
   const clientData: ClientDataJSON = JSON.parse(toString);
 
   return clientData;

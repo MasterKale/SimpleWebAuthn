@@ -1,13 +1,12 @@
 import jwkToPem from 'jwk-to-pem';
 
 import { COSEKEYS, COSEKTY, COSECRV, COSEPublicKey } from './convertCOSEtoPKCS';
-import * as isoCBOR from './isoCBOR';
-import * as isoBase64URL from './isoBase64URL';
+import { isoBase64URL, isoCBOR } from './iso';
 
 export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
   let struct;
   try {
-    struct = cbor.decodeFirst<COSEPublicKey>(publicKey);
+    struct = isoCBOR.decodeFirst<COSEPublicKey>(publicKey);
   } catch (err) {
     const _err = err as Error;
     throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);
@@ -40,8 +39,8 @@ export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
       kty: 'EC',
       // Specify curve as "P-256" from "p256"
       crv: COSECRV[crv as number].replace('p', 'P-'),
-      x: base64url.fromBuffer(x as Uint8Array, 'base64'),
-      y: base64url.fromBuffer(y as Uint8Array, 'base64'),
+      x: isoBase64URL.fromBuffer(x as Uint8Array, 'base64'),
+      y: isoBase64URL.fromBuffer(y as Uint8Array, 'base64'),
     });
 
     return ecPEM;
@@ -59,8 +58,8 @@ export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
 
     const rsaPEM = jwkToPem({
       kty: 'RSA',
-      n: base64url.fromBuffer(n as Uint8Array, 'base64'),
-      e: base64url.fromBuffer(e as Uint8Array, 'base64'),
+      n: isoBase64URL.fromBuffer(n as Uint8Array, 'base64'),
+      e: isoBase64URL.fromBuffer(e as Uint8Array, 'base64'),
     });
 
     return rsaPEM;

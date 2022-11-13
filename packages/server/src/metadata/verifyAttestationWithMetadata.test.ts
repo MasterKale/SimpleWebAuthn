@@ -1,6 +1,6 @@
 import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata';
 import { MetadataStatement } from '../metadata/mdsTypes';
-import * as base64url from '../helpers/base64url';
+import { isoBase64URL } from '../helpers/iso';
 
 test('should verify attestation with metadata (android-safetynet)', async () => {
   const metadataStatementJSONSafetyNet: MetadataStatement = {
@@ -48,7 +48,7 @@ test('should verify attestation with metadata (android-safetynet)', async () => 
 
   const verified = await verifyAttestationWithMetadata({
     statement: metadataStatementJSONSafetyNet,
-    credentialPublicKey: base64url.toBuffer(credentialPublicKey),
+    credentialPublicKey: isoBase64URL.toBuffer(credentialPublicKey),
     x5c,
   });
 
@@ -98,7 +98,7 @@ test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator alg
 
   const verified = await verifyAttestationWithMetadata({
     statement: metadataStatement,
-    credentialPublicKey: base64url.toBuffer(credentialPublicKey),
+    credentialPublicKey: isoBase64URL.toBuffer(credentialPublicKey),
     x5c,
   });
 
@@ -155,7 +155,7 @@ test('should not validate certificate path when authenticator is self-referencin
 
   const verified = await verifyAttestationWithMetadata({
     statement: metadataStatement,
-    credentialPublicKey: base64url.toBuffer(credentialPublicKey),
+    credentialPublicKey: isoBase64URL.toBuffer(credentialPublicKey),
     x5c,
   });
 

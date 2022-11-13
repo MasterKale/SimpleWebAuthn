@@ -8,7 +8,7 @@ import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
 import { COSEALGHASH, convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import * as isoUint8Array from '../../helpers/isoUint8Array';
+import { isoUint8Array } from '../../helpers/iso';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
@@ -46,7 +46,7 @@ export async function verifyAttestationAndroidKey(
   // Convert the credentialPublicKey to PKCS
   const credPubKeyPKCS = convertCOSEtoPKCS(credentialPublicKey);
 
-  if (!uint8Array.areEqual(credPubKeyPKCS, parsedCertPubKey)) {
+  if (!isoUint8Array.areEqual(credPubKeyPKCS, parsedCertPubKey)) {
     throw new Error('Credential public key does not equal leaf cert public key (AndroidKey)');
   }
 
@@ -64,7 +64,7 @@ export async function verifyAttestationAndroidKey(
   // Verify extKeyStore values
   const { attestationChallenge, teeEnforced, softwareEnforced } = parsedExtKeyStore;
 
-  if (!uint8Array.areEqual(new Uint8Array(attestationChallenge.buffer), clientDataHash)) {
+  if (!isoUint8Array.areEqual(new Uint8Array(attestationChallenge.buffer), clientDataHash)) {
     throw new Error('Attestation challenge was not equal to client data hash (AndroidKey)');
   }
 
@@ -101,7 +101,7 @@ export async function verifyAttestationAndroidKey(
     }
   }
 
-  const signatureBase = uint8Array.concat([authData, clientDataHash]);
+  const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
   const hashAlg = COSEALGHASH[alg as number];
 
   return verifySignature({
