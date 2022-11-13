@@ -7,4 +7,5 @@
  */
 export * as isoBase64URL from './isoBase64URL';
 export * as isoCBOR from './isoCBOR';
+export * as isoCrypto from './isoCrypto';
 export * as isoUint8Array from './isoUint8Array';
