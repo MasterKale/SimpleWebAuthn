@@ -3,7 +3,6 @@ import { verify as ed25519Verify } from '@noble/ed25519';
 
 import { COSEKEYS, COSEKTY, COSEPublicKey } from './convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
-import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
 import { isoCBOR, isoCrypto } from './iso';
 
 type VerifySignatureOptsLeafCert = {
@@ -73,11 +72,8 @@ export async function verifySignature(
       }
 
       return ed25519Verify(signature, signatureBase, (x as Uint8Array));
-    } else if (kty === COSEKTY.EC2) {
-      return isoCrypto.verify(cosePublicKey, signature, signatureBase);
     } else {
-      // Convert pubKey to PEM for ECC and RSA
-      publicKeyPEM = convertPublicKeyToPEM(credentialPublicKey);
+      return isoCrypto.verify(cosePublicKey, signature, signatureBase);
     }
   }
 
