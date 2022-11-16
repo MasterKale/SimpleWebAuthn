@@ -1,4 +1,9 @@
 import { webcrypto } from 'node:crypto';
+import { ECDSASigValue } from "@peculiar/asn1-ecc";
+import { AsnParser } from '@peculiar/asn1-schema';
+
+import { isoUint8Array, isoBase64URL } from './index';
+import { COSEKEYS, COSEKTY, COSEPublicKey } from '../convertCOSEtoPKCS';
 
 /**
  * Fill up the provided bytes array with random bytes equal to its length.
@@ -43,6 +48,120 @@ export async function digest(data: Uint8Array, algorithm: string): Promise<Uint8
 }
 
 /**
+ * Verify signatures with their public key. Supports EC2 and RSA public key.
+ */
+export async function verify(
+  publicKey: COSEPublicKey,
+  signature: Uint8Array,
+  signatureBase: Uint8Array,
+): Promise<boolean> {
+  const kty = publicKey.get(COSEKEYS.kty);
+
+  if (!kty) {
+    throw new Error('Public key was missing kty');
+  }
+
+  if (kty === COSEKTY.EC2) {
+    // The signature is wrapped in ASN.1 structure, so we need to peel it apart
+    const parsedSignature = AsnParser.parse(signature, ECDSASigValue);
+    let rBytes = new Uint8Array(parsedSignature.r);
+    let sBytes = new Uint8Array(parsedSignature.s);
+
+    if (shouldRemoveLeadingZero(rBytes)) {
+      rBytes = rBytes.slice(1);
+    }
+
+    if (shouldRemoveLeadingZero(sBytes)) {
+      sBytes = sBytes.slice(1);
+    }
+
+    const signatureBytes = isoUint8Array.concat([rBytes, sBytes]);
+
+    const alg = publicKey.get(COSEKEYS.alg);
+    const crv = publicKey.get(COSEKEYS.crv);
+    const x = publicKey.get(COSEKEYS.x);
+    const y = publicKey.get(COSEKEYS.y);
+
+    if (!alg) {
+      throw new Error('Public key was missing alg');
+    }
+
+    if (!crv) {
+      throw new Error('Public key was missing crv');
+    }
+
+    if (!x) {
+      throw new Error('Public key was missing x');
+    }
+
+    if (!y) {
+      throw new Error('Public key was missing y');
+    }
+
+    const subtleCrv = mapCoseCrvToWebCryptoCrv(crv as number);
+    const subtleAlg = mapCoseAlgToWebCryptoAlg(alg as number);
+
+    const subtlePublicKey = await importECKey(
+      subtleCrv,
+      x as Uint8Array,
+      y as Uint8Array,
+    );
+
+    return verifyECSignature(subtlePublicKey, signatureBytes, signatureBase, subtleAlg);
+  }
+
+  return false;
+}
+
+/**
+ * Import a public key from its corresponding
+ */
+function importECKey(crv: SubtleCryptoCrv, x: Uint8Array, y: Uint8Array): Promise<CryptoKey> {
+  const jwk = {
+    kty: "EC",
+    crv,
+    x: isoBase64URL.fromBuffer(x as Uint8Array),
+    y: isoBase64URL.fromBuffer(y as Uint8Array),
+    ext: false,
+  };
+
+  const algorithm: EcKeyImportParams = {
+    name: 'ECDSA',
+    namedCurve: crv,
+  };
+
+  const extractable = false;
+
+  const keyUsages: KeyUsage[] = ["verify"];
+
+  if (globalThis.crypto) {
+    return globalThis.crypto.subtle.importKey('jwk', jwk, algorithm, extractable, keyUsages);
+  } else {
+    return webcrypto.subtle.importKey('jwk', jwk, algorithm, extractable, keyUsages);
+  }
+}
+
+/**
+ *
+ */
+function verifyECSignature(
+  key: CryptoKey,
+  signature: Uint8Array,
+  data: Uint8Array,
+  alg: SubtleCryptoAlg = 'SHA-256',
+): Promise<boolean> {
+  const algorithm: EcdsaParams = {
+    name: 'ECDSA',
+    hash: { name: alg },
+  };
+  if (globalThis.crypto) {
+    return globalThis.crypto.subtle.verify(algorithm, key, signature, data);
+  } else {
+    return webcrypto.subtle.verify(algorithm, key, signature, data);
+  }
+}
+
+/**
  * Convert algorithms like "SHA1", "sha256", etc... into values like "SHA-1", "SHA-256", etc...
  * that `.digest()` will accept
  */
@@ -52,6 +171,17 @@ function normalizeAlgorithm(algorithm: string): SubtleCryptoAlg {
   }
 
   return algorithm as SubtleCryptoAlg;
+}
+
+/**
+ * Determine if the DER-specific `00` byte at the start of an ECDSA signature byte sequence
+ * should be removed based on the following logic:
+ *
+ * "If the leading byte is 0x0, and the the high order bit on the second byte is not set to 0,
+ * then remove the leading 0x0 byte"
+ */
+function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
+  return (bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0);
 }
 
 /**
