@@ -4,7 +4,7 @@ import { verify as ed25519Verify } from '@noble/ed25519';
 import { COSEKEYS, COSEKTY, COSEPublicKey } from './convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
-import { isoCBOR } from './iso';
+import { isoCBOR, isoCrypto } from './iso';
 
 type VerifySignatureOptsLeafCert = {
   signature: Uint8Array;
@@ -49,15 +49,15 @@ export async function verifySignature(
     const { credentialPublicKey } = opts;
 
     // Decode CBOR to COSE
-    let struct;
+    let cosePublicKey;
     try {
-      struct = isoCBOR.decodeFirst<COSEPublicKey>(credentialPublicKey);
+      cosePublicKey = isoCBOR.decodeFirst<COSEPublicKey>(credentialPublicKey);
     } catch (err) {
       const _err = err as Error;
       throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);
     }
 
-    const kty = struct.get(COSEKEYS.kty);
+    const kty = cosePublicKey.get(COSEKEYS.kty);
 
     if (!kty) {
       throw new Error('Public key was missing kty');
@@ -66,13 +66,15 @@ export async function verifySignature(
     // Check key type
     if (kty === COSEKTY.OKP) {
       // Verify Ed25519 slightly differently
-      const x = struct.get(COSEKEYS.x);
+      const x = cosePublicKey.get(COSEKEYS.x);
 
       if (!x) {
         throw new Error('Public key was missing x (OKP)');
       }
 
       return ed25519Verify(signature, signatureBase, (x as Uint8Array));
+    } else if (kty === COSEKTY.EC2) {
+      return isoCrypto.verify(cosePublicKey, signature, signatureBase);
     } else {
       // Convert pubKey to PEM for ECC and RSA
       publicKeyPEM = convertPublicKeyToPEM(credentialPublicKey);
