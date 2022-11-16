@@ -46,12 +46,14 @@ export async function digest(data: Uint8Array, algorithm: string): Promise<Uint8
  * Convert algorithms like "SHA1", "sha256", etc... into values like "SHA-1", "SHA-256", etc...
  * that `.digest()` will accept
  */
-function normalizeAlgorithm(algorithm: string): string {
+function normalizeAlgorithm(algorithm: string): SubtleCryptoAlg {
   if (/sha\d{1,3}/i.test(algorithm)) {
     algorithm = algorithm.toUpperCase().replace('SHA', 'SHA-');
   }
 
-  return algorithm;
+  return algorithm as SubtleCryptoAlg;
+}
+
 /**
  * Convert a COSE crv ID into a corresponding string value that WebCrypto APIs expect
  */
