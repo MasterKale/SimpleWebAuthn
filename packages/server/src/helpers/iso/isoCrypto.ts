@@ -117,7 +117,7 @@ export async function verify(
  * Import a public key from its corresponding
  */
 function importECKey(crv: SubtleCryptoCrv, x: Uint8Array, y: Uint8Array): Promise<CryptoKey> {
-  const jwk = {
+  const jwk: JsonWebKey = {
     kty: "EC",
     crv,
     x: isoBase64URL.fromBuffer(x as Uint8Array),
