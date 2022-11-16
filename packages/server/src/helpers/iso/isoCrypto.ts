@@ -52,4 +52,40 @@ function normalizeAlgorithm(algorithm: string): string {
   }
 
   return algorithm;
+/**
+ * Convert a COSE crv ID into a corresponding string value that WebCrypto APIs expect
+ */
+function mapCoseCrvToWebCryptoCrv(crv: number): SubtleCryptoCrv {
+  if (crv === 1) {
+    return 'P-256';
+  }
+
+  if (crv === 2) {
+    return 'P-384';
+  }
+
+  if (crv === 3) {
+    return 'P-521';
+  }
+
+  throw new Error(`Unexpected COSE crv value of ${crv}`);
 }
+type SubtleCryptoCrv = "P-256" | "P-384" | "P-521";
+
+/**
+ * Convert a COSE alg ID into a corresponding string value that WebCrypto APIs expect
+ */
+function mapCoseAlgToWebCryptoAlg(alg: number): SubtleCryptoAlg {
+  if ([-65535].indexOf(alg) >= 0) {
+    return 'SHA-1';
+  } else if ([-7, -37, -257].indexOf(alg) >= 0) {
+    return 'SHA-256';
+  } else if ([-35, -38, -258].indexOf(alg) >= 0) {
+    return 'SHA-384'
+  } else if ([-8, -36, -39, -259].indexOf(alg) >= 0) {
+    return 'SHA-512';
+  }
+
+  throw new Error(`Unexpected COSE alg value of ${alg}`);
+}
+export type SubtleCryptoAlg = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
