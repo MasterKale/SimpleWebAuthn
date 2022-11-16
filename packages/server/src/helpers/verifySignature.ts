@@ -16,7 +16,7 @@ type VerifySignatureOptsLeafCert = {
 type VerifySignatureOptsCredentialPublicKey = {
   signature: Uint8Array;
   signatureBase: Uint8Array;
-  credentialPublicKey: Uint8Array;
+  publicKey: Uint8Array;
   hashAlgorithm?: string;
 };
 
@@ -46,12 +46,12 @@ export async function verifySignature(
   let publicKeyPEM = '';
 
   if (_isCredPubKeyOpts) {
-    const { credentialPublicKey } = opts;
+    const { publicKey } = opts;
 
     // Decode CBOR to COSE
     let cosePublicKey;
     try {
-      cosePublicKey = isoCBOR.decodeFirst<COSEPublicKey>(credentialPublicKey);
+      cosePublicKey = isoCBOR.decodeFirst<COSEPublicKey>(publicKey);
     } catch (err) {
       const _err = err as Error;
       throw new Error(`Error decoding public key while converting to PEM: ${_err.message}`);
@@ -99,6 +99,6 @@ function isCredPubKeyOpts(
   opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
 ): opts is VerifySignatureOptsCredentialPublicKey {
   return (
-    Object.keys(opts as VerifySignatureOptsCredentialPublicKey).indexOf('credentialPublicKey') >= 0
+    Object.keys(opts as VerifySignatureOptsCredentialPublicKey).indexOf('publicKey') >= 0
   );
 }

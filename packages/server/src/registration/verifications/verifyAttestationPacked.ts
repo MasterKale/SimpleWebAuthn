@@ -119,7 +119,7 @@ export async function verifyAttestationPacked(
     verified = await verifySignature({
       signature: sig,
       signatureBase,
-      credentialPublicKey,
+      publicKey: credentialPublicKey,
       hashAlgorithm: hashAlg
     });
   }
