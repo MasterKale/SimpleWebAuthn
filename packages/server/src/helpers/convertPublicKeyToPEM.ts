@@ -1,6 +1,6 @@
 import jwkToPem from 'jwk-to-pem';
 
-import { COSEKEYS, COSEKTY, COSECRV, COSEPublicKey } from './convertCOSEtoPKCS';
+import { COSEKEYS, COSEKTY, coseCRV, COSEPublicKey } from './convertCOSEtoPKCS';
 import { isoBase64URL, isoCBOR } from './iso';
 
 export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
@@ -38,7 +38,7 @@ export function convertPublicKeyToPEM(publicKey: Uint8Array): string {
     const ecPEM = jwkToPem({
       kty: 'EC',
       // Specify curve as "P-256" from "p256"
-      crv: COSECRV[crv as number].replace('p', 'P-'),
+      crv: coseCRV[crv as number].replace('p', 'P-'),
       x: isoBase64URL.fromBuffer(x as Uint8Array, 'base64'),
       y: isoBase64URL.fromBuffer(y as Uint8Array, 'base64'),
     });

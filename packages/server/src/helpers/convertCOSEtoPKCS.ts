@@ -41,6 +41,13 @@ export enum COSEKTY {
   RSA = 3,
 }
 
+export enum COSECRV {
+  P256 = 1,
+  P384 = 2,
+  P521 = 3,
+  ED25519 = 6,
+}
+
 export const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
   '-3': 'pss-sha256',
   '-39': 'pss-sha512',
@@ -52,7 +59,7 @@ export const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
 };
 
 // See https://w3c.github.io/webauthn/#sctn-alg-identifier
-export const COSECRV: { [key: number]: string } = {
+export const coseCRV: { [key: number]: string } = {
   // alg: -7
   1: 'p256',
   // alg: -35

@@ -3,7 +3,7 @@ import { ECDSASigValue } from "@peculiar/asn1-ecc";
 import { AsnParser } from '@peculiar/asn1-schema';
 
 import { isoUint8Array, isoBase64URL } from './index';
-import { COSEKEYS, COSEKTY, COSEPublicKey } from '../convertCOSEtoPKCS';
+import { COSECRV, coseCRV, COSEKEYS, COSEKTY, COSEPublicKey } from '../convertCOSEtoPKCS';
 
 /**
  * Fill up the provided bytes array with random bytes equal to its length.
@@ -188,15 +188,15 @@ function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
  * Convert a COSE crv ID into a corresponding string value that WebCrypto APIs expect
  */
 function mapCoseCrvToWebCryptoCrv(crv: number): SubtleCryptoCrv {
-  if (crv === 1) {
+  if (crv === COSECRV.P256) {
     return 'P-256';
   }
 
-  if (crv === 2) {
+  if (crv === COSECRV.P384) {
     return 'P-384';
   }
 
-  if (crv === 3) {
+  if (crv === COSECRV.P521) {
     return 'P-521';
   }
 
