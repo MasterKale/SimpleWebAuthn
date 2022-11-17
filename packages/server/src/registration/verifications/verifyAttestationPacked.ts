@@ -110,7 +110,7 @@ export async function verifyAttestationPacked(
 
     verified = await verifySignature({
       signature: sig,
-      signatureBase,
+      data: signatureBase,
       leafCert: x5c[0],
     });
   } else {
@@ -118,7 +118,7 @@ export async function verifyAttestationPacked(
 
     verified = await verifySignature({
       signature: sig,
-      signatureBase,
+      data: signatureBase,
       publicKey: credentialPublicKey,
       rsaHashAlgorithm: hashAlg
     });

@@ -287,7 +287,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   // In the wise words of Yuriy Ackermann: "Get Martini friend, you are done!"
   return verifySignature({
     signature: sig,
-    signatureBase: certInfo,
+    data: certInfo,
     leafCert: x5c[0],
     rsaHashAlgorithm: hashAlg
   });

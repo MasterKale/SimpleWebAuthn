@@ -60,7 +60,7 @@ export async function verifyAttestationFIDOU2F(
 
   return verifySignature({
     signature: sig,
-    signatureBase,
+    data: signatureBase,
     leafCert: x5c[0],
   });
 }

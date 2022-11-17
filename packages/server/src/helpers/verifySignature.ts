@@ -9,32 +9,27 @@ import { COSECRV, COSEKEYS, COSEKTY, COSEPublicKey } from './convertCOSEtoPKCS';
 import { isoCrypto } from './iso';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
 
-type VerifySignatureOptsLeafCert = {
+type VerifySignatureOptsBase = {
   signature: Uint8Array;
-  signatureBase: Uint8Array;
-  leafCert: Uint8Array;
+  data: Uint8Array;
   rsaHashAlgorithm?: string;
+}
+
+type VerifySignatureOptsLeafCert = VerifySignatureOptsBase & {
+  leafCert: Uint8Array;
 };
 
-type VerifySignatureOptsCredentialPublicKey = {
-  signature: Uint8Array;
-  signatureBase: Uint8Array;
+type VerifySignatureOptsCredentialPublicKey = VerifySignatureOptsBase & {
   publicKey: Uint8Array;
-  rsaHashAlgorithm?: string;
 };
 
 /**
  * Verify an authenticator's signature
- *
- * @param signature attStmt.sig
- * @param signatureBase Bytes that were signed over
- * @param publicKey Authenticator's public key as a PEM certificate
- * @param rsaHashAlgorithm Which algorithm to use to verify RSA signatures
  */
 export async function verifySignature(
   opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
 ): Promise<boolean> {
-  const { signature, signatureBase, rsaHashAlgorithm } = opts;
+  const { signature, data, rsaHashAlgorithm } = opts;
   const _isLeafcertOpts = isLeafCertOpts(opts);
   const _isCredPubKeyOpts = isCredPubKeyOpts(opts);
 
@@ -74,7 +69,7 @@ export async function verifySignature(
         throw new Error('Public key was missing x (OKP)');
       }
 
-      return ed25519Verify(signature, signatureBase, (x as Uint8Array));
+      return ed25519Verify(signature, data, (x as Uint8Array));
     }
 
     // Assume we're handling COSEKTY.EC2 or COSEKTY.RSA key from here on
@@ -196,7 +191,7 @@ export async function verifySignature(
     coseKty: kty,
     coseAlg: alg,
     signature,
-    data: signatureBase,
+    data,
   });
 }
 

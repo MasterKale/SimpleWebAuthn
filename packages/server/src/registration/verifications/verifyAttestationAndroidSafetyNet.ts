@@ -128,7 +128,7 @@ export async function verifyAttestationAndroidSafetyNet(
 
   const verified = await verifySignature({
     signature: signatureBuffer,
-    signatureBase: signatureBaseBuffer,
+    data: signatureBaseBuffer,
     leafCert: leafCertBuffer,
   });
   /**

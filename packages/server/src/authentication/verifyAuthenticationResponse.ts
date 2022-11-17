@@ -205,7 +205,7 @@ export async function verifyAuthenticationResponse(
   const toReturn: VerifiedAuthenticationResponse = {
     verified: await verifySignature({
       signature,
-      signatureBase,
+      data: signatureBase,
       publicKey: authenticator.credentialPublicKey,
     }),
     authenticationInfo: {
