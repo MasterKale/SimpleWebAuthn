@@ -3,7 +3,7 @@ import { ECDSASigValue } from "@peculiar/asn1-ecc";
 import { AsnParser } from '@peculiar/asn1-schema';
 
 import { isoUint8Array, isoBase64URL } from './index';
-import { COSECRV, coseCRV, COSEKEYS, COSEKTY, COSEPublicKey } from '../convertCOSEtoPKCS';
+import { COSECRV, COSEKEYS, COSEKTY, COSEALG, COSEPublicKey } from '../convertCOSEtoPKCS';
 
 /**
  * Fill up the provided bytes array with random bytes equal to its length.
@@ -33,7 +33,7 @@ export function getRandomValues(array: Uint8Array): Uint8Array {
  * - `"SHA-512"`
  */
 export async function digest(data: Uint8Array, algorithm: string): Promise<Uint8Array> {
-  algorithm = normalizeAlgorithm(algorithm);
+  algorithm = normalizeSHAAlgorithm(algorithm);
 
   let hashed: ArrayBuffer
   if (globalThis.crypto) {
@@ -48,20 +48,22 @@ export async function digest(data: Uint8Array, algorithm: string): Promise<Uint8
 }
 
 /**
- * Verify signatures with their public key. Supports EC2 and RSA public key.
+ * Verify signatures with their public key. Supports EC2 and RSA public keys.
  */
-export async function verify(
-  publicKey: COSEPublicKey,
+export async function verify({
+  publicKey,
+  coseKty,
+  coseAlg,
+  signature,
+  data,
+}: {
+  publicKey: CryptoKey,
+  coseKty: COSEKTY,
+  coseAlg: COSEALG,
   signature: Uint8Array,
-  signatureBase: Uint8Array,
-): Promise<boolean> {
-  const kty = publicKey.get(COSEKEYS.kty);
-
-  if (!kty) {
-    throw new Error('Public key was missing kty');
-  }
-
-  if (kty === COSEKTY.EC2) {
+  data: Uint8Array,
+}): Promise<boolean> {
+  if (coseKty === COSEKTY.EC2) {
     // The signature is wrapped in ASN.1 structure, so we need to peel it apart
     const parsedSignature = AsnParser.parse(signature, ECDSASigValue);
     let rBytes = new Uint8Array(parsedSignature.r);
@@ -77,49 +79,78 @@ export async function verify(
 
     const signatureBytes = isoUint8Array.concat([rBytes, sBytes]);
 
-    const alg = publicKey.get(COSEKEYS.alg);
-    const crv = publicKey.get(COSEKEYS.crv);
-    const x = publicKey.get(COSEKEYS.x);
-    const y = publicKey.get(COSEKEYS.y);
-
-    if (!alg) {
-      throw new Error('Public key was missing alg');
-    }
-
-    if (!crv) {
-      throw new Error('Public key was missing crv');
-    }
-
-    if (!x) {
-      throw new Error('Public key was missing x');
-    }
-
-    if (!y) {
-      throw new Error('Public key was missing y');
-    }
-
-    const subtleCrv = mapCoseCrvToWebCryptoCrv(crv as number);
-    const subtleAlg = mapCoseAlgToWebCryptoAlg(alg as number);
-
-    const subtlePublicKey = await importECKey(
-      subtleCrv,
-      x as Uint8Array,
-      y as Uint8Array,
-    );
-
-    return verifyECSignature(subtlePublicKey, signatureBytes, signatureBase, subtleAlg);
+    return verifyECSignature(publicKey, signatureBytes, data, coseAlg);
+  } else if (coseKty === COSEKTY.RSA) {
+    return verifyRSASignature(publicKey, signature, data);
   }
 
-  return false;
+  throw new Error(
+    `Signature verification with public key of kty ${coseKty} is not supported by this method`,
+  );
 }
 
 /**
- * Import a public key from its corresponding
+ * Import an EC2 or RSA public key from its COSE representation
+ *
+ * @param publicKey A `Map` containing COSE-specific public key properties
+ * @param rsaHashAlgorithm A SHA hashing identifier for use when verifying signatures with the
+ * returned RSA public key (e.g. `"sha1"`, `"sha256"`, etc...), if applicable
  */
-function importECKey(crv: SubtleCryptoCrv, x: Uint8Array, y: Uint8Array): Promise<CryptoKey> {
+export async function importKey(publicKey: COSEPublicKey, rsaHashAlgorithm?: string): Promise<CryptoKey> {
+  const kty = publicKey.get(COSEKEYS.kty);
+
+  if (!kty) {
+    throw new Error('Public key was missing kty');
+  }
+
+  if (kty === COSEKTY.EC2) {
+    return importECKey(publicKey);
+  }
+
+  if (kty === COSEKTY.RSA) {
+    return importRSAKey(publicKey, rsaHashAlgorithm);
+  }
+
+  throw new Error(`Unable to import public key of kty ${kty}`);
+}
+
+/**
+ * Import an EC2 public key from its COSE representation
+ */
+async function importECKey(publicKey: COSEPublicKey): Promise<CryptoKey> {
+  const crv = publicKey.get(COSEKEYS.crv);
+  const x = publicKey.get(COSEKEYS.x);
+  const y = publicKey.get(COSEKEYS.y);
+
+  if (!crv) {
+    throw new Error('EC2 public key was missing crv');
+  }
+
+  if (!x) {
+    throw new Error('EC2 public key was missing x');
+  }
+
+  if (!y) {
+    throw new Error('EC2 public key was missing y');
+  }
+
+  /**
+   * Convert a COSE crv ID into a corresponding string value that WebCrypto APIs expect
+   */
+  let _crv: SubtleCryptoCrv;
+  if (crv === COSECRV.P256) {
+    _crv = 'P-256';
+  } else if (crv === COSECRV.P384) {
+    _crv = 'P-384';
+  } else if (crv === COSECRV.P521) {
+    _crv = 'P-521';
+  } else {
+    throw new Error(`Unexpected COSE crv value of ${crv}`);
+  }
+
   const jwk: JsonWebKey = {
     kty: "EC",
-    crv,
+    crv: _crv,
     x: isoBase64URL.fromBuffer(x as Uint8Array),
     y: isoBase64URL.fromBuffer(y as Uint8Array),
     ext: false,
@@ -127,7 +158,7 @@ function importECKey(crv: SubtleCryptoCrv, x: Uint8Array, y: Uint8Array): Promis
 
   const algorithm: EcKeyImportParams = {
     name: 'ECDSA',
-    namedCurve: crv,
+    namedCurve: _crv,
   };
 
   const extractable = false;
@@ -142,17 +173,94 @@ function importECKey(crv: SubtleCryptoCrv, x: Uint8Array, y: Uint8Array): Promis
 }
 
 /**
- *
+ * Verify a signature using an EC2 public key
  */
-function verifyECSignature(
+async function verifyECSignature(
   key: CryptoKey,
   signature: Uint8Array,
   data: Uint8Array,
-  alg: SubtleCryptoAlg = 'SHA-256',
+  alg: COSEALG,
 ): Promise<boolean> {
+  const subtleAlg = mapCoseAlgToWebCryptoAlg(alg);
+
   const algorithm: EcdsaParams = {
     name: 'ECDSA',
-    hash: { name: alg },
+    hash: { name: subtleAlg },
+  };
+  if (globalThis.crypto) {
+    return globalThis.crypto.subtle.verify(algorithm, key, signature, data);
+  } else {
+    return webcrypto.subtle.verify(algorithm, key, signature, data);
+  }
+}
+
+/**
+ * Import an RSA public key from its COSE representation
+ */
+async function importRSAKey(publicKey: COSEPublicKey, hashAlgorithm?: string): Promise<CryptoKey> {
+  const alg = publicKey.get(COSEKEYS.alg);
+  const n = publicKey.get(COSEKEYS.n);
+  const e = publicKey.get(COSEKEYS.e);
+
+  if (!alg) {
+    throw new Error('RSA public key was missing alg');
+  }
+
+  if (!n) {
+    throw new Error('RSA public key was missing n');
+  }
+
+  if (!e) {
+    throw new Error('RSA public key was missing e');
+  }
+
+  const jwk: JsonWebKey = {
+    kty: 'RSA',
+    alg: '',
+    n: isoBase64URL.fromBuffer(n as Uint8Array),
+    e: isoBase64URL.fromBuffer(e as Uint8Array),
+    ext: false,
+  };
+
+  const keyAlgorithm = {
+    name: 'RSASSA-PKCS1-v1_5',
+    // This is actually the digest hash that'll get used by `.verify()`
+    hash: { name: mapCoseAlgToWebCryptoAlg(alg as number) },
+  };
+
+  if (hashAlgorithm) {
+    const normalized = normalizeSHAAlgorithm(hashAlgorithm);
+    keyAlgorithm.hash.name = normalized;
+  }
+
+  if (keyAlgorithm.hash.name === 'SHA-256') {
+    jwk.alg = 'RS256';
+  } else if (keyAlgorithm.hash.name === 'SHA-384') {
+    jwk.alg = 'RS384';
+  } else if (keyAlgorithm.hash.name === 'SHA-512') {
+    jwk.alg = 'RS512';
+  } else if (keyAlgorithm.hash.name === 'SHA-1') {
+    jwk.alg = 'RS1';
+  }
+
+  const extractable = false;
+
+  const keyUsages: KeyUsage[] = ["verify"];
+
+  if (globalThis.crypto) {
+    return globalThis.crypto.subtle.importKey('jwk', jwk, keyAlgorithm, extractable, keyUsages);
+  } else {
+    return webcrypto.subtle.importKey('jwk', jwk, keyAlgorithm, extractable, keyUsages);
+  }
+}
+
+async function verifyRSASignature(
+  key: CryptoKey,
+  signature: Uint8Array,
+  data: Uint8Array,
+): Promise<boolean> {
+  const algorithm = {
+    name: 'RSASSA-PKCS1-v1_5',
   };
   if (globalThis.crypto) {
     return globalThis.crypto.subtle.verify(algorithm, key, signature, data);
@@ -165,12 +273,12 @@ function verifyECSignature(
  * Convert algorithms like "SHA1", "sha256", etc... into values like "SHA-1", "SHA-256", etc...
  * that `.digest()` will accept
  */
-function normalizeAlgorithm(algorithm: string): SubtleCryptoAlg {
+function normalizeSHAAlgorithm(algorithm: string): SubtleCryptoAlg {
   if (/sha\d{1,3}/i.test(algorithm)) {
-    algorithm = algorithm.toUpperCase().replace('SHA', 'SHA-');
+    algorithm = algorithm.replace(/sha/i, 'SHA-');
   }
 
-  return algorithm as SubtleCryptoAlg;
+  return algorithm.toUpperCase() as SubtleCryptoAlg;
 }
 
 /**
@@ -184,30 +292,12 @@ function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
   return (bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0);
 }
 
-/**
- * Convert a COSE crv ID into a corresponding string value that WebCrypto APIs expect
- */
-function mapCoseCrvToWebCryptoCrv(crv: number): SubtleCryptoCrv {
-  if (crv === COSECRV.P256) {
-    return 'P-256';
-  }
-
-  if (crv === COSECRV.P384) {
-    return 'P-384';
-  }
-
-  if (crv === COSECRV.P521) {
-    return 'P-521';
-  }
-
-  throw new Error(`Unexpected COSE crv value of ${crv}`);
-}
 type SubtleCryptoCrv = "P-256" | "P-384" | "P-521";
 
 /**
  * Convert a COSE alg ID into a corresponding string value that WebCrypto APIs expect
  */
-function mapCoseAlgToWebCryptoAlg(alg: number): SubtleCryptoAlg {
+function mapCoseAlgToWebCryptoAlg(alg: COSEALG): SubtleCryptoAlg {
   if ([-65535].indexOf(alg) >= 0) {
     return 'SHA-1';
   } else if ([-7, -37, -257].indexOf(alg) >= 0) {

@@ -48,6 +48,8 @@ export enum COSECRV {
   ED25519 = 6,
 }
 
+export type COSEALG = number;
+
 export const COSERSASCHEME: { [key: string]: SigningSchemeHash } = {
   '-3': 'pss-sha256',
   '-39': 'pss-sha512',
