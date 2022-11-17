@@ -13,14 +13,14 @@ type VerifySignatureOptsLeafCert = {
   signature: Uint8Array;
   signatureBase: Uint8Array;
   leafCert: Uint8Array;
-  hashAlgorithm?: string;
+  rsaHashAlgorithm?: string;
 };
 
 type VerifySignatureOptsCredentialPublicKey = {
   signature: Uint8Array;
   signatureBase: Uint8Array;
   publicKey: Uint8Array;
-  hashAlgorithm?: string;
+  rsaHashAlgorithm?: string;
 };
 
 /**

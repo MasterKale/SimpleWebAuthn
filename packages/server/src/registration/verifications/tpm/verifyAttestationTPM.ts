@@ -289,7 +289,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
     signature: sig,
     signatureBase: certInfo,
     leafCert: x5c[0],
-    hashAlgorithm: hashAlg
+    rsaHashAlgorithm: hashAlg
   });
 }
 

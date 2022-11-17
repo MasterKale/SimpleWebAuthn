@@ -120,7 +120,7 @@ export async function verifyAttestationPacked(
       signature: sig,
       signatureBase,
       publicKey: credentialPublicKey,
-      hashAlgorithm: hashAlg
+      rsaHashAlgorithm: hashAlg
     });
   }
 

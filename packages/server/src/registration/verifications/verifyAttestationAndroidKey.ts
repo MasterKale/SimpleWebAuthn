@@ -108,6 +108,6 @@ export async function verifyAttestationAndroidKey(
     signature: sig,
     signatureBase,
     leafCert: x5c[0],
-    hashAlgorithm: hashAlg
+    rsaHashAlgorithm: hashAlg
   });
 }
