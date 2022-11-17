@@ -3,7 +3,7 @@ import { ECDSASigValue } from "@peculiar/asn1-ecc";
 import { AsnParser } from '@peculiar/asn1-schema';
 
 import { isoUint8Array, isoBase64URL } from './index';
-import { COSECRV, COSEKEYS, COSEKTY, COSEALG, COSEPublicKey } from '../convertCOSEtoPKCS';
+import { COSECRV, COSEKEYS, COSEKTY, COSEALG, COSEPublicKeyEC2, COSEPublicKeyRSA, isCOSEAlg, isCOSEPublicKeyEC2, isCOSEPublicKeyRSA } from '../convertCOSEtoPKCS';
 
 /**
  * Fill up the provided bytes array with random bytes equal to its length.
@@ -96,18 +96,18 @@ export async function verify({
  * @param rsaHashAlgorithm A SHA hashing identifier for use when verifying signatures with the
  * returned RSA public key (e.g. `"sha1"`, `"sha256"`, etc...), if applicable
  */
-export async function importKey(publicKey: COSEPublicKey, rsaHashAlgorithm?: string): Promise<CryptoKey> {
+export async function importKey(publicKey: COSEPublicKeyEC2 | COSEPublicKeyRSA, rsaHashAlgorithm?: string): Promise<CryptoKey> {
   const kty = publicKey.get(COSEKEYS.kty);
 
   if (!kty) {
     throw new Error('Public key was missing kty');
   }
 
-  if (kty === COSEKTY.EC2) {
+  if (isCOSEPublicKeyEC2(publicKey)) {
     return importECKey(publicKey);
   }
 
-  if (kty === COSEKTY.RSA) {
+  if (isCOSEPublicKeyRSA(publicKey)) {
     return importRSAKey(publicKey, rsaHashAlgorithm);
   }
 
@@ -117,7 +117,7 @@ export async function importKey(publicKey: COSEPublicKey, rsaHashAlgorithm?: str
 /**
  * Import an EC2 public key from its COSE representation
  */
-async function importECKey(publicKey: COSEPublicKey): Promise<CryptoKey> {
+async function importECKey(publicKey: COSEPublicKeyEC2): Promise<CryptoKey> {
   const crv = publicKey.get(COSEKEYS.crv);
   const x = publicKey.get(COSEKEYS.x);
   const y = publicKey.get(COSEKEYS.y);
@@ -151,8 +151,8 @@ async function importECKey(publicKey: COSEPublicKey): Promise<CryptoKey> {
   const jwk: JsonWebKey = {
     kty: "EC",
     crv: _crv,
-    x: isoBase64URL.fromBuffer(x as Uint8Array),
-    y: isoBase64URL.fromBuffer(y as Uint8Array),
+    x: isoBase64URL.fromBuffer(x),
+    y: isoBase64URL.fromBuffer(y),
     ext: false,
   };
 
@@ -197,35 +197,39 @@ async function verifyECSignature(
 /**
  * Import an RSA public key from its COSE representation
  */
-async function importRSAKey(publicKey: COSEPublicKey, hashAlgorithm?: string): Promise<CryptoKey> {
+async function importRSAKey(publicKey: COSEPublicKeyRSA, hashAlgorithm?: string): Promise<CryptoKey> {
   const alg = publicKey.get(COSEKEYS.alg);
   const n = publicKey.get(COSEKEYS.n);
   const e = publicKey.get(COSEKEYS.e);
 
   if (!alg) {
-    throw new Error('RSA public key was missing alg');
+    throw new Error('Public key was missing alg (RSA)');
+  }
+
+  if (!isCOSEAlg(alg)) {
+    throw new Error(`Public key had invalid alg ${alg} (RSA)`);
   }
 
   if (!n) {
-    throw new Error('RSA public key was missing n');
+    throw new Error('Public key was missing n (RSA)');
   }
 
   if (!e) {
-    throw new Error('RSA public key was missing e');
+    throw new Error('Public key was missing e (RSA)');
   }
 
   const jwk: JsonWebKey = {
     kty: 'RSA',
     alg: '',
-    n: isoBase64URL.fromBuffer(n as Uint8Array),
-    e: isoBase64URL.fromBuffer(e as Uint8Array),
+    n: isoBase64URL.fromBuffer(n),
+    e: isoBase64URL.fromBuffer(e),
     ext: false,
   };
 
   const keyAlgorithm = {
     name: 'RSASSA-PKCS1-v1_5',
     // This is actually the digest hash that'll get used by `.verify()`
-    hash: { name: mapCoseAlgToWebCryptoAlg(alg as number) },
+    hash: { name: mapCoseAlgToWebCryptoAlg(alg) },
   };
 
   if (hashAlgorithm) {

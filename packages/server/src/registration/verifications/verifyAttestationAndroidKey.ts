@@ -7,7 +7,7 @@ import type { AttestationFormatVerifierOpts } from '../verifyRegistrationRespons
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
-import { COSEALGHASH, convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
+import { coseAlgSHAHashMap, convertCOSEtoPKCS, isCOSEAlg } from '../../helpers/convertCOSEtoPKCS';
 import { isoUint8Array } from '../../helpers/iso';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
@@ -34,6 +34,10 @@ export async function verifyAttestationAndroidKey(
 
   if (!alg) {
     throw new Error(`Attestation statement did not contain alg (AndroidKey)`);
+  }
+
+  if (!isCOSEAlg(alg)) {
+    throw new Error(`Attestation statement contained invalid alg ${alg} (AndroidKey)`);
   }
 
   // Check that credentialPublicKey matches the public key in the attestation certificate
@@ -102,7 +106,7 @@ export async function verifyAttestationAndroidKey(
   }
 
   const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
-  const hashAlg = COSEALGHASH[alg as number];
+  const hashAlg = coseAlgSHAHashMap[alg];
 
   return verifySignature({
     signature: sig,

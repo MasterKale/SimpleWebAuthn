@@ -1,6 +1,6 @@
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
+import { coseAlgSHAHashMap, isCOSEAlg } from '../../helpers/convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
@@ -26,8 +26,12 @@ export async function verifyAttestationPacked(
     throw new Error('No attestation signature provided in attestation statement (Packed)');
   }
 
-  if (typeof alg !== 'number') {
-    throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
+  if (!alg) {
+    throw new Error('Attestation statement did not contain alg (Packed)');
+  }
+
+  if (!isCOSEAlg(alg)) {
+    throw new Error(`Attestation statement contained invalid alg ${alg} (Packed)`);
   }
 
   const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
@@ -114,7 +118,7 @@ export async function verifyAttestationPacked(
       leafCert: x5c[0],
     });
   } else {
-    const hashAlg: string = COSEALGHASH[alg as number];
+    const hashAlg: string = coseAlgSHAHashMap[alg];
 
     verified = await verifySignature({
       signature: sig,

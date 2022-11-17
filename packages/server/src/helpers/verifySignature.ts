@@ -5,7 +5,7 @@ import { Certificate } from '@peculiar/asn1-x509';
 import { ECParameters, id_ecPublicKey, id_secp256r1 } from '@peculiar/asn1-ecc';
 import { RSAPublicKey } from '@peculiar/asn1-rsa';
 
-import { COSECRV, COSEKEYS, COSEKTY, COSEPublicKey } from './convertCOSEtoPKCS';
+import { COSEALG, COSECRV, COSEKEYS, COSEKTY, COSEPublicKey, COSEPublicKeyEC2, COSEPublicKeyRSA, isCOSEAlg, isCOSEPublicKeyOKP } from './convertCOSEtoPKCS';
 import { isoCrypto } from './iso';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
 
@@ -43,7 +43,7 @@ export async function verifySignature(
 
   let subtlePublicKey: CryptoKey;
   let kty: COSEKTY;
-  let alg: number;
+  let alg: COSEALG;
 
   if (_isCredPubKeyOpts) {
     const { publicKey } = opts;
@@ -61,21 +61,25 @@ export async function verifySignature(
       throw new Error('Public key was missing alg');
     }
 
+    if (!isCOSEAlg(_alg)) {
+      throw new Error(`Public key contained invalid alg ${_alg}`);
+    }
+
     // Verify Ed25519 slightly differently
-    if (_kty === COSEKTY.OKP) {
+    if (isCOSEPublicKeyOKP(cosePublicKey)) {
       const x = cosePublicKey.get(COSEKEYS.x);
 
       if (!x) {
         throw new Error('Public key was missing x (OKP)');
       }
 
-      return ed25519Verify(signature, data, (x as Uint8Array));
+      return ed25519Verify(signature, data, x);
     }
 
     // Assume we're handling COSEKTY.EC2 or COSEKTY.RSA key from here on
-    subtlePublicKey = await isoCrypto.importKey(cosePublicKey);
+    subtlePublicKey = await isoCrypto.importKey(cosePublicKey as COSEPublicKeyEC2 | COSEPublicKeyRSA);
     kty = _kty as COSEKTY;
-    alg = _alg as number;
+    alg = _alg;
   } else if (_isLeafcertOpts) {
     /**
      * Time to extract the public key from an X.509 leaf certificate
@@ -130,7 +134,7 @@ export async function verifySignature(
         throw new Error('TODO: Figure out how to handle public keys in "compressed form"');
       }
 
-      const coseEC2PubKey: COSEPublicKey = new Map();
+      const coseEC2PubKey: COSEPublicKeyEC2 = new Map();
       coseEC2PubKey.set(COSEKEYS.kty, COSEKTY.EC2);
       coseEC2PubKey.set(COSEKEYS.crv, crv);
       coseEC2PubKey.set(COSEKEYS.x, x);
@@ -145,7 +149,7 @@ export async function verifySignature(
       kty = COSEKTY.RSA;
       const rsaPublicKey = AsnParser.parse(subjectPublicKeyInfo.subjectPublicKey, RSAPublicKey);
 
-      let _alg = -999;
+      let _alg: COSEALG;
       if (signatureAlgorithm === '1.2.840.113549.1.1.11') {
         _alg = -257; // RS256
       } else if (signatureAlgorithm === '1.2.840.113549.1.1.12') {
@@ -158,7 +162,7 @@ export async function verifySignature(
         );
       }
 
-      const coseRSAPubKey: COSEPublicKey = new Map();
+      const coseRSAPubKey: COSEPublicKeyRSA = new Map();
       coseRSAPubKey.set(COSEKEYS.kty, COSEKTY.RSA);
       coseRSAPubKey.set(COSEKEYS.alg, _alg);
       coseRSAPubKey.set(COSEKEYS.n, new Uint8Array(rsaPublicKey.modulus));
