@@ -142,10 +142,7 @@ export type Base64URLString = string;
  * Properties marked optional are not supported in all browsers.
  */
 export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
-  getTransports?: () => AuthenticatorTransportFuture[];
-  getAuthenticatorData?: () => ArrayBuffer;
-  getPublicKey?: () => ArrayBuffer;
-  getPublicKeyAlgorithm?: () => COSEAlgorithmIdentifier[];
+  getTransports: () => AuthenticatorTransportFuture[];
 }
 
 /**
@@ -171,8 +168,6 @@ export interface PublicKeyCredentialDescriptorFuture
 export interface PublicKeyCredentialFuture extends PublicKeyCredential {
   // See https://github.com/w3c/webauthn/issues/1745
   isConditionalMediationAvailable?(): Promise<boolean>;
-  // See https://w3c.github.io/webauthn/#dom-publickeycredential-authenticatorattachment
-  authenticatorAttachment?: AuthenticatorAttachment;
 }
 
 /**

@@ -198,6 +198,7 @@ test.skip('should verify TPM assertion', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedChallenge,
     expectedOrigin: assertionOrigin,
@@ -276,6 +277,7 @@ test('should pass verification if custom challenge verifier returns true', async
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
@@ -327,6 +329,7 @@ test('should return authenticator extension output', async () => {
       rawId: 'E_Pko4wN1BXE23S0ftN3eQ',
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
     expectedRPID: 'try-webauthn.appspot.com',
@@ -389,6 +392,7 @@ const assertionResponse: AuthenticationCredentialJSON = {
   },
   clientExtensionResults: {},
   type: 'public-key',
+  authenticatorAttachment: '',
 };
 const assertionChallenge = isoBase64URL.fromString('totallyUniqueValueEveryTime');
 const assertionOrigin = 'https://dev.dontneeda.pw';
@@ -418,6 +422,7 @@ const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
   },
   type: 'public-key',
   clientExtensionResults: {},
+  authenticatorAttachment: '',
 };
 const assertionFirstTimeUsedChallenge = isoBase64URL.fromString('totallyUniqueValueEveryAssertion');
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
