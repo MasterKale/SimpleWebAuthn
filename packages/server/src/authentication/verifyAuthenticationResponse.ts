@@ -206,7 +206,7 @@ export async function verifyAuthenticationResponse(
     verified: await verifySignature({
       signature,
       data: signatureBase,
-      publicKey: authenticator.credentialPublicKey,
+      credentialPublicKey: authenticator.credentialPublicKey,
     }),
     authenticationInfo: {
       newCounter: counter,

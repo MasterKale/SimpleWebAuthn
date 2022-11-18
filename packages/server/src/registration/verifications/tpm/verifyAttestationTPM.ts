@@ -304,7 +304,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   return verifySignature({
     signature: sig,
     data: certInfo,
-    leafCert: x5c[0],
+    leafCertificate: x5c[0],
     rsaHashAlgorithm: hashAlg
   });
 }

@@ -115,7 +115,7 @@ export async function verifyAttestationPacked(
     verified = await verifySignature({
       signature: sig,
       data: signatureBase,
-      leafCert: x5c[0],
+      leafCertificate: x5c[0],
     });
   } else {
     const hashAlg: string = coseAlgSHAHashMap[alg];
@@ -123,7 +123,7 @@ export async function verifyAttestationPacked(
     verified = await verifySignature({
       signature: sig,
       data: signatureBase,
-      publicKey: credentialPublicKey,
+      credentialPublicKey,
       rsaHashAlgorithm: hashAlg
     });
   }

@@ -111,7 +111,7 @@ export async function verifyAttestationAndroidKey(
   return verifySignature({
     signature: sig,
     data: signatureBase,
-    leafCert: x5c[0],
+    leafCertificate: x5c[0],
     rsaHashAlgorithm: hashAlg
   });
 }

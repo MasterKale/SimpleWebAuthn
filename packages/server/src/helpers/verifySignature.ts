@@ -9,35 +9,23 @@ import { COSEALG, COSECRV, COSEKEYS, COSEKTY, COSEPublicKey, COSEPublicKeyEC2, C
 import { isoCrypto } from './iso';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
 
-type VerifySignatureOptsBase = {
-  signature: Uint8Array;
-  data: Uint8Array;
-  rsaHashAlgorithm?: string;
-}
-
-type VerifySignatureOptsLeafCert = VerifySignatureOptsBase & {
-  leafCert: Uint8Array;
-};
-
-type VerifySignatureOptsCredentialPublicKey = VerifySignatureOptsBase & {
-  publicKey: Uint8Array;
-};
-
 /**
  * Verify an authenticator's signature
  */
-export async function verifySignature(
-  opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
-): Promise<boolean> {
-  const { signature, data, rsaHashAlgorithm } = opts;
-  const _isLeafcertOpts = isLeafCertOpts(opts);
-  const _isCredPubKeyOpts = isCredPubKeyOpts(opts);
+export async function verifySignature(opts: {
+  signature: Uint8Array;
+  data: Uint8Array;
+  credentialPublicKey?: Uint8Array;
+  leafCertificate?: Uint8Array;
+  rsaHashAlgorithm?: string;
+}): Promise<boolean> {
+  const { signature, data, credentialPublicKey, leafCertificate, rsaHashAlgorithm } = opts;
 
-  if (!_isLeafcertOpts && !_isCredPubKeyOpts) {
+  if (!leafCertificate && !credentialPublicKey) {
     throw new Error('Must declare either "leafCert" or "credentialPublicKey"');
   }
 
-  if (_isLeafcertOpts && _isCredPubKeyOpts) {
+  if (leafCertificate && credentialPublicKey) {
     throw new Error('Must not declare both "leafCert" and "credentialPublicKey"');
   }
 
@@ -45,10 +33,8 @@ export async function verifySignature(
   let kty: COSEKTY;
   let alg: COSEALG;
 
-  if (_isCredPubKeyOpts) {
-    const { publicKey } = opts;
-
-    const cosePublicKey = decodeCredentialPublicKey(publicKey);
+  if (credentialPublicKey) {
+    const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
     const _kty = cosePublicKey.get(COSEKEYS.kty);
     const _alg = cosePublicKey.get(COSEKEYS.alg);
@@ -80,13 +66,11 @@ export async function verifySignature(
     subtlePublicKey = await isoCrypto.importKey(cosePublicKey as COSEPublicKeyEC2 | COSEPublicKeyRSA);
     kty = _kty as COSEKTY;
     alg = _alg;
-  } else if (_isLeafcertOpts) {
+  } else if (leafCertificate) {
     /**
      * Time to extract the public key from an X.509 leaf certificate
      */
-    const { leafCert } = opts;
-
-    const x509 = AsnParser.parse(leafCert, Certificate);
+    const x509 = AsnParser.parse(leafCertificate, Certificate);
 
     const { tbsCertificate } = x509;
     const {
@@ -197,18 +181,4 @@ export async function verifySignature(
     signature,
     data,
   });
-}
-
-function isLeafCertOpts(
-  opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
-): opts is VerifySignatureOptsLeafCert {
-  return Object.keys(opts as VerifySignatureOptsLeafCert).indexOf('leafCert') >= 0;
-}
-
-function isCredPubKeyOpts(
-  opts: VerifySignatureOptsLeafCert | VerifySignatureOptsCredentialPublicKey,
-): opts is VerifySignatureOptsCredentialPublicKey {
-  return (
-    Object.keys(opts as VerifySignatureOptsCredentialPublicKey).indexOf('publicKey') >= 0
-  );
 }
