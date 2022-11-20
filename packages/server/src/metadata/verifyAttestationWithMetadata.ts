@@ -4,7 +4,14 @@ import type { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../helpers/validateCertificatePath';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEALG, COSECRV, COSEKEYS, COSEKTY, COSEPublicKeyEC2, isCOSEPublicKeyEC2 } from '../helpers/cose';
+import {
+  COSEALG,
+  COSECRV,
+  COSEKEYS,
+  COSEKTY,
+  COSEPublicKeyEC2,
+  isCOSEPublicKeyEC2,
+} from '../helpers/cose';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as
@@ -21,11 +28,7 @@ export async function verifyAttestationWithMetadata({
   x5c: Uint8Array[] | Base64URLString[];
   attestationStatementAlg?: number;
 }): Promise<boolean> {
-  const {
-    authenticationAlgorithms,
-    authenticatorGetInfo,
-    attestationRootCertificates,
-  } = statement;
+  const { authenticationAlgorithms, authenticatorGetInfo, attestationRootCertificates } = statement;
 
   // Make sure the alg in the attestation statement matches one of the ones specified in metadata
   const keypairCOSEAlgs: Set<COSEInfo> = new Set();
@@ -104,8 +107,9 @@ export async function verifyAttestationWithMetadata({
      * ]
      * ```
      */
-    const debugMDSAlgs = authenticationAlgorithms
-      .map((algSign) => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`);
+    const debugMDSAlgs = authenticationAlgorithms.map(
+      algSign => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`,
+    );
     const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, '');
 
     /**
@@ -140,10 +144,7 @@ export async function verifyAttestationWithMetadata({
    * certificate chain validation.
    */
   let authenticatorIsSelfReferencing = false;
-  if (
-    authenticatorCerts.length === 1 &&
-    statementRootCerts.indexOf(authenticatorCerts[0]) >= 0
-  ) {
+  if (authenticatorCerts.length === 1 && statementRootCerts.indexOf(authenticatorCerts[0]) >= 0) {
     authenticatorIsSelfReferencing = true;
   }
 

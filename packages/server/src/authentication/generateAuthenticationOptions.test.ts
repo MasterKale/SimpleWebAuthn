@@ -5,10 +5,9 @@ import { isoBase64URL } from '../helpers/iso';
 import { generateAuthenticationOptions } from './generateAuthenticationOptions';
 
 const challengeString = 'dG90YWxseXJhbmRvbXZhbHVl';
-const challengeBuffer = isoBase64URL.toBuffer(challengeString)
+const challengeBuffer = isoBase64URL.toBuffer(challengeString);
 
 test('should generate credential request options suitable for sending via JSON', () => {
-
   const options = generateAuthenticationOptions({
     allowCredentials: [
       {

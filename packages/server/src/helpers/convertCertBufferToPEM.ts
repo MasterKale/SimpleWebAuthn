@@ -15,7 +15,7 @@ export function convertCertBufferToPEM(certBuffer: Uint8Array | Base64URLString)
     if (isoBase64URL.isBase64url(certBuffer)) {
       b64cert = isoBase64URL.toBase64(certBuffer);
     } else if (isoBase64URL.isBase64(certBuffer)) {
-      b64cert = certBuffer
+      b64cert = certBuffer;
     } else {
       throw new Error('Certificate is not a valid base64 or base64url string');
     }

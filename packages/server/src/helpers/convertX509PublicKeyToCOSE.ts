@@ -3,7 +3,15 @@ import { Certificate } from '@peculiar/asn1-x509';
 import { ECParameters, id_ecPublicKey, id_secp256r1 } from '@peculiar/asn1-ecc';
 import { RSAPublicKey } from '@peculiar/asn1-rsa';
 
-import { COSEPublicKey, COSEKTY, COSECRV, COSEKEYS, COSEPublicKeyEC2, COSEPublicKeyRSA, COSEALG } from "./cose";
+import {
+  COSEPublicKey,
+  COSEKTY,
+  COSECRV,
+  COSEKEYS,
+  COSEPublicKeyEC2,
+  COSEPublicKeyRSA,
+  COSEALG,
+} from './cose';
 
 export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();
@@ -14,10 +22,7 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
   const x509 = AsnParser.parse(leafCertificate, Certificate);
 
   const { tbsCertificate } = x509;
-  const {
-    subjectPublicKeyInfo,
-    signature: _tbsSignature,
-  } = tbsCertificate;
+  const { subjectPublicKeyInfo, signature: _tbsSignature } = tbsCertificate;
 
   const signatureAlgorithm = _tbsSignature.algorithm;
   const publicKeyAlgorithmID = subjectPublicKeyInfo.algorithm.algorithm;
@@ -30,7 +35,10 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
       throw new Error('Leaf cert public key missing parameters (EC2)');
     }
 
-    const ecParameters = AsnParser.parse(new Uint8Array(subjectPublicKeyInfo.algorithm.parameters), ECParameters);
+    const ecParameters = AsnParser.parse(
+      new Uint8Array(subjectPublicKeyInfo.algorithm.parameters),
+      ECParameters,
+    );
 
     let crv = -999;
     if (ecParameters.namedCurve === id_secp256r1) {
@@ -41,7 +49,7 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
       );
     }
 
-    const subjectPublicKey = new Uint8Array(subjectPublicKeyInfo.subjectPublicKey)
+    const subjectPublicKey = new Uint8Array(subjectPublicKeyInfo.subjectPublicKey);
 
     let x: Uint8Array;
     let y: Uint8Array;
@@ -49,7 +57,7 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
       // Public key is in "uncompressed form", so we can split the remaining bytes in half
       let pointer = 1;
       const halfLength = (subjectPublicKey.length - 1) / 2;
-      x = subjectPublicKey.slice(pointer, pointer += halfLength);
+      x = subjectPublicKey.slice(pointer, (pointer += halfLength));
       y = subjectPublicKey.slice(pointer);
     } else {
       throw new Error('TODO: Figure out how to handle public keys in "compressed form"');

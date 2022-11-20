@@ -4,19 +4,24 @@ import { isoUint8Array } from './iso';
 /**
  * Go through each expected RP ID and try to find one that matches. Raises an Error if no
  */
-export async function matchExpectedRPID(rpIDHash: Uint8Array, expectedRPIDs: string[]): Promise<void> {
+export async function matchExpectedRPID(
+  rpIDHash: Uint8Array,
+  expectedRPIDs: string[],
+): Promise<void> {
   try {
-    await Promise.any(expectedRPIDs.map((expected) => {
-      return new Promise((resolve, reject) => {
-        toHash(isoUint8Array.fromASCIIString(expected)).then((expectedRPIDHash) => {
-          if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
-            resolve(true);
-          } else {
-            reject();
-          }
-        })
-      });
-    }));
+    await Promise.any(
+      expectedRPIDs.map(expected => {
+        return new Promise((resolve, reject) => {
+          toHash(isoUint8Array.fromASCIIString(expected)).then(expectedRPIDHash => {
+            if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
+              resolve(true);
+            } else {
+              reject();
+            }
+          });
+        });
+      }),
+    );
   } catch (err) {
     const _err = err as Error;
 

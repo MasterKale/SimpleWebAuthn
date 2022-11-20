@@ -18,7 +18,7 @@ import { COSEKEYS } from '../helpers/cose';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import { isoBase64URL }  from '../helpers/iso';
+import { isoBase64URL } from '../helpers/iso';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';

@@ -237,9 +237,9 @@ test('should throw if an unexpected attestation format is specified', async () =
 });
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
-  const authData = esmDecodeAttestationObject.decodeAttestationObject(
-    isoBase64URL.toBuffer(attestationNone.response.attestationObject),
-  ).get('authData');
+  const authData = esmDecodeAttestationObject
+    .decodeAttestationObject(isoBase64URL.toBuffer(attestationNone.response.attestationObject))
+    .get('authData');
   const actualAuthData = esmParseAuthenticatorData.parseAuthenticatorData(authData);
 
   mockParseAuthData.mockReturnValue({

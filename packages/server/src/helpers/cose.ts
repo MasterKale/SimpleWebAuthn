@@ -8,7 +8,7 @@
  * These types are an unorthodox way of saying "these Maps should involve these discrete lists of
  * keys", but it works.
  */
- export type COSEPublicKey = {
+export type COSEPublicKey = {
   // Getters
   get(key: COSEKEYS.kty): COSEKTY | undefined;
   get(key: COSEKEYS.alg): COSEALG | undefined;
@@ -46,17 +46,23 @@ export type COSEPublicKeyRSA = COSEPublicKey & {
   set(key: COSEKEYS.e, value: Uint8Array): void;
 };
 
-export function isCOSEPublicKeyOKP(cosePublicKey: COSEPublicKey): cosePublicKey is COSEPublicKeyOKP {
+export function isCOSEPublicKeyOKP(
+  cosePublicKey: COSEPublicKey,
+): cosePublicKey is COSEPublicKeyOKP {
   const kty = cosePublicKey.get(COSEKEYS.kty);
   return isCOSEKty(kty) && kty === COSEKTY.OKP;
 }
 
-export function isCOSEPublicKeyEC2(cosePublicKey: COSEPublicKey): cosePublicKey is COSEPublicKeyEC2 {
+export function isCOSEPublicKeyEC2(
+  cosePublicKey: COSEPublicKey,
+): cosePublicKey is COSEPublicKeyEC2 {
   const kty = cosePublicKey.get(COSEKEYS.kty);
   return isCOSEKty(kty) && kty === COSEKTY.EC2;
 }
 
-export function isCOSEPublicKeyRSA(cosePublicKey: COSEPublicKey): cosePublicKey is COSEPublicKeyRSA {
+export function isCOSEPublicKeyRSA(
+  cosePublicKey: COSEPublicKey,
+): cosePublicKey is COSEPublicKeyRSA {
   const kty = cosePublicKey.get(COSEKEYS.kty);
   return isCOSEKty(kty) && kty === COSEKTY.RSA;
 }

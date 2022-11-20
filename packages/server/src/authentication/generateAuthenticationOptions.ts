@@ -5,7 +5,7 @@ import type {
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 
-import { isoBase64URL, isoUint8Array } from '../helpers/iso'
+import { isoBase64URL, isoUint8Array } from '../helpers/iso';
 import { generateChallenge } from '../helpers/generateChallenge';
 
 export type GenerateAuthenticationOptionsOpts = {
@@ -45,10 +45,10 @@ export function generateAuthenticationOptions(
   /**
    * Preserve ability to specify `string` values for challenges
    */
-   let _challenge = challenge;
-   if (typeof _challenge === 'string') {
-     _challenge = isoUint8Array.fromUTF8String(_challenge);
-   }
+  let _challenge = challenge;
+  if (typeof _challenge === 'string') {
+    _challenge = isoUint8Array.fromUTF8String(_challenge);
+  }
 
   return {
     challenge: isoBase64URL.fromBuffer(_challenge),
