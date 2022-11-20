@@ -36,4 +36,6 @@ export type AttestationStatement = {
   get(key: 'ver'): string | undefined;
   get(key: 'certInfo'): Uint8Array | undefined;
   get(key: 'pubArea'): Uint8Array | undefined;
+  // `Map` properties
+  get size(): number;
 };

@@ -219,7 +219,7 @@ export async function verifyRegistrationResponse(
   } else if (fmt === 'apple') {
     verified = await verifyAttestationApple(verifierOpts);
   } else if (fmt === 'none') {
-    if (Object.keys(attStmt).length > 0) {
+    if (attStmt.size > 0) {
       throw new Error('None attestation had unexpected attestation statement');
     }
     // This is the weaker of the attestations, so there's nothing else to really check
