@@ -1,5 +1,12 @@
 /**
- * Fundamental values that are needed to discern the more specific COSE public key types below
+ * Fundamental values that are needed to discern the more specific COSE public key types below.
+ *
+ * The use of `Maps` here is due to CBOR encoding being used with public keys, and the CBOR "Map"
+ * type is being decoded to JavaScript's `Map` type instead of, say, a basic Object as us JS
+ * developers might prefer.
+ *
+ * These types are an unorthodox way of saying "these Maps should involve these discrete lists of
+ * keys", but it works.
  */
  export type COSEPublicKey = {
   // Getters

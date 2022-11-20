@@ -24,6 +24,10 @@ export type AttestationObject = {
   get(key: 'authData'): Uint8Array;
 };
 
+/**
+ * `AttestationStatement` will be an instance of `Map`, but these keys help make finite the list of
+ * possible values within it.
+ */
 export type AttestationStatement = {
   get(key: 'sig'): Uint8Array | undefined;
   get(key: 'x5c'): Uint8Array[] | undefined;
