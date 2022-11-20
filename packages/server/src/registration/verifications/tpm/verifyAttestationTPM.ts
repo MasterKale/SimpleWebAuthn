@@ -175,7 +175,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
 
   // Hash attToBeSigned using the algorithm specified in attStmt.alg to create attToBeSignedHash
   const hashAlg: string = coseAlgSHAHashMap[alg];
-  const attToBeSignedHash = await toHash(attToBeSigned, hashAlg);
+  const attToBeSignedHash = await toHash(attToBeSigned, alg);
 
   // Check that certInfo.extraData is equals to attToBeSignedHash.
   if (!isoUint8Array.areEqual(extraData, attToBeSignedHash)) {
