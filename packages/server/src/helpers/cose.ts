@@ -12,8 +12,10 @@
 
 export type COSEPublicKeyOKP = COSEPublicKey & {
   // Getters
+  get(key: COSEKEYS.crv): number | undefined;
   get(key: COSEKEYS.x): Uint8Array | undefined;
   // Setters
+  set(key: COSEKEYS.crv, value: number): void;
   set(key: COSEKEYS.x, value: Uint8Array): void;
 };
 
