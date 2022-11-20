@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-node",
+      "type": "node",
       "name": "Launch Example Server",
       "request": "launch",
       "runtimeArgs": [
@@ -14,7 +14,8 @@
       ],
       "runtimeExecutable": "npm",
       "skipFiles": [
-        "<node_internals>/**"
+        "<node_internals>/**",
+        "${workspaceFolder}/**/node_modules/**",
       ],
       "cwd": "${workspaceFolder}/example",
     }
