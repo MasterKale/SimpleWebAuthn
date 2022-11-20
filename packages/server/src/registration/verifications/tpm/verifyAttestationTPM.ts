@@ -160,7 +160,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   }
 
   // Hash pubArea to create pubAreaHash using the nameAlg in attested
-  const pubAreaHash = await toHash(pubArea, attested.nameAlg.replace('TPM_ALG_', ''));
+  const pubAreaHash = await toHash(pubArea, attestedNameAlgToCOSEAlg(attested.nameAlg));
 
   // Concatenate attested.nameAlg and pubAreaHash to create attestedName.
   const attestedName = isoUint8Array.concat([attested.nameAlgBuffer, pubAreaHash]);
@@ -370,4 +370,25 @@ function getTcgAtTpmValues(root: Name): {
     tcgAtTpmModel,
     tcgAtTpmVersion,
   };
+}
+
+/**
+ * Convert TPM-specific SHA algorithm ID's with COSE-specific equivalents. Note that the choice to
+ * use ECDSA SHA IDs is arbitrary; any such COSEALG that would map to SHA-256 in
+ * `mapCoseAlgToWebCryptoAlg()`
+ *
+ * SHA IDs referenced from here:
+ *
+ * https://trustedcomputinggroup.org/wp-content/uploads/TCG_TPM2_r1p59_Part2_Structures_pub.pdf
+ */
+function attestedNameAlgToCOSEAlg(alg: string): COSEALG {
+  if (alg === 'TPM_ALG_SHA256') {
+    return COSEALG.ES256;
+  } else if (alg === 'TPM_ALG_SHA384') {
+    return COSEALG.ES384;
+  } else if (alg === 'TPM_ALG_SHA512') {
+    return COSEALG.ES512;
+  }
+
+  throw new Error(`Unexpected TPM attested name alg ${alg}`);
 }
