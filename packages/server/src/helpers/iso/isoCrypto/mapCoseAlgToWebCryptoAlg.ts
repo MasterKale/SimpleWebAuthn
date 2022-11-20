@@ -1,5 +1,5 @@
 import { SubtleCryptoAlg } from "./structs";
-import { COSEALG } from "../../convertCOSEtoPKCS";
+import { COSEALG } from "../../cose";
 
 
 /**

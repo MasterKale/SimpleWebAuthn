@@ -4,7 +4,7 @@ import type { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../helpers/validateCertificatePath';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEALG, COSECRV, COSEKEYS, COSEKTY, COSEPublicKeyEC2, isCOSEPublicKeyEC2 } from '../helpers/convertCOSEtoPKCS';
+import { COSEALG, COSECRV, COSEKEYS, COSEKTY, COSEPublicKeyEC2, isCOSEPublicKeyEC2 } from '../helpers/cose';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as

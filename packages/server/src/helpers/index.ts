@@ -1,6 +1,6 @@
 import { convertAAGUIDToString } from './convertAAGUIDToString';
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
-import { convertCOSEtoPKCS } from './convertCOSEtoPKCS';
+import { convertCOSEtoPKCS } from './cose';
 import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
 import { decodeAttestationObject } from './decodeAttestationObject';
 import { decodeClientDataJSON } from './decodeClientDataJSON';
@@ -41,7 +41,7 @@ import type {
 } from './decodeAttestationObject';
 import type { CertificateInfo } from './getCertificateInfo';
 import type { ClientDataJSON } from './decodeClientDataJSON';
-import type { COSEPublicKey } from './convertCOSEtoPKCS';
+import type { COSEPublicKey } from './cose';
 import type { ParsedAuthenticatorData } from './parseAuthenticatorData';
 
 export type {

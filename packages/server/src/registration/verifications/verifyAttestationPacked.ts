@@ -1,6 +1,6 @@
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import { coseAlgSHAHashMap, isCOSEAlg } from '../../helpers/convertCOSEtoPKCS';
+import { isCOSEAlg } from '../../helpers/cose';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';

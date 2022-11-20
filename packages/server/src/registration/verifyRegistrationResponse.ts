@@ -14,7 +14,7 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import { COSEKEYS } from '../helpers/cose';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID';

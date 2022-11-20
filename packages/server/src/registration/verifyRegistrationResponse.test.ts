@@ -8,7 +8,7 @@ import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
 import { toHash } from '../helpers/toHash';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso';
-import { COSEPublicKey, COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import { COSEPublicKey, COSEKEYS } from '../helpers/cose';
 import { SettingsService } from '../services/settingsService';
 
 import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
