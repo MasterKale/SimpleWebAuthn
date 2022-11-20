@@ -1,7 +1,6 @@
 import { convertAAGUIDToString } from './convertAAGUIDToString';
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
-import { convertCOSEtoPKCS } from './cose';
-import { convertPublicKeyToPEM } from './convertPublicKeyToPEM';
+import { convertCOSEtoPKCS } from './convertCOSEtoPKCS';
 import { decodeAttestationObject } from './decodeAttestationObject';
 import { decodeClientDataJSON } from './decodeClientDataJSON';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
@@ -12,13 +11,13 @@ import { parseAuthenticatorData } from './parseAuthenticatorData';
 import { toHash } from './toHash';
 import { validateCertificatePath } from './validateCertificatePath';
 import { verifySignature } from './verifySignature';
-import { isoCBOR, isoBase64URL, isoUint8Array } from './iso';
+import { isoCBOR, isoBase64URL, isoUint8Array, isoCrypto } from './iso';
+import * as cose from './cose';
 
 export {
   convertAAGUIDToString,
   convertCertBufferToPEM,
   convertCOSEtoPKCS,
-  convertPublicKeyToPEM,
   decodeAttestationObject,
   decodeClientDataJSON,
   decodeCredentialPublicKey,
@@ -30,8 +29,10 @@ export {
   validateCertificatePath,
   verifySignature,
   isoCBOR,
+  isoCrypto,
   isoBase64URL,
   isoUint8Array,
+  cose,
 };
 
 import type {
