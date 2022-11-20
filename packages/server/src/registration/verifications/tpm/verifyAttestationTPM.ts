@@ -174,7 +174,6 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   const attToBeSigned = isoUint8Array.concat([authData, clientDataHash]);
 
   // Hash attToBeSigned using the algorithm specified in attStmt.alg to create attToBeSignedHash
-  const hashAlg: string = coseAlgSHAHashMap[alg];
   const attToBeSignedHash = await toHash(attToBeSigned, alg);
 
   // Check that certInfo.extraData is equals to attToBeSignedHash.
@@ -305,7 +304,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
     signature: sig,
     data: certInfo,
     leafCertificate: x5c[0],
-    rsaHashAlgorithm: hashAlg
+    attestationHashAlgorithm: alg,
   });
 }
 

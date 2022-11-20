@@ -118,13 +118,11 @@ export async function verifyAttestationPacked(
       leafCertificate: x5c[0],
     });
   } else {
-    const hashAlg: string = coseAlgSHAHashMap[alg];
-
     verified = await verifySignature({
       signature: sig,
       data: signatureBase,
       credentialPublicKey,
-      rsaHashAlgorithm: hashAlg
+      attestationHashAlgorithm: alg
     });
   }
 

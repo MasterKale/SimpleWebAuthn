@@ -107,12 +107,11 @@ export async function verifyAttestationAndroidKey(
   }
 
   const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
-  const hashAlg = coseAlgSHAHashMap[alg];
 
   return verifySignature({
     signature: sig,
     data: signatureBase,
     leafCertificate: x5c[0],
-    rsaHashAlgorithm: hashAlg
+    attestationHashAlgorithm: alg,
   });
 }
