@@ -95,7 +95,10 @@ export interface AuthenticationCredentialJSON
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
  */
 export interface AuthenticatorAttestationResponseJSON
-  extends Omit<AuthenticatorAttestationResponseFuture, 'clientDataJSON' | 'attestationObject'> {
+  extends Omit<
+    AuthenticatorAttestationResponseFuture,
+    'clientDataJSON' | 'attestationObject' | 'getTransports' | 'getAuthenticatorData' | 'getPublicKey' | 'getPublicKeyAlgorithm'
+  > {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
 }
