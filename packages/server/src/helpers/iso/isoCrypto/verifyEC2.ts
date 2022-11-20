@@ -64,7 +64,7 @@ export async function verifyEC2(opts: {
   } else if (crv === COSECRV.P521) {
     _crv = 'P-521';
   } else {
-    throw new Error(`Unexpected COSE crv value of ${crv}`);
+    throw new Error(`Unexpected COSE crv value of ${crv} (EC2)`);
   }
 
   const keyData: JsonWebKey = {
