@@ -104,6 +104,8 @@ function signatureAlgorithmToCOSEAlg(signatureAlgorithm: string): COSEALG {
     alg = COSEALG.RS384;
   } else if (signatureAlgorithm === '1.2.840.113549.1.1.13') {
     alg = COSEALG.RS512;
+  } else if (signatureAlgorithm === '1.2.840.113549.1.1.5') {
+    alg = COSEALG.RS1;
   } else {
     throw new Error(
       `Leaf cert contained unexpected signature algorithm ${signatureAlgorithm} (EC2)`,
