@@ -4,6 +4,7 @@ import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from "../../cose";
 import { mapCoseAlgToWebCryptoAlg } from "./mapCoseAlgToWebCryptoAlg";
 import { importKey } from './importKey';
 import { isoBase64URL } from '../index';
+import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName';
 
 /**
  *
@@ -45,9 +46,7 @@ export async function verifyRSA(opts: {
   };
 
   const keyAlgorithm = {
-    // TODO: Determine this from `alg` so we might support the rarer RSA-PSS
-    name: 'RSASSA-PKCS1-v1_5',
-    // This is actually the digest hash that'll get used by `.verify()`
+    name: mapCoseAlgToWebCryptoKeyAlgName(alg),
     hash: { name: mapCoseAlgToWebCryptoAlg(alg) },
   };
 
@@ -55,14 +54,26 @@ export async function verifyRSA(opts: {
     keyAlgorithm.hash.name = mapCoseAlgToWebCryptoAlg(shaHashOverride);
   }
 
-  if (keyAlgorithm.hash.name === 'SHA-256') {
-    keyData.alg = 'RS256';
-  } else if (keyAlgorithm.hash.name === 'SHA-384') {
-    keyData.alg = 'RS384';
-  } else if (keyAlgorithm.hash.name === 'SHA-512') {
-    keyData.alg = 'RS512';
-  } else if (keyAlgorithm.hash.name === 'SHA-1') {
-    keyData.alg = 'RS1';
+  if (keyAlgorithm.name === 'RSASSA-PKCS1-v1_5') {
+    if (keyAlgorithm.hash.name === 'SHA-256') {
+      keyData.alg = 'RS256';
+    } else if (keyAlgorithm.hash.name === 'SHA-384') {
+      keyData.alg = 'RS384';
+    } else if (keyAlgorithm.hash.name === 'SHA-512') {
+      keyData.alg = 'RS512';
+    } else if (keyAlgorithm.hash.name === 'SHA-1') {
+      keyData.alg = 'RS1';
+    }
+  } else if (keyAlgorithm.name === 'RSA-PSS') {
+    if (keyAlgorithm.hash.name === 'SHA-256') {
+      keyData.alg = 'PS256';
+    } else if (keyAlgorithm.hash.name === 'SHA-384') {
+      keyData.alg = 'PS384';
+    } else if (keyAlgorithm.hash.name === 'SHA-512') {
+      keyData.alg = 'PS512';
+    }
+  } else {
+    throw new Error(`Unexpected RSA key algorithm ${alg} (${keyAlgorithm.name})`);
   }
 
   const key = await importKey({
