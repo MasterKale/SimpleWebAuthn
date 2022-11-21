@@ -32,6 +32,8 @@ export async function verifyOKP(opts: {
     throw new Error('Public key was missing x (OKP)');
   }
 
+  // Pulled key import steps from here:
+  // https://wicg.github.io/webcrypto-secure-curves/#ed25519-operations
   let _crv: SubtleCryptoCrv;
   if (crv === COSECRV.ED25519) {
     _crv = 'Ed25519';

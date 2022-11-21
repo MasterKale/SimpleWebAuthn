@@ -76,6 +76,12 @@ export async function verifyEC2(opts: {
   };
 
   const keyAlgorithm: EcKeyImportParams = {
+    /**
+     * Note to future self: you can't use `mapCoseAlgToWebCryptoKeyAlgName()` here because some
+     * leaf certs from actual devices specified an RSA SHA value for `alg` (e.g. `-257`) which
+     * would then map here to `'RSASSA-PKCS1-v1_5'`. We always want `'ECDSA'` here so we'll
+     * hard-code this.
+     */
     name: 'ECDSA',
     namedCurve: _crv,
   };
