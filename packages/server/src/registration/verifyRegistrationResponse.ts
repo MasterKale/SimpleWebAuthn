@@ -29,8 +29,7 @@ import { verifyDevicePublicKeyAttestation } from '../extensions/devicePublicKey/
 import {
   decodeDevicePubKey,
   deserializeDevicePubKeyAuthenticatorOutput,
-  encodeDevicePubKeyAuthenticatorOutput,
-  DevicePublicKeyAuthenticatorOutputJSON,
+  DevicePublicKeyAuthenticatorOutput,
 } from '../extensions/devicePublicKey/decodeDevicePubKey';
 
 export type VerifyRegistrationResponseOpts = {
@@ -229,8 +228,7 @@ export async function verifyRegistrationResponse(
         throw new Error('Invalid device public key attestation.');
       }
 
-      const unregisteredDevicePubKey = encodeDevicePubKeyAuthenticatorOutput(dpkAuthOutput);
-      extensionOutputs.unregisteredDevicePubKey = unregisteredDevicePubKey;
+      extensionOutputs.devicePubKey = dpkAuthOutput;
     }
   }
 
@@ -356,5 +354,5 @@ export type AttestationFormatVerifierOpts = {
 };
 
 export type RegistrationExtensionOutputs = {
-  unregisteredDevicePubKey?: DevicePublicKeyAuthenticatorOutputJSON;
+  devicePubKey?: DevicePublicKeyAuthenticatorOutput;
 }

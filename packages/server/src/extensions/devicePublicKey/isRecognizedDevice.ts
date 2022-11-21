@@ -13,12 +13,12 @@ import { verifyDevicePublicKeyAttestation } from "./verifyDevicePublicKeyAttesta
  * store it. Throws when it's an invalid device or any unexpected issue occurs.
  * @param responseDevicePublicKey 
  * @param knownDevicePublicKeys
- * @returns DevicePublicKeyAuthenticatorOutput | undefined
+ * @returns DevicePubKeyAuthenticatorOutputRecognizedResult | undefined
  */
 export async function isRecognizedDevice(
   responseDevicePublicKey: DevicePublicKeyAuthenticatorOutput,
   userDevicePublicKeys?: DevicePublicKeyAuthenticatorOutputJSON[]
-): Promise<DevicePublicKeyAuthenticatorOutput | undefined> {
+): Promise<DevicePublicKeyRecognitionResult> {
   if (userDevicePublicKeys && userDevicePublicKeys.length > 0) {
     // Decode all DPKs
     const decodedDPKs = userDevicePublicKeys.map(userDPK => {
@@ -64,8 +64,14 @@ export async function isRecognizedDevice(
         if (!isValidDPKAttestation) {
           throw new Error('DevicePublicKey attestation could not be verified');
         }
-        // When `fmt` is `none` or the device public key attestation is valid, store the DPK.
-        return responseDevicePublicKey;
+
+        // When `fmt` is `none` or the device public key attestation is valid,
+        // return the DPK as unrecognized.
+        const result: DevicePublicKeyRecognitionResult = {
+          authenticatorOutput: responseDevicePublicKey,
+          recognitionResult: 'unrecognized'
+        }
+        return result;
       } else {
         // Otherwise there is some form of error: we recieved a known dpk
         // value, but one or more of the accompanying aaguid, scope values
@@ -97,8 +103,13 @@ export async function isRecognizedDevice(
         }
       }
     }
-    // This is a valid and a known device.
-    return;
+    // When a matched device public key is found and equal, or the attestation
+    // is valid, return the DPK as recognized.
+    const result: DevicePublicKeyRecognitionResult = {
+      authenticatorOutput: matchedDPKs[0],
+      recognitionResult: 'recognized'
+    }
+    return result;
 
   } else {
     // Otherwise, the Relying Party does not have `attObjForDevicePublicKey`
@@ -107,8 +118,13 @@ export async function isRecognizedDevice(
     if (!isValidDPKAttestation) {
       throw new Error('DevicePublicKey attestation could not be verified');
     }
-    // When `fmt` is `none` or the device public key attestation is valid, store the DPK.
-    return responseDevicePublicKey;
+    // When `fmt` is `none` or the device public key attestation is valid,
+    // return the DPK as unrecognized.
+    const result: DevicePublicKeyRecognitionResult = {
+      authenticatorOutput: responseDevicePublicKey,
+      recognitionResult: 'unrecognized'
+    }
+    return result;
   }
 }
 
@@ -151,4 +167,9 @@ export function checkAttStmtBinaryEquality(
     throw new Error("Response DPK pubArea and recognized DPK pubArea did not match.")
   }
   return true;
+}
+
+export type DevicePublicKeyRecognitionResult = {
+  authenticatorOutput: DevicePublicKeyAuthenticatorOutput,
+  recognitionResult: 'recognized' | 'unrecognized'
 }

@@ -9,6 +9,7 @@ import {
   AuthenticationCredentialJSON,
 } from '@simplewebauthn/typescript-types';
 import {
+  DevicePublicKeyAuthenticatorOutput,
   DevicePublicKeyAuthenticatorOutputJSON,
 } from '../extensions/devicePublicKey/decodeDevicePubKey';
 
@@ -314,77 +315,107 @@ test('should fail verification if custom challenge verifier returns false', asyn
   ).rejects.toThrow(/custom challenge verifier returned false/i);
 });
 
-const DpkAuthCred: AuthenticationCredentialJSON = {
-  response: {
-    clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiS05aUmtPRU5KY1dCTzZHX0VjcE1GS2FWRDlham1xNExsZDZJMllJc1c3QSIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
-    authenticatorData: 'DXX8xWP9p3nbLjQ-6kiYiHWLeFSdSTpP2-oc2WqjHMSdAAAAAKFsZGV2aWNlUHViS2V5WIymY2Rwa1hNpQECAyYgASFYIE3BmJ0MLxBA0B9-wVrFQrFNtUvF6l1X7X9rOD67T6uwIlggW2G32XUvyDaGpA6jyiacF319GPZvInOfUlCqenX2hVtjZm10ZG5vbmVlbm9uY2VAZXNjb3BlAGZhYWd1aWRQAAAAAAAAAAAAAAAAAAAAAGdhdHRTdG10oA==',
-    signature: 'MEUCIF1LvdGHiW5aq25ZrNVUeZOm7pcS_9a172pkO2C6ILE1AiEA8NYg-ZzOgt1pN0Bqv02t7lWCSMn_IPpvKHdT5Mjv75E=',
-    userHandle: 'b2FPajFxcmM4MWo3QkFFel9RN2lEakh5RVNlU2RLNDF0Sl92eHpQYWV5UQ==',
-  },
-  id: 'BxYpj3rs5WGW8UVnXsmMzg',
-  rawId: 'BxYpj3rs5WGW8UVnXsmMzg',
-  type: 'public-key',
-  clientExtensionResults: {
-    devicePubKey: {
-      'authenticatorOutput': 'pmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
-      'signature': 'MEQCIAdwrIjLt7ULTU5OzpnhzvbWJ3srVLoOCYs72Hlw6ugoAiAFl4_jfJJv89cM5qSx8lI_pIXLRIy6lO9N3O8SUjyNKQ==',
+describe('device public key related tests', () => {
+  const DpkAuthCred: AuthenticationCredentialJSON = {
+    response: {
+      clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiS05aUmtPRU5KY1dCTzZHX0VjcE1GS2FWRDlham1xNExsZDZJMllJc1c3QSIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
+      authenticatorData: 'DXX8xWP9p3nbLjQ-6kiYiHWLeFSdSTpP2-oc2WqjHMSdAAAAAKFsZGV2aWNlUHViS2V5WIymY2Rwa1hNpQECAyYgASFYIE3BmJ0MLxBA0B9-wVrFQrFNtUvF6l1X7X9rOD67T6uwIlggW2G32XUvyDaGpA6jyiacF319GPZvInOfUlCqenX2hVtjZm10ZG5vbmVlbm9uY2VAZXNjb3BlAGZhYWd1aWRQAAAAAAAAAAAAAAAAAAAAAGdhdHRTdG10oA==',
+      signature: 'MEUCIF1LvdGHiW5aq25ZrNVUeZOm7pcS_9a172pkO2C6ILE1AiEA8NYg-ZzOgt1pN0Bqv02t7lWCSMn_IPpvKHdT5Mjv75E=',
+      userHandle: 'b2FPajFxcmM4MWo3QkFFel9RN2lEakh5RVNlU2RLNDF0Sl92eHpQYWV5UQ==',
+    },
+    id: 'BxYpj3rs5WGW8UVnXsmMzg',
+    rawId: 'BxYpj3rs5WGW8UVnXsmMzg',
+    type: 'public-key',
+    clientExtensionResults: {
+      devicePubKey: {
+        'authenticatorOutput': 'pmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
+        'signature': 'MEQCIAdwrIjLt7ULTU5OzpnhzvbWJ3srVLoOCYs72Hlw6ugoAiAFl4_jfJJv89cM5qSx8lI_pIXLRIy6lO9N3O8SUjyNKQ==',
+      }
     }
+  };
+
+  const DpkVerifyAuthRespOpts: VerifyAuthenticationResponseOpts = {
+    credential: DpkAuthCred,
+    expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
+    expectedRPID: 'try-webauthn.appspot.com',
+    expectedChallenge: 'KNZRkOENJcWBO6G_EcpMFKaVD9ajmq4Lld6I2YIsW7A',
+    authenticator: {
+      credentialID: base64url.toBuffer('BxYpj3rs5WGW8UVnXsmMzg'),
+      credentialPublicKey: base64url.toBuffer('pQECAyYgASFYIPLEylOIRiI7z7q6zuYjWB9TcOj9yNwmawogQJ4ZKpNAIlggd9ZqIjd30p1tIU6A8ue5wEZl9q/AsKR/leaHFZ/bwWk='),
+      counter: 0,
+    },
   }
-};
 
-const DpkVerifyAuthRespOpts: VerifyAuthenticationResponseOpts = {
-  credential: DpkAuthCred,
-  expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
-  expectedRPID: 'try-webauthn.appspot.com',
-  expectedChallenge: 'KNZRkOENJcWBO6G_EcpMFKaVD9ajmq4Lld6I2YIsW7A',
-  authenticator: {
-    credentialID: base64url.toBuffer('BxYpj3rs5WGW8UVnXsmMzg'),
-    credentialPublicKey: base64url.toBuffer('pQECAyYgASFYIPLEylOIRiI7z7q6zuYjWB9TcOj9yNwmawogQJ4ZKpNAIlggd9ZqIjd30p1tIU6A8ue5wEZl9q/AsKR/leaHFZ/bwWk='),
-    counter: 0,
-  },
-}
+  if (!DpkAuthCred?.clientExtensionResults?.devicePubKey) {
+    throw new Error('This exception will not happen.');
+  }
 
-if (!DpkAuthCred?.clientExtensionResults?.devicePubKey) {
-  throw new Error('This exception will not happen.');
-}
+  // This DPK is baked into `DpkAuthCred`.
+  const devicePubKey: DevicePublicKeyAuthenticatorOutput = {
+    dpk: Buffer.from('a50102032620012158204dc1989d0c2f1040d01f7ec15ac542b14db54bc5ea5d57ed7f6b383ebb4fabb02258205b61b7d9752fc83686a40ea3ca269c177d7d18f66f22739f5250aa7a75f6855b', 'hex'),
+    nonce: Buffer.from('', 'hex'),
+    scope: 0,
+    aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+    fmt: 'none',
+    attStmt: {}
+  }
 
-const sameDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
-  dpk: 'pQECAyYgASFYIE3BmJ0MLxBA0B9-wVrFQrFNtUvF6l1X7X9rOD67T6uwIlggW2G32XUvyDaGpA6jyiacF319GPZvInOfUlCqenX2hVs',
-  nonce: '',
-  scope: 0,
-  aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
-  fmt: 'none',
-  attStmt: {}
-}
+  // This is an encoded version of `devicePubKey`.
+  const devicePubKeyJSON: DevicePublicKeyAuthenticatorOutputJSON = {
+    dpk: 'pQECAyYgASFYIE3BmJ0MLxBA0B9-wVrFQrFNtUvF6l1X7X9rOD67T6uwIlggW2G32XUvyDaGpA6jyiacF319GPZvInOfUlCqenX2hVs',
+    nonce: '',
+    scope: 0,
+    aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
+    fmt: 'none',
+    attStmt: {}
+  }
 
-const differentDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
-  dpk: 'pQECAyYgASFYIJkaq-2d5Ccant6tiAb53JbW3M0MR2JTpVEEieyDeb5bIlggoJc8_e27eeJ_707nSBZz-zMSUE3cpUNM_SNDHWrSnto',
-  nonce: '',
-  scope: 0,
-  aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
-  fmt: 'none',
-  attStmt: {},
-};
+  // A different DPK example.
+  const differentDevicePubKey: DevicePublicKeyAuthenticatorOutput = {
+    dpk: Buffer.from('a5010203262001215820991aabed9de4271a9edead8806f9dc96d6dccd0c476253a5510489ec8379be5b225820a0973cfdedbb79e27fef4ee7481673fb3312504ddca5434cfd23431d6ad29eda', 'hex'),
+    nonce: Buffer.from('', 'hex'),
+    scope: 0,
+    aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+    fmt: 'none',
+    attStmt: {},
+  }
 
-test('should throw if multiple device public key matches', async () => {
-  await expect(verifyAuthenticationResponse({
-    ...DpkVerifyAuthRespOpts,
-    userDevicePublicKeys: [sameDevicePubKey, sameDevicePubKey],
-  })).rejects.toThrowError(new Error('It is undetermined whether this is a known device.'));
-});
+  // This is an encoded version of `differentDevicePubKey`.
+  const differentDevicePubKeyJSON: DevicePublicKeyAuthenticatorOutputJSON = {
+    dpk: 'pQECAyYgASFYIJkaq-2d5Ccant6tiAb53JbW3M0MR2JTpVEEieyDeb5bIlggoJc8_e27eeJ_707nSBZz-zMSUE3cpUNM_SNDHWrSnto',
+    nonce: '',
+    scope: 0,
+    aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
+    fmt: 'none',
+    attStmt: {},
+  };
 
-test('should return the new device public key when no device public key matches', async () => {
-  await expect(verifyAuthenticationResponse({
-    ...DpkVerifyAuthRespOpts,
-    userDevicePublicKeys: [differentDevicePubKey, differentDevicePubKey],
-  }).then(verification => verification.authenticationInfo.extensionOutputs?.unregisteredDevicePubKey)).resolves.toMatchObject(sameDevicePubKey);
-});
+  test('should throw if multiple device public key matches', async () => {
+    await expect(verifyAuthenticationResponse({
+      ...DpkVerifyAuthRespOpts,
+      userDevicePublicKeys: [devicePubKeyJSON, devicePubKeyJSON],
+    })).rejects.toThrowError(new Error('It is undetermined whether this is a known device.'));
+  });
 
-test('should return undefined when one device public key matches', async () => {
-  await expect(verifyAuthenticationResponse({
-    ...DpkVerifyAuthRespOpts,
-    userDevicePublicKeys: [sameDevicePubKey, differentDevicePubKey]
-  }).then(verification => verification.authenticationInfo.extensionOutputs?.unregisteredDevicePubKey)).resolves.toBeUndefined();
+  test('should return the new device public key when no device public key matches', async () => {
+    await expect(verifyAuthenticationResponse({
+      ...DpkVerifyAuthRespOpts,
+      userDevicePublicKeys: [differentDevicePubKeyJSON, differentDevicePubKeyJSON],
+    }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKey)).resolves.toMatchObject({
+      authenticatorOutput: devicePubKey,
+      recognitionResult: 'unrecognized'
+    });
+  });
+
+  test('should return undefined when one device public key matches', async () => {
+    await expect(verifyAuthenticationResponse({
+      ...DpkVerifyAuthRespOpts,
+      userDevicePublicKeys: [devicePubKeyJSON, differentDevicePubKeyJSON]
+    }).then(verification => verification.authenticationInfo.extensionOutputs?.devicePubKey)).resolves.toMatchObject({
+      authenticatorOutput: devicePubKey,
+      recognitionResult: 'recognized'
+    });
+  });
 });
 
 test('should return credential backup info', async () => {

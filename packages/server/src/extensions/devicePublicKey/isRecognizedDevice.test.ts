@@ -13,7 +13,7 @@ const devicePubKey: DevicePublicKeyAuthenticatorOutput = {
   attStmt: {},
 }
 
-const sameDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
+const devicePubKeyJSON: DevicePublicKeyAuthenticatorOutputJSON = {
   dpk: 'pQECAyYgASFYIO3q0_01dpwj00DdwYMKf_IOc1XynRx1qg3CtqwYLqfTIlggNFHcmZKvlGgltEGUX8nRNOF7c6pf6pWANR58k_XTZRM',
   nonce: '',
   scope: 0,
@@ -22,7 +22,16 @@ const sameDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
   attStmt: {},
 }
 
-const differentDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
+const differentDevicePubKey: DevicePublicKeyAuthenticatorOutput = {
+  dpk: Buffer.from('a5010203262001215820991aabed9de4271a9edead8806f9dc96d6dccd0c476253a5510489ec8379be5b225820a0973cfdedbb79e27fef4ee7481673fb3312504ddca5434cfd23431d6ad29eda', 'hex'),
+  nonce: Buffer.from('', 'hex'),
+  scope: 0,
+  aaguid: Buffer.from('B93FD961F2E6462FB12282002247DE78', 'hex'),
+  fmt: 'none',
+  attStmt: {},
+};
+
+const differentDevicePubKeyJSON: DevicePublicKeyAuthenticatorOutputJSON = {
   dpk: 'pQECAyYgASFYIJkaq-2d5Ccant6tiAb53JbW3M0MR2JTpVEEieyDeb5bIlggoJc8_e27eeJ_707nSBZz-zMSUE3cpUNM_SNDHWrSnto',
   nonce: '',
   scope: 0,
@@ -32,15 +41,21 @@ const differentDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON = {
 };
 
 it("should throw when more than two device public key matches", async () => {
-  expect(isRecognizedDevice(devicePubKey, [sameDevicePubKey, sameDevicePubKey])).rejects.toThrowError(new Error('It is undetermined whether this is a known device.'));
+  await expect(isRecognizedDevice(devicePubKey, [devicePubKeyJSON, devicePubKeyJSON])).rejects.toThrowError(new Error('It is undetermined whether this is a known device.'));
 });
 
-it("should return the new device public key when no device public key matches", async () => {
-  expect(isRecognizedDevice(devicePubKey, [differentDevicePubKey, differentDevicePubKey])).resolves.toMatchObject(devicePubKey);
+it("should return the unrecognized new device public key", async () => {
+  await expect(isRecognizedDevice(devicePubKey, [differentDevicePubKeyJSON, differentDevicePubKeyJSON])).resolves.toMatchObject({
+    authenticatorOutput: devicePubKey,
+    recognitionResult: 'unrecognized'
+  });
 });
 
-it("should return undefined when one device public key matches", async () => {
-  expect(isRecognizedDevice(devicePubKey, [sameDevicePubKey, differentDevicePubKey])).resolves.toBeUndefined();
+it("should return one recognized device public key that matches", async () => {
+  await expect(isRecognizedDevice(devicePubKey, [devicePubKeyJSON, differentDevicePubKeyJSON])).resolves.toMatchObject({
+    authenticatorOutput: devicePubKey,
+    recognitionResult: 'recognized'
+  });
 });
 
 // Needs test data

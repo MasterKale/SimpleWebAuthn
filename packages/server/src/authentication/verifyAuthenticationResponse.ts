@@ -20,9 +20,11 @@ import {
   DevicePublicKeyAuthenticatorOutputJSON,
   decodeDevicePubKey,
   deserializeDevicePubKeyAuthenticatorOutput,
-  encodeDevicePubKeyAuthenticatorOutput,
 } from '../extensions/devicePublicKey/decodeDevicePubKey';
-import { isRecognizedDevice } from '../extensions/devicePublicKey/isRecognizedDevice';
+import {
+  isRecognizedDevice,
+  DevicePublicKeyRecognitionResult
+} from '../extensions/devicePublicKey/isRecognizedDevice';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -228,10 +230,7 @@ export async function verifyAuthenticationResponse(
         throw new Error('Invalid device public key signature.');
       }
 
-      const unregisteredDevicePubKey = await isRecognizedDevice(dpkAuthOutput, userDevicePublicKeys);
-      if (unregisteredDevicePubKey) {
-        extensionOutputs.unregisteredDevicePubKey = encodeDevicePubKeyAuthenticatorOutput(unregisteredDevicePubKey);
-      }
+      extensionOutputs.devicePubKey = await isRecognizedDevice(dpkAuthOutput, userDevicePublicKeys);
     }
   }
 
@@ -302,5 +301,5 @@ export type VerifiedAuthenticationResponse = {
 };
 
 export type AuthenticationExtensionOutputs = {
-  unregisteredDevicePubKey?: DevicePublicKeyAuthenticatorOutputJSON;
+  devicePubKey?: DevicePublicKeyRecognitionResult;
 }

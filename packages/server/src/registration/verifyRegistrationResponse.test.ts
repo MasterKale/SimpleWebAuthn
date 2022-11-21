@@ -12,6 +12,7 @@ import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationF
 
 import { toHash } from '../helpers/toHash';
 import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
+import { DevicePublicKeyAuthenticatorOutput } from '../extensions/devicePublicKey/decodeDevicePubKey';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -580,45 +581,47 @@ test('should return credential backup info', async () => {
   expect(verification.registrationInfo?.credentialBackedUp).toEqual(false);
 });
 
-const DpkRegCred: RegistrationCredentialJSON = {
-  response: {
-    clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNkM0QUptNmJyTVJwSF9JZVhDVmtHTTUydnVwTy14Y1huNldlcWIyVjJtTSIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
-    attestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBMA11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzE3QAAAAAAAAAAAAAAAAAAAAAAAAAAABAHFimPeuzlYZbxRWdeyYzOpQECAyYgASFYIPLEylOIRiI7z7q6zuYjWB9TcOj9yNwmawogQJ4ZKpNAIlggd9ZqIjd30p1tIU6A8ue5wEZl9q_AsKR_leaHFZ_bwWmhbGRldmljZVB1YktleViMpmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA='
-  },
-  id: 'BxYpj3rs5WGW8UVnXsmMzg',
-  rawId: 'BxYpj3rs5WGW8UVnXsmMzg',
-  type: 'public-key',
-  transports: [],
-  clientExtensionResults: {
-    devicePubKey: {
-      authenticatorOutput: 'pmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
-      signature: 'MEUCIQDTf2ImngEOi3qHws6gxf6CpquI97oDIl8m_4T2xQO-YwIgdWN7elqNuU-yMZtGpy8hQtL_E-qmZ1_rM2u2nhXYw7A='
-    }
-  }
-};
-
-if (!DpkRegCred?.clientExtensionResults?.devicePubKey) {
-  throw new Error('This exception will not happen.');
-}
-
-const DpkVerifyRegRespOpts: VerifyRegistrationResponseOpts = {
-  credential: DpkRegCred,
-  expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
-  expectedRPID: 'try-webauthn.appspot.com',
-  expectedChallenge: '6C4AJm6brMRpH_IeXCVkGM52vupO-xcXn6Weqb2V2mM',
-}
-
-test('should return authenticator extension output', async () => {
-  const verification = await verifyRegistrationResponse(DpkVerifyRegRespOpts);
-  expect(verification.registrationInfo?.extensionOutputs).toMatchObject({
-    unregisteredDevicePubKey: {
-      dpk: 'pQECAyYgASFYIE3BmJ0MLxBA0B9-wVrFQrFNtUvF6l1X7X9rOD67T6uwIlggW2G32XUvyDaGpA6jyiacF319GPZvInOfUlCqenX2hVs',
-      nonce: '',
-      scope: 0,
-      aaguid: 'AAAAAAAAAAAAAAAAAAAAAA',
-      fmt: 'none',
-      attStmt: {}
+describe('device public key related tests', () => {
+  const DpkRegCred: RegistrationCredentialJSON = {
+    response: {
+      clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNkM0QUptNmJyTVJwSF9JZVhDVmtHTTUydnVwTy14Y1huNldlcWIyVjJtTSIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
+      attestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBMA11_MVj_ad52y40PupImIh1i3hUnUk6T9vqHNlqoxzE3QAAAAAAAAAAAAAAAAAAAAAAAAAAABAHFimPeuzlYZbxRWdeyYzOpQECAyYgASFYIPLEylOIRiI7z7q6zuYjWB9TcOj9yNwmawogQJ4ZKpNAIlggd9ZqIjd30p1tIU6A8ue5wEZl9q_AsKR_leaHFZ_bwWmhbGRldmljZVB1YktleViMpmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA='
     },
+    id: 'BxYpj3rs5WGW8UVnXsmMzg',
+    rawId: 'BxYpj3rs5WGW8UVnXsmMzg',
+    type: 'public-key',
+    transports: [],
+    clientExtensionResults: {
+      devicePubKey: {
+        authenticatorOutput: 'pmNkcGtYTaUBAgMmIAEhWCBNwZidDC8QQNAffsFaxUKxTbVLxepdV-1_azg-u0-rsCJYIFtht9l1L8g2hqQOo8omnBd9fRj2byJzn1JQqnp19oVbY2ZtdGRub25lZW5vbmNlQGVzY29wZQBmYWFndWlkUAAAAAAAAAAAAAAAAAAAAABnYXR0U3RtdKA=',
+        signature: 'MEUCIQDTf2ImngEOi3qHws6gxf6CpquI97oDIl8m_4T2xQO-YwIgdWN7elqNuU-yMZtGpy8hQtL_E-qmZ1_rM2u2nhXYw7A='
+      }
+    }
+  };
+
+  if (!DpkRegCred?.clientExtensionResults?.devicePubKey) {
+    throw new Error('This exception will not happen.');
+  }
+
+  const DpkVerifyRegRespOpts: VerifyRegistrationResponseOpts = {
+    credential: DpkRegCred,
+    expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
+    expectedRPID: 'try-webauthn.appspot.com',
+    expectedChallenge: '6C4AJm6brMRpH_IeXCVkGM52vupO-xcXn6Weqb2V2mM',
+  }
+
+  const devicePubKey: DevicePublicKeyAuthenticatorOutput = {
+    dpk: Buffer.from('a50102032620012158204dc1989d0c2f1040d01f7ec15ac542b14db54bc5ea5d57ed7f6b383ebb4fabb02258205b61b7d9752fc83686a40ea3ca269c177d7d18f66f22739f5250aa7a75f6855b', 'hex'),
+    nonce: Buffer.from('', 'hex'),
+    scope: 0,
+    aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+    fmt: 'none',
+    attStmt: {}
+  }
+
+  test('should return authenticator extension output', async () => {
+    const verification = await verifyRegistrationResponse(DpkVerifyRegRespOpts);
+    expect(verification.registrationInfo?.extensionOutputs?.devicePubKey).toMatchObject(devicePubKey);
   });
 });
 
