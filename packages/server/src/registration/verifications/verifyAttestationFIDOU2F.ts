@@ -5,6 +5,7 @@ import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
 import { isoUint8Array } from '../../helpers/iso';
+import { COSEALG } from '../../helpers/cose';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
@@ -62,5 +63,6 @@ export async function verifyAttestationFIDOU2F(
     signature: sig,
     data: signatureBase,
     leafCertificate: x5c[0],
+    attestationHashAlgorithm: COSEALG.ES256,
   });
 }

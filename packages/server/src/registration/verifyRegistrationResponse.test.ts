@@ -614,6 +614,25 @@ test('should return authenticator extension output', async () => {
   });
 });
 
+test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert public key', async () => {
+  const verified = await verifyRegistrationResponse({
+    credential: {
+      id: '7wQcUWO9gG6mi2IktoZUogs8opnghY01DPYwaerMZms',
+      rawId: '7wQcUWO9gG6mi2IktoZUogs8opnghY01DPYwaerMZms',
+      response: {
+        attestationObject: 'o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAN2iKnT1qcZPVab9eiXw6kmMqAsCjR8FMdx8DWCfc6h1AiEA8Hp4Fv2eWsokC8g3sL3tEgNEpsopz-G7l30-czGkuvBjeDVjgVkELzCCBCswggIToAMCAQICAQEwDQYJKoZIhvcNAQEFBQAwgaExGDAWBgNVBAMMD0ZJRE8yIFRFU1QgUk9PVDExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEMMAoGA1UECwwDQ1dHMQswCQYDVQQGEwJVUzELMAkGA1UECAwCTVkxEjAQBgNVBAcMCVdha2VmaWVsZDAeFw0xODAzMTYxNDM1MjdaFw0yODAzMTMxNDM1MjdaMIGsMSMwIQYDVQQDDBpGSURPMiBCQVRDSCBLRVkgcHJpbWUyNTZ2MTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEMMAoGA1UECwwDQ1dHMQswCQYDVQQGEwJVUzELMAkGA1UECAwCTVkxEjAQBgNVBAcMCVdha2VmaWVsZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABE86Xl6rbB-8rpf232RJlnYse-9yAEAqdsbyMPZVbxeqmZtZf8S_UIqvjp7wzQE_Wrm9J5FL8IBDeMvMsRuJtUajLDAqMAkGA1UdEwQCMAAwHQYDVR0OBBYEFFZN98D4xlW2oR9sTRnzv0Hi_QF5MA0GCSqGSIb3DQEBBQUAA4ICAQCPv4yN9RQfvCdl8cwVzLiOGIPrwLatOwARyap0KVJrfJaTs5rydAjinMLav-26bIElQSdus4Z8lnJtavFdGW8VLzdpB_De57XiBp_giTiZBwyCPiG4h-Pk1EAiY7ggednblFi9HxlcNkddyelfiu1Oa9Dlgc5rZsMIkVU4IFW4w6W8dqKhgMM7qRt0ZgRQ19TPdrN7YMsJy6_nujWWpecmXUvFW5SRo7MA2W3WPkKG6Ngwjer8b5-U1ZLpAB4gK46QQaQJrkHymudr6kgmEaUwpue30FGdXNZ9vTrLw8NcfXJMh_I__V4JNABvjJUPUXYN4Qm-y5Ej7wv82A3ktgo_8hcOjlmoZ5yEcDureFLS7kQJC64z9U-55NM7tcIcI-2BMLb2uOZ4lloeq3coP0mZX7KYd6PzGTeQ8Cmkq1GhDum_p7phCx-Rlo44j4H4DypCKH_g-NMWilBQaTSc6K0JAGQiVrh710aQWVhVYf1ITZRoV9Joc9shZQa7o2GvQYLyJHSfCnqJOqnwJ_q-RBBV3EiPLxmOzhBdNUCl1abvPhVtLksbUPfdQHBQ-io70edZe3utb4rFIHboWUSKvW2M3giMZyuSYZt6PzSRNmzqdjZlcFXuJI7iV_O8KNwWuNW14MCKXYi1sliYUhz5iSP9Ym0U2eVzvdsWzz0p55F6xWhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NBAAAAAgAAAAAAAAAAAAAAAAAAAAAAIO8EHFFjvYBupotiJLaGVKILPKKZ4IWNNQz2MGnqzGZrpQECAyYgASFYIMmWvjddCcHDGxX5F8qRMl1FccFW5R8VQuZOTey6LqA8IlggZLJ8OVPsX-NPDEUjyjzkV1YLW8Nglp1Ea4qgb2n-O88',
+        clientDataJSON: 'eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjaGFsbGVuZ2UiOiJ3SjZtclpua2I2OUdENWQ5X2ZVejktTmdSSEUwejEwcXVYVUJTYTl4SzVvIiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
+      },
+      authenticatorAttachment: '',
+      clientExtensionResults: {},
+      type: 'public-key',
+    },
+    expectedChallenge: 'wJ6mrZnkb69GD5d9_fUz9-NgRHE0z10quXUBSa9xK5o',
+    expectedOrigin: 'http://localhost:8000',
+    expectedRPID: 'localhost',
+  });
+});
+
 /**
  * Various Attestations Below
  */
