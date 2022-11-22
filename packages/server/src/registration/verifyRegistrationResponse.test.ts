@@ -89,7 +89,7 @@ test('should verify Packed (EC2) attestation', async () => {
   expect(verification.registrationInfo?.credentialID).toEqual(
     isoBase64URL.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
-        'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
+      'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
     ),
   );
 });
@@ -631,6 +631,45 @@ test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert p
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
   });
+});
+
+test('should verify Packed attestation with RSA-PSS SHA-256 public key', async () => {
+  const verified = await verifyRegistrationResponse({
+    credential: {
+      id: "n_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_Q",
+      rawId: "n_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_Q",
+      response: {
+        attestationObject: "o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZzgkY3NpZ1kBAEaJQ9f_DWVWGJMJrHymDCRP7v2cOzeEA8Z1IUsd4GTq65qqg2khO05tKe6QK_NvpWbiLCRJ2E9QiMUu3xGTl7RIrIRp4T2WCjk5tLbLNwsHuFAPyjcuvIlcX2ZsKNL27tTroIz_zbzDk07vf0jhghoS3ec-qKrSZQ-B0ULgyDJf0omzgDRlH6uon7mErtunes9hVDUTn9pG9UJSL-jDptoJyu87NnBFGnlpu-Iur1lMKIEW27m5E7wYxF7IqIF2lylZGqXxh7ji93Bs7Hhik6y1T9KiGmn58rrYMxmBXzprxNQMF7rJxXbSZ9ZfjaZYamMDaoKDyKEhfAiOHXCm8AVoYXV0aERhdGFZAWZJlg3liA6MaHQ0Fw9kdmBbj-SuuaKGMseZXPO6gx2XY0EAAAB1qWxJcH1fTWqB93Yyt64CQAAgn_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_SkAQMDOCQgWQEArEwu_kUDitzDgKOTthwbNnBGfGeUEwv8ksLGvqyRbTNClHnrR9fpaffqQeNor3ndNSReFnZ_3i468d677NMJC4-qoLKu7JP2FIDpt2reDCxg7-XvsaCcDIOucvKR-KIKg9CGiNpkHMhq2auXc4aqYrRjRyuoNYkzpWGENn34govaQQqC5Gdc0yHSeFJLrc9rbQoxMiZY1Ujpe3p9me0VXL4QdNmH_NlnzRclt38Rl8HqQOhrLo6rJOuRc_Ws-BjT0xh8HL8STgTxwb9aKquFkPxylztEy4TAgmOsFv-ukfGwbGO4fszqQKtpsf5-ulO8mfszgY1VrCLmuDzBzdGsdSFDAQAB",
+        clientDataJSON: "eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjaGFsbGVuZ2UiOiI0MHZfaXpNcHpYLUxPTklHekdxMFlieER3TUtNZmRfWHhRenBlNld2NjRZIiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9",
+      },
+      authenticatorAttachment: '',
+      clientExtensionResults: {},
+      type: "public-key",
+    },
+    expectedChallenge: '40v_izMpzX-LONIGzGq0YbxDwMKMfd_XxQzpe6Wv64Y',
+    expectedOrigin: 'http://localhost:8000',
+    expectedRPID: 'localhost',
+  });
+});
+
+test('should verify Packed attestation with RSA-PSS SHA-384 public key', async () => {
+  const verified = await verifyRegistrationResponse({
+    credential: {
+      id: "BCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb0",
+      rawId: "BCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb0",
+      response: {
+        attestationObject: "o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZzglY3NpZ1kBAB7Tn5jK2sn5U4SBuxYzmR-Rg6iU5nox23mUxw6c10RsWcCw0h3aSKaon3gcn_Sfy8cov1YSsJVeUy9jVYJSpfQSS9ZMZXD5btGPf_YKH34j9YSGyTyutquZRxJ01mou2krDIaiXJOGLFpCJfVUBe-ben68MESby_Q2VFA6u3pjayC6Tu_iUJKPwdWPPaJM2P2KwyYtPy2jGIKqn6UFekfHOKpIDInW7QmzZF6JKUXNWqmwddq0vfzBpHlcyCBRDKmbGv667lkOUz9d7h_Lw0ho2HBrqEQuXhfmog5viDsezgHjQ196JZTwIgAO20vWioXiDWwJKjXGUmQxt9OGlQ1doYXV0aERhdGFZAWZJlg3liA6MaHQ0Fw9kdmBbj-SuuaKGMseZXPO6gx2XY0EAAABjBuy6aWZcQpm9f0NUYyTRzQAgBCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb2kAQMDOCUgWQEApgFt6NaWotNSJIfFKOsdNlOtc7vdG7b78Rrnk7oCyUYg9PFVXRhgwSNAKBwimjeRILxcra5roznykpbcv3RIWNaej-tfxG2KYINh5ts8V2I3R2PgtlgwMfSSH9tv65gAzAFRk7tyizHelODhhNUbMVPMc-qTmnBzZANd06w0PN8xnWgCHPaG2MHZkFAOqiNkL4Kv0PPFbQTpy9HZd9ofdQhpKL71iXU4pMFJSSLG8jhY-HM2EwBM2HBTqb06qDjt6UOThCqCqd-ltNRllKWfstkUKQT0XOB-NpZ88037onupO2qDaMSudwolToh3-muuGAYCSANRS3TcNPuYP-s-6yFDAQAB",
+        clientDataJSON: "eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjaGFsbGVuZ2UiOiJwLWphWEhmWUpkbGQ2eTVucklzYTZyblpmNnJnU0MtRm8xcTdBU01VN2s4IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9",
+      },
+      clientExtensionResults: {},
+      authenticatorAttachment: '',
+      type: "public-key",
+    },
+    expectedChallenge: 'p-jaXHfYJdld6y5nrIsa6rnZf6rgSC-Fo1q7ASMU7k8',
+    expectedOrigin: 'http://localhost:8000',
+    expectedRPID: 'localhost',
+  });
+
 });
 
 /**
