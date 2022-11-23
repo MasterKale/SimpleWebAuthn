@@ -103,14 +103,15 @@ export function encodeDevicePubKeyAuthenticatorOutput(
 
 export function decodeDevicePubKeyAuthenticatorOutput(
   encodedDevicePubKey: DevicePublicKeyAuthenticatorOutputJSON
-): DevicePublicKeyAuthenticatorOutput {
+): DevicePublicKeyAuthenticatorOutputExtended {
   const aaguid = base64url.toBuffer(encodedDevicePubKey.aaguid);
   const dpk = base64url.toBuffer(encodedDevicePubKey.dpk);
   const scope = encodedDevicePubKey.scope;
   const nonce = encodedDevicePubKey.nonce ? base64url.toBuffer(encodedDevicePubKey.nonce) : Buffer.from('', 'hex');
   const fmt = encodedDevicePubKey.fmt ? encodedDevicePubKey.fmt : 'none';
 
-  const decodedDevicePubKey: DevicePublicKeyAuthenticatorOutput = {
+  const decodedDevicePubKey: DevicePublicKeyAuthenticatorOutputExtended = {
+    ...encodedDevicePubKey,
     aaguid,
     dpk,
     scope,
@@ -145,7 +146,11 @@ export type DevicePublicKeyAuthenticatorOutput = {
   nonce?: Buffer;
 };
 
+export type DevicePublicKeyAuthenticatorOutputExtended =
+  DevicePublicKeyAuthenticatorOutput | {[key: string]: any}
+
 export type DevicePublicKeyAuthenticatorOutputJSON = {
+  [key: string]: any;
   aaguid: string;
   dpk: string;
   scope: number;

@@ -1,6 +1,7 @@
 import { AttestationStatement } from "@simplewebauthn/typescript-types";
 import {
   DevicePublicKeyAuthenticatorOutput,
+  DevicePublicKeyAuthenticatorOutputExtended,
   DevicePublicKeyAuthenticatorOutputJSON,
   decodeDevicePubKeyAuthenticatorOutput,
 } from './decodeDevicePubKey';
@@ -170,6 +171,6 @@ export function checkAttStmtBinaryEquality(
 }
 
 export type DevicePublicKeyRecognitionResult = {
-  authenticatorOutput: DevicePublicKeyAuthenticatorOutput,
+  authenticatorOutput: DevicePublicKeyAuthenticatorOutputExtended,
   recognitionResult: 'recognized' | 'unrecognized'
 }
