@@ -1,7 +1,7 @@
 
 /* IMPORT */
 
-import type {Crypto} from './types';
+import type { Crypto } from '@simplewebauthn/typescript-types';
 
 /* MAIN */
 

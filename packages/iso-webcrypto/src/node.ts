@@ -2,7 +2,7 @@
 /* IMPORT */
 
 import crypto from 'node:crypto';
-import type {Crypto} from './types';
+import type { Crypto } from '@simplewebauthn/typescript-types';
 
 /* MAIN */
 
