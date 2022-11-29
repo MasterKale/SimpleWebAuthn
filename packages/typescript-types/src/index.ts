@@ -6,7 +6,6 @@
 import type {
   AuthenticatorAssertionResponse,
   AuthenticatorAttestationResponse,
-  COSEAlgorithmIdentifier,
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialDescriptor,
@@ -14,7 +13,6 @@ import type {
   PublicKeyCredentialUserEntity,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
-  AuthenticatorAttachment,
 } from './dom';
 
 export * from './dom';
