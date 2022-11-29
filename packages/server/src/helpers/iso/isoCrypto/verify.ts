@@ -1,4 +1,11 @@
-import { COSEALG, COSEKEYS, COSEPublicKey, isCOSEPublicKeyEC2, isCOSEPublicKeyOKP, isCOSEPublicKeyRSA } from '../../cose';
+import {
+  COSEALG,
+  COSEKEYS,
+  COSEPublicKey,
+  isCOSEPublicKeyEC2,
+  isCOSEPublicKeyOKP,
+  isCOSEPublicKeyRSA,
+} from '../../cose';
 import { verifyEC2 } from './verifyEC2';
 import { verifyRSA } from './verifyRSA';
 import { verifyOKP } from './verifyOKP';
@@ -7,10 +14,10 @@ import { verifyOKP } from './verifyOKP';
  * Verify signatures with their public key. Supports EC2 and RSA public keys.
  */
 export async function verify(opts: {
-  cosePublicKey: COSEPublicKey,
-  signature: Uint8Array,
-  data: Uint8Array,
-  shaHashOverride?: COSEALG,
+  cosePublicKey: COSEPublicKey;
+  signature: Uint8Array;
+  data: Uint8Array;
+  shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 

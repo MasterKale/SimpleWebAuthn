@@ -1,7 +1,7 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
-import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from "../../cose";
-import { mapCoseAlgToWebCryptoAlg } from "./mapCoseAlgToWebCryptoAlg";
+import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
 import { importKey } from './importKey';
 import { isoBase64URL } from '../index';
 import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName';
@@ -10,10 +10,10 @@ import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgNa
  *
  */
 export async function verifyRSA(opts: {
-  cosePublicKey: COSEPublicKeyRSA,
-  signature: Uint8Array,
-  data: Uint8Array,
-  shaHashOverride?: COSEALG,
+  cosePublicKey: COSEPublicKeyRSA;
+  signature: Uint8Array;
+  data: Uint8Array;
+  shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 

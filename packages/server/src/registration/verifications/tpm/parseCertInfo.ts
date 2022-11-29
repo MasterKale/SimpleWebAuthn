@@ -28,12 +28,12 @@ export function parseCertInfo(certInfo: Uint8Array): ParsedCertInfo {
   const extraData = certInfo.slice(pointer, (pointer += extraDataLength));
 
   // Information about the TPM device's internal clock, can be ignored
-  const clock = certInfo.slice(pointer, pointer += 8);
+  const clock = certInfo.slice(pointer, (pointer += 8));
   const resetCount = dataView.getUint32(pointer);
   pointer += 4;
   const restartCount = dataView.getUint32(pointer);
   pointer += 4;
-  const safe = !!certInfo.slice(pointer, pointer += 1);
+  const safe = !!certInfo.slice(pointer, (pointer += 1));
 
   const clockInfo = { clock, resetCount, restartCount, safe };
 

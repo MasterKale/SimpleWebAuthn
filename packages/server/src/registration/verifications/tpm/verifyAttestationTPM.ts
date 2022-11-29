@@ -11,7 +11,14 @@ import {
 import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse';
 
 import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey';
-import { COSEKEYS, isCOSEAlg, COSEKTY, isCOSEPublicKeyRSA, isCOSEPublicKeyEC2, COSEALG } from '../../../helpers/cose';
+import {
+  COSEKEYS,
+  isCOSEAlg,
+  COSEKTY,
+  isCOSEPublicKeyRSA,
+  isCOSEPublicKeyEC2,
+  COSEALG,
+} from '../../../helpers/cose';
 import { toHash } from '../../../helpers/toHash';
 import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
@@ -25,7 +32,9 @@ import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants';
 import { parseCertInfo } from './parseCertInfo';
 import { parsePubArea } from './parsePubArea';
 
-export async function verifyAttestationTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
+export async function verifyAttestationTPM(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
     options;
   const ver = attStmt.get('ver');
@@ -76,7 +85,9 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   if (pubType === 'TPM_ALG_RSA') {
     if (!isCOSEPublicKeyRSA(cosePublicKey)) {
       throw new Error(
-        `Credential public key with kty ${cosePublicKey.get(COSEKEYS.kty)} did not match ${pubType}`,
+        `Credential public key with kty ${cosePublicKey.get(
+          COSEKEYS.kty,
+        )} did not match ${pubType}`,
       );
     }
 
@@ -111,7 +122,9 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   } else if (pubType === 'TPM_ALG_ECC') {
     if (!isCOSEPublicKeyEC2(cosePublicKey)) {
       throw new Error(
-        `Credential public key with kty ${cosePublicKey.get(COSEKEYS.kty)} did not match ${pubType}`,
+        `Credential public key with kty ${cosePublicKey.get(
+          COSEKEYS.kty,
+        )} did not match ${pubType}`,
       );
     }
 
@@ -138,7 +151,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
     }
 
     const pubAreaCurveID = parameters.ecc.curveID;
-    const pubAreaCurveIDMapToCOSECRV = TPM_ECC_CURVE_COSE_CRV_MAP[pubAreaCurveID]
+    const pubAreaCurveIDMapToCOSECRV = TPM_ECC_CURVE_COSE_CRV_MAP[pubAreaCurveID];
     if (pubAreaCurveIDMapToCOSECRV !== crv) {
       throw new Error(
         `Public area key curve ID "${pubAreaCurveID}" mapped to "${pubAreaCurveIDMapToCOSECRV}" which did not match public key crv of "${crv}" (TPM|ECC)`,

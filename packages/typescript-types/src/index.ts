@@ -95,7 +95,12 @@ export interface AuthenticationCredentialJSON
 export interface AuthenticatorAttestationResponseJSON
   extends Omit<
     AuthenticatorAttestationResponseFuture,
-    'clientDataJSON' | 'attestationObject' | 'getTransports' | 'getAuthenticatorData' | 'getPublicKey' | 'getPublicKeyAlgorithm'
+    | 'clientDataJSON'
+    | 'attestationObject'
+    | 'getTransports'
+    | 'getAuthenticatorData'
+    | 'getPublicKey'
+    | 'getPublicKeyAlgorithm'
   > {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;

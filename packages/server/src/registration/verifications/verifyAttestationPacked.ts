@@ -122,7 +122,7 @@ export async function verifyAttestationPacked(
       signature: sig,
       data: signatureBase,
       credentialPublicKey,
-      attestationHashAlgorithm: alg
+      attestationHashAlgorithm: alg,
     });
   }
 

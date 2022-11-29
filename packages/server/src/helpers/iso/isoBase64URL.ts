@@ -8,7 +8,10 @@ import base64 from '@hexagon/base64';
  * @param buffer Value to decode from base64
  * @param to (optional) The decoding to use, in case it's desirable to decode from base64 instead
  */
-export function toBuffer(base64urlString: string, from: 'base64' | 'base64url' = 'base64url'): Uint8Array {
+export function toBuffer(
+  base64urlString: string,
+  from: 'base64' | 'base64url' = 'base64url',
+): Uint8Array {
   const _buffer = base64.toArrayBuffer(base64urlString, from === 'base64url');
   return new Uint8Array(_buffer);
 }

@@ -1,21 +1,21 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
-import { ECDSASigValue } from "@peculiar/asn1-ecc";
+import { ECDSASigValue } from '@peculiar/asn1-ecc';
 import { AsnParser } from '@peculiar/asn1-schema';
 
-import { COSEALG, COSECRV, COSEKEYS, COSEPublicKeyEC2 } from "../../cose";
-import { mapCoseAlgToWebCryptoAlg } from "./mapCoseAlgToWebCryptoAlg";
+import { COSEALG, COSECRV, COSEKEYS, COSEPublicKeyEC2 } from '../../cose';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
 import { importKey } from './importKey';
 import { isoBase64URL, isoUint8Array } from '../index';
-import { SubtleCryptoCrv } from "./structs";
+import { SubtleCryptoCrv } from './structs';
 
 /**
  * Verify a signature using an EC2 public key
  */
 export async function verifyEC2(opts: {
-  cosePublicKey: COSEPublicKeyEC2,
-  signature: Uint8Array,
-  data: Uint8Array,
-  shaHashOverride?: COSEALG,
+  cosePublicKey: COSEPublicKeyEC2;
+  signature: Uint8Array;
+  data: Uint8Array;
+  shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 
@@ -68,7 +68,7 @@ export async function verifyEC2(opts: {
   }
 
   const keyData: JsonWebKey = {
-    kty: "EC",
+    kty: 'EC',
     crv: _crv,
     x: isoBase64URL.fromBuffer(x),
     y: isoBase64URL.fromBuffer(y),
@@ -113,5 +113,5 @@ export async function verifyEC2(opts: {
  * then remove the leading 0x0 byte"
  */
 function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
-  return (bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0);
+  return bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0;
 }

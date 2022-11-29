@@ -6,9 +6,9 @@ import { SubtleCryptoCrv } from './structs';
 import { importKey } from './importKey';
 
 export async function verifyOKP(opts: {
-  cosePublicKey: COSEPublicKeyOKP,
-  signature: Uint8Array,
-  data: Uint8Array,
+  cosePublicKey: COSEPublicKeyOKP;
+  signature: Uint8Array;
+  data: Uint8Array;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data } = opts;
 
@@ -42,9 +42,9 @@ export async function verifyOKP(opts: {
   }
 
   const keyData: JsonWebKey = {
-    kty: "OKP",
+    kty: 'OKP',
     crv: _crv,
-    alg: "EdDSA",
+    alg: 'EdDSA',
     x: isoBase64URL.fromBuffer(x),
     ext: false,
   };

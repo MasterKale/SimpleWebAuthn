@@ -24,7 +24,9 @@ let spyDate: jest.SpyInstance;
 
 beforeEach(async () => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
-  const decodedAttestationObject = decodeAttestationObject(isoBase64URL.toBuffer(attestationObject));
+  const decodedAttestationObject = decodeAttestationObject(
+    isoBase64URL.toBuffer(attestationObject),
+  );
 
   authData = decodedAttestationObject.get('authData');
   attStmt = decodedAttestationObject.get('attStmt');
@@ -87,7 +89,9 @@ test('should validate response with cert path completed with GlobalSign R1 root 
   spyDate.mockReturnValue(new Date('2021-11-15T00:00:42.000Z'));
 
   const { attestationObject, clientDataJSON } = safetyNetUsingGSR1RootCert.response;
-  const decodedAttestationObject = decodeAttestationObject(isoBase64URL.toBuffer(attestationObject));
+  const decodedAttestationObject = decodeAttestationObject(
+    isoBase64URL.toBuffer(attestationObject),
+  );
 
   const _authData = decodedAttestationObject.get('authData');
   const _attStmt = decodedAttestationObject.get('attStmt');
