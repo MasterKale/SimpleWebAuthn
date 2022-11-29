@@ -1,4 +1,4 @@
-import { webcrypto } from 'node:crypto';
+import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
 import { COSEPublicKeyOKP, COSEKEYS, isCOSEAlg, COSECRV } from '../../cose';
 import { isoBase64URL } from '../../index';
@@ -63,9 +63,5 @@ export async function verifyOKP(opts: {
     name: _crv,
   };
 
-  if (globalThis.crypto) {
-    return globalThis.crypto.subtle.verify(verifyAlgorithm, key, signature, data);
-  } else {
-    return webcrypto.subtle.verify(verifyAlgorithm, key, signature, data);
-  }
+  return WebCrypto.subtle.verify(verifyAlgorithm, key, signature, data);
 }

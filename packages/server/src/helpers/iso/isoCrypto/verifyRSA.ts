@@ -1,4 +1,4 @@
-import { webcrypto } from 'node:crypto';
+import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
 import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from "../../cose";
 import { mapCoseAlgToWebCryptoAlg } from "./mapCoseAlgToWebCryptoAlg";
@@ -100,9 +100,5 @@ export async function verifyRSA(opts: {
     algorithm: keyAlgorithm,
   });
 
-  if (globalThis.crypto) {
-    return globalThis.crypto.subtle.verify(verifyAlgorithm, key, signature, data);
-  } else {
-    return webcrypto.subtle.verify(verifyAlgorithm, key, signature, data);
-  }
+  return WebCrypto.subtle.verify(verifyAlgorithm, key, signature, data);
 }

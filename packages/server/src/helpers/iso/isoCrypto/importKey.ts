@@ -1,4 +1,4 @@
-import { webcrypto } from 'node:crypto';
+import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
 export async function importKey(opts: {
   keyData: JsonWebKey,
@@ -6,9 +6,5 @@ export async function importKey(opts: {
 }): Promise<CryptoKey> {
   const { keyData, algorithm } = opts;
 
-  if (globalThis.crypto) {
-    return globalThis.crypto.subtle.importKey('jwk', keyData, algorithm, false, ['verify']);
-  } else {
-    return webcrypto.subtle.importKey('jwk', keyData, algorithm, false, ['verify']);
-  }
+  return WebCrypto.subtle.importKey('jwk', keyData, algorithm, false, ['verify']);
 }

@@ -1,4 +1,4 @@
-import { webcrypto } from 'node:crypto';
+import WebCrypto from '@simplewebauthn/iso-webcrypto';
 import { ECDSASigValue } from "@peculiar/asn1-ecc";
 import { AsnParser } from '@peculiar/asn1-schema';
 
@@ -102,11 +102,7 @@ export async function verifyEC2(opts: {
     hash: { name: subtleAlg },
   };
 
-  if (globalThis.crypto) {
-    return globalThis.crypto.subtle.verify(verifyAlgorithm, key, finalSignature, data);
-  } else {
-    return webcrypto.subtle.verify(verifyAlgorithm, key, finalSignature, data);
-  }
+  return WebCrypto.subtle.verify(verifyAlgorithm, key, finalSignature, data);
 }
 
 /**
