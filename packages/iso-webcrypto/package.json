@@ -1,0 +1,40 @@
+{
+  "name": "@simplewebauthn/iso-webcrypto",
+  "version": "6.2.1",
+  "description": "A small library for accessing a runtime's WebCrypto API",
+  "main": "dist/node.js",
+  "types": "./dist/node.d.ts",
+  "exports": {
+    "node": "./dist/node.js",
+    "default": "./dist/browser.js"
+  },
+  "author": "Matthew Miller <matthew@millerti.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+    "directory": "packages/iso-webcrypto"
+  },
+  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/iso-webcrypto#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsex compile",
+    "build:watch": "tsex compile --watch",
+    "prepublish": "npm run build"
+  },
+  "keywords": [
+    "typescript",
+    "isomorphic",
+    "webcrypto",
+    "browser",
+    "node"
+  ],
+  "devDependencies": {
+    "@simplewebauthn/typescript-types": "*",
+    "@types/node": "^18.11.9",
+    "tsex": "^1.0.4",
+    "typescript": "^4.9.3"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "extends": "tsex/tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "preserveValueImports": false,
+  }
+}
