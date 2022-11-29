@@ -20,7 +20,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rimraf dist && tsex compile",
+    "build": "rimraf dist && tsex compile > output.txt; cat output.txt; rm output.txt",
     "build:watch": "tsex compile --watch",
     "prepublish": "npm run build"
   },
