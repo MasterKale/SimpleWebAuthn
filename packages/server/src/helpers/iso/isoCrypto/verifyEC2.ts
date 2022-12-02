@@ -19,21 +19,6 @@ export async function verifyEC2(opts: {
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 
-  // The signature is wrapped in ASN.1 structure, so we need to peel it apart
-  const parsedSignature = AsnParser.parse(signature, ECDSASigValue);
-  let rBytes = new Uint8Array(parsedSignature.r);
-  let sBytes = new Uint8Array(parsedSignature.s);
-
-  if (shouldRemoveLeadingZero(rBytes)) {
-    rBytes = rBytes.slice(1);
-  }
-
-  if (shouldRemoveLeadingZero(sBytes)) {
-    sBytes = sBytes.slice(1);
-  }
-
-  const finalSignature = isoUint8Array.concat([rBytes, sBytes]);
-
   // Import the public key
   const alg = cosePublicKey.get(COSEKEYS.alg);
   const crv = cosePublicKey.get(COSEKEYS.crv);
@@ -101,6 +86,21 @@ export async function verifyEC2(opts: {
     name: 'ECDSA',
     hash: { name: subtleAlg },
   };
+
+  // The signature is wrapped in ASN.1 structure, so we need to peel it apart
+  const parsedSignature = AsnParser.parse(signature, ECDSASigValue);
+  let rBytes = new Uint8Array(parsedSignature.r);
+  let sBytes = new Uint8Array(parsedSignature.s);
+
+  if (shouldRemoveLeadingZero(rBytes)) {
+    rBytes = rBytes.slice(1);
+  }
+
+  if (shouldRemoveLeadingZero(sBytes)) {
+    sBytes = sBytes.slice(1);
+  }
+
+  const finalSignature = isoUint8Array.concat([rBytes, sBytes]);
 
   return WebCrypto.subtle.verify(verifyAlgorithm, key, finalSignature, data);
 }

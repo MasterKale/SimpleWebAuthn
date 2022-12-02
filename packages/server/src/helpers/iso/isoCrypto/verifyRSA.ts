@@ -7,7 +7,7 @@ import { isoBase64URL } from '../index';
 import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName';
 
 /**
- *
+ * Verify a signature using an RSA public key
  */
 export async function verifyRSA(opts: {
   cosePublicKey: COSEPublicKeyRSA;
