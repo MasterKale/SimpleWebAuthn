@@ -1,10 +1,10 @@
-import base64url from 'base64url';
+// TODO: This test can take upwards of 7 seconds to complete locally, more in CI...need to figure
+// out why
+jest.setTimeout(30000);
 
 import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
 
 test('should verify Apple attestation', async () => {
-  const expectedChallenge = 'h5xSyIRMx2IQPr1mQk6GD98XSQOBHgMHVpJIkMV9Nkc';
-  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
     credential: {
       id: 'J4lAqPXhefDrUD7oh5LQMbBH5TE',
@@ -17,8 +17,9 @@ test('should verify Apple attestation', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
-    expectedChallenge,
+    expectedChallenge: 'h5xSyIRMx2IQPr1mQk6GD98XSQOBHgMHVpJIkMV9Nkc',
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
   });

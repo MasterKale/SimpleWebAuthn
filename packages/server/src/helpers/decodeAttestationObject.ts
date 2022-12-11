@@ -1,13 +1,12 @@
-import cbor from 'cbor';
+import { isoCBOR } from './iso';
 
 /**
  * Convert an AttestationObject buffer to a proper object
  *
  * @param base64AttestationObject Attestation Object buffer
  */
-export function decodeAttestationObject(attestationObject: Buffer): AttestationObject {
-  const toCBOR: AttestationObject = cbor.decodeAllSync(attestationObject)[0];
-  return toCBOR;
+export function decodeAttestationObject(attestationObject: Uint8Array): AttestationObject {
+  return isoCBOR.decodeFirst<AttestationObject>(attestationObject);
 }
 
 export type AttestationFormat =
@@ -20,17 +19,23 @@ export type AttestationFormat =
   | 'none';
 
 export type AttestationObject = {
-  fmt: AttestationFormat;
-  attStmt: AttestationStatement;
-  authData: Buffer;
+  get(key: 'fmt'): AttestationFormat;
+  get(key: 'attStmt'): AttestationStatement;
+  get(key: 'authData'): Uint8Array;
 };
 
+/**
+ * `AttestationStatement` will be an instance of `Map`, but these keys help make finite the list of
+ * possible values within it.
+ */
 export type AttestationStatement = {
-  sig?: Buffer;
-  x5c?: Buffer[];
-  response?: Buffer;
-  alg?: number;
-  ver?: string;
-  certInfo?: Buffer;
-  pubArea?: Buffer;
+  get(key: 'sig'): Uint8Array | undefined;
+  get(key: 'x5c'): Uint8Array[] | undefined;
+  get(key: 'response'): Uint8Array | undefined;
+  get(key: 'alg'): number | undefined;
+  get(key: 'ver'): string | undefined;
+  get(key: 'certInfo'): Uint8Array | undefined;
+  get(key: 'pubArea'): Uint8Array | undefined;
+  // `Map` properties
+  get size(): number;
 };

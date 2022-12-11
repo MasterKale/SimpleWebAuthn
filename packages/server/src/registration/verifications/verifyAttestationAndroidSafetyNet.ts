@@ -1,5 +1,3 @@
-import base64url from 'base64url';
-
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
 import { toHash } from '../../helpers/toHash';
@@ -7,6 +5,7 @@ import { verifySignature } from '../../helpers/verifySignature';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
+import { isoUint8Array, isoBase64URL } from '../../helpers/iso';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
@@ -25,7 +24,9 @@ export async function verifyAttestationAndroidSafetyNet(
     verifyTimestampMS = true,
     credentialPublicKey,
   } = options;
-  const { alg, response, ver } = attStmt;
+  const alg = attStmt.get('alg');
+  const response = attStmt.get('response');
+  const ver = attStmt.get('ver');
 
   if (!ver) {
     throw new Error('No ver value in attestation (SafetyNet)');
@@ -36,11 +37,11 @@ export async function verifyAttestationAndroidSafetyNet(
   }
 
   // Prepare to verify a JWT
-  const jwt = response.toString('utf8');
+  const jwt = isoUint8Array.toUTF8String(response);
   const jwtParts = jwt.split('.');
 
-  const HEADER: SafetyNetJWTHeader = JSON.parse(base64url.decode(jwtParts[0]));
-  const PAYLOAD: SafetyNetJWTPayload = JSON.parse(base64url.decode(jwtParts[1]));
+  const HEADER: SafetyNetJWTHeader = JSON.parse(isoBase64URL.toString(jwtParts[0]));
+  const PAYLOAD: SafetyNetJWTPayload = JSON.parse(isoBase64URL.toString(jwtParts[1]));
   const SIGNATURE: SafetyNetJWTSignature = jwtParts[2];
 
   /**
@@ -63,9 +64,9 @@ export async function verifyAttestationAndroidSafetyNet(
     }
   }
 
-  const nonceBase = Buffer.concat([authData, clientDataHash]);
-  const nonceBuffer = toHash(nonceBase);
-  const expectedNonce = nonceBuffer.toString('base64');
+  const nonceBase = isoUint8Array.concat([authData, clientDataHash]);
+  const nonceBuffer = await toHash(nonceBase);
+  const expectedNonce = isoBase64URL.fromBuffer(nonceBuffer, 'base64');
 
   if (nonce !== expectedNonce) {
     throw new Error('Could not verify payload nonce (SafetyNet)');
@@ -81,7 +82,8 @@ export async function verifyAttestationAndroidSafetyNet(
   /**
    * START Verify Header
    */
-  const leafCertBuffer = base64url.toBuffer(HEADER.x5c[0]);
+  // `HEADER.x5c[0]` is definitely a base64 string
+  const leafCertBuffer = isoBase64URL.toBuffer(HEADER.x5c[0], 'base64');
   const leafCertInfo = getCertificateInfo(leafCertBuffer);
 
   const { subject } = leafCertInfo;
@@ -121,13 +123,13 @@ export async function verifyAttestationAndroidSafetyNet(
   /**
    * START Verify Signature
    */
-  const signatureBaseBuffer = Buffer.from(`${jwtParts[0]}.${jwtParts[1]}`);
-  const signatureBuffer = base64url.toBuffer(SIGNATURE);
+  const signatureBaseBuffer = isoUint8Array.fromUTF8String(`${jwtParts[0]}.${jwtParts[1]}`);
+  const signatureBuffer = isoBase64URL.toBuffer(SIGNATURE);
 
   const verified = await verifySignature({
     signature: signatureBuffer,
-    signatureBase: signatureBaseBuffer,
-    leafCert: leafCertBuffer,
+    data: signatureBaseBuffer,
+    leafCertificate: leafCertBuffer,
   });
   /**
    * END Verify Signature

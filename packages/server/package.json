@@ -30,10 +30,11 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "scripts": {
     "build": "rimraf dist && tsc",
+    "build:lerna-debug": "rimraf dist && tsc > output.txt; cat output.txt; rm output.txt",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "npm test -- --coverage",
@@ -47,24 +48,23 @@
     "node"
   ],
   "dependencies": {
-    "@noble/ed25519": "^1.6.1",
+    "@hexagon/base64": "^1.1.25",
     "@peculiar/asn1-android": "^2.1.7",
+    "@peculiar/asn1-ecc": "^2.3.4",
+    "@peculiar/asn1-rsa": "^2.3.4",
     "@peculiar/asn1-schema": "^2.1.7",
     "@peculiar/asn1-x509": "^2.1.7",
-    "base64url": "^3.0.1",
-    "cbor": "^5.1.0",
+    "@simplewebauthn/iso-webcrypto": "*",
+    "cbor-x": "^1.4.1",
+    "cross-fetch": "^3.1.5",
     "debug": "^4.3.2",
-    "jsrsasign": "^10.4.0",
-    "jwk-to-pem": "^2.0.4",
-    "node-fetch": "^2.6.0"
+    "jsrsasign": "^10.4.0"
   },
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb",
   "devDependencies": {
     "@simplewebauthn/typescript-types": "*",
-    "@types/cbor": "^5.0.1",
     "@types/debug": "^4.1.7",
     "@types/jsrsasign": "^8.0.13",
-    "@types/jwk-to-pem": "^2.0.1",
-    "@types/node-fetch": "^2.5.12"
+    "@types/node": "^18.11.9"
   }
 }

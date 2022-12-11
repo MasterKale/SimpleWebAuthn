@@ -4,6 +4,8 @@ import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
+import { isoUint8Array } from '../../helpers/iso';
+import { COSEALG } from '../../helpers/cose';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
@@ -17,14 +19,14 @@ export async function verifyAttestationFIDOU2F(
     rpIdHash,
     credentialID,
     credentialPublicKey,
-    aaguid = '',
+    aaguid,
     rootCertificates,
   } = options;
 
-  const reservedByte = Buffer.from([0x00]);
+  const reservedByte = Uint8Array.from([0x00]);
   const publicKey = convertCOSEtoPKCS(credentialPublicKey);
 
-  const signatureBase = Buffer.concat([
+  const signatureBase = isoUint8Array.concat([
     reservedByte,
     rpIdHash,
     clientDataHash,
@@ -32,7 +34,8 @@ export async function verifyAttestationFIDOU2F(
     publicKey,
   ]);
 
-  const { sig, x5c } = attStmt;
+  const sig = attStmt.get('sig');
+  const x5c = attStmt.get('x5c');
 
   if (!x5c) {
     throw new Error('No attestation certificate provided in attestation statement (FIDOU2F)');
@@ -43,7 +46,7 @@ export async function verifyAttestationFIDOU2F(
   }
 
   // FIDO spec says that aaguid _must_ equal 0x00 here to be legit
-  const aaguidToHex = Number.parseInt(aaguid.toString('hex'), 16);
+  const aaguidToHex = Number.parseInt(isoUint8Array.toHex(aaguid), 16);
   if (aaguidToHex !== 0x00) {
     throw new Error(`AAGUID "${aaguidToHex}" was not expected value`);
   }
@@ -58,7 +61,8 @@ export async function verifyAttestationFIDOU2F(
 
   return verifySignature({
     signature: sig,
-    signatureBase,
-    leafCert: x5c[0],
+    data: signatureBase,
+    leafCertificate: x5c[0],
+    attestationHashAlgorithm: COSEALG.ES256,
   });
 }

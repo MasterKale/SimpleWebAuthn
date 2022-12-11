@@ -1,4 +1,3 @@
-import base64url from 'base64url';
 import {
   AuthenticationCredentialJSON,
   AuthenticatorDevice,
@@ -10,9 +9,10 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { toHash } from '../helpers/toHash';
 import { verifySignature } from '../helpers/verifySignature';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
-import { isBase64URLString } from '../helpers/isBase64URLString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
+import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
 export type VerifyAuthenticationResponseOpts = {
   credential: AuthenticationCredentialJSON;
@@ -120,11 +120,11 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  if (!isBase64URLString(response.authenticatorData)) {
+  if (!isoBase64URL.isBase64url(response.authenticatorData)) {
     throw new Error('Credential response authenticatorData was not a base64url string');
   }
 
-  if (!isBase64URLString(response.signature)) {
+  if (!isoBase64URL.isBase64url(response.signature)) {
     throw new Error('Credential response signature was not a base64url string');
   }
 
@@ -142,27 +142,19 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const authDataBuffer = base64url.toBuffer(response.authenticatorData);
+  const authDataBuffer = isoBase64URL.toBuffer(response.authenticatorData);
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
   const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
+  let expectedRPIDs: string[] = [];
   if (typeof expectedRPID === 'string') {
-    const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-    if (!rpIdHash.equals(expectedRPIDHash)) {
-      throw new Error(`Unexpected RP ID hash`);
-    }
+    expectedRPIDs = [expectedRPID];
   } else {
-    // Go through each expected RP ID and try to find one that matches
-    const foundMatch = expectedRPID.some(expected => {
-      const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
-      return rpIdHash.equals(expectedRPIDHash);
-    });
-
-    if (!foundMatch) {
-      throw new Error(`Unexpected RP ID hash`);
-    }
+    expectedRPIDs = expectedRPID;
   }
+
+  await matchExpectedRPID(rpIdHash, expectedRPIDs);
 
   if (advancedFIDOConfig !== undefined) {
     const { userVerification: fidoUserVerification } = advancedFIDOConfig;
@@ -193,10 +185,10 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
-  const signatureBase = Buffer.concat([authDataBuffer, clientDataHash]);
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(response.clientDataJSON));
+  const signatureBase = isoUint8Array.concat([authDataBuffer, clientDataHash]);
 
-  const signature = base64url.toBuffer(response.signature);
+  const signature = isoBase64URL.toBuffer(response.signature);
 
   if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
     // Error out when the counter in the DB is greater than or equal to the counter in the
@@ -213,7 +205,7 @@ export async function verifyAuthenticationResponse(
   const toReturn: VerifiedAuthenticationResponse = {
     verified: await verifySignature({
       signature,
-      signatureBase,
+      data: signatureBase,
       credentialPublicKey: authenticator.credentialPublicKey,
     }),
     authenticationInfo: {
@@ -250,7 +242,7 @@ export async function verifyAuthenticationResponse(
 export type VerifiedAuthenticationResponse = {
   verified: boolean;
   authenticationInfo: {
-    credentialID: Buffer;
+    credentialID: Uint8Array;
     newCounter: number;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;

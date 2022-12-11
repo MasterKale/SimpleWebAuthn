@@ -1,4 +1,0 @@
-/**
- * @packageDocumentation
- * @module @simplewebauthn/testing
- */

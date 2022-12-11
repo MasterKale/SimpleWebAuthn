@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fetch from 'cross-fetch';
 import { KJUR } from 'jsrsasign';
 
 import { validateCertificatePath } from '../helpers/validateCertificatePath';
@@ -139,7 +139,7 @@ export class BaseMetadataService {
    * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
    * BLOB download.
    */
-  async getStatement(aaguid: string | Buffer): Promise<MetadataStatement | undefined> {
+  async getStatement(aaguid: string | Uint8Array): Promise<MetadataStatement | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
       return;
     }
@@ -148,7 +148,7 @@ export class BaseMetadataService {
       return;
     }
 
-    if (aaguid instanceof Buffer) {
+    if (aaguid instanceof Uint8Array) {
       aaguid = convertAAGUIDToString(aaguid);
     }
 
@@ -286,7 +286,7 @@ export class BaseMetadataService {
       let iterations = totalTimeoutMS / intervalMS;
 
       // Check service state every `intervalMS` milliseconds
-      const intervalID: NodeJS.Timeout = global.setInterval(() => {
+      const intervalID: NodeJS.Timeout = globalThis.setInterval(() => {
         if (iterations < 1) {
           clearInterval(intervalID);
           reject(`State did not become ready in ${totalTimeoutMS / 1000} seconds`);

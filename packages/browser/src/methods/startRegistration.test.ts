@@ -96,9 +96,14 @@ test('should return base64url-encoded response values', async () => {
         response: {
           attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
           clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
+          getTransports: () => [],
+          getAuthenticatorData: () => new Uint8Array(),
+          getPublicKey: () => null,
+          getPublicKeyAlgorithm: () => -999,
         },
         getClientExtensionResults: () => ({}),
         type: 'webauthn.create',
+        authenticatorAttachment: '',
       });
     });
   });
@@ -132,7 +137,9 @@ test('should send extensions to authenticator if present in options', async () =
   const extensions: AuthenticationExtensionsClientInputs = {
     credProps: true,
     appid: 'appidHere',
+    // @ts-ignore
     uvm: true,
+    // @ts-ignore
     appidExclude: 'appidExcludeHere',
   };
   const optsWithExts: PublicKeyCredentialCreationOptionsJSON = {

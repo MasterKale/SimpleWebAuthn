@@ -187,6 +187,6 @@ export const TPM_ECC_CURVE_COSE_CRV_MAP: { [key: string]: number } = {
   TPM_ECC_NIST_P256: 1, // p256
   TPM_ECC_NIST_P384: 2, // p384
   TPM_ECC_NIST_P521: 3, // p521
-  TPM_ECC_BN_P256: 1,   // p256
-  TPM_ECC_SM2_P256: 1,  // p256
+  TPM_ECC_BN_P256: 1, // p256
+  TPM_ECC_SM2_P256: 1, // p256
 };

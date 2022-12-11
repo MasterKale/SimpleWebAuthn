@@ -1,4 +1,3 @@
-import base64url from 'base64url';
 import {
   RegistrationCredentialJSON,
   COSEAlgorithmIdentifier,
@@ -15,9 +14,11 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEKEYS } from '../helpers/convertCOSEtoPKCS';
+import { COSEKEYS } from '../helpers/cose';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
 import { parseBackupFlags } from '../helpers/parseBackupFlags';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
+import { isoBase64URL } from '../helpers/iso';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
@@ -129,9 +130,11 @@ export async function verifyRegistrationResponse(
     }
   }
 
-  const attestationObject = base64url.toBuffer(response.attestationObject);
+  const attestationObject = isoBase64URL.toBuffer(response.attestationObject);
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
-  const { fmt, authData, attStmt } = decodedAttestationObject;
+  const fmt = decodedAttestationObject.get('fmt');
+  const authData = decodedAttestationObject.get('authData');
+  const attStmt = decodedAttestationObject.get('attStmt');
 
   const parsedAuthData = parseAuthenticatorData(authData);
   const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsData } =
@@ -139,22 +142,14 @@ export async function verifyRegistrationResponse(
 
   // Make sure the response's RP ID is ours
   if (expectedRPID) {
+    let expectedRPIDs: string[] = [];
     if (typeof expectedRPID === 'string') {
-      const expectedRPIDHash = toHash(Buffer.from(expectedRPID, 'ascii'));
-      if (!rpIdHash.equals(expectedRPIDHash)) {
-        throw new Error(`Unexpected RP ID hash`);
-      }
+      expectedRPIDs = [expectedRPID];
     } else {
-      // Go through each expected RP ID and try to find one that matches
-      const foundMatch = expectedRPID.some(expected => {
-        const expectedRPIDHash = toHash(Buffer.from(expected, 'ascii'));
-        return rpIdHash.equals(expectedRPIDHash);
-      });
-
-      if (!foundMatch) {
-        throw new Error(`Unexpected RP ID hash`);
-      }
+      expectedRPIDs = expectedRPID;
     }
+
+    await matchExpectedRPID(rpIdHash, expectedRPIDs);
   }
 
   // Make sure someone was physically present
@@ -192,7 +187,7 @@ export async function verifyRegistrationResponse(
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
-  const clientDataHash = toHash(base64url.toBuffer(response.clientDataJSON));
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(response.clientDataJSON));
   const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
 
   // Prepare arguments to pass to the relevant verification method
@@ -224,7 +219,7 @@ export async function verifyRegistrationResponse(
   } else if (fmt === 'apple') {
     verified = await verifyAttestationApple(verifierOpts);
   } else if (fmt === 'none') {
-    if (Object.keys(attStmt).length > 0) {
+    if (attStmt.size > 0) {
       throw new Error('None attestation had unexpected attestation statement');
     }
     // This is the weaker of the attestations, so there's nothing else to really check
@@ -287,10 +282,10 @@ export type VerifiedRegistrationResponse = {
     fmt: AttestationFormat;
     counter: number;
     aaguid: string;
-    credentialID: Buffer;
-    credentialPublicKey: Buffer;
+    credentialID: Uint8Array;
+    credentialPublicKey: Uint8Array;
     credentialType: 'public-key';
-    attestationObject: Buffer;
+    attestationObject: Uint8Array;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
@@ -302,13 +297,13 @@ export type VerifiedRegistrationResponse = {
  * Values passed to all attestation format verifiers, from which they are free to use as they please
  */
 export type AttestationFormatVerifierOpts = {
-  aaguid: Buffer;
+  aaguid: Uint8Array;
   attStmt: AttestationStatement;
-  authData: Buffer;
-  clientDataHash: Buffer;
-  credentialID: Buffer;
-  credentialPublicKey: Buffer;
+  authData: Uint8Array;
+  clientDataHash: Uint8Array;
+  credentialID: Uint8Array;
+  credentialPublicKey: Uint8Array;
   rootCertificates: string[];
-  rpIdHash: Buffer;
+  rpIdHash: Uint8Array;
   verifyTimestampMS?: boolean;
 };

@@ -175,7 +175,7 @@ test('should require resident key if residentKey option is absent but requireRes
     userName: 'usernameHere',
     authenticatorSelection: {
       requireResidentKey: true,
-    }
+    },
   });
 
   expect(options.authenticatorSelection?.requireResidentKey).toEqual(true);
@@ -190,7 +190,7 @@ test('should discourage resident key if residentKey option is absent but require
     userName: 'usernameHere',
     authenticatorSelection: {
       requireResidentKey: false,
-    }
+    },
   });
 
   expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);

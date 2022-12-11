@@ -1,10 +1,11 @@
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import { COSEALGHASH } from '../../helpers/convertCOSEtoPKCS';
+import { isCOSEAlg } from '../../helpers/cose';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { verifySignature } from '../../helpers/verifySignature';
+import { isoUint8Array } from '../../helpers/iso';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
@@ -17,17 +18,23 @@ export async function verifyAttestationPacked(
   const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid, rootCertificates } =
     options;
 
-  const { sig, x5c, alg } = attStmt;
+  const sig = attStmt.get('sig');
+  const x5c = attStmt.get('x5c');
+  const alg = attStmt.get('alg');
 
   if (!sig) {
     throw new Error('No attestation signature provided in attestation statement (Packed)');
   }
 
-  if (typeof alg !== 'number') {
-    throw new Error(`Attestation Statement alg "${alg}" is not a number (Packed)`);
+  if (!alg) {
+    throw new Error('Attestation statement did not contain alg (Packed)');
   }
 
-  const signatureBase = Buffer.concat([authData, clientDataHash]);
+  if (!isCOSEAlg(alg)) {
+    throw new Error(`Attestation statement contained invalid alg ${alg} (Packed)`);
+  }
+
+  const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
 
   let verified = false;
 
@@ -107,17 +114,15 @@ export async function verifyAttestationPacked(
 
     verified = await verifySignature({
       signature: sig,
-      signatureBase,
-      leafCert: x5c[0],
+      data: signatureBase,
+      leafCertificate: x5c[0],
     });
   } else {
-    const hashAlg: string = COSEALGHASH[alg as number];
-
     verified = await verifySignature({
       signature: sig,
-      signatureBase,
+      data: signatureBase,
       credentialPublicKey,
-      hashAlgorithm: hashAlg
+      attestationHashAlgorithm: alg,
     });
   }
 

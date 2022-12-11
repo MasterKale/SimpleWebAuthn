@@ -4,7 +4,14 @@ import type { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../helpers/validateCertificatePath';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEKEYS, COSEKTY } from '../helpers/convertCOSEtoPKCS';
+import {
+  COSEALG,
+  COSECRV,
+  COSEKEYS,
+  COSEKTY,
+  COSEPublicKeyEC2,
+  isCOSEPublicKeyEC2,
+} from '../helpers/cose';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as
@@ -17,15 +24,11 @@ export async function verifyAttestationWithMetadata({
   attestationStatementAlg,
 }: {
   statement: MetadataStatement;
-  credentialPublicKey: Buffer;
-  x5c: Buffer[] | Base64URLString[];
+  credentialPublicKey: Uint8Array;
+  x5c: Uint8Array[] | Base64URLString[];
   attestationStatementAlg?: number;
 }): Promise<boolean> {
-  const {
-    authenticationAlgorithms,
-    authenticatorGetInfo,
-    attestationRootCertificates,
-  } = statement;
+  const { authenticationAlgorithms, authenticatorGetInfo, attestationRootCertificates } = statement;
 
   // Make sure the alg in the attestation statement matches one of the ones specified in metadata
   const keypairCOSEAlgs: Set<COSEInfo> = new Set();
@@ -41,14 +44,28 @@ export async function verifyAttestationWithMetadata({
 
   // Extract the public key's COSE info for comparison
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
+
+  const kty = decodedPublicKey.get(COSEKEYS.kty);
+  const alg = decodedPublicKey.get(COSEKEYS.alg);
+
+  if (!kty) {
+    throw new Error('Credential public key was missing kty');
+  }
+
+  if (!alg) {
+    throw new Error('Credential public key was missing alg');
+  }
+
+  if (!kty) {
+    throw new Error('Credential public key was missing kty');
+  }
+
   // Assume everything is a number because these values should be
-  const publicKeyCOSEInfo: COSEInfo = {
-    kty: decodedPublicKey.get(COSEKEYS.kty) as number,
-    alg: decodedPublicKey.get(COSEKEYS.alg) as number,
-    crv: decodedPublicKey.get(COSEKEYS.crv) as number,
-  };
-  if (!publicKeyCOSEInfo.crv) {
-    delete publicKeyCOSEInfo.crv;
+  const publicKeyCOSEInfo: COSEInfo = { kty, alg };
+
+  if (isCOSEPublicKeyEC2(decodedPublicKey)) {
+    const crv = decodedPublicKey.get(COSEKEYS.crv);
+    publicKeyCOSEInfo.crv = crv;
   }
 
   /**
@@ -90,8 +107,9 @@ export async function verifyAttestationWithMetadata({
      * ]
      * ```
      */
-    const debugMDSAlgs = authenticationAlgorithms
-      .map((algSign) => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`);
+    const debugMDSAlgs = authenticationAlgorithms.map(
+      algSign => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`,
+    );
     const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, '');
 
     /**
@@ -126,10 +144,7 @@ export async function verifyAttestationWithMetadata({
    * certificate chain validation.
    */
   let authenticatorIsSelfReferencing = false;
-  if (
-    authenticatorCerts.length === 1 &&
-    statementRootCerts.indexOf(authenticatorCerts[0]) >= 0
-  ) {
+  if (authenticatorCerts.length === 1 && statementRootCerts.indexOf(authenticatorCerts[0]) >= 0) {
     authenticatorIsSelfReferencing = true;
   }
 
@@ -148,9 +163,9 @@ export async function verifyAttestationWithMetadata({
 }
 
 type COSEInfo = {
-  kty: number;
-  alg: number;
-  crv?: number;
+  kty: COSEKTY;
+  alg: COSEALG;
+  crv?: COSECRV;
 };
 
 /**

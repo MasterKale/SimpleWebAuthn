@@ -4,13 +4,13 @@ import type {
   PublicKeyCredentialDescriptorFuture,
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
-import base64url from 'base64url';
 
+import { isoBase64URL, isoUint8Array } from '../helpers/iso';
 import { generateChallenge } from '../helpers/generateChallenge';
 
 export type GenerateAuthenticationOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptorFuture[];
-  challenge?: string | Buffer;
+  challenge?: string | Uint8Array;
   timeout?: number;
   userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;
@@ -42,11 +42,19 @@ export function generateAuthenticationOptions(
     rpID,
   } = options;
 
+  /**
+   * Preserve ability to specify `string` values for challenges
+   */
+  let _challenge = challenge;
+  if (typeof _challenge === 'string') {
+    _challenge = isoUint8Array.fromUTF8String(_challenge);
+  }
+
   return {
-    challenge: base64url.encode(challenge),
+    challenge: isoBase64URL.fromBuffer(_challenge),
     allowCredentials: allowCredentials?.map(cred => ({
       ...cred,
-      id: base64url.encode(cred.id as Buffer),
+      id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),
     timeout,
     userVerification,

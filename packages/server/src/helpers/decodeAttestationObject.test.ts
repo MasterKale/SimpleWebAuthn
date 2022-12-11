@@ -11,9 +11,9 @@ test('should decode base64url-encoded indirect attestationObject', () => {
     ),
   );
 
-  expect(decoded.fmt).toEqual('none');
-  expect(decoded.attStmt).toEqual({});
-  expect(decoded.authData).toBeDefined();
+  expect(decoded.get('fmt')).toEqual('none');
+  expect(decoded.get('attStmt')).toEqual(new Map());
+  expect(decoded.get('authData')).toBeDefined();
 });
 
 test('should decode base64url-encoded direct attestationObject', () => {
@@ -38,8 +38,8 @@ test('should decode base64url-encoded direct attestationObject', () => {
     ),
   );
 
-  expect(decoded.fmt).toEqual('fido-u2f');
-  expect(decoded.attStmt.sig).toBeDefined();
-  expect(decoded.attStmt.x5c).toBeDefined();
-  expect(decoded.authData).toBeDefined();
+  expect(decoded.get('fmt')).toEqual('fido-u2f');
+  expect(decoded.get('attStmt').get('sig')).toBeDefined();
+  expect(decoded.get('attStmt').get('x5c')).toBeDefined();
+  expect(decoded.get('authData')).toBeDefined();
 });

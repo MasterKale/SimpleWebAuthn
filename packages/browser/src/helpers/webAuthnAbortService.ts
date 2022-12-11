@@ -15,8 +15,10 @@ class WebAuthnAbortService {
       this.controller.abort('Cancelling existing WebAuthn API call for new one');
     }
 
-    this.controller = new AbortController();
-    return this.controller.signal;
+    const newController = new AbortController();
+
+    this.controller = newController;
+    return newController.signal;
   }
 }
 

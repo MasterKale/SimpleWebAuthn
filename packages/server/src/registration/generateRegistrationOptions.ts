@@ -7,16 +7,16 @@ import type {
   PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
-import base64url from 'base64url';
 
 import { generateChallenge } from '../helpers/generateChallenge';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
   rpID: string;
   userID: string;
   userName: string;
-  challenge?: string | Buffer;
+  challenge?: string | Uint8Array;
   userDisplayName?: string;
   timeout?: number;
   attestationType?: AttestationConveyancePreference;
@@ -151,8 +151,16 @@ export function generateRegistrationOptions(
     authenticatorSelection.requireResidentKey = authenticatorSelection.residentKey === 'required';
   }
 
+  /**
+   * Preserve ability to specify `string` values for challenges
+   */
+  let _challenge = challenge;
+  if (typeof _challenge === 'string') {
+    _challenge = isoUint8Array.fromASCIIString(_challenge);
+  }
+
   return {
-    challenge: base64url.encode(challenge),
+    challenge: isoBase64URL.fromBuffer(_challenge),
     rp: {
       name: rpName,
       id: rpID,
@@ -167,7 +175,7 @@ export function generateRegistrationOptions(
     attestation: attestationType,
     excludeCredentials: excludeCredentials.map(cred => ({
       ...cred,
-      id: base64url.encode(cred.id as Buffer),
+      id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),
     authenticatorSelection,
     extensions,

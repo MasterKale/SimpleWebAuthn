@@ -6,7 +6,6 @@
 import type {
   AuthenticatorAssertionResponse,
   AuthenticatorAttestationResponse,
-  COSEAlgorithmIdentifier,
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialDescriptor,
@@ -14,7 +13,6 @@ import type {
   PublicKeyCredentialUserEntity,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
-  AuthenticatorAttachment,
 } from './dom';
 
 export * from './dom';
@@ -95,7 +93,15 @@ export interface AuthenticationCredentialJSON
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
  */
 export interface AuthenticatorAttestationResponseJSON
-  extends Omit<AuthenticatorAttestationResponseFuture, 'clientDataJSON' | 'attestationObject'> {
+  extends Omit<
+    AuthenticatorAttestationResponseFuture,
+    | 'clientDataJSON'
+    | 'attestationObject'
+    | 'getTransports'
+    | 'getAuthenticatorData'
+    | 'getPublicKey'
+    | 'getPublicKeyAlgorithm'
+  > {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
 }
@@ -119,8 +125,8 @@ export interface AuthenticatorAssertionResponseJSON
  * A WebAuthn-compatible device and the information needed to verify assertions by it
  */
 export type AuthenticatorDevice = {
-  credentialPublicKey: Buffer;
-  credentialID: Buffer;
+  credentialPublicKey: Uint8Array;
+  credentialID: Uint8Array;
   // Number of times this authenticator is expected to have been used
   counter: number;
   // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
@@ -142,10 +148,7 @@ export type Base64URLString = string;
  * Properties marked optional are not supported in all browsers.
  */
 export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
-  getTransports?: () => AuthenticatorTransportFuture[];
-  getAuthenticatorData?: () => ArrayBuffer;
-  getPublicKey?: () => ArrayBuffer;
-  getPublicKeyAlgorithm?: () => COSEAlgorithmIdentifier[];
+  getTransports: () => AuthenticatorTransportFuture[];
 }
 
 /**
@@ -171,8 +174,6 @@ export interface PublicKeyCredentialDescriptorFuture
 export interface PublicKeyCredentialFuture extends PublicKeyCredential {
   // See https://github.com/w3c/webauthn/issues/1745
   isConditionalMediationAvailable?(): Promise<boolean>;
-  // See https://w3c.github.io/webauthn/#dom-publickeycredential-authenticatorattachment
-  authenticatorAttachment?: AuthenticatorAttachment;
 }
 
 /**

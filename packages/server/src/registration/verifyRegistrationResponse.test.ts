@@ -1,4 +1,4 @@
-import base64url from 'base64url';
+import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse';
 
@@ -6,12 +6,12 @@ import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject'
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
+import { toHash } from '../helpers/toHash';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso';
+import { COSEPublicKey, COSEKEYS } from '../helpers/cose';
 import { SettingsService } from '../services/settingsService';
 
 import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
-
-import { toHash } from '../helpers/toHash';
-import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -19,10 +19,10 @@ import { RegistrationCredentialJSON } from '@simplewebauthn/typescript-types';
  */
 SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
 
-let mockDecodeAttestation: jest.SpyInstance;
+let mockDecodeAttestation: jest.SpyInstance<esmDecodeAttestationObject.AttestationObject>;
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
-let mockDecodePubKey: jest.SpyInstance;
+let mockDecodePubKey: jest.SpyInstance<COSEPublicKey>;
 let mockVerifyFIDOU2F: jest.SpyInstance;
 
 beforeEach(() => {
@@ -53,12 +53,12 @@ test('should verify FIDO U2F attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('fido-u2f');
   expect(verification.registrationInfo?.counter).toEqual(0);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
     ),
   );
@@ -66,7 +66,7 @@ test('should verify FIDO U2F attestation', async () => {
   expect(verification.registrationInfo?.credentialType).toEqual('public-key');
   expect(verification.registrationInfo?.userVerified).toEqual(false);
   expect(verification.registrationInfo?.attestationObject).toEqual(
-    base64url.toBuffer(attestationFIDOU2F.response.attestationObject),
+    isoBase64URL.toBuffer(attestationFIDOU2F.response.attestationObject),
   );
 });
 
@@ -82,12 +82,12 @@ test('should verify Packed (EC2) attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('packed');
   expect(verification.registrationInfo?.counter).toEqual(1589874425);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIEoxVVqK-oIGmqoDEyO4KjmMx5R2HeMM4LQQXh8sE01PIlggtzuuoMN5fWnAIuuXdlfshOGu1k3ApBUtDJ8eKiuo_6c',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
         'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
     ),
@@ -106,12 +106,12 @@ test('should verify Packed (X5C) attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('packed');
   expect(verification.registrationInfo?.counter).toEqual(28);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIGwlsYCNyRb4AD9cyTw6cH5VS-uzflmmO1UldGGe9eIaIlggvadzKD8p6wKLjgYfxRxldjCMGRV0YyM13osWbKIPrF8',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
     ),
   );
@@ -129,12 +129,12 @@ test('should verify None attestation', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('none');
   expect(verification.registrationInfo?.counter).toEqual(0);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
     ),
   );
@@ -154,6 +154,7 @@ test('should verify None attestation w/RSA public key', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -164,12 +165,12 @@ test('should verify None attestation w/RSA public key', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('none');
   expect(verification.registrationInfo?.counter).toEqual(0);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQDxfpXrj0ba_AH30JJ_-W7BHSOPugOD8aEDdNBKc1gjB9AmV3FPl2aL0fwiOMKtM_byI24qXb2FzcyjC7HUVkHRtzkAQnahXckI4wY_01koaY6iwXuIE3Ya0Zjs2iZyz6u4G_abGnWdObqa_kHxc3CHR7Xy5MDkAkKyX6TqU0tgHZcEhDd_Lb5ONJDwg4wvKlZBtZYElfMuZ6lonoRZ7qR_81rGkDZyFaxp6RlyvzEbo4ijeIaHQylqCz-oFm03ifZMOfRHYuF4uTjJDRH-g4BW1f3rdi7DTHk1hJnIw1IyL_VFIQ9NifkAguYjNCySCUNpYli2eMrPhAu5dYJFFjINIUMBAAE',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
+    isoBase64URL.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
   );
 });
 
@@ -217,17 +218,13 @@ test('should throw when attestation type is not webauthn.create', async () => {
 });
 
 test('should throw if an unexpected attestation format is specified', async () => {
-  const fmt = 'fizzbuzz';
-
   const realAtteObj = esmDecodeAttestationObject.decodeAttestationObject(
-    base64url.toBuffer(attestationNone.response.attestationObject),
+    isoBase64URL.toBuffer(attestationNone.response.attestationObject),
   );
+  // Mangle the fmt
+  (realAtteObj as Map<unknown, unknown>).set('fmt', 'fizzbuzz');
 
-  mockDecodeAttestation.mockReturnValue({
-    ...realAtteObj,
-    // @ts-ignore 2322
-    fmt,
-  });
+  mockDecodeAttestation.mockReturnValue(realAtteObj);
 
   await expect(
     verifyRegistrationResponse({
@@ -240,14 +237,14 @@ test('should throw if an unexpected attestation format is specified', async () =
 });
 
 test('should throw error if assertion RP ID is unexpected value', async () => {
-  const { authData } = esmDecodeAttestationObject.decodeAttestationObject(
-    base64url.toBuffer(attestationNone.response.attestationObject),
-  );
+  const authData = esmDecodeAttestationObject
+    .decodeAttestationObject(isoBase64URL.toBuffer(attestationNone.response.attestationObject))
+    .get('authData');
   const actualAuthData = esmParseAuthenticatorData.parseAuthenticatorData(authData);
 
   mockParseAuthData.mockReturnValue({
     ...actualAuthData,
-    rpIdHash: toHash(Buffer.from('bad.url', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('bad.url', 'ascii')),
   });
 
   await expect(
@@ -262,7 +259,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
 
 test('should throw error if user was not present', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: false,
     },
@@ -280,7 +277,7 @@ test('should throw error if user was not present', async () => {
 
 test('should throw if the authenticator does not give back credential ID', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: true,
     },
@@ -299,7 +296,7 @@ test('should throw if the authenticator does not give back credential ID', async
 
 test('should throw if the authenticator does not give back credential public key', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: true,
     },
@@ -318,11 +315,8 @@ test('should throw if the authenticator does not give back credential public key
 });
 
 test('should throw error if no alg is specified in public key', async () => {
-  mockDecodePubKey.mockReturnValue({
-    get: () => undefined,
-    credentialID: '',
-    credentialPublicKey: '',
-  });
+  const pubKey = new Map();
+  mockDecodePubKey.mockReturnValue(pubKey);
 
   await expect(
     verifyRegistrationResponse({
@@ -335,11 +329,9 @@ test('should throw error if no alg is specified in public key', async () => {
 });
 
 test('should throw error if unsupported alg is used', async () => {
-  mockDecodePubKey.mockReturnValue({
-    get: () => -999,
-    credentialID: '',
-    credentialPublicKey: '',
-  });
+  const pubKey = new Map();
+  pubKey.set(COSEKEYS.alg, -999);
+  mockDecodePubKey.mockReturnValue(pubKey);
 
   await expect(
     verifyRegistrationResponse({
@@ -367,7 +359,7 @@ test('should not include authenticator info if not verified', async () => {
 
 test('should throw an error if user verification is required but user was not verified', async () => {
   mockParseAuthData.mockReturnValue({
-    rpIdHash: toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
+    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
     flags: {
       up: true,
       uv: false,
@@ -399,6 +391,7 @@ test('should validate TPM RSA response (SHA256)', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedChallenge: expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -409,12 +402,12 @@ test('should validate TPM RSA response (SHA256)', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('tpm');
   expect(verification.registrationInfo?.counter).toEqual(30);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQCtxzw59Wsl8xWP97wPTu2TSDlushwshL8GedHAHO1R62m3nNy21hCLJlQabfLepRUQ_v9mq3PCmV81tBSqtRGU5_YlK0R2yeu756SnT39c6hKC3PBPt_xdjL_ccz4H_73DunfB63QZOtdeAsswV7WPLqMARofuM-LQ_LHnNguCypDcxhADuUqQtogfwZsknTVIPxzGcfqnQ7ERF9D9AOWIQ8YjOsTi_B2zS8SOySKIFUGwwYcPG7DiCE-QJcI-fpydRDnEq6UxbkYgB7XK4BlmPKlwuXkBDX9egl_Ma4B7W2WJvYbKevu6Z8Kc5y-OITpNVDYKbBK3qKyh4yIUpB1NIUMBAAE',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
+    isoBase64URL.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
   );
 });
 
@@ -432,6 +425,7 @@ test('should validate TPM RSA response (SHA1)', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -442,12 +436,12 @@ test('should validate TPM RSA response (SHA1)', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('tpm');
   expect(verification.registrationInfo?.counter).toEqual(97);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pAEDAzn__iBZAQCzl_wD24PZ5z-po2FrwoQVdd13got_CkL8p4B_NvJBC5OwAYKDilii_wj-0CA8ManbpSInx9Tdnz6t91OhudwUT0-W_BHSLK_MqFcjZWrR5LYVmVpz1EgH3DrOTra4AlogEq2D2CYktPrPe7joE-oT3vAYXK8vzQDLRyaxI_Z1qS4KLlLCdajW8PGpw1YRjMDw6s69GZU8mXkgNPMCUh1TZ1bnCvJTO9fnmLjDjqdQGRU4bWo8tFjCL8g1-2WD_2n0-twt6n-Uox5VnR1dQJG4awMlanBCkGGpOb3WBDQ8K10YJJ2evPhJKGJahBvu2Dxmq6pLCAXCv0ma3EHj-PmDIUMBAAE',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
+    isoBase64URL.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
   );
 });
 
@@ -465,6 +459,7 @@ test('should validate Android-Key response', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
@@ -475,12 +470,12 @@ test('should validate Android-Key response', async () => {
   expect(verification.registrationInfo?.fmt).toEqual('android-key');
   expect(verification.registrationInfo?.counter).toEqual(108);
   expect(verification.registrationInfo?.credentialPublicKey).toEqual(
-    base64url.toBuffer(
+    isoBase64URL.toBuffer(
       'pQECAyYgASFYIEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239oIlgg6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
     ),
   );
   expect(verification.registrationInfo?.credentialID).toEqual(
-    base64url.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
+    isoBase64URL.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
   );
 });
 
@@ -543,10 +538,11 @@ test('should pass verification if custom challenge verifier returns true', async
       type: 'public-key',
       clientExtensionResults: {},
       transports: ['internal'],
+      authenticatorAttachment: '',
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
-        base64url.decode(challenge),
+        isoBase64URL.toString(challenge),
       );
       return parsedChallenge.actualChallenge === 'xRsYdCQv5WZOqmxReiZl6C9q5SfrZne4lNSr9QVtPig';
     },
@@ -594,6 +590,7 @@ test('should return authenticator extension output', async () => {
           'ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxl' +
           'LmZpZG8yYXBpZXhhbXBsZSJ9',
       },
+      authenticatorAttachment: '',
       clientExtensionResults: {},
       type: 'public-key',
     },
@@ -604,18 +601,79 @@ test('should return authenticator extension output', async () => {
 
   expect(verification.registrationInfo?.authenticatorExtensionResults).toMatchObject({
     devicePubKey: {
-      dpk: Buffer.from(
+      dpk: isoUint8Array.fromHex(
         'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
-        'hex',
       ),
-      sig: Buffer.from(
+      sig: isoUint8Array.fromHex(
         '3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E',
-        'hex',
       ),
-      nonce: Buffer.from('', 'hex'),
-      scope: Buffer.from('00', 'hex'),
-      aaguid: Buffer.from('00000000000000000000000000000000', 'hex'),
+      nonce: isoUint8Array.fromHex(''),
+      scope: isoUint8Array.fromHex('00'),
+      aaguid: isoUint8Array.fromHex('00000000000000000000000000000000'),
     },
+  });
+});
+
+test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert public key', async () => {
+  const verified = await verifyRegistrationResponse({
+    credential: {
+      id: '7wQcUWO9gG6mi2IktoZUogs8opnghY01DPYwaerMZms',
+      rawId: '7wQcUWO9gG6mi2IktoZUogs8opnghY01DPYwaerMZms',
+      response: {
+        attestationObject:
+          'o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAN2iKnT1qcZPVab9eiXw6kmMqAsCjR8FMdx8DWCfc6h1AiEA8Hp4Fv2eWsokC8g3sL3tEgNEpsopz-G7l30-czGkuvBjeDVjgVkELzCCBCswggIToAMCAQICAQEwDQYJKoZIhvcNAQEFBQAwgaExGDAWBgNVBAMMD0ZJRE8yIFRFU1QgUk9PVDExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEMMAoGA1UECwwDQ1dHMQswCQYDVQQGEwJVUzELMAkGA1UECAwCTVkxEjAQBgNVBAcMCVdha2VmaWVsZDAeFw0xODAzMTYxNDM1MjdaFw0yODAzMTMxNDM1MjdaMIGsMSMwIQYDVQQDDBpGSURPMiBCQVRDSCBLRVkgcHJpbWUyNTZ2MTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEMMAoGA1UECwwDQ1dHMQswCQYDVQQGEwJVUzELMAkGA1UECAwCTVkxEjAQBgNVBAcMCVdha2VmaWVsZDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABE86Xl6rbB-8rpf232RJlnYse-9yAEAqdsbyMPZVbxeqmZtZf8S_UIqvjp7wzQE_Wrm9J5FL8IBDeMvMsRuJtUajLDAqMAkGA1UdEwQCMAAwHQYDVR0OBBYEFFZN98D4xlW2oR9sTRnzv0Hi_QF5MA0GCSqGSIb3DQEBBQUAA4ICAQCPv4yN9RQfvCdl8cwVzLiOGIPrwLatOwARyap0KVJrfJaTs5rydAjinMLav-26bIElQSdus4Z8lnJtavFdGW8VLzdpB_De57XiBp_giTiZBwyCPiG4h-Pk1EAiY7ggednblFi9HxlcNkddyelfiu1Oa9Dlgc5rZsMIkVU4IFW4w6W8dqKhgMM7qRt0ZgRQ19TPdrN7YMsJy6_nujWWpecmXUvFW5SRo7MA2W3WPkKG6Ngwjer8b5-U1ZLpAB4gK46QQaQJrkHymudr6kgmEaUwpue30FGdXNZ9vTrLw8NcfXJMh_I__V4JNABvjJUPUXYN4Qm-y5Ej7wv82A3ktgo_8hcOjlmoZ5yEcDureFLS7kQJC64z9U-55NM7tcIcI-2BMLb2uOZ4lloeq3coP0mZX7KYd6PzGTeQ8Cmkq1GhDum_p7phCx-Rlo44j4H4DypCKH_g-NMWilBQaTSc6K0JAGQiVrh710aQWVhVYf1ITZRoV9Joc9shZQa7o2GvQYLyJHSfCnqJOqnwJ_q-RBBV3EiPLxmOzhBdNUCl1abvPhVtLksbUPfdQHBQ-io70edZe3utb4rFIHboWUSKvW2M3giMZyuSYZt6PzSRNmzqdjZlcFXuJI7iV_O8KNwWuNW14MCKXYi1sliYUhz5iSP9Ym0U2eVzvdsWzz0p55F6xWhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NBAAAAAgAAAAAAAAAAAAAAAAAAAAAAIO8EHFFjvYBupotiJLaGVKILPKKZ4IWNNQz2MGnqzGZrpQECAyYgASFYIMmWvjddCcHDGxX5F8qRMl1FccFW5R8VQuZOTey6LqA8IlggZLJ8OVPsX-NPDEUjyjzkV1YLW8Nglp1Ea4qgb2n-O88',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjaGFsbGVuZ2UiOiJ3SjZtclpua2I2OUdENWQ5X2ZVejktTmdSSEUwejEwcXVYVUJTYTl4SzVvIiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
+      },
+      authenticatorAttachment: '',
+      clientExtensionResults: {},
+      type: 'public-key',
+    },
+    expectedChallenge: 'wJ6mrZnkb69GD5d9_fUz9-NgRHE0z10quXUBSa9xK5o',
+    expectedOrigin: 'http://localhost:8000',
+    expectedRPID: 'localhost',
+  });
+});
+
+test('should verify Packed attestation with RSA-PSS SHA-256 public key', async () => {
+  const verified = await verifyRegistrationResponse({
+    credential: {
+      id: 'n_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_Q',
+      rawId: 'n_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_Q',
+      response: {
+        attestationObject:
+          'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZzgkY3NpZ1kBAEaJQ9f_DWVWGJMJrHymDCRP7v2cOzeEA8Z1IUsd4GTq65qqg2khO05tKe6QK_NvpWbiLCRJ2E9QiMUu3xGTl7RIrIRp4T2WCjk5tLbLNwsHuFAPyjcuvIlcX2ZsKNL27tTroIz_zbzDk07vf0jhghoS3ec-qKrSZQ-B0ULgyDJf0omzgDRlH6uon7mErtunes9hVDUTn9pG9UJSL-jDptoJyu87NnBFGnlpu-Iur1lMKIEW27m5E7wYxF7IqIF2lylZGqXxh7ji93Bs7Hhik6y1T9KiGmn58rrYMxmBXzprxNQMF7rJxXbSZ9ZfjaZYamMDaoKDyKEhfAiOHXCm8AVoYXV0aERhdGFZAWZJlg3liA6MaHQ0Fw9kdmBbj-SuuaKGMseZXPO6gx2XY0EAAAB1qWxJcH1fTWqB93Yyt64CQAAgn_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_SkAQMDOCQgWQEArEwu_kUDitzDgKOTthwbNnBGfGeUEwv8ksLGvqyRbTNClHnrR9fpaffqQeNor3ndNSReFnZ_3i468d677NMJC4-qoLKu7JP2FIDpt2reDCxg7-XvsaCcDIOucvKR-KIKg9CGiNpkHMhq2auXc4aqYrRjRyuoNYkzpWGENn34govaQQqC5Gdc0yHSeFJLrc9rbQoxMiZY1Ujpe3p9me0VXL4QdNmH_NlnzRclt38Rl8HqQOhrLo6rJOuRc_Ws-BjT0xh8HL8STgTxwb9aKquFkPxylztEy4TAgmOsFv-ukfGwbGO4fszqQKtpsf5-ulO8mfszgY1VrCLmuDzBzdGsdSFDAQAB',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjaGFsbGVuZ2UiOiI0MHZfaXpNcHpYLUxPTklHekdxMFlieER3TUtNZmRfWHhRenBlNld2NjRZIiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
+      },
+      authenticatorAttachment: '',
+      clientExtensionResults: {},
+      type: 'public-key',
+    },
+    expectedChallenge: '40v_izMpzX-LONIGzGq0YbxDwMKMfd_XxQzpe6Wv64Y',
+    expectedOrigin: 'http://localhost:8000',
+    expectedRPID: 'localhost',
+  });
+});
+
+test('should verify Packed attestation with RSA-PSS SHA-384 public key', async () => {
+  const verified = await verifyRegistrationResponse({
+    credential: {
+      id: 'BCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb0',
+      rawId: 'BCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb0',
+      response: {
+        attestationObject:
+          'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZzglY3NpZ1kBAB7Tn5jK2sn5U4SBuxYzmR-Rg6iU5nox23mUxw6c10RsWcCw0h3aSKaon3gcn_Sfy8cov1YSsJVeUy9jVYJSpfQSS9ZMZXD5btGPf_YKH34j9YSGyTyutquZRxJ01mou2krDIaiXJOGLFpCJfVUBe-ben68MESby_Q2VFA6u3pjayC6Tu_iUJKPwdWPPaJM2P2KwyYtPy2jGIKqn6UFekfHOKpIDInW7QmzZF6JKUXNWqmwddq0vfzBpHlcyCBRDKmbGv667lkOUz9d7h_Lw0ho2HBrqEQuXhfmog5viDsezgHjQ196JZTwIgAO20vWioXiDWwJKjXGUmQxt9OGlQ1doYXV0aERhdGFZAWZJlg3liA6MaHQ0Fw9kdmBbj-SuuaKGMseZXPO6gx2XY0EAAABjBuy6aWZcQpm9f0NUYyTRzQAgBCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb2kAQMDOCUgWQEApgFt6NaWotNSJIfFKOsdNlOtc7vdG7b78Rrnk7oCyUYg9PFVXRhgwSNAKBwimjeRILxcra5roznykpbcv3RIWNaej-tfxG2KYINh5ts8V2I3R2PgtlgwMfSSH9tv65gAzAFRk7tyizHelODhhNUbMVPMc-qTmnBzZANd06w0PN8xnWgCHPaG2MHZkFAOqiNkL4Kv0PPFbQTpy9HZd9ofdQhpKL71iXU4pMFJSSLG8jhY-HM2EwBM2HBTqb06qDjt6UOThCqCqd-ltNRllKWfstkUKQT0XOB-NpZ88037onupO2qDaMSudwolToh3-muuGAYCSANRS3TcNPuYP-s-6yFDAQAB',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjaGFsbGVuZ2UiOiJwLWphWEhmWUpkbGQ2eTVucklzYTZyblpmNnJnU0MtRm8xcTdBU01VN2s4IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
+      },
+      clientExtensionResults: {},
+      authenticatorAttachment: '',
+      type: 'public-key',
+    },
+    expectedChallenge: 'p-jaXHfYJdld6y5nrIsa6rnZf6rgSC-Fo1q7ASMU7k8',
+    expectedOrigin: 'http://localhost:8000',
+    expectedRPID: 'localhost',
   });
 });
 
@@ -632,10 +690,11 @@ const attestationFIDOU2F: RegistrationCredentialJSON = {
     clientDataJSON:
       'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sQmRIUmxjM1JoZEdsdmJnIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0ZSJ9',
   },
-  clientExtensionResults: {},
   type: 'public-key',
+  clientExtensionResults: {},
+  authenticatorAttachment: '',
 };
-const attestationFIDOU2FChallenge = base64url.encode('totallyUniqueValueEveryAttestation');
+const attestationFIDOU2FChallenge = isoBase64URL.fromString('totallyUniqueValueEveryAttestation');
 
 const attestationPacked: RegistrationCredentialJSON = {
   id: 'bbb',
@@ -655,8 +714,9 @@ const attestationPacked: RegistrationCredentialJSON = {
   },
   clientExtensionResults: {},
   type: 'public-key',
+  authenticatorAttachment: '',
 };
-const attestationPackedChallenge = base64url.encode('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
+const attestationPackedChallenge = isoBase64URL.fromString('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
 
 const attestationPackedX5C: RegistrationCredentialJSON = {
   // TODO: Grab these from another iPhone attestation
@@ -684,10 +744,11 @@ const attestationPackedX5C: RegistrationCredentialJSON = {
       'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhG' +
       'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0=',
   },
-  clientExtensionResults: {},
   type: 'public-key',
+  clientExtensionResults: {},
+  authenticatorAttachment: '',
 };
-const attestationPackedX5CChallenge = base64url.encode('totallyUniqueValueEveryTime');
+const attestationPackedX5CChallenge = isoBase64URL.fromString('totallyUniqueValueEveryTime');
 
 const attestationNone: RegistrationCredentialJSON = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
@@ -703,7 +764,8 @@ const attestationNone: RegistrationCredentialJSON = {
       'VURBd1NEQndOV2Q0YURKZmRUVmZVRU0wVG1WWloyUSIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
       'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9',
   },
-  clientExtensionResults: {},
   type: 'public-key',
+  clientExtensionResults: {},
+  authenticatorAttachment: '',
 };
-const attestationNoneChallenge = base64url.encode('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');
+const attestationNoneChallenge = isoBase64URL.fromString('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');

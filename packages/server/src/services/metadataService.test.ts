@@ -1,5 +1,5 @@
-jest.mock('node-fetch');
-import fetch from 'node-fetch';
+jest.mock('cross-fetch');
+import fetch from 'cross-fetch';
 
 import { MetadataService, BaseMetadataService } from './metadataService';
 import type { MetadataStatement } from '../metadata/mdsTypes';

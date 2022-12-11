@@ -1,9 +1,10 @@
 import { X509 } from 'jsrsasign';
-import fetch from 'node-fetch';
+import fetch from 'cross-fetch';
 import { AsnParser } from '@peculiar/asn1-schema';
 import { CertificateList } from '@peculiar/asn1-x509';
 
 import { convertCertBufferToPEM } from './convertCertBufferToPEM';
+import { isoUint8Array } from './iso';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID
@@ -61,14 +62,14 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
   const crlCert = new X509();
   try {
     const respCRL = await fetch(crlURL[0]);
-    const dataCRL = await respCRL.buffer();
-    const dataPEM = convertCertBufferToPEM(dataCRL);
+    const dataCRL = await respCRL.arrayBuffer();
+    const dataPEM = convertCertBufferToPEM(new Uint8Array(dataCRL));
     crlCert.readCertPEM(dataPEM);
   } catch (err) {
     return false;
   }
 
-  const data = AsnParser.parse(Buffer.from(crlCert.hex, 'hex'), CertificateList);
+  const data = AsnParser.parse(isoUint8Array.fromHex(crlCert.hex), CertificateList);
 
   const newCached: CAAuthorityInfo = {
     revokedCerts: [],
@@ -85,7 +86,7 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
 
   if (revokedCerts) {
     for (const cert of revokedCerts) {
-      const revokedHex = Buffer.from(cert.userCertificate).toString('hex');
+      const revokedHex = isoUint8Array.toHex(new Uint8Array(cert.userCertificate));
       newCached.revokedCerts.push(revokedHex);
     }
 

@@ -1,6 +1,5 @@
-import base64url from 'base64url';
-
 import { SettingsService } from '../../services/settingsService';
+import { isoBase64URL } from '../../helpers/iso';
 
 import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
 
@@ -12,7 +11,7 @@ SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [
 
 test('should verify Android KeyStore response', async () => {
   const expectedChallenge = '4ab7dfd1-a695-4777-985f-ad2993828e99';
-  jest.spyOn(base64url, 'encode').mockReturnValueOnce(expectedChallenge);
+  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
     credential: {
       id: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
@@ -25,6 +24,7 @@ test('should verify Android KeyStore response', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
+      authenticatorAttachment: '',
     },
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',

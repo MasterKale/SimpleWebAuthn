@@ -1,5 +1,3 @@
-import base64url from 'base64url';
-
 import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet';
 
 import {
@@ -8,35 +6,38 @@ import {
 } from '../../helpers/decodeAttestationObject';
 import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData';
 import { toHash } from '../../helpers/toHash';
+import { isoBase64URL } from '../../helpers/iso';
 import { SettingsService } from '../../services/settingsService';
 
 const rootCertificates = SettingsService.getRootCertificates({
   identifier: 'android-safetynet',
 });
 
-let authData: Buffer;
+let authData: Uint8Array;
 let attStmt: AttestationStatement;
-let clientDataHash: Buffer;
-let aaguid: Buffer;
-let credentialID: Buffer;
-let credentialPublicKey: Buffer;
-let rpIdHash: Buffer;
+let clientDataHash: Uint8Array;
+let aaguid: Uint8Array;
+let credentialID: Uint8Array;
+let credentialPublicKey: Uint8Array;
+let rpIdHash: Uint8Array;
 let spyDate: jest.SpyInstance;
 
-beforeEach(() => {
+beforeEach(async () => {
   const { attestationObject, clientDataJSON } = attestationAndroidSafetyNet.response;
-  const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
+  const decodedAttestationObject = decodeAttestationObject(
+    isoBase64URL.toBuffer(attestationObject),
+  );
 
-  authData = decodedAttestationObject.authData;
-  attStmt = decodedAttestationObject.attStmt;
-  clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
+  authData = decodedAttestationObject.get('authData');
+  attStmt = decodedAttestationObject.get('attStmt');
+  clientDataHash = await toHash(isoBase64URL.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(authData);
   aaguid = parsedAuthData.aaguid!;
   credentialID = parsedAuthData.credentialID!;
   credentialPublicKey = parsedAuthData.credentialPublicKey!;
 
-  spyDate = jest.spyOn(global.Date, 'now');
+  spyDate = jest.spyOn(globalThis.Date, 'now');
 });
 
 afterEach(() => {
@@ -88,11 +89,13 @@ test('should validate response with cert path completed with GlobalSign R1 root 
   spyDate.mockReturnValue(new Date('2021-11-15T00:00:42.000Z'));
 
   const { attestationObject, clientDataJSON } = safetyNetUsingGSR1RootCert.response;
-  const decodedAttestationObject = decodeAttestationObject(base64url.toBuffer(attestationObject));
+  const decodedAttestationObject = decodeAttestationObject(
+    isoBase64URL.toBuffer(attestationObject),
+  );
 
-  const _authData = decodedAttestationObject.authData;
-  const _attStmt = decodedAttestationObject.attStmt;
-  const _clientDataHash = toHash(base64url.toBuffer(clientDataJSON));
+  const _authData = decodedAttestationObject.get('authData');
+  const _attStmt = decodedAttestationObject.get('attStmt');
+  const _clientDataHash = await toHash(isoBase64URL.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(_authData);
   const _aaguid = parsedAuthData.aaguid!;

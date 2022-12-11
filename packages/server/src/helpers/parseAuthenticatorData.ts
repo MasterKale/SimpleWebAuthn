@@ -1,14 +1,14 @@
-import cbor from 'cbor';
-import { decodeCborFirst } from './decodeCbor';
 import {
   decodeAuthenticatorExtensions,
   AuthenticationExtensionsAuthenticatorOutputs,
 } from './decodeAuthenticatorExtensions';
+import { isoCBOR, isoUint8Array } from './iso';
+import { COSEPublicKey } from './cose';
 
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
-export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorData {
+export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticatorData {
   if (authData.byteLength < 37) {
     throw new Error(
       `Authenticator data was ${authData.byteLength} bytes, expected at least 37 bytes`,
@@ -16,6 +16,7 @@ export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorDat
   }
 
   let pointer = 0;
+  const dataView = isoUint8Array.toDataView(authData);
 
   const rpIdHash = authData.slice(pointer, (pointer += 32));
 
@@ -34,37 +35,38 @@ export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorDat
     flagsInt,
   };
 
-  const counterBuf = authData.slice(pointer, (pointer += 4));
-  const counter = counterBuf.readUInt32BE(0);
+  const counterBuf = authData.slice(pointer, pointer + 4);
+  const counter = dataView.getUint32(pointer, false);
+  pointer += 4;
 
-  let aaguid: Buffer | undefined = undefined;
-  let credentialID: Buffer | undefined = undefined;
-  let credentialPublicKey: Buffer | undefined = undefined;
+  let aaguid: Uint8Array | undefined = undefined;
+  let credentialID: Uint8Array | undefined = undefined;
+  let credentialPublicKey: Uint8Array | undefined = undefined;
 
   if (flags.at) {
     aaguid = authData.slice(pointer, (pointer += 16));
 
-    const credIDLenBuf = authData.slice(pointer, (pointer += 2));
-    const credIDLen = credIDLenBuf.readUInt16BE(0);
+    const credIDLen = dataView.getUint16(pointer);
+    pointer += 2;
 
     credentialID = authData.slice(pointer, (pointer += credIDLen));
 
     // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
-    const firstDecoded = decodeCborFirst(authData.slice(pointer));
-    const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
+    const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(authData.slice(pointer));
+    const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
+
     credentialPublicKey = firstEncoded;
     pointer += firstEncoded.byteLength;
   }
 
   let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
-  let extensionsDataBuffer: Buffer | undefined = undefined;
+  let extensionsDataBuffer: Uint8Array | undefined = undefined;
 
   if (flags.ed) {
-    const firstDecoded = decodeCborFirst(authData.slice(pointer));
-    const firstEncoded = Buffer.from(cbor.encode(firstDecoded) as ArrayBuffer);
-    extensionsDataBuffer = firstEncoded;
+    const firstDecoded = isoCBOR.decodeFirst(authData.slice(pointer));
+    extensionsDataBuffer = Uint8Array.from(isoCBOR.encode(firstDecoded));
     extensionsData = decodeAuthenticatorExtensions(extensionsDataBuffer);
-    pointer += firstEncoded.byteLength;
+    pointer += extensionsDataBuffer.byteLength;
   }
 
   // Pointer should be at the end of the authenticator data, otherwise too much data was sent
@@ -87,8 +89,8 @@ export function parseAuthenticatorData(authData: Buffer): ParsedAuthenticatorDat
 }
 
 export type ParsedAuthenticatorData = {
-  rpIdHash: Buffer;
-  flagsBuf: Buffer;
+  rpIdHash: Uint8Array;
+  flagsBuf: Uint8Array;
   flags: {
     up: boolean;
     uv: boolean;
@@ -99,10 +101,10 @@ export type ParsedAuthenticatorData = {
     flagsInt: number;
   };
   counter: number;
-  counterBuf: Buffer;
-  aaguid?: Buffer;
-  credentialID?: Buffer;
-  credentialPublicKey?: Buffer;
+  counterBuf: Uint8Array;
+  aaguid?: Uint8Array;
+  credentialID?: Uint8Array;
+  credentialPublicKey?: Uint8Array;
   extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
-  extensionsDataBuffer?: Buffer;
+  extensionsDataBuffer?: Uint8Array;
 };

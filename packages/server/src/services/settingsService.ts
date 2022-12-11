@@ -28,13 +28,13 @@ class BaseSettingsService {
    */
   setRootCertificates(opts: {
     identifier: RootCertIdentifier;
-    certificates: (Buffer | string)[];
+    certificates: (Uint8Array | string)[];
   }): void {
     const { identifier, certificates } = opts;
 
     const newCertificates: string[] = [];
     for (const cert of certificates) {
-      if (cert instanceof Buffer) {
+      if (cert instanceof Uint8Array) {
         newCertificates.push(convertCertBufferToPEM(cert));
       } else {
         newCertificates.push(cert);

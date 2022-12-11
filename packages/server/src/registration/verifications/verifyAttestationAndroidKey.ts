@@ -7,7 +7,9 @@ import type { AttestationFormatVerifierOpts } from '../verifyRegistrationRespons
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { verifySignature } from '../../helpers/verifySignature';
-import { COSEALGHASH, convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
+import { isCOSEAlg } from '../../helpers/cose';
+import { isoUint8Array } from '../../helpers/iso';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 
@@ -19,7 +21,9 @@ export async function verifyAttestationAndroidKey(
 ): Promise<boolean> {
   const { authData, clientDataHash, attStmt, credentialPublicKey, aaguid, rootCertificates } =
     options;
-  const { x5c, sig, alg } = attStmt;
+  const x5c = attStmt.get('x5c');
+  const sig = attStmt.get('sig');
+  const alg = attStmt.get('alg');
 
   if (!x5c) {
     throw new Error('No attestation certificate provided in attestation statement (AndroidKey)');
@@ -33,17 +37,21 @@ export async function verifyAttestationAndroidKey(
     throw new Error(`Attestation statement did not contain alg (AndroidKey)`);
   }
 
+  if (!isCOSEAlg(alg)) {
+    throw new Error(`Attestation statement contained invalid alg ${alg} (AndroidKey)`);
+  }
+
   // Check that credentialPublicKey matches the public key in the attestation certificate
   // Find the public cert in the certificate as PKCS
   const parsedCert = AsnParser.parse(x5c[0], Certificate);
-  const parsedCertPubKey = Buffer.from(
+  const parsedCertPubKey = new Uint8Array(
     parsedCert.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey,
   );
 
   // Convert the credentialPublicKey to PKCS
   const credPubKeyPKCS = convertCOSEtoPKCS(credentialPublicKey);
 
-  if (!credPubKeyPKCS.equals(parsedCertPubKey)) {
+  if (!isoUint8Array.areEqual(credPubKeyPKCS, parsedCertPubKey)) {
     throw new Error('Credential public key does not equal leaf cert public key (AndroidKey)');
   }
 
@@ -61,7 +69,7 @@ export async function verifyAttestationAndroidKey(
   // Verify extKeyStore values
   const { attestationChallenge, teeEnforced, softwareEnforced } = parsedExtKeyStore;
 
-  if (!Buffer.from(attestationChallenge.buffer).equals(clientDataHash)) {
+  if (!isoUint8Array.areEqual(new Uint8Array(attestationChallenge.buffer), clientDataHash)) {
     throw new Error('Attestation challenge was not equal to client data hash (AndroidKey)');
   }
 
@@ -98,13 +106,12 @@ export async function verifyAttestationAndroidKey(
     }
   }
 
-  const signatureBase = Buffer.concat([authData, clientDataHash]);
-  const hashAlg = COSEALGHASH[alg as number];
+  const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
 
   return verifySignature({
     signature: sig,
-    signatureBase,
-    leafCert: x5c[0],
-    hashAlgorithm: hashAlg
+    data: signatureBase,
+    leafCertificate: x5c[0],
+    attestationHashAlgorithm: alg,
   });
 }

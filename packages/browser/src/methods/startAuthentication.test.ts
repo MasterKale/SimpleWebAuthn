@@ -116,6 +116,7 @@ test('should return base64url-encoded response values', async () => {
         },
         getClientExtensionResults: () => ({}),
         type: 'webauthn.get',
+        authenticatorAttachment: '',
       });
     });
   });
@@ -163,7 +164,9 @@ test('should send extensions to authenticator if present in options', async () =
   const extensions: AuthenticationExtensionsClientInputs = {
     credProps: true,
     appid: 'appidHere',
+    // @ts-ignore
     uvm: true,
+    // @ts-ignore
     appidExclude: 'appidExcludeHere',
   };
   const optsWithExts: PublicKeyCredentialRequestOptionsJSON = {

@@ -11,12 +11,20 @@ import {
 import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse';
 
 import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey';
-import { COSEKEYS, COSEALGHASH } from '../../../helpers/convertCOSEtoPKCS';
+import {
+  COSEKEYS,
+  isCOSEAlg,
+  COSEKTY,
+  isCOSEPublicKeyRSA,
+  isCOSEPublicKeyEC2,
+  COSEALG,
+} from '../../../helpers/cose';
 import { toHash } from '../../../helpers/toHash';
 import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
 import { verifySignature } from '../../../helpers/verifySignature';
+import { isoUint8Array } from '../../../helpers/iso';
 import { MetadataService } from '../../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 
@@ -24,10 +32,17 @@ import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants';
 import { parseCertInfo } from './parseCertInfo';
 import { parsePubArea } from './parsePubArea';
 
-export async function verifyAttestationTPM(options: AttestationFormatVerifierOpts): Promise<boolean> {
+export async function verifyAttestationTPM(
+  options: AttestationFormatVerifierOpts,
+): Promise<boolean> {
   const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
     options;
-  const { ver, sig, alg, x5c, pubArea, certInfo } = attStmt;
+  const ver = attStmt.get('ver');
+  const sig = attStmt.get('sig');
+  const alg = attStmt.get('alg');
+  const x5c = attStmt.get('x5c');
+  const pubArea = attStmt.get('pubArea');
+  const certInfo = attStmt.get('certInfo');
 
   /**
    * Verify structures
@@ -42,6 +57,10 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
 
   if (!alg) {
     throw new Error(`Attestation statement did not contain alg (TPM)`);
+  }
+
+  if (!isCOSEAlg(alg)) {
+    throw new Error(`Attestation statement contained invalid alg ${alg} (TPM)`);
   }
 
   if (!x5c) {
@@ -64,6 +83,14 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   const cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
 
   if (pubType === 'TPM_ALG_RSA') {
+    if (!isCOSEPublicKeyRSA(cosePublicKey)) {
+      throw new Error(
+        `Credential public key with kty ${cosePublicKey.get(
+          COSEKEYS.kty,
+        )} did not match ${pubType}`,
+      );
+    }
+
     const n = cosePublicKey.get(COSEKEYS.n);
     const e = cosePublicKey.get(COSEKEYS.e);
 
@@ -74,7 +101,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error('COSE public key missing e (TPM|RSA)');
     }
 
-    if (!unique.equals(n as Buffer)) {
+    if (!isoUint8Array.areEqual(unique, n)) {
       throw new Error('PubArea unique is not same as credentialPublicKey (TPM|RSA)');
     }
 
@@ -82,7 +109,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error(`Parsed pubArea type is RSA, but missing parameters.rsa (TPM|RSA)`);
     }
 
-    const eBuffer = e as Buffer;
+    const eBuffer = e as Uint8Array;
     // If `exponent` is equal to 0x00, then exponent is the default RSA exponent of 2^16+1 (65537)
     const pubAreaExponent = parameters.rsa.exponent || 65537;
 
@@ -93,6 +120,14 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
     }
   } else if (pubType === 'TPM_ALG_ECC') {
+    if (!isCOSEPublicKeyEC2(cosePublicKey)) {
+      throw new Error(
+        `Credential public key with kty ${cosePublicKey.get(
+          COSEKEYS.kty,
+        )} did not match ${pubType}`,
+      );
+    }
+
     const crv = cosePublicKey.get(COSEKEYS.crv);
     const x = cosePublicKey.get(COSEKEYS.x);
     const y = cosePublicKey.get(COSEKEYS.y);
@@ -107,7 +142,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
       throw new Error('COSE public key missing y (TPM|ECC)');
     }
 
-    if (!unique.equals(Buffer.concat([x as Buffer, y as Buffer]))) {
+    if (!isoUint8Array.areEqual(unique, isoUint8Array.concat([x, y]))) {
       throw new Error('PubArea unique is not same as public key x and y (TPM|ECC)');
     }
 
@@ -116,7 +151,7 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
     }
 
     const pubAreaCurveID = parameters.ecc.curveID;
-    const pubAreaCurveIDMapToCOSECRV = TPM_ECC_CURVE_COSE_CRV_MAP[pubAreaCurveID]
+    const pubAreaCurveIDMapToCOSECRV = TPM_ECC_CURVE_COSE_CRV_MAP[pubAreaCurveID];
     if (pubAreaCurveIDMapToCOSECRV !== crv) {
       throw new Error(
         `Public area key curve ID "${pubAreaCurveID}" mapped to "${pubAreaCurveIDMapToCOSECRV}" which did not match public key crv of "${crv}" (TPM|ECC)`,
@@ -138,25 +173,24 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   }
 
   // Hash pubArea to create pubAreaHash using the nameAlg in attested
-  const pubAreaHash = toHash(pubArea, attested.nameAlg.replace('TPM_ALG_', ''));
+  const pubAreaHash = await toHash(pubArea, attestedNameAlgToCOSEAlg(attested.nameAlg));
 
   // Concatenate attested.nameAlg and pubAreaHash to create attestedName.
-  const attestedName = Buffer.concat([attested.nameAlgBuffer, pubAreaHash]);
+  const attestedName = isoUint8Array.concat([attested.nameAlgBuffer, pubAreaHash]);
 
   // Check that certInfo.attested.name is equals to attestedName.
-  if (!attested.name.equals(attestedName)) {
+  if (!isoUint8Array.areEqual(attested.name, attestedName)) {
     throw new Error(`Attested name comparison failed (TPM)`);
   }
 
   // Concatenate authData with clientDataHash to create attToBeSigned
-  const attToBeSigned = Buffer.concat([authData, clientDataHash]);
+  const attToBeSigned = isoUint8Array.concat([authData, clientDataHash]);
 
   // Hash attToBeSigned using the algorithm specified in attStmt.alg to create attToBeSignedHash
-  const hashAlg: string = COSEALGHASH[alg as number];
-  const attToBeSignedHash = toHash(attToBeSigned, hashAlg);
+  const attToBeSignedHash = await toHash(attToBeSigned, alg);
 
   // Check that certInfo.extraData is equals to attToBeSignedHash.
-  if (!extraData.equals(attToBeSignedHash)) {
+  if (!isoUint8Array.areEqual(extraData, attToBeSignedHash)) {
     throw new Error('CertInfo extra data did not equal hashed attestation (TPM)');
   }
 
@@ -281,9 +315,9 @@ export async function verifyAttestationTPM(options: AttestationFormatVerifierOpt
   // In the wise words of Yuriy Ackermann: "Get Martini friend, you are done!"
   return verifySignature({
     signature: sig,
-    signatureBase: certInfo,
-    leafCert: x5c[0],
-    hashAlgorithm: hashAlg
+    data: certInfo,
+    leafCertificate: x5c[0],
+    attestationHashAlgorithm: alg,
   });
 }
 
@@ -348,4 +382,25 @@ function getTcgAtTpmValues(root: Name): {
     tcgAtTpmModel,
     tcgAtTpmVersion,
   };
+}
+
+/**
+ * Convert TPM-specific SHA algorithm ID's with COSE-specific equivalents. Note that the choice to
+ * use ECDSA SHA IDs is arbitrary; any such COSEALG that would map to SHA-256 in
+ * `mapCoseAlgToWebCryptoAlg()`
+ *
+ * SHA IDs referenced from here:
+ *
+ * https://trustedcomputinggroup.org/wp-content/uploads/TCG_TPM2_r1p59_Part2_Structures_pub.pdf
+ */
+function attestedNameAlgToCOSEAlg(alg: string): COSEALG {
+  if (alg === 'TPM_ALG_SHA256') {
+    return COSEALG.ES256;
+  } else if (alg === 'TPM_ALG_SHA384') {
+    return COSEALG.ES384;
+  } else if (alg === 'TPM_ALG_SHA512') {
+    return COSEALG.ES512;
+  }
+
+  throw new Error(`Unexpected TPM attested name alg ${alg}`);
 }

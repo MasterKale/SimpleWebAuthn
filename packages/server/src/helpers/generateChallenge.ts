@@ -1,9 +1,9 @@
-import crypto from 'crypto';
+import { isoCrypto } from './iso';
 
 /**
  * Generate a suitably random value to be used as an attestation or assertion challenge
  */
-export function generateChallenge(): Buffer {
+export function generateChallenge(): Uint8Array {
   /**
    * WebAuthn spec says that 16 bytes is a good minimum:
    *
@@ -12,5 +12,9 @@ export function generateChallenge(): Buffer {
    *
    * Just in case, let's double it
    */
-  return crypto.randomBytes(32);
+  const challenge = new Uint8Array(32);
+
+  isoCrypto.getRandomValues(challenge);
+
+  return challenge;
 }
