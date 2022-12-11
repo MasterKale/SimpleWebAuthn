@@ -48,7 +48,8 @@ test('should generate credential request options suitable for sending via JSON',
     attestation: attestationType,
     excludeCredentials: [],
     authenticatorSelection: {
-      requireResidentKey: false,
+      requireResidentKey: true,
+      residentKey: 'required',
       userVerification: 'preferred',
     },
   });
@@ -197,7 +198,7 @@ test('should discourage resident key if residentKey option is absent but require
   expect(options.authenticatorSelection?.residentKey).toBeUndefined();
 });
 
-test('should not set resident key if both residentKey and requireResidentKey options are absent', () => {
+test('should require resident key if both residentKey and requireResidentKey options are absent', () => {
   const options = generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
@@ -205,8 +206,8 @@ test('should not set resident key if both residentKey and requireResidentKey opt
     userName: 'usernameHere',
   });
 
-  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
-  expect(options.authenticatorSelection?.residentKey).toBeUndefined();
+  expect(options.authenticatorSelection?.requireResidentKey).toEqual(true);
+  expect(options.authenticatorSelection?.residentKey).toEqual('required');
 });
 
 test('should set requireResidentKey to true if residentKey if set to required', () => {
