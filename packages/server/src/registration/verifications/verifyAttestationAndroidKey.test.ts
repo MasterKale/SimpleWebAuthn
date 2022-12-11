@@ -29,6 +29,7 @@ test('should verify Android KeyStore response', async () => {
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);

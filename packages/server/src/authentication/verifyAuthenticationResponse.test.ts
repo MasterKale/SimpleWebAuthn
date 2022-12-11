@@ -29,6 +29,7 @@ test('should verify an assertion response', async () => {
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: authenticator,
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -41,6 +42,7 @@ test('should return authenticator info after verification', async () => {
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: authenticator,
+    requireUserVerification: false,
   });
 
   expect(verification.authenticationInfo.newCounter).toEqual(144);
@@ -122,6 +124,7 @@ test('should throw error if previous counter value is not less than in response'
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: badDevice,
+      requireUserVerification: false,
     }),
   ).rejects.toThrow(/counter value/i);
 });
@@ -150,6 +153,7 @@ test('should not compare counters if both are 0', async () => {
     expectedOrigin: assertionFirstTimeUsedOrigin,
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: authenticatorFirstTimeUsed,
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -220,6 +224,7 @@ test('should support multiple possible origins', async () => {
     expectedOrigin: ['https://simplewebauthn.dev', assertionOrigin],
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: authenticator,
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -244,6 +249,7 @@ test('should support multiple possible RP IDs', async () => {
     expectedOrigin: assertionOrigin,
     expectedRPID: ['dev.dontneeda.pw', 'simplewebauthn.dev'],
     authenticator: authenticator,
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -367,6 +373,7 @@ test('should return credential backup info', async () => {
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: authenticator,
+    requireUserVerification: false,
   });
 
   expect(verification.authenticationInfo?.credentialDeviceType).toEqual('singleDevice');
@@ -443,6 +450,7 @@ test('should return user verified flag after successful auth', async () => {
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: authenticator,
+    requireUserVerification: false,
   });
 
   expect(verification.authenticationInfo?.userVerified).toBeDefined();
