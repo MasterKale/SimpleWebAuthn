@@ -47,6 +47,7 @@ test('should verify FIDO U2F attestation', async () => {
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -89,7 +90,7 @@ test('should verify Packed (EC2) attestation', async () => {
   expect(verification.registrationInfo?.credentialID).toEqual(
     isoBase64URL.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
-        'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
+      'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
     ),
   );
 });
@@ -100,6 +101,7 @@ test('should verify Packed (X5C) attestation', async () => {
     expectedChallenge: attestationPackedX5CChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -290,6 +292,7 @@ test('should throw if the authenticator does not give back credential ID', async
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
+      requireUserVerification: false,
     }),
   ).rejects.toThrow(/credential id/i);
 });
@@ -310,6 +313,7 @@ test('should throw if the authenticator does not give back credential public key
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
+      requireUserVerification: false,
     }),
   ).rejects.toThrow(/public key/i);
 });
@@ -351,6 +355,7 @@ test('should not include authenticator info if not verified', async () => {
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toBe(false);
@@ -396,6 +401,7 @@ test('should validate TPM RSA response (SHA256)', async () => {
     expectedChallenge: expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -430,6 +436,7 @@ test('should validate TPM RSA response (SHA1)', async () => {
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -464,6 +471,7 @@ test('should validate Android-Key response', async () => {
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -632,6 +640,7 @@ test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert p
     expectedChallenge: 'wJ6mrZnkb69GD5d9_fUz9-NgRHE0z10quXUBSa9xK5o',
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
+    requireUserVerification: false,
   });
 });
 
@@ -653,6 +662,7 @@ test('should verify Packed attestation with RSA-PSS SHA-256 public key', async (
     expectedChallenge: '40v_izMpzX-LONIGzGq0YbxDwMKMfd_XxQzpe6Wv64Y',
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
+    requireUserVerification: false,
   });
 });
 
@@ -674,6 +684,7 @@ test('should verify Packed attestation with RSA-PSS SHA-384 public key', async (
     expectedChallenge: 'p-jaXHfYJdld6y5nrIsa6rnZf6rgSC-Fo1q7ASMU7k8',
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
+    requireUserVerification: false,
   });
 });
 

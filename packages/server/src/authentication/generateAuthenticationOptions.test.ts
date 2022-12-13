@@ -41,6 +41,7 @@ test('should generate credential request options suitable for sending via JSON',
       },
     ],
     timeout: 1,
+    userVerification: 'preferred',
   });
 });
 
@@ -56,7 +57,7 @@ test('defaults to 60 seconds if no timeout is specified', () => {
   expect(options.timeout).toEqual(60000);
 });
 
-test('should not set userVerification if not specified', () => {
+test('should set userVerification to "preferred" if not specified', () => {
   const options = generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
@@ -65,7 +66,7 @@ test('should not set userVerification if not specified', () => {
     ],
   });
 
-  expect(options.userVerification).toEqual(undefined);
+  expect(options.userVerification).toEqual('preferred');
 });
 
 test('should not set allowCredentials if not specified', () => {
@@ -82,7 +83,7 @@ test('should generate without params', () => {
     extensions: undefined,
     rpId: undefined,
     timeout: 60000,
-    userVerification: undefined,
+    userVerification: 'preferred',
   });
   expect(typeof challenge).toEqual('string');
 });

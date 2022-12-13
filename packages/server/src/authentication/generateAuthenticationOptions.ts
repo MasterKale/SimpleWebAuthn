@@ -37,7 +37,7 @@ export function generateAuthenticationOptions(
     allowCredentials,
     challenge = generateChallenge(),
     timeout = 60000,
-    userVerification,
+    userVerification = 'preferred',
     extensions,
     rpID,
   } = options;

@@ -54,7 +54,7 @@ export async function verifyAuthenticationResponse(
     expectedOrigin,
     expectedRPID,
     authenticator,
-    requireUserVerification,
+    requireUserVerification = true,
     advancedFIDOConfig,
   } = options;
   const { id, rawId, type: credentialType, response } = credential;

@@ -21,6 +21,7 @@ test('should verify TPM response', async () => {
     expectedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -52,6 +53,7 @@ test('should verify SHA1 TPM response', async () => {
     expectedChallenge,
     expectedOrigin: 'https://localhost:44329',
     expectedRPID: 'localhost',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);
@@ -83,6 +85,7 @@ test('should verify SHA256 TPM response', async () => {
     expectedChallenge,
     expectedOrigin: 'https://localhost:44329',
     expectedRPID: 'localhost',
+    requireUserVerification: false,
   });
 
   expect(verification.verified).toEqual(true);

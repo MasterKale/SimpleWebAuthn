@@ -61,7 +61,7 @@ export async function verifyRegistrationResponse(
     expectedChallenge,
     expectedOrigin,
     expectedRPID,
-    requireUserVerification = false,
+    requireUserVerification = true,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
   const { id, rawId, type: credentialType, response } = credential;
