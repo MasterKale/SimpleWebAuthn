@@ -316,8 +316,8 @@ export async function verifyAttestationTPM(
   return verifySignature({
     signature: sig,
     data: certInfo,
-    leafCertificate: x5c[0],
-    attestationHashAlgorithm: alg,
+    x509Certificate: x5c[0],
+    hashAlgorithm: alg,
   });
 }
 

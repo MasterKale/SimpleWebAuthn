@@ -10,16 +10,16 @@ export async function verifySignature(opts: {
   signature: Uint8Array;
   data: Uint8Array;
   credentialPublicKey?: Uint8Array;
-  leafCertificate?: Uint8Array;
-  attestationHashAlgorithm?: COSEALG;
+  x509Certificate?: Uint8Array;
+  hashAlgorithm?: COSEALG;
 }): Promise<boolean> {
-  const { signature, data, credentialPublicKey, leafCertificate, attestationHashAlgorithm } = opts;
+  const { signature, data, credentialPublicKey, x509Certificate, hashAlgorithm } = opts;
 
-  if (!leafCertificate && !credentialPublicKey) {
+  if (!x509Certificate && !credentialPublicKey) {
     throw new Error('Must declare either "leafCert" or "credentialPublicKey"');
   }
 
-  if (leafCertificate && credentialPublicKey) {
+  if (x509Certificate && credentialPublicKey) {
     throw new Error('Must not declare both "leafCert" and "credentialPublicKey"');
   }
 
@@ -27,14 +27,14 @@ export async function verifySignature(opts: {
 
   if (credentialPublicKey) {
     cosePublicKey = decodeCredentialPublicKey(credentialPublicKey);
-  } else if (leafCertificate) {
-    cosePublicKey = convertX509PublicKeyToCOSE(leafCertificate);
+  } else if (x509Certificate) {
+    cosePublicKey = convertX509PublicKeyToCOSE(x509Certificate);
   }
 
   return isoCrypto.verify({
     cosePublicKey,
     signature,
     data,
-    shaHashOverride: attestationHashAlgorithm,
+    shaHashOverride: hashAlgorithm,
   });
 }

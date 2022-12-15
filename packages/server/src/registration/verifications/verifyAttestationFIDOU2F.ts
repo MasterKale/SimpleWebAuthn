@@ -62,7 +62,7 @@ export async function verifyAttestationFIDOU2F(
   return verifySignature({
     signature: sig,
     data: signatureBase,
-    leafCertificate: x5c[0],
-    attestationHashAlgorithm: COSEALG.ES256,
+    x509Certificate: x5c[0],
+    hashAlgorithm: COSEALG.ES256,
   });
 }

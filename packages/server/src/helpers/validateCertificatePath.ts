@@ -125,8 +125,8 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const verified = await verifySignature({
       data: new Uint8Array(data),
       signature: new Uint8Array(signature),
-      leafCertificate: issuerCertBytes,
-      attestationHashAlgorithm: signatureAlgorithm,
+      x509Certificate: issuerCertBytes,
+      hashAlgorithm: signatureAlgorithm,
     });
 
     if (!verified) {
