@@ -64,7 +64,7 @@
   "devDependencies": {
     "@simplewebauthn/typescript-types": "*",
     "@types/debug": "^4.1.7",
-    "@types/jsrsasign": "^8.0.13",
+    "@types/jsrsasign": "^10.5.4",
     "@types/node": "^18.11.9"
   }
 }
