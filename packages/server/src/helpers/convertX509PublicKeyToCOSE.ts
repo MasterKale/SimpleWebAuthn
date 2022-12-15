@@ -1,6 +1,6 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
-import { ECParameters, id_ecPublicKey, id_secp256r1 } from '@peculiar/asn1-ecc';
+import { ECParameters, id_ecPublicKey, id_secp256r1, id_secp384r1 } from '@peculiar/asn1-ecc';
 import { RSAPublicKey } from '@peculiar/asn1-rsa';
 
 import {
@@ -41,8 +41,12 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
     );
 
     let crv = -999;
-    if (ecParameters.namedCurve === id_secp256r1) {
+    const { namedCurve } = ecParameters;
+
+    if (namedCurve === id_secp256r1) {
       crv = COSECRV.P256;
+    } else if (namedCurve === id_secp384r1) {
+      crv = COSECRV.P384;
     } else {
       throw new Error(
         `Leaf cert public key contained unexpected namedCurve ${ecParameters.namedCurve} (EC2)`,
