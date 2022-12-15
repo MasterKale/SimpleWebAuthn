@@ -15,5 +15,5 @@ export function mapCoseAlgToWebCryptoKeyAlgName(alg: COSEALG): SubtleCryptoKeyAl
     return 'RSA-PSS';
   }
 
-  throw new Error(`Unexpected COSE alg value of ${alg}`);
+  throw new Error(`Could not map COSE alg value of ${alg} to a WebCrypto key alg name`);
 }
