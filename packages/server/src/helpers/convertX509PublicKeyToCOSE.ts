@@ -13,13 +13,13 @@ import {
 } from './cose';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
 
-export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPublicKey {
+export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();
 
   /**
-   * Time to extract the public key from an X.509 leaf certificate
+   * Time to extract the public key from an X.509 certificate
    */
-  const x509 = AsnParser.parse(leafCertificate, Certificate);
+  const x509 = AsnParser.parse(x509Certificate, Certificate);
 
   const { tbsCertificate } = x509;
   const { subjectPublicKeyInfo, signature: _tbsSignature } = tbsCertificate;
@@ -32,7 +32,7 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
      * EC2 Public Key
      */
     if (!subjectPublicKeyInfo.algorithm.parameters) {
-      throw new Error('Leaf cert public key missing parameters (EC2)');
+      throw new Error('Certificate public key was missing parameters (EC2)');
     }
 
     const ecParameters = AsnParser.parse(
@@ -49,7 +49,7 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
       crv = COSECRV.P384;
     } else {
       throw new Error(
-        `Leaf cert public key contained unexpected namedCurve ${ecParameters.namedCurve} (EC2)`,
+        `Certificate public key contained unexpected namedCurve ${namedCurve} (EC2)`,
       );
     }
 
@@ -89,7 +89,9 @@ export function convertX509PublicKeyToCOSE(leafCertificate: Uint8Array): COSEPub
 
     cosePublicKey = coseRSAPubKey;
   } else {
-    throw new Error(`Unexpected leaf cert public key algorithm ${publicKeyAlgorithmID}`);
+    throw new Error(
+      `Certificate public key contained unexpected algorithm ID ${publicKeyAlgorithmID}`
+    );
   }
 
   return cosePublicKey;
