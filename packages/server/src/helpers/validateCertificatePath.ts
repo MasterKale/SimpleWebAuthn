@@ -6,7 +6,7 @@ import { X509, zulutodate } from 'jsrsasign';
 import { isCertRevoked } from './isCertRevoked';
 import { isoBase64URL } from './iso';
 import { verifySignature } from './verifySignature';
-import { signatureAlgorithmToCOSEAlg } from './convertX509PublicKeyToCOSE';
+import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -117,7 +117,9 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
 
     const data = AsnSerializer.serialize(x509Subject.tbsCertificate);
     const signature = x509Subject.signatureValue;
-    const signatureAlgorithm = signatureAlgorithmToCOSEAlg(x509Subject.signatureAlgorithm.algorithm);
+    const signatureAlgorithm = mapX509SignatureAlgToCOSEAlg(
+      x509Subject.signatureAlgorithm.algorithm,
+    );
     const issuerCertBytes = pemToBytes(issuerPem);
 
     const verified = await verifySignature({
