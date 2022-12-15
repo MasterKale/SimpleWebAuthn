@@ -27,15 +27,27 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
   const certSerialHex = cert.getSerialNumberHex();
 
   // Check to see if we've got cached info for the cert's CA
-  let certAuthKeyID: { kid: { hex: string } } | null = null;
+  let keyIdentifier: jsrsasign.AuthorityKeyIdentifierResult | jsrsasign.ExtSubjectKeyIdentifier | undefined = undefined;
   try {
-    certAuthKeyID = cert.getExtAuthorityKeyIdentifier() as { kid: { hex: string } } | null;
+    keyIdentifier = cert.getExtAuthorityKeyIdentifier();
   } catch (err) {
-    return false;
+    // pass
   }
 
-  if (certAuthKeyID) {
-    const cached = cacheRevokedCerts[certAuthKeyID.kid.hex];
+  /**
+   * We might be dealing with a self-signed root certificate. Check the
+   * Subject key Identifier extension next.
+   */
+  if (!keyIdentifier) {
+    try {
+      keyIdentifier = cert.getExtSubjectKeyIdentifier();
+    } catch (err) {
+      // pass
+    }
+  }
+
+  if (keyIdentifier) {
+    const cached = cacheRevokedCerts[keyIdentifier.kid.hex];
     if (cached) {
       const now = new Date();
       // If there's a nextUpdate then make sure we're before it
@@ -91,8 +103,8 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
     }
 
     // Cache the results
-    if (certAuthKeyID) {
-      cacheRevokedCerts[certAuthKeyID.kid.hex] = newCached;
+    if (keyIdentifier) {
+      cacheRevokedCerts[keyIdentifier.kid.hex] = newCached;
     }
 
     return newCached.revokedCerts.indexOf(certSerialHex) >= 0;
