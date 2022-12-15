@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-// `ASN1HEX` exists in the lib but not in its typings
-// @ts-ignore 2305
-import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
+import { AsnParser, AsnSerializer } from '@peculiar/asn1-schema';
+import { Certificate } from '@peculiar/asn1-x509';
+import { X509, zulutodate } from 'jsrsasign';
 
 import { isCertRevoked } from './isCertRevoked';
-
-const { crypto } = KJUR;
+import { isoBase64URL } from './iso';
+import { verifySignature } from './verifySignature';
+import { signatureAlgorithmToCOSEAlg } from './convertX509PublicKeyToCOSE';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -111,16 +112,22 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
       throw new InvalidSubjectAndIssuer();
     }
 
-    const subjectCertStruct = ASN1HEX.getTLVbyList(subjectCert.hex, 0, [0]);
-    const alg = subjectCert.getSignatureAlgorithmField();
-    const signatureHex = subjectCert.getSignatureValueHex();
+    // Verify the subject certificate's signature with the issuer cert's public key
+    const x509Subject = AsnParser.parse(pemToBytes(subjectPem), Certificate);
 
-    const Signature = new crypto.Signature({ alg });
-    Signature.init(issuerPem);
-    // TODO: `updateHex()` takes approximately two seconds per execution, can we improve this?
-    Signature.updateHex(subjectCertStruct ?? '');
+    const data = AsnSerializer.serialize(x509Subject.tbsCertificate);
+    const signature = x509Subject.signatureValue;
+    const signatureAlgorithm = signatureAlgorithmToCOSEAlg(x509Subject.signatureAlgorithm.algorithm);
+    const issuerCertBytes = pemToBytes(issuerPem);
 
-    if (!Signature.verify(signatureHex)) {
+    const verified = await verifySignature({
+      data: new Uint8Array(data),
+      signature: new Uint8Array(signature),
+      leafCertificate: issuerCertBytes,
+      attestationHashAlgorithm: signatureAlgorithm,
+    });
+
+    if (!verified) {
       throw new Error('Invalid certificate path: invalid signature');
     }
   }
@@ -142,4 +149,16 @@ class CertificateNotYetValidOrExpired extends Error {
     super(message);
     this.name = 'CertificateNotYetValidOrExpired';
   }
+}
+
+/**
+ * Take a certificate in PEM format and convert it to bytes
+ */
+function pemToBytes(pem: string): Uint8Array {
+  const certBase64 = pem
+    .replace('-----BEGIN CERTIFICATE-----', '')
+    .replace('-----END CERTIFICATE-----', '')
+    .replace(/\n/g, '');
+
+  return isoBase64URL.toBuffer(certBase64, 'base64');
 }
