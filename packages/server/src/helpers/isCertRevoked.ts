@@ -34,7 +34,7 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
   const { extensions } = cert.tbsCertificate;
 
   if (!extensions) {
-    throw new Error('Certificate had no extensions needed to check for revocation');
+    return false;
   }
 
   let extAuthorityKeyID: AuthorityKeyIdentifier | undefined;
