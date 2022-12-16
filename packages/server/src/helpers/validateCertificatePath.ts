@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { AsnParser, AsnSerializer } from '@peculiar/asn1-schema';
-import { Certificate } from '@peculiar/asn1-x509';
-import { X509, zulutodate } from 'jsrsasign';
+import { AsnSerializer } from '@peculiar/asn1-schema';
 
 import { isCertRevoked } from './isCertRevoked';
 import { isoBase64URL } from './iso';
 import { verifySignature } from './verifySignature';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
+import { getCertificateInfo } from './getCertificateInfo';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -64,9 +63,6 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
   for (let i = 0; i < certificates.length; i += 1) {
     const subjectPem = certificates[i];
 
-    const subjectCert = new X509();
-    subjectCert.readCertPEM(subjectPem);
-
     const isLeafCert = i === 0;
     const isRootCert = i + 1 >= certificates.length;
 
@@ -77,19 +73,20 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
       issuerPem = certificates[i + 1];
     }
 
-    const issuerCert = new X509();
-    issuerCert.readCertPEM(issuerPem);
+    const subjectInfo = getCertificateInfo(pemToBytes(subjectPem));
+    const issuerInfo = getCertificateInfo(pemToBytes(issuerPem));
+
+    const x509Subject = subjectInfo.parsedCertificate;
 
     // Check for certificate revocation
-    const subjectCertRevoked = await isCertRevoked(subjectCert);
+    const subjectCertRevoked = await isCertRevoked(x509Subject);
 
     if (subjectCertRevoked) {
       throw new Error(`Found revoked certificate in certificate path`);
     }
 
     // Check that intermediate certificate is within its valid time window
-    const notBefore = zulutodate(issuerCert.getNotBefore());
-    const notAfter = zulutodate(issuerCert.getNotAfter());
+    const { notBefore, notAfter } = issuerInfo;
 
     const now = new Date(Date.now());
     if (notBefore > now || notAfter < now) {
@@ -108,13 +105,11 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
       }
     }
 
-    if (subjectCert.getIssuerString() !== issuerCert.getSubjectString()) {
+    if (subjectInfo.issuer.combined !== issuerInfo.subject.combined) {
       throw new InvalidSubjectAndIssuer();
     }
 
     // Verify the subject certificate's signature with the issuer cert's public key
-    const x509Subject = AsnParser.parse(pemToBytes(subjectPem), Certificate);
-
     const data = AsnSerializer.serialize(x509Subject.tbsCertificate);
     const signature = x509Subject.signatureValue;
     const signatureAlgorithm = mapX509SignatureAlgToCOSEAlg(
