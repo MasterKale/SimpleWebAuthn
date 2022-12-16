@@ -1,9 +1,16 @@
-import { X509 } from 'jsrsasign';
 import fetch from 'cross-fetch';
 import { AsnParser } from '@peculiar/asn1-schema';
-import { CertificateList } from '@peculiar/asn1-x509';
+import {
+  CertificateList,
+  Certificate,
+  AuthorityKeyIdentifier,
+  id_ce_authorityKeyIdentifier,
+  SubjectKeyIdentifier,
+  id_ce_subjectKeyIdentifier,
+  id_ce_cRLDistributionPoints,
+  CRLDistributionPoints,
+} from '@peculiar/asn1-x509';
 
-import { convertCertBufferToPEM } from './convertCertBufferToPEM';
 import { isoUint8Array } from './iso';
 
 /**
@@ -23,31 +30,48 @@ const cacheRevokedCerts: { [certAuthorityKeyID: string]: CAAuthorityInfo } = {};
  *
  * CRL certificate structure referenced from https://tools.ietf.org/html/rfc5280#page-117
  */
-export async function isCertRevoked(cert: X509): Promise<boolean> {
-  const certSerialHex = cert.getSerialNumberHex();
+export async function isCertRevoked(cert: Certificate): Promise<boolean> {
+  const { extensions } = cert.tbsCertificate;
+
+  if (!extensions) {
+    throw new Error('Certificate had no extensions needed to check for revocation');
+  }
+
+  let extAuthorityKeyID: AuthorityKeyIdentifier | undefined;
+  let extSubjectKeyID: SubjectKeyIdentifier | undefined;
+  let extCRLDistributionPoints: CRLDistributionPoints | undefined;
+
+  extensions.forEach((ext) => {
+    if (ext.extnID === id_ce_authorityKeyIdentifier) {
+      extAuthorityKeyID = AsnParser.parse(ext.extnValue, AuthorityKeyIdentifier);
+    } else if (ext.extnID === id_ce_subjectKeyIdentifier) {
+      extSubjectKeyID = AsnParser.parse(ext.extnValue, SubjectKeyIdentifier);
+    } else if (ext.extnID === id_ce_cRLDistributionPoints) {
+      extCRLDistributionPoints = AsnParser.parse(ext.extnValue, CRLDistributionPoints);
+    }
+  });
 
   // Check to see if we've got cached info for the cert's CA
-  let keyIdentifier: jsrsasign.AuthorityKeyIdentifierResult | jsrsasign.ExtSubjectKeyIdentifier | undefined = undefined;
-  try {
-    keyIdentifier = cert.getExtAuthorityKeyIdentifier();
-  } catch (err) {
-    // pass
+  let keyIdentifier: string | undefined = undefined;
+
+  if (extAuthorityKeyID && extAuthorityKeyID.keyIdentifier) {
+    keyIdentifier = isoUint8Array.toHex(
+      new Uint8Array(extAuthorityKeyID.keyIdentifier.buffer),
+    );
+  } else if (extSubjectKeyID) {
+    /**
+     * We might be dealing with a self-signed root certificate. Check the
+     * Subject key Identifier extension next.
+     */
+    keyIdentifier = isoUint8Array.toHex(
+      new Uint8Array(extSubjectKeyID.buffer),
+    );
   }
 
-  /**
-   * We might be dealing with a self-signed root certificate. Check the
-   * Subject key Identifier extension next.
-   */
-  if (!keyIdentifier) {
-    try {
-      keyIdentifier = cert.getExtSubjectKeyIdentifier();
-    } catch (err) {
-      // pass
-    }
-  }
+  const certSerialHex = isoUint8Array.toHex(new Uint8Array(cert.tbsCertificate.serialNumber));
 
   if (keyIdentifier) {
-    const cached = cacheRevokedCerts[keyIdentifier.kid.hex];
+    const cached = cacheRevokedCerts[keyIdentifier];
     if (cached) {
       const now = new Date();
       // If there's a nextUpdate then make sure we're before it
@@ -57,13 +81,7 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
     }
   }
 
-  let crlURL = undefined;
-  try {
-    crlURL = cert.getExtCRLDistributionPointsURI();
-  } catch (err) {
-    // Cert probably didn't include any CDP URIs
-    return false;
-  }
+  const crlURL = extCRLDistributionPoints?.[0].distributionPoint?.fullName?.[0].uniformResourceIdentifier;
 
   // If no URL is provided then we have nothing to check
   if (!crlURL) {
@@ -71,17 +89,15 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
   }
 
   // Download and read the CRL
-  const crlCert = new X509();
+  let certListBytes: ArrayBuffer;
   try {
-    const respCRL = await fetch(crlURL[0]);
-    const dataCRL = await respCRL.arrayBuffer();
-    const dataPEM = convertCertBufferToPEM(new Uint8Array(dataCRL));
-    crlCert.readCertPEM(dataPEM);
+    const respCRL = await fetch(crlURL);
+    certListBytes = await respCRL.arrayBuffer();
   } catch (err) {
     return false;
   }
 
-  const data = AsnParser.parse(isoUint8Array.fromHex(crlCert.hex), CertificateList);
+  const data = AsnParser.parse(certListBytes, CertificateList);
 
   const newCached: CAAuthorityInfo = {
     revokedCerts: [],
@@ -104,7 +120,7 @@ export async function isCertRevoked(cert: X509): Promise<boolean> {
 
     // Cache the results
     if (keyIdentifier) {
-      cacheRevokedCerts[keyIdentifier.kid.hex] = newCached;
+      cacheRevokedCerts[keyIdentifier] = newCached;
     }
 
     return newCached.revokedCerts.indexOf(certSerialHex) >= 0;
