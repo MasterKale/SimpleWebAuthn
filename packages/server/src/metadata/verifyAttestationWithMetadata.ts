@@ -9,7 +9,6 @@ import {
   COSECRV,
   COSEKEYS,
   COSEKTY,
-  COSEPublicKeyEC2,
   isCOSEPublicKeyEC2,
 } from '../helpers/cose';
 
