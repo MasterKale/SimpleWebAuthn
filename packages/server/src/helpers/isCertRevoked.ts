@@ -97,7 +97,13 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
     return false;
   }
 
-  const data = AsnParser.parse(certListBytes, CertificateList);
+  let data: CertificateList;
+  try {
+    data = AsnParser.parse(certListBytes, CertificateList);
+  } catch (err) {
+    // Something was malformed with the CRL, so pass
+    return false;
+  }
 
   const newCached: CAAuthorityInfo = {
     revokedCerts: [],
