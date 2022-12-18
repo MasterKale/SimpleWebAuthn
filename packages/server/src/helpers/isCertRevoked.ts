@@ -41,7 +41,7 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
   let extSubjectKeyID: SubjectKeyIdentifier | undefined;
   let extCRLDistributionPoints: CRLDistributionPoints | undefined;
 
-  extensions.forEach((ext) => {
+  extensions.forEach(ext => {
     if (ext.extnID === id_ce_authorityKeyIdentifier) {
       extAuthorityKeyID = AsnParser.parse(ext.extnValue, AuthorityKeyIdentifier);
     } else if (ext.extnID === id_ce_subjectKeyIdentifier) {
@@ -55,17 +55,13 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
   let keyIdentifier: string | undefined = undefined;
 
   if (extAuthorityKeyID && extAuthorityKeyID.keyIdentifier) {
-    keyIdentifier = isoUint8Array.toHex(
-      new Uint8Array(extAuthorityKeyID.keyIdentifier.buffer),
-    );
+    keyIdentifier = isoUint8Array.toHex(new Uint8Array(extAuthorityKeyID.keyIdentifier.buffer));
   } else if (extSubjectKeyID) {
     /**
      * We might be dealing with a self-signed root certificate. Check the
      * Subject key Identifier extension next.
      */
-    keyIdentifier = isoUint8Array.toHex(
-      new Uint8Array(extSubjectKeyID.buffer),
-    );
+    keyIdentifier = isoUint8Array.toHex(new Uint8Array(extSubjectKeyID.buffer));
   }
 
   const certSerialHex = isoUint8Array.toHex(new Uint8Array(cert.tbsCertificate.serialNumber));
@@ -81,7 +77,8 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
     }
   }
 
-  const crlURL = extCRLDistributionPoints?.[0].distributionPoint?.fullName?.[0].uniformResourceIdentifier;
+  const crlURL =
+    extCRLDistributionPoints?.[0].distributionPoint?.fullName?.[0].uniformResourceIdentifier;
 
   // If no URL is provided then we have nothing to check
   if (!crlURL) {

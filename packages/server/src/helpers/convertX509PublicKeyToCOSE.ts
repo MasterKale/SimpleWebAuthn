@@ -48,9 +48,7 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
     } else if (namedCurve === id_secp384r1) {
       crv = COSECRV.P384;
     } else {
-      throw new Error(
-        `Certificate public key contained unexpected namedCurve ${namedCurve} (EC2)`,
-      );
+      throw new Error(`Certificate public key contained unexpected namedCurve ${namedCurve} (EC2)`);
     }
 
     const subjectPublicKey = new Uint8Array(subjectPublicKeyInfo.subjectPublicKey);
@@ -90,7 +88,7 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
     cosePublicKey = coseRSAPubKey;
   } else {
     throw new Error(
-      `Certificate public key contained unexpected algorithm ID ${publicKeyAlgorithmID}`
+      `Certificate public key contained unexpected algorithm ID ${publicKeyAlgorithmID}`,
     );
   }
 
