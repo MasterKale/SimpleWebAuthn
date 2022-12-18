@@ -57,14 +57,12 @@
     "@simplewebauthn/iso-webcrypto": "*",
     "cbor-x": "^1.4.1",
     "cross-fetch": "^3.1.5",
-    "debug": "^4.3.2",
-    "jsrsasign": "^10.4.0"
+    "debug": "^4.3.2"
   },
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb",
   "devDependencies": {
     "@simplewebauthn/typescript-types": "*",
     "@types/debug": "^4.1.7",
-    "@types/jsrsasign": "^10.5.4",
     "@types/node": "^18.11.9"
   }
 }
