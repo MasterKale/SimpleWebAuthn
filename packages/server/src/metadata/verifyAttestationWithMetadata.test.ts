@@ -175,51 +175,53 @@ test('should verify idmelon attestation with updated root certificate', async ()
    * new root certificate, which is included below and will eventually get rolled out via FIDO MDS.
    */
   const metadataStatement: MetadataStatement = {
-    "legalHeader": "Submission of this statement and retrieval and use of this statement indicates acceptance of the appropriate agreement located at https://fidoalliance.org/metadata/metadata-legal-terms/.",
-    "aaguid": "820d89ed-d65a-409e-85cb-f73f0578f82a",
-    "description": "Vancosys iOS Authenticator",
-    "authenticatorVersion": 2,
-    "protocolFamily": "fido2",
-    "schema": 3,
-    "upv": [{ "major": 1, "minor": 0 }],
-    "authenticationAlgorithms": ["secp256r1_ecdsa_sha256_raw"],
-    "publicKeyAlgAndEncodings": ["cose"],
-    "attestationTypes": ["basic_full"],
-    "userVerificationDetails": [
+    legalHeader:
+      'Submission of this statement and retrieval and use of this statement indicates acceptance of the appropriate agreement located at https://fidoalliance.org/metadata/metadata-legal-terms/.',
+    aaguid: '820d89ed-d65a-409e-85cb-f73f0578f82a',
+    description: 'Vancosys iOS Authenticator',
+    authenticatorVersion: 2,
+    protocolFamily: 'fido2',
+    schema: 3,
+    upv: [{ major: 1, minor: 0 }],
+    authenticationAlgorithms: ['secp256r1_ecdsa_sha256_raw'],
+    publicKeyAlgAndEncodings: ['cose'],
+    attestationTypes: ['basic_full'],
+    userVerificationDetails: [
       [
-        { "userVerificationMethod": "faceprint_internal" },
-        { "userVerificationMethod": "voiceprint_internal" },
-        { "userVerificationMethod": "passcode_internal" },
-        { "userVerificationMethod": "eyeprint_internal" },
-        { "userVerificationMethod": "handprint_internal" },
-        { "userVerificationMethod": "fingerprint_internal" },
-        { "userVerificationMethod": "pattern_internal" },
-        { "userVerificationMethod": "location_internal" },
-        { "userVerificationMethod": "presence_internal" },
-      ]
+        { userVerificationMethod: 'faceprint_internal' },
+        { userVerificationMethod: 'voiceprint_internal' },
+        { userVerificationMethod: 'passcode_internal' },
+        { userVerificationMethod: 'eyeprint_internal' },
+        { userVerificationMethod: 'handprint_internal' },
+        { userVerificationMethod: 'fingerprint_internal' },
+        { userVerificationMethod: 'pattern_internal' },
+        { userVerificationMethod: 'location_internal' },
+        { userVerificationMethod: 'presence_internal' },
+      ],
     ],
-    "keyProtection": ["hardware", "secure_element"],
-    "matcherProtection": ["on_chip"],
-    "cryptoStrength": 128,
-    "attachmentHint": ["external"],
-    "tcDisplay": [],
-    "attestationRootCertificates": [
-      "MIIByzCCAXGgAwIBAgIJANmMNK6jVpuuMAoGCCqGSM49BAMCMEExJDAiBgNVBAoMG1ZhbmNvc3lzIERhdGEgU2VjdXJpdHkgSW5jLjEZMBcGA1UEAwwQVmFuY29zeXMgUm9vdCBDQTAgFw0yMjEyMTQxODQxMDlaGA8yMDcyMTIwMTE4NDEwOVowQTEkMCIGA1UECgwbVmFuY29zeXMgRGF0YSBTZWN1cml0eSBJbmMuMRkwFwYDVQQDDBBWYW5jb3N5cyBSb290IENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEalYgEopnKScAm+d9f1XpGB3zbkZCD3hZEKuxTclpBYlj4ypNRg0gMSa7geBgd6nck50YaVhdy75uIc2wbWX8t6NQME4wHQYDVR0OBBYEFOxyf0cDs8Yl+VnWSZ1uYJAKkFeVMB8GA1UdIwQYMBaAFOxyf0cDs8Yl+VnWSZ1uYJAKkFeVMAwGA1UdEwQFMAMBAf8wCgYIKoZIzj0EAwIDSAAwRQIhAO2XuiRDXxy/UkWhsuZQYNUXeOj08AeTWADAqXvcA30hAiBi2cdGd61PNwHDTYjXPenPcD8S0rFTDncNWfs3E/WDXA=="
+    keyProtection: ['hardware', 'secure_element'],
+    matcherProtection: ['on_chip'],
+    cryptoStrength: 128,
+    attachmentHint: ['external'],
+    tcDisplay: [],
+    attestationRootCertificates: [
+      'MIIByzCCAXGgAwIBAgIJANmMNK6jVpuuMAoGCCqGSM49BAMCMEExJDAiBgNVBAoMG1ZhbmNvc3lzIERhdGEgU2VjdXJpdHkgSW5jLjEZMBcGA1UEAwwQVmFuY29zeXMgUm9vdCBDQTAgFw0yMjEyMTQxODQxMDlaGA8yMDcyMTIwMTE4NDEwOVowQTEkMCIGA1UECgwbVmFuY29zeXMgRGF0YSBTZWN1cml0eSBJbmMuMRkwFwYDVQQDDBBWYW5jb3N5cyBSb290IENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEalYgEopnKScAm+d9f1XpGB3zbkZCD3hZEKuxTclpBYlj4ypNRg0gMSa7geBgd6nck50YaVhdy75uIc2wbWX8t6NQME4wHQYDVR0OBBYEFOxyf0cDs8Yl+VnWSZ1uYJAKkFeVMB8GA1UdIwQYMBaAFOxyf0cDs8Yl+VnWSZ1uYJAKkFeVMAwGA1UdEwQFMAMBAf8wCgYIKoZIzj0EAwIDSAAwRQIhAO2XuiRDXxy/UkWhsuZQYNUXeOj08AeTWADAqXvcA30hAiBi2cdGd61PNwHDTYjXPenPcD8S0rFTDncNWfs3E/WDXA==',
     ],
-    "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUtmc3y+fyWzOZis9rK5fI6n9B8v+Cw2ezl8vlHptNVrNbX7Paj0ulvud293++JxuP///89HRvpAAAAEXRSTlP/////////////////////ACWtmWIAAABsSURBVHgBxdPBCoAwDIPh/yDise//tIIQCZo6RNGdtuWDstFSg/UOgMiADQBJ6J4iCwS4BgzBuEQHCoFa+mdM+qijsDMVhBfdoRFaAL4nAe6AeghODYPnsaNyLuAqg5AHwO9AYu5BmqEPhncFmecvM5KKQHMAAAAASUVORK5CYII=",
-    "authenticatorGetInfo": {
-      "versions": ["FIDO_2_0"],
-      "extensions": ["hmac-secret"],
-      "aaguid": "820d89edd65a409e85cbf73f0578f82a",
-      "options": { "plat": false, "rk": true, "up": true, "uv": true },
-      "maxMsgSize": 2048
-    }
+    icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUtmc3y+fyWzOZis9rK5fI6n9B8v+Cw2ezl8vlHptNVrNbX7Paj0ulvud293++JxuP///89HRvpAAAAEXRSTlP/////////////////////ACWtmWIAAABsSURBVHgBxdPBCoAwDIPh/yDise//tIIQCZo6RNGdtuWDstFSg/UOgMiADQBJ6J4iCwS4BgzBuEQHCoFa+mdM+qijsDMVhBfdoRFaAL4nAe6AeghODYPnsaNyLuAqg5AHwO9AYu5BmqEPhncFmecvM5KKQHMAAAAASUVORK5CYII=',
+    authenticatorGetInfo: {
+      versions: ['FIDO_2_0'],
+      extensions: ['hmac-secret'],
+      aaguid: '820d89edd65a409e85cbf73f0578f82a',
+      options: { plat: false, rk: true, up: true, uv: true },
+      maxMsgSize: 2048,
+    },
   };
 
   const x5c = [
-    'MIIB6TCCAY+gAwIBAgIJAJz56pzvu76hMAoGCCqGSM49BAMCMEExJDAiBgNVBAoMG1ZhbmNvc3lzIERhdGEgU2VjdXJpdHkgSW5jLjEZMBcGA1UEAwwQVmFuY29zeXMgUm9vdCBDQTAgFw0xODEyMjIxNzQzMjhaGA8yMDY4MTIwOTE3NDMyOFowfDELMAkGA1UEBhMCQ0ExJDAiBgNVBAoMG1ZhbmNvc3lzIERhdGEgU2VjdXJpdHkgSW5jLjEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjEjMCEGA1UEAwwaVmFuY29zeXMgaU9TIEF1dGhlbnRpY2F0b3IwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATZVzbtmSJbzsoN6mfdD+t1LV52zB+LWN0UusmV9+sRmfNB49adqPQ+h0JOlEwfL4zkbMmuDr6JhBRKJ5/c0SkeozMwMTAMBgNVHRMBAf8EAjAAMCEGCysGAQQBguUcAQEEBBIEEIINie3WWkCehcv3PwV4+CowCgYIKoZIzj0EAwIDSAAwRQIgV7++U2fQyy6Qido7fDhsi5Grrt76LTgZ5XJlA9UKEVECIQDJO0YHevdU77VlZ+Of58oKMjWD3SkzC1SWSlhl3nezHQ=='
+    'MIIB6TCCAY+gAwIBAgIJAJz56pzvu76hMAoGCCqGSM49BAMCMEExJDAiBgNVBAoMG1ZhbmNvc3lzIERhdGEgU2VjdXJpdHkgSW5jLjEZMBcGA1UEAwwQVmFuY29zeXMgUm9vdCBDQTAgFw0xODEyMjIxNzQzMjhaGA8yMDY4MTIwOTE3NDMyOFowfDELMAkGA1UEBhMCQ0ExJDAiBgNVBAoMG1ZhbmNvc3lzIERhdGEgU2VjdXJpdHkgSW5jLjEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjEjMCEGA1UEAwwaVmFuY29zeXMgaU9TIEF1dGhlbnRpY2F0b3IwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATZVzbtmSJbzsoN6mfdD+t1LV52zB+LWN0UusmV9+sRmfNB49adqPQ+h0JOlEwfL4zkbMmuDr6JhBRKJ5/c0SkeozMwMTAMBgNVHRMBAf8EAjAAMCEGCysGAQQBguUcAQEEBBIEEIINie3WWkCehcv3PwV4+CowCgYIKoZIzj0EAwIDSAAwRQIgV7++U2fQyy6Qido7fDhsi5Grrt76LTgZ5XJlA9UKEVECIQDJO0YHevdU77VlZ+Of58oKMjWD3SkzC1SWSlhl3nezHQ==',
   ];
-  const credentialPublicKey = 'pQECAyYgASFYINuJbeLdkZwgKtUw2VSopICTTO5PKdj95GXJ7JCsQi7iIlggxygEp0_P0oMXhfw2BjtL0M7-yIpnk5uSHc0oNkXfdJw';
+  const credentialPublicKey =
+    'pQECAyYgASFYINuJbeLdkZwgKtUw2VSopICTTO5PKdj95GXJ7JCsQi7iIlggxygEp0_P0oMXhfw2BjtL0M7-yIpnk5uSHc0oNkXfdJw';
 
   const verified = await verifyAttestationWithMetadata({
     statement: metadataStatement,
@@ -228,4 +230,4 @@ test('should verify idmelon attestation with updated root certificate', async ()
   });
 
   expect(verified).toEqual(true);
-})
+});

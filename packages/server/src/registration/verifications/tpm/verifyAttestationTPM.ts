@@ -14,7 +14,6 @@ import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPubl
 import {
   COSEKEYS,
   isCOSEAlg,
-  COSEKTY,
   isCOSEPublicKeyRSA,
   isCOSEPublicKeyEC2,
   COSEALG,
@@ -215,7 +214,7 @@ export async function verifyAttestationTPM(
   }
 
   // Check that Subject sequence is empty.
-  if (Object.keys(subject).length > 0) {
+  if (subject.combined.length > 0) {
     throw new Error('Certificate subject was not empty (TPM)');
   }
 
@@ -316,8 +315,8 @@ export async function verifyAttestationTPM(
   return verifySignature({
     signature: sig,
     data: certInfo,
-    leafCertificate: x5c[0],
-    attestationHashAlgorithm: alg,
+    x509Certificate: x5c[0],
+    hashAlgorithm: alg,
   });
 }
 

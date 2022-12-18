@@ -15,5 +15,5 @@ export function mapCoseAlgToWebCryptoAlg(alg: COSEALG): SubtleCryptoAlg {
     return 'SHA-512';
   }
 
-  throw new Error(`Unexpected COSE alg value of ${alg}`);
+  throw new Error(`Could not map COSE alg value of ${alg} to a WebCrypto alg`);
 }

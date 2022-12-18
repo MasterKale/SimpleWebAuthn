@@ -8,6 +8,7 @@ export type CertificateInfo = {
   basicConstraintsCA: boolean;
   notBefore: Date;
   notAfter: Date;
+  parsedCertificate: Certificate;
 };
 
 type Issuer = {
@@ -15,6 +16,7 @@ type Issuer = {
   O?: string;
   OU?: string;
   CN?: string;
+  combined: string;
 };
 
 type Subject = {
@@ -22,6 +24,7 @@ type Subject = {
   O?: string;
   OU?: string;
   CN?: string;
+  combined: string;
 };
 
 const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
@@ -37,26 +40,28 @@ const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
  * @param pemCertificate Result from call to `convertASN1toPEM(x5c[0])`
  */
 export function getCertificateInfo(leafCertBuffer: Uint8Array): CertificateInfo {
-  const asnx509 = AsnParser.parse(leafCertBuffer, Certificate);
-  const parsedCert = asnx509.tbsCertificate;
+  const x509 = AsnParser.parse(leafCertBuffer, Certificate);
+  const parsedCert = x509.tbsCertificate;
 
   // Issuer
-  const issuer: Issuer = {};
+  const issuer: Issuer = { combined: '' };
   parsedCert.issuer.forEach(([iss]) => {
     const key = issuerSubjectIDKey[iss.type];
     if (key) {
       issuer[key] = iss.value.toString();
     }
   });
+  issuer.combined = issuerSubjectToString(issuer);
 
   // Subject
-  const subject: Subject = {};
+  const subject: Subject = { combined: '' };
   parsedCert.subject.forEach(([iss]) => {
     const key = issuerSubjectIDKey[iss.type];
     if (key) {
       subject[key] = iss.value.toString();
     }
   });
+  subject.combined = issuerSubjectToString(subject);
 
   let basicConstraintsCA = false;
   if (parsedCert.extensions) {
@@ -76,5 +81,35 @@ export function getCertificateInfo(leafCertBuffer: Uint8Array): CertificateInfo 
     basicConstraintsCA,
     notBefore: parsedCert.validity.notBefore.getTime(),
     notAfter: parsedCert.validity.notAfter.getTime(),
+    parsedCertificate: x509,
   };
+}
+
+/**
+ * Stringify the parts of Issuer or Subject info for easier comparison of subject issuers with
+ * issuer subjects.
+ *
+ * The order might seem arbitrary, because it is. It should be enough that the two are stringified
+ * in the same order.
+ */
+function issuerSubjectToString(input: Issuer | Subject): string {
+  const parts: string[] = [];
+
+  if (input.C) {
+    parts.push(input.C);
+  }
+
+  if (input.O) {
+    parts.push(input.O);
+  }
+
+  if (input.OU) {
+    parts.push(input.OU);
+  }
+
+  if (input.CN) {
+    parts.push(input.CN);
+  }
+
+  return parts.join(' : ');
 }

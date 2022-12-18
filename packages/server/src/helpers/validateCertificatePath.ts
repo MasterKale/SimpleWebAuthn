@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-// `ASN1HEX` exists in the lib but not in its typings
-// @ts-ignore 2305
-import { KJUR, X509, ASN1HEX, zulutodate } from 'jsrsasign';
+import { AsnSerializer } from '@peculiar/asn1-schema';
 
 import { isCertRevoked } from './isCertRevoked';
-
-const { crypto } = KJUR;
+import { isoBase64URL } from './iso';
+import { verifySignature } from './verifySignature';
+import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
+import { getCertificateInfo } from './getCertificateInfo';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -63,9 +63,6 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
   for (let i = 0; i < certificates.length; i += 1) {
     const subjectPem = certificates[i];
 
-    const subjectCert = new X509();
-    subjectCert.readCertPEM(subjectPem);
-
     const isLeafCert = i === 0;
     const isRootCert = i + 1 >= certificates.length;
 
@@ -76,19 +73,20 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
       issuerPem = certificates[i + 1];
     }
 
-    const issuerCert = new X509();
-    issuerCert.readCertPEM(issuerPem);
+    const subjectInfo = getCertificateInfo(pemToBytes(subjectPem));
+    const issuerInfo = getCertificateInfo(pemToBytes(issuerPem));
+
+    const x509Subject = subjectInfo.parsedCertificate;
 
     // Check for certificate revocation
-    const subjectCertRevoked = await isCertRevoked(subjectCert);
+    const subjectCertRevoked = await isCertRevoked(x509Subject);
 
     if (subjectCertRevoked) {
       throw new Error(`Found revoked certificate in certificate path`);
     }
 
     // Check that intermediate certificate is within its valid time window
-    const notBefore = zulutodate(issuerCert.getNotBefore());
-    const notAfter = zulutodate(issuerCert.getNotAfter());
+    const { notBefore, notAfter } = issuerInfo;
 
     const now = new Date(Date.now());
     if (notBefore > now || notAfter < now) {
@@ -107,20 +105,26 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
       }
     }
 
-    if (subjectCert.getIssuerString() !== issuerCert.getSubjectString()) {
+    if (subjectInfo.issuer.combined !== issuerInfo.subject.combined) {
       throw new InvalidSubjectAndIssuer();
     }
 
-    const subjectCertStruct = ASN1HEX.getTLVbyList(subjectCert.hex, 0, [0]);
-    const alg = subjectCert.getSignatureAlgorithmField();
-    const signatureHex = subjectCert.getSignatureValueHex();
+    // Verify the subject certificate's signature with the issuer cert's public key
+    const data = AsnSerializer.serialize(x509Subject.tbsCertificate);
+    const signature = x509Subject.signatureValue;
+    const signatureAlgorithm = mapX509SignatureAlgToCOSEAlg(
+      x509Subject.signatureAlgorithm.algorithm,
+    );
+    const issuerCertBytes = pemToBytes(issuerPem);
 
-    const Signature = new crypto.Signature({ alg });
-    Signature.init(issuerPem);
-    // TODO: `updateHex()` takes approximately two seconds per execution, can we improve this?
-    Signature.updateHex(subjectCertStruct ?? '');
+    const verified = await verifySignature({
+      data: new Uint8Array(data),
+      signature: new Uint8Array(signature),
+      x509Certificate: issuerCertBytes,
+      hashAlgorithm: signatureAlgorithm,
+    });
 
-    if (!Signature.verify(signatureHex)) {
+    if (!verified) {
       throw new Error('Invalid certificate path: invalid signature');
     }
   }
@@ -142,4 +146,16 @@ class CertificateNotYetValidOrExpired extends Error {
     super(message);
     this.name = 'CertificateNotYetValidOrExpired';
   }
+}
+
+/**
+ * Take a certificate in PEM format and convert it to bytes
+ */
+function pemToBytes(pem: string): Uint8Array {
+  const certBase64 = pem
+    .replace('-----BEGIN CERTIFICATE-----', '')
+    .replace('-----END CERTIFICATE-----', '')
+    .replace(/\n/g, '');
+
+  return isoBase64URL.toBuffer(certBase64, 'base64');
 }

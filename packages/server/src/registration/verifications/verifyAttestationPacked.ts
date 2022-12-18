@@ -115,14 +115,14 @@ export async function verifyAttestationPacked(
     verified = await verifySignature({
       signature: sig,
       data: signatureBase,
-      leafCertificate: x5c[0],
+      x509Certificate: x5c[0],
     });
   } else {
     verified = await verifySignature({
       signature: sig,
       data: signatureBase,
       credentialPublicKey,
-      attestationHashAlgorithm: alg,
+      hashAlgorithm: alg,
     });
   }
 
