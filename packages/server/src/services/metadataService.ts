@@ -1,5 +1,4 @@
 import fetch from 'cross-fetch';
-import { KJUR } from 'jsrsasign';
 
 import { validateCertificatePath } from '../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
@@ -12,8 +11,10 @@ import type {
 } from '../metadata/mdsTypes';
 import { SettingsService } from '../services/settingsService';
 import { getLogger } from '../helpers/logging';
+import { convertPEMToBytes } from '../helpers/convertPEMToBytes';
 
 import { parseJWT } from '../metadata/parseJWT';
+import { verifyJWT } from '../metadata/verifyJWT';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -234,13 +235,7 @@ export class BaseMetadataService {
 
     // Verify the BLOB JWT signature
     const leafCert = headerCertsPEM[0];
-    const verified = KJUR.jws.JWS.verifyJWT(data, leafCert, {
-      alg: [header.alg],
-      // Empty values to appease TypeScript and this library's subtly mis-typed @types definitions
-      aud: [],
-      iss: [],
-      sub: [],
-    });
+    const verified = await verifyJWT(data, convertPEMToBytes(leafCert));
 
     if (!verified) {
       // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
