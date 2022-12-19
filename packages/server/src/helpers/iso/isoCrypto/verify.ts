@@ -9,6 +9,7 @@ import {
 import { verifyEC2 } from './verifyEC2';
 import { verifyRSA } from './verifyRSA';
 import { verifyOKP } from './verifyOKP';
+import { unwrapEC2Signature } from './unwrapEC2Signature';
 
 /**
  * Verify signatures with their public key. Supports EC2 and RSA public keys.
@@ -22,7 +23,8 @@ export async function verify(opts: {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 
   if (isCOSEPublicKeyEC2(cosePublicKey)) {
-    return verifyEC2({ cosePublicKey, signature, data, shaHashOverride });
+    const unwrappedSignature = unwrapEC2Signature(signature);
+    return verifyEC2({ cosePublicKey, signature: unwrappedSignature, data, shaHashOverride });
   } else if (isCOSEPublicKeyRSA(cosePublicKey)) {
     return verifyRSA({ cosePublicKey, signature, data, shaHashOverride });
   } else if (isCOSEPublicKeyOKP(cosePublicKey)) {

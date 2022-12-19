@@ -1,11 +1,9 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
-import { ECDSASigValue } from '@peculiar/asn1-ecc';
-import { AsnParser } from '@peculiar/asn1-schema';
 
 import { COSEALG, COSECRV, COSEKEYS, COSEPublicKeyEC2 } from '../../cose';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
 import { importKey } from './importKey';
-import { isoBase64URL, isoUint8Array } from '../index';
+import { isoBase64URL } from '../index';
 import { SubtleCryptoCrv } from './structs';
 
 /**
@@ -87,31 +85,5 @@ export async function verifyEC2(opts: {
     hash: { name: subtleAlg },
   };
 
-  // The signature is wrapped in ASN.1 structure, so we need to peel it apart
-  const parsedSignature = AsnParser.parse(signature, ECDSASigValue);
-  let rBytes = new Uint8Array(parsedSignature.r);
-  let sBytes = new Uint8Array(parsedSignature.s);
-
-  if (shouldRemoveLeadingZero(rBytes)) {
-    rBytes = rBytes.slice(1);
-  }
-
-  if (shouldRemoveLeadingZero(sBytes)) {
-    sBytes = sBytes.slice(1);
-  }
-
-  const finalSignature = isoUint8Array.concat([rBytes, sBytes]);
-
-  return WebCrypto.subtle.verify(verifyAlgorithm, key, finalSignature, data);
-}
-
-/**
- * Determine if the DER-specific `00` byte at the start of an ECDSA signature byte sequence
- * should be removed based on the following logic:
- *
- * "If the leading byte is 0x0, and the the high order bit on the second byte is not set to 0,
- * then remove the leading 0x0 byte"
- */
-function shouldRemoveLeadingZero(bytes: Uint8Array): boolean {
-  return bytes[0] === 0x0 && (bytes[1] & (1 << 7)) !== 0;
+  return WebCrypto.subtle.verify(verifyAlgorithm, key, signature, data);
 }

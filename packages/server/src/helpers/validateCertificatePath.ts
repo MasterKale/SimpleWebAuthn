@@ -2,10 +2,10 @@
 import { AsnSerializer } from '@peculiar/asn1-schema';
 
 import { isCertRevoked } from './isCertRevoked';
-import { isoBase64URL } from './iso';
 import { verifySignature } from './verifySignature';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
 import { getCertificateInfo } from './getCertificateInfo';
+import { convertPEMToBytes } from './convertPEMToBytes';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -73,8 +73,8 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
       issuerPem = certificates[i + 1];
     }
 
-    const subjectInfo = getCertificateInfo(pemToBytes(subjectPem));
-    const issuerInfo = getCertificateInfo(pemToBytes(issuerPem));
+    const subjectInfo = getCertificateInfo(convertPEMToBytes(subjectPem));
+    const issuerInfo = getCertificateInfo(convertPEMToBytes(issuerPem));
 
     const x509Subject = subjectInfo.parsedCertificate;
 
@@ -115,7 +115,7 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const signatureAlgorithm = mapX509SignatureAlgToCOSEAlg(
       x509Subject.signatureAlgorithm.algorithm,
     );
-    const issuerCertBytes = pemToBytes(issuerPem);
+    const issuerCertBytes = convertPEMToBytes(issuerPem);
 
     const verified = await verifySignature({
       data: new Uint8Array(data),
@@ -146,16 +146,4 @@ class CertificateNotYetValidOrExpired extends Error {
     super(message);
     this.name = 'CertificateNotYetValidOrExpired';
   }
-}
-
-/**
- * Take a certificate in PEM format and convert it to bytes
- */
-function pemToBytes(pem: string): Uint8Array {
-  const certBase64 = pem
-    .replace('-----BEGIN CERTIFICATE-----', '')
-    .replace('-----END CERTIFICATE-----', '')
-    .replace(/\n/g, '');
-
-  return isoBase64URL.toBuffer(certBase64, 'base64');
 }
