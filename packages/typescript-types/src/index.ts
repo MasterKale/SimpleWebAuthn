@@ -110,12 +110,16 @@ export interface AuthenticationCredential extends PublicKeyCredentialFuture {
 /**
  * A slightly-modified AuthenticationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-authenticationresponsejson
  */
-export interface AuthenticationCredentialJSON
-  extends Omit<AuthenticationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+export interface AuthenticationResponseJSON {
+  id: Base64URLString;
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
+  authenticatorAttachment?: AuthenticatorAttachment;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
+  type: PublicKeyCredentialType;
 }
 
 /**
@@ -133,14 +137,12 @@ export interface AuthenticatorAttestationResponseJSON {
 /**
  * A slightly-modified AuthenticatorAssertionResponse to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-authenticatorassertionresponsejson
  */
-export interface AuthenticatorAssertionResponseJSON
-  extends Omit<
-    AuthenticatorAssertionResponse,
-    'authenticatorData' | 'clientDataJSON' | 'signature' | 'userHandle'
-  > {
-  authenticatorData: Base64URLString;
+export interface AuthenticatorAssertionResponseJSON {
   clientDataJSON: Base64URLString;
+  authenticatorData: Base64URLString;
   signature: Base64URLString;
   userHandle?: string;
 }
