@@ -1,7 +1,8 @@
 import {
   PublicKeyCredentialRequestOptionsJSON,
   AuthenticationCredential,
-  AuthenticationCredentialJSON,
+  AuthenticationResponseJSON,
+  PublicKeyCredentialFuture,
 } from '@simplewebauthn/typescript-types';
 
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
@@ -12,21 +13,25 @@ import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAu
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
  *
- * @param requestOptionsJSON Output from **@simplewebauthn/server**'s generateAssertionOptions(...)
+ * @param requestOptionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions(...)`
  * @param useBrowserAutofill Initialize conditional UI to enable logging in via browser
  * autofill prompts
  */
 export async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
   useBrowserAutofill = false,
-): Promise<AuthenticationCredentialJSON> {
+): Promise<AuthenticationResponseJSON> {
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
+
+  const globalPublicKeyCredential =
+    window.PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
   // We need to avoid passing empty array to avoid blocking retrieval
   // of public key
@@ -36,11 +41,16 @@ export async function startAuthentication(
   }
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
-  const publicKey: PublicKeyCredentialRequestOptions = {
-    ...requestOptionsJSON,
-    challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
-    allowCredentials,
-  };
+  let publicKey: PublicKeyCredentialRequestOptions;
+  if (typeof globalPublicKeyCredential.parseRequestOptionsFromJSON === 'function') {
+    publicKey = globalPublicKeyCredential.parseRequestOptionsFromJSON(requestOptionsJSON);
+  } else {
+    publicKey = {
+      ...requestOptionsJSON,
+      challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
+      allowCredentials,
+    };
+  }
 
   // Prepare options for `.get()`
   const options: CredentialRequestOptions = {};
@@ -86,6 +96,12 @@ export async function startAuthentication(
     throw new Error('Authentication was not completed');
   }
 
+  // Use toJSON() if it's available in the browser
+  if (typeof credential.toJSON === 'function') {
+    return credential.toJSON() as AuthenticationResponseJSON;
+  }
+
+  // Manually construct an instance of AuthenticationResponseJSON
   const { id, rawId, response, type } = credential;
 
   let userHandle = undefined;
@@ -105,6 +121,6 @@ export async function startAuthentication(
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
-    authenticatorAttachment: credential.authenticatorAttachment,
+    authenticatorAttachment: toAuthenticatorAttachment(credential.authenticatorAttachment),
   };
 }
