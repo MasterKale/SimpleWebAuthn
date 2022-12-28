@@ -13,6 +13,15 @@ import type {
   PublicKeyCredentialUserEntity,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
+  PublicKeyCredentialRpEntity,
+  PublicKeyCredentialType,
+  PublicKeyCredentialParameters,
+  AuthenticatorSelectionCriteria,
+  AttestationConveyancePreference,
+  UserVerificationRequirement,
+  AuthenticatorAttachment,
+  PublicKeyCredentialCreationOptions,
+  PublicKeyCredentialRequestOptions,
 } from './dom';
 
 export * from './dom';
@@ -20,12 +29,21 @@ export * from './dom';
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.create(...) in the browser.
+ *
+ * This should eventually get replaced with official TypeScript DOM types when WebAuthn L3 types
+ * eventually make it into the language:
+ *
+ * https://w3c.github.io/webauthn/#dictdef-publickeycredentialcreationoptionsjson
  */
-export interface PublicKeyCredentialCreationOptionsJSON
-  extends Omit<PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'> {
+export interface PublicKeyCredentialCreationOptionsJSON {
+  rp: PublicKeyCredentialRpEntity;
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64URLString;
-  excludeCredentials: PublicKeyCredentialDescriptorJSON[];
+  pubKeyCredParams: PublicKeyCredentialParameters[];
+  timeout?: number;
+  excludeCredentials?: PublicKeyCredentialDescriptorJSON[];
+  authenticatorSelection?: AuthenticatorSelectionCriteria;
+  attestation?: AttestationConveyancePreference;
   extensions?: AuthenticationExtensionsClientInputs;
 }
 
@@ -33,22 +51,31 @@ export interface PublicKeyCredentialCreationOptionsJSON
  * A variant of PublicKeyCredentialRequestOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.get(...) in the browser.
  */
-export interface PublicKeyCredentialRequestOptionsJSON
-  extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
+export interface PublicKeyCredentialRequestOptionsJSON {
   challenge: Base64URLString;
+  timeout?: number;
+  rpId?: string;
   allowCredentials?: PublicKeyCredentialDescriptorJSON[];
+  userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;
 }
 
-export interface PublicKeyCredentialDescriptorJSON
-  extends Omit<PublicKeyCredentialDescriptorFuture, 'id' | 'transports'> {
+/**
+ * https://w3c.github.io/webauthn/#dictdef-publickeycredentialdescriptorjson
+ */
+export interface PublicKeyCredentialDescriptorJSON {
   id: Base64URLString;
+  type: PublicKeyCredentialType;
   transports?: AuthenticatorTransportFuture[];
 }
 
-export interface PublicKeyCredentialUserEntityJSON
-  extends Omit<PublicKeyCredentialUserEntity, 'id'> {
+/**
+ * https://w3c.github.io/webauthn/#dictdef-publickeycredentialuserentityjson
+ */
+export interface PublicKeyCredentialUserEntityJSON {
   id: string;
+  name: string;
+  displayName: string;
 }
 
 /**
