@@ -12,7 +12,7 @@ test('should verify (broken) Packed response from Chrome virtual authenticator',
    * This unit test will remain for now in case this issue comes up again.
    */
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: '5Hwc78jGjXrzOS8Mke9KhFZEtX54iYD-UEBKgvMXM64',
       rawId: '5Hwc78jGjXrzOS8Mke9KhFZEtX54iYD-UEBKgvMXM64',
       response: {

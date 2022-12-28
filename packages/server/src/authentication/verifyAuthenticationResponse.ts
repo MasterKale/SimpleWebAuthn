@@ -15,7 +15,7 @@ import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
 import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
 export type VerifyAuthenticationResponseOpts = {
-  credential: AuthenticationResponseJSON;
+  response: AuthenticationResponseJSON;
   expectedChallenge: string | ((challenge: string) => boolean);
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
@@ -31,7 +31,7 @@ export type VerifyAuthenticationResponseOpts = {
  *
  * **Options:**
  *
- * @param credential Authenticator credential returned by browser's `startAssertion()`
+ * @param response Response returned by **@simplewebauthn/browser**'s `startAssertion()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
  * `generateAuthenticationOptions()`
  * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
@@ -49,7 +49,7 @@ export async function verifyAuthenticationResponse(
   options: VerifyAuthenticationResponseOpts,
 ): Promise<VerifiedAuthenticationResponse> {
   const {
-    credential,
+    response,
     expectedChallenge,
     expectedOrigin,
     expectedRPID,
@@ -57,7 +57,7 @@ export async function verifyAuthenticationResponse(
     requireUserVerification = true,
     advancedFIDOConfig,
   } = options;
-  const { id, rawId, type: credentialType, response } = credential;
+  const { id, rawId, type: credentialType, response: assertionResponse } = response;
 
   // Ensure credential specified an ID
   if (!id) {
@@ -78,11 +78,11 @@ export async function verifyAuthenticationResponse(
     throw new Error('Credential missing response');
   }
 
-  if (typeof response?.clientDataJSON !== 'string') {
+  if (typeof assertionResponse?.clientDataJSON !== 'string') {
     throw new Error('Credential response clientDataJSON was not a string');
   }
 
-  const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
+  const clientDataJSON = decodeClientDataJSON(assertionResponse.clientDataJSON);
 
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
@@ -120,15 +120,15 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  if (!isoBase64URL.isBase64url(response.authenticatorData)) {
+  if (!isoBase64URL.isBase64url(assertionResponse.authenticatorData)) {
     throw new Error('Credential response authenticatorData was not a base64url string');
   }
 
-  if (!isoBase64URL.isBase64url(response.signature)) {
+  if (!isoBase64URL.isBase64url(assertionResponse.signature)) {
     throw new Error('Credential response signature was not a base64url string');
   }
 
-  if (response.userHandle && typeof response.userHandle !== 'string') {
+  if (assertionResponse.userHandle && typeof assertionResponse.userHandle !== 'string') {
     throw new Error('Credential response userHandle was not a string');
   }
 
@@ -142,7 +142,7 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const authDataBuffer = isoBase64URL.toBuffer(response.authenticatorData);
+  const authDataBuffer = isoBase64URL.toBuffer(assertionResponse.authenticatorData);
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
   const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
 
@@ -185,10 +185,10 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  const clientDataHash = await toHash(isoBase64URL.toBuffer(response.clientDataJSON));
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(assertionResponse.clientDataJSON));
   const signatureBase = isoUint8Array.concat([authDataBuffer, clientDataHash]);
 
-  const signature = isoBase64URL.toBuffer(response.signature);
+  const signature = isoBase64URL.toBuffer(assertionResponse.signature);
 
   if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
     // Error out when the counter in the DB is greater than or equal to the counter in the

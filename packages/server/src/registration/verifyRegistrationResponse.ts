@@ -30,7 +30,7 @@ import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAn
 import { verifyAttestationApple } from './verifications/verifyAttestationApple';
 
 export type VerifyRegistrationResponseOpts = {
-  credential: RegistrationResponseJSON;
+  response: RegistrationResponseJSON;
   expectedChallenge: string | ((challenge: string) => boolean);
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];
@@ -43,7 +43,7 @@ export type VerifyRegistrationResponseOpts = {
  *
  * **Options:**
  *
- * @param credential Authenticator credential returned by browser's `startAuthentication()`
+ * @param response Response returned by **@simplewebauthn/browser**'s `startAuthentication()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
  * `generateRegistrationOptions()`
  * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
@@ -57,14 +57,14 @@ export async function verifyRegistrationResponse(
   options: VerifyRegistrationResponseOpts,
 ): Promise<VerifiedRegistrationResponse> {
   const {
-    credential,
+    response,
     expectedChallenge,
     expectedOrigin,
     expectedRPID,
     requireUserVerification = true,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
-  const { id, rawId, type: credentialType, response } = credential;
+  const { id, rawId, type: responseType, response: attestationResponse } = response;
 
   // Ensure credential specified an ID
   if (!id) {
@@ -77,11 +77,11 @@ export async function verifyRegistrationResponse(
   }
 
   // Make sure credential type is public-key
-  if (credentialType !== 'public-key') {
-    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
+  if (responseType !== 'public-key') {
+    throw new Error(`Unexpected credential type ${responseType}, expected "public-key"`);
   }
 
-  const clientDataJSON = decodeClientDataJSON(response.clientDataJSON);
+  const clientDataJSON = decodeClientDataJSON(attestationResponse.clientDataJSON);
 
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
@@ -130,7 +130,7 @@ export async function verifyRegistrationResponse(
     }
   }
 
-  const attestationObject = isoBase64URL.toBuffer(response.attestationObject);
+  const attestationObject = isoBase64URL.toBuffer(attestationResponse.attestationObject);
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
   const fmt = decodedAttestationObject.get('fmt');
   const authData = decodedAttestationObject.get('authData');
@@ -187,7 +187,7 @@ export async function verifyRegistrationResponse(
     throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
   }
 
-  const clientDataHash = await toHash(isoBase64URL.toBuffer(response.clientDataJSON));
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(attestationResponse.clientDataJSON));
   const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
 
   // Prepare arguments to pass to the relevant verification method
@@ -241,7 +241,7 @@ export async function verifyRegistrationResponse(
       aaguid: convertAAGUIDToString(aaguid),
       credentialID,
       credentialPublicKey,
-      credentialType,
+      credentialType: responseType,
       attestationObject,
       userVerified: flags.uv,
       credentialDeviceType,

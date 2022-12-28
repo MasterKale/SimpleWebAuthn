@@ -5,7 +5,7 @@ test('should verify TPM response', async () => {
   const expectedChallenge = 'a4de0d36-057d-4e9d-831a-2c578fa89170';
   jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'SErwRhxIzjPowcnM3e-D-u89EQXLUe1NYewpshd7Mc0',
       rawId: 'SErwRhxIzjPowcnM3e-D-u89EQXLUe1NYewpshd7Mc0',
       response: {
@@ -37,7 +37,7 @@ test('should verify SHA1 TPM response', async () => {
     '9JyUfJkg8PqoKZuD7FHzOE9dbyculC9urGTpGqBnEwnhKmni4rGRXxm3-ZBHK8x6riJQqIpC8qEa-T0qIFTKTQ';
   jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       rawId: 'UJDoUJoGiDQF_EEZ3G_z9Lfq16_KFaXtMTjwTUrrRlc',
       id: 'UJDoUJoGiDQF_EEZ3G_z9Lfq16_KFaXtMTjwTUrrRlc',
       response: {
@@ -69,7 +69,7 @@ test('should verify SHA256 TPM response', async () => {
     'gHrAk4pNe2VlB0HLeKclI2P6QEa83PuGeijTHMtpbhY9KlybyhlwF_VzRe7yhabXagWuY6rkDWfvvhNqgh2o7A';
   jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       rawId: 'h9XMhkVePN1Prq9Ks_VfwIsVZvt-jmSRTEnevTc-KB8',
       id: 'h9XMhkVePN1Prq9Ks_VfwIsVZvt-jmSRTEnevTc-KB8',
       response: {
@@ -108,7 +108,7 @@ test('should verify TPM response with spec-compliant tcgAtTpm SAN structure', as
   const expectedChallenge = 'VfmZXKDxqdoXFMHXO3SE2Q2b8u5Ki64OL_XICELcGKg';
   jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'LVwzXx0fStkvsos_jdl9DTd6O3-6be8Ua4tcdXc5XeM',
       rawId: 'LVwzXx0fStkvsos_jdl9DTd6O3-6be8Ua4tcdXc5XeM',
       response: {
@@ -142,7 +142,7 @@ test('should verify TPM response with non-spec-compliant tcgAtTpm SAN structure'
   const expectedChallenge = '4STWgmXrgJxzigqe6nFuIg';
   jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'X7TPi7o8WfiIz1bP0Vciz1xRvSMyiitgOR1sUqY724s',
       rawId: 'X7TPi7o8WfiIz1bP0Vciz1xRvSMyiitgOR1sUqY724s',
       response: {
@@ -167,7 +167,7 @@ test('should verify TPM response with ECC public area type', async () => {
   const expectedChallenge = 'uzn9u0Tx-LBdtGgERsbkHRBjiUt5i2rvm2BBTZrWqEo';
   jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'hsS2ywFz_LWf9-lC35vC9uJTVD3ZCVdweZvESUbjXnQ',
       rawId: 'hsS2ywFz_LWf9-lC35vC9uJTVD3ZCVdweZvESUbjXnQ',
       type: 'public-key',

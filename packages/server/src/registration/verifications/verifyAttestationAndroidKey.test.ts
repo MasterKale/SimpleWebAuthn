@@ -13,7 +13,7 @@ test('should verify Android KeyStore response', async () => {
   const expectedChallenge = '4ab7dfd1-a695-4777-985f-ad2993828e99';
   jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
       rawId: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
       response: {

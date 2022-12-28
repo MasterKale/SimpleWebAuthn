@@ -2,7 +2,7 @@ import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
 
 test('should verify Apple attestation', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'J4lAqPXhefDrUD7oh5LQMbBH5TE',
       rawId: 'J4lAqPXhefDrUD7oh5LQMbBH5TE',
       response: {

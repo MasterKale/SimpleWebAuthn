@@ -43,7 +43,7 @@ afterEach(() => {
 
 test('should verify FIDO U2F attestation', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationFIDOU2F,
+    response: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
@@ -73,7 +73,7 @@ test('should verify FIDO U2F attestation', async () => {
 
 test('should verify Packed (EC2) attestation', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationPacked,
+    response: attestationPacked,
     expectedChallenge: attestationPackedChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
@@ -97,7 +97,7 @@ test('should verify Packed (EC2) attestation', async () => {
 
 test('should verify Packed (X5C) attestation', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationPackedX5C,
+    response: attestationPackedX5C,
     expectedChallenge: attestationPackedX5CChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
@@ -121,7 +121,7 @@ test('should verify Packed (X5C) attestation', async () => {
 
 test('should verify None attestation', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationNone,
+    response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
@@ -145,7 +145,7 @@ test('should verify None attestation', async () => {
 test('should verify None attestation w/RSA public key', async () => {
   const expectedChallenge = 'pYZ3VX2yb8dS9yplNxJChiXhPGBk8gZzTAyJ2iU5x1k';
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo',
       rawId: 'kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo',
       response: {
@@ -179,7 +179,7 @@ test('should verify None attestation w/RSA public key', async () => {
 test('should throw when response challenge is not expected value', async () => {
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -190,7 +190,7 @@ test('should throw when response challenge is not expected value', async () => {
 test('should throw when response origin is not expected value', async () => {
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://different.address',
       expectedRPID: 'dev.dontneeda.pw',
@@ -211,7 +211,7 @@ test('should throw when attestation type is not webauthn.create', async () => {
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: challenge,
       expectedOrigin: origin,
       expectedRPID: 'dev.dontneeda.pw',
@@ -230,7 +230,7 @@ test('should throw if an unexpected attestation format is specified', async () =
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -251,7 +251,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -269,7 +269,7 @@ test('should throw error if user was not present', async () => {
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -288,7 +288,7 @@ test('should throw if the authenticator does not give back credential ID', async
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -309,7 +309,7 @@ test('should throw if the authenticator does not give back credential public key
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -324,7 +324,7 @@ test('should throw error if no alg is specified in public key', async () => {
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -339,7 +339,7 @@ test('should throw error if unsupported alg is used', async () => {
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -351,7 +351,7 @@ test('should not include authenticator info if not verified', async () => {
   mockVerifyFIDOU2F.mockReturnValue(false);
 
   const verification = await verifyRegistrationResponse({
-    credential: attestationFIDOU2F,
+    response: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
@@ -373,7 +373,7 @@ test('should throw an error if user verification is required but user was not ve
 
   await expect(
     verifyRegistrationResponse({
-      credential: attestationFIDOU2F,
+      response: attestationFIDOU2F,
       expectedChallenge: attestationFIDOU2FChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -385,7 +385,7 @@ test('should throw an error if user verification is required but user was not ve
 test('should validate TPM RSA response (SHA256)', async () => {
   const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
       rawId: 'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
       response: {
@@ -420,7 +420,7 @@ test('should validate TPM RSA response (SHA256)', async () => {
 test('should validate TPM RSA response (SHA1)', async () => {
   const expectedChallenge = 'f4e8d87b-d363-47cc-ab4d-1a84647bf245';
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
       rawId: 'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
       response: {
@@ -455,7 +455,7 @@ test('should validate TPM RSA response (SHA1)', async () => {
 test('should validate Android-Key response', async () => {
   const expectedChallenge = '14e0d1b6-9c36-4849-aeec-ea64676449ef';
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
       rawId: 'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
       response: {
@@ -489,7 +489,7 @@ test('should validate Android-Key response', async () => {
 
 test('should support multiple possible origins', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationNone,
+    response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: ['https://dev.dontneeda.pw', 'https://different.address'],
     expectedRPID: 'dev.dontneeda.pw',
@@ -501,7 +501,7 @@ test('should support multiple possible origins', async () => {
 test('should throw an error if origin not in list of expected origins', async () => {
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: ['https://different.address'],
       expectedRPID: 'dev.dontneeda.pw',
@@ -511,7 +511,7 @@ test('should throw an error if origin not in list of expected origins', async ()
 
 test('should support multiple possible RP IDs', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationNone,
+    response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: ['dev.dontneeda.pw', 'simplewebauthn.dev'],
@@ -523,7 +523,7 @@ test('should support multiple possible RP IDs', async () => {
 test('should throw an error if RP ID not in list of possible RP IDs', async () => {
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: attestationNoneChallenge,
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: ['simplewebauthn.dev'],
@@ -533,7 +533,7 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
 
 test('should pass verification if custom challenge verifier returns true', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA',
       rawId:
         'AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA',
@@ -563,7 +563,7 @@ test('should pass verification if custom challenge verifier returns true', async
 test('should fail verification if custom challenge verifier returns false', async () => {
   await expect(
     verifyRegistrationResponse({
-      credential: attestationNone,
+      response: attestationNone,
       expectedChallenge: (challenge: string) => challenge === 'thisWillneverMatch',
       expectedOrigin: 'https://dev.dontneeda.pw',
       expectedRPID: 'dev.dontneeda.pw',
@@ -573,7 +573,7 @@ test('should fail verification if custom challenge verifier returns false', asyn
 
 test('should return credential backup info', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: attestationNone,
+    response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
@@ -585,7 +585,7 @@ test('should return credential backup info', async () => {
 
 test('should return authenticator extension output', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'E_Pko4wN1BXE23S0ftN3eQ',
       rawId: 'E_Pko4wN1BXE23S0ftN3eQ',
       response: {
@@ -623,7 +623,7 @@ test('should return authenticator extension output', async () => {
 
 test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert public key', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: '7wQcUWO9gG6mi2IktoZUogs8opnghY01DPYwaerMZms',
       rawId: '7wQcUWO9gG6mi2IktoZUogs8opnghY01DPYwaerMZms',
       response: {
@@ -647,7 +647,7 @@ test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert p
 
 test('should verify Packed attestation with RSA-PSS SHA-256 public key', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'n_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_Q',
       rawId: 'n_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_Q',
       response: {
@@ -671,7 +671,7 @@ test('should verify Packed attestation with RSA-PSS SHA-256 public key', async (
 
 test('should verify Packed attestation with RSA-PSS SHA-384 public key', async () => {
   const verification = await verifyRegistrationResponse({
-    credential: {
+    response: {
       id: 'BCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb0',
       rawId: 'BCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb0',
       response: {
