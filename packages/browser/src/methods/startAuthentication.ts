@@ -17,7 +17,7 @@ import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment'
 /**
  * Begin authenticator "login" via WebAuthn assertion
  *
- * @param requestOptionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions(...)`
+ * @param requestOptionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions()`
  * @param useBrowserAutofill Initialize conditional UI to enable logging in via browser
  * autofill prompts
  */

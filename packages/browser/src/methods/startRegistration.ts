@@ -17,7 +17,7 @@ import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment'
 /**
  * Begin authenticator "registration" via WebAuthn attestation
  *
- * @param creationOptionsJSON Output from @simplewebauthn/server's generateRegistrationOptions(...)
+ * @param creationOptionsJSON Output from **@simplewebauthn/server**'s `generateRegistrationOptions()`
  */
 export async function startRegistration(
   creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
