@@ -3,10 +3,7 @@ import { verifyAuthenticationResponse } from './verifyAuthenticationResponse';
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
-import {
-  AuthenticatorDevice,
-  AuthenticationResponseJSON,
-} from '@simplewebauthn/typescript-types';
+import { AuthenticatorDevice, AuthenticationResponseJSON } from '@simplewebauthn/typescript-types';
 import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
 let mockDecodeClientData: jest.SpyInstance;

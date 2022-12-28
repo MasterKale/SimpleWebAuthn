@@ -90,7 +90,7 @@ test('should verify Packed (EC2) attestation', async () => {
   expect(verification.registrationInfo?.credentialID).toEqual(
     isoBase64URL.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
-      'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
+        'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
     ),
   );
 });

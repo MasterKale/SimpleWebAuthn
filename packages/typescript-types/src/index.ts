@@ -205,9 +205,13 @@ export interface PublicKeyCredentialFuture extends PublicKeyCredential {
   // See https://github.com/w3c/webauthn/issues/1745
   isConditionalMediationAvailable?(): Promise<boolean>;
   // See https://w3c.github.io/webauthn/#sctn-parseCreationOptionsFromJSON
-  parseCreationOptionsFromJSON?(options: PublicKeyCredentialCreationOptionsJSON): PublicKeyCredentialCreationOptions;
+  parseCreationOptionsFromJSON?(
+    options: PublicKeyCredentialCreationOptionsJSON,
+  ): PublicKeyCredentialCreationOptions;
   // See https://w3c.github.io/webauthn/#sctn-parseRequestOptionsFromJSON
-  parseRequestOptionsFromJSON?(options: PublicKeyCredentialRequestOptionsJSON): PublicKeyCredentialRequestOptions;
+  parseRequestOptionsFromJSON?(
+    options: PublicKeyCredentialRequestOptionsJSON,
+  ): PublicKeyCredentialRequestOptions;
   // See https://w3c.github.io/webauthn/#dom-publickeycredential-tojson
   toJSON?(): PublicKeyCredentialJSON;
 }

@@ -34,7 +34,9 @@ export async function startRegistration(
       ...creationOptionsJSON.user,
       id: utf8StringToBuffer(creationOptionsJSON.user.id),
     },
-    excludeCredentials: creationOptionsJSON.excludeCredentials?.map(toPublicKeyCredentialDescriptor),
+    excludeCredentials: creationOptionsJSON.excludeCredentials?.map(
+      toPublicKeyCredentialDescriptor,
+    ),
   };
 
   // Finalize options

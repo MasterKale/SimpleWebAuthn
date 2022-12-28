@@ -5,7 +5,9 @@ const attachments: AuthenticatorAttachment[] = ['cross-platform', 'platform'];
 /**
  * If possible coerce a `string` value into a known `AuthenticatorAttachment`
  */
-export function toAuthenticatorAttachment(attachment: string | null): AuthenticatorAttachment | undefined {
+export function toAuthenticatorAttachment(
+  attachment: string | null,
+): AuthenticatorAttachment | undefined {
   if (!attachment) {
     return;
   }
