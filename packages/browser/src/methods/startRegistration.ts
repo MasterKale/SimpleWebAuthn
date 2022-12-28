@@ -2,7 +2,6 @@ import {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
   RegistrationResponseJSON,
-  PublicKeyCredentialFuture,
 } from '@simplewebauthn/typescript-types';
 
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
@@ -26,24 +25,16 @@ export async function startRegistration(
     throw new Error('WebAuthn is not supported in this browser');
   }
 
-  const globalPublicKeyCredential =
-    window.PublicKeyCredential as unknown as PublicKeyCredentialFuture;
-
-  let publicKey: PublicKeyCredentialCreationOptions;
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
-  if (typeof globalPublicKeyCredential.parseCreationOptionsFromJSON === 'function') {
-    publicKey = globalPublicKeyCredential.parseCreationOptionsFromJSON(creationOptionsJSON);
-  } else {
-    publicKey = {
-      ...creationOptionsJSON,
-      challenge: base64URLStringToBuffer(creationOptionsJSON.challenge),
-      user: {
-        ...creationOptionsJSON.user,
-        id: utf8StringToBuffer(creationOptionsJSON.user.id),
-      },
-      excludeCredentials: creationOptionsJSON.excludeCredentials?.map(toPublicKeyCredentialDescriptor),
-    };
-  }
+  const publicKey: PublicKeyCredentialCreationOptions = {
+    ...creationOptionsJSON,
+    challenge: base64URLStringToBuffer(creationOptionsJSON.challenge),
+    user: {
+      ...creationOptionsJSON.user,
+      id: utf8StringToBuffer(creationOptionsJSON.user.id),
+    },
+    excludeCredentials: creationOptionsJSON.excludeCredentials?.map(toPublicKeyCredentialDescriptor),
+  };
 
   // Finalize options
   const options: CredentialCreationOptions = { publicKey };
@@ -60,11 +51,6 @@ export async function startRegistration(
 
   if (!credential) {
     throw new Error('Registration was not completed');
-  }
-
-  // Use toJSON() if it's available in the browser
-  if (typeof credential.toJSON === 'function') {
-    return credential.toJSON() as RegistrationResponseJSON;
   }
 
   // Manually construct an instance of RegistrationResponseJSON

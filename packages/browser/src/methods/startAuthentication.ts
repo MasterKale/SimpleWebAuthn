@@ -2,7 +2,6 @@ import {
   PublicKeyCredentialRequestOptionsJSON,
   AuthenticationCredential,
   AuthenticationResponseJSON,
-  PublicKeyCredentialFuture,
 } from '@simplewebauthn/typescript-types';
 
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
@@ -30,9 +29,6 @@ export async function startAuthentication(
     throw new Error('WebAuthn is not supported in this browser');
   }
 
-  const globalPublicKeyCredential =
-    window.PublicKeyCredential as unknown as PublicKeyCredentialFuture;
-
   // We need to avoid passing empty array to avoid blocking retrieval
   // of public key
   let allowCredentials;
@@ -41,16 +37,11 @@ export async function startAuthentication(
   }
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
-  let publicKey: PublicKeyCredentialRequestOptions;
-  if (typeof globalPublicKeyCredential.parseRequestOptionsFromJSON === 'function') {
-    publicKey = globalPublicKeyCredential.parseRequestOptionsFromJSON(requestOptionsJSON);
-  } else {
-    publicKey = {
-      ...requestOptionsJSON,
-      challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
-      allowCredentials,
-    };
-  }
+  const publicKey: PublicKeyCredentialRequestOptions = {
+    ...requestOptionsJSON,
+    challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
+    allowCredentials,
+  };
 
   // Prepare options for `.get()`
   const options: CredentialRequestOptions = {};
@@ -94,11 +85,6 @@ export async function startAuthentication(
 
   if (!credential) {
     throw new Error('Authentication was not completed');
-  }
-
-  // Use toJSON() if it's available in the browser
-  if (typeof credential.toJSON === 'function') {
-    return credential.toJSON() as AuthenticationResponseJSON;
   }
 
   // Manually construct an instance of AuthenticationResponseJSON
