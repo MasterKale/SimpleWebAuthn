@@ -5,7 +5,7 @@ import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
 import {
   AuthenticatorDevice,
-  AuthenticationCredentialJSON,
+  AuthenticationResponseJSON,
 } from '@simplewebauthn/typescript-types';
 import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
@@ -202,7 +202,6 @@ test.skip('should verify TPM assertion', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
-      authenticatorAttachment: '',
     },
     expectedChallenge,
     expectedOrigin: assertionOrigin,
@@ -283,7 +282,6 @@ test('should pass verification if custom challenge verifier returns true', async
       },
       type: 'public-key',
       clientExtensionResults: {},
-      authenticatorAttachment: '',
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
@@ -335,7 +333,6 @@ test('should return authenticator extension output', async () => {
       rawId: 'E_Pko4wN1BXE23S0ftN3eQ',
       type: 'public-key',
       clientExtensionResults: {},
-      authenticatorAttachment: '',
     },
     expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
     expectedRPID: 'try-webauthn.appspot.com',
@@ -384,7 +381,7 @@ test('should return credential backup info', async () => {
  * Assertion examples below
  */
 
-const assertionResponse: AuthenticationCredentialJSON = {
+const assertionResponse: AuthenticationResponseJSON = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   rawId: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   response: {
@@ -399,7 +396,6 @@ const assertionResponse: AuthenticationCredentialJSON = {
   },
   clientExtensionResults: {},
   type: 'public-key',
-  authenticatorAttachment: '',
 };
 const assertionChallenge = isoBase64URL.fromString('totallyUniqueValueEveryTime');
 const assertionOrigin = 'https://dev.dontneeda.pw';
@@ -417,7 +413,7 @@ const authenticator: AuthenticatorDevice = {
 /**
  * Represented a device that's being used on the website for the first time
  */
-const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
+const assertionFirstTimeUsedResponse: AuthenticationResponseJSON = {
   id: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   rawId: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   response: {
@@ -429,7 +425,6 @@ const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
   },
   type: 'public-key',
   clientExtensionResults: {},
-  authenticatorAttachment: '',
 };
 const assertionFirstTimeUsedChallenge = isoBase64URL.fromString('totallyUniqueValueEveryAssertion');
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
