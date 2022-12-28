@@ -2,6 +2,7 @@ import {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
   RegistrationResponseJSON,
+  AuthenticatorTransportFuture,
 } from '@simplewebauthn/typescript-types';
 
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
@@ -55,13 +56,19 @@ export async function startRegistration(
 
   const { id, rawId, response, type } = credential;
 
+  // Continue to play it safe with `getTransports()` for now, even when L3 types say it's required
+  let transports: AuthenticatorTransportFuture[] | undefined = undefined;
+  if (typeof response.getTransports === 'function') {
+    transports = response.getTransports();
+  }
+
   return {
     id,
     rawId: bufferToBase64URLString(rawId),
     response: {
       attestationObject: bufferToBase64URLString(response.attestationObject),
       clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
-      transports: response.getTransports(),
+      transports,
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),

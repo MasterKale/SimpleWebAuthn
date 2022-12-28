@@ -128,7 +128,8 @@ export interface AuthenticationResponseJSON {
 export interface AuthenticatorAttestationResponseJSON {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
-  transports: AuthenticatorTransportFuture[];
+  // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
+  transports?: AuthenticatorTransportFuture[];
 }
 
 /**
