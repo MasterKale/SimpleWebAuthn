@@ -88,13 +88,16 @@ export interface RegistrationCredential extends PublicKeyCredentialFuture {
 /**
  * A slightly-modified RegistrationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-registrationresponsejson
  */
-export interface RegistrationCredentialJSON
-  extends Omit<RegistrationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+export interface RegistrationResponseJSON {
+  id: Base64URLString;
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
+  authenticatorAttachment?: AuthenticatorAttachment;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
-  transports?: AuthenticatorTransportFuture[];
+  type: PublicKeyCredentialType;
 }
 
 /**
@@ -118,19 +121,13 @@ export interface AuthenticationCredentialJSON
 /**
  * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-authenticatorattestationresponsejson
  */
-export interface AuthenticatorAttestationResponseJSON
-  extends Omit<
-    AuthenticatorAttestationResponseFuture,
-    | 'clientDataJSON'
-    | 'attestationObject'
-    | 'getTransports'
-    | 'getAuthenticatorData'
-    | 'getPublicKey'
-    | 'getPublicKeyAlgorithm'
-  > {
+export interface AuthenticatorAttestationResponseJSON {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
+  transports: AuthenticatorTransportFuture[];
 }
 
 /**
