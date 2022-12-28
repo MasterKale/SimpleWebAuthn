@@ -64,7 +64,7 @@ export async function verifyRegistrationResponse(
     requireUserVerification = true,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
-  const { id, rawId, type: responseType, response: attestationResponse } = response;
+  const { id, rawId, type: credentialType, response: attestationResponse } = response;
 
   // Ensure credential specified an ID
   if (!id) {
@@ -77,8 +77,8 @@ export async function verifyRegistrationResponse(
   }
 
   // Make sure credential type is public-key
-  if (responseType !== 'public-key') {
-    throw new Error(`Unexpected credential type ${responseType}, expected "public-key"`);
+  if (credentialType !== 'public-key') {
+    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
   }
 
   const clientDataJSON = decodeClientDataJSON(attestationResponse.clientDataJSON);
@@ -241,7 +241,7 @@ export async function verifyRegistrationResponse(
       aaguid: convertAAGUIDToString(aaguid),
       credentialID,
       credentialPublicKey,
-      credentialType: responseType,
+      credentialType,
       attestationObject,
       userVerified: flags.uv,
       credentialDeviceType,
