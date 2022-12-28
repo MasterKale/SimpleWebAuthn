@@ -1,5 +1,5 @@
 import {
-  RegistrationCredentialJSON,
+  RegistrationResponseJSON,
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
 } from '@simplewebauthn/typescript-types';
@@ -30,7 +30,7 @@ import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAn
 import { verifyAttestationApple } from './verifications/verifyAttestationApple';
 
 export type VerifyRegistrationResponseOpts = {
-  credential: RegistrationCredentialJSON;
+  credential: RegistrationResponseJSON;
   expectedChallenge: string | ((challenge: string) => boolean);
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];

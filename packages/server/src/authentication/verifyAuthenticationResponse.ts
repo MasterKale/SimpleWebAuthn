@@ -1,5 +1,5 @@
 import {
-  AuthenticationCredentialJSON,
+  AuthenticationResponseJSON,
   AuthenticatorDevice,
   CredentialDeviceType,
   UserVerificationRequirement,
@@ -15,7 +15,7 @@ import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
 import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
 export type VerifyAuthenticationResponseOpts = {
-  credential: AuthenticationCredentialJSON;
+  credential: AuthenticationResponseJSON;
   expectedChallenge: string | ((challenge: string) => boolean);
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
@@ -33,7 +33,7 @@ export type VerifyAuthenticationResponseOpts = {
  *
  * @param credential Authenticator credential returned by browser's `startAssertion()`
  * @param expectedChallenge The base64url-encoded `options.challenge` returned by
- * `generateAssertionOptions()`
+ * `generateAuthenticationOptions()`
  * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
