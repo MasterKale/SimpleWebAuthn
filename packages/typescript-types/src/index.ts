@@ -171,7 +171,7 @@ export type Base64URLString = string;
  * Properties marked optional are not supported in all browsers.
  */
 export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
-  getTransports: () => AuthenticatorTransportFuture[];
+  getTransports(): AuthenticatorTransportFuture[];
 }
 
 /**
