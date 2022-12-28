@@ -1,7 +1,7 @@
 import {
   PublicKeyCredentialRequestOptionsJSON,
   AuthenticationCredential,
-  AuthenticationCredentialJSON,
+  AuthenticationResponseJSON,
 } from '@simplewebauthn/typescript-types';
 
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
@@ -12,18 +12,19 @@ import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAu
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
  *
- * @param requestOptionsJSON Output from **@simplewebauthn/server**'s generateAssertionOptions(...)
+ * @param requestOptionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions()`
  * @param useBrowserAutofill Initialize conditional UI to enable logging in via browser
  * autofill prompts
  */
 export async function startAuthentication(
   requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
   useBrowserAutofill = false,
-): Promise<AuthenticationCredentialJSON> {
+): Promise<AuthenticationResponseJSON> {
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
@@ -105,6 +106,6 @@ export async function startAuthentication(
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
-    authenticatorAttachment: credential.authenticatorAttachment,
+    authenticatorAttachment: toAuthenticatorAttachment(credential.authenticatorAttachment),
   };
 }

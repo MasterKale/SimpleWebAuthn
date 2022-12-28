@@ -1,7 +1,8 @@
 import {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
-  RegistrationCredentialJSON,
+  RegistrationResponseJSON,
+  AuthenticatorTransportFuture,
 } from '@simplewebauthn/typescript-types';
 
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
@@ -11,15 +12,16 @@ import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyRegistrationError } from '../helpers/identifyRegistrationError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
  *
- * @param creationOptionsJSON Output from @simplewebauthn/server's generateRegistrationOptions(...)
+ * @param creationOptionsJSON Output from **@simplewebauthn/server**'s `generateRegistrationOptions()`
  */
 export async function startRegistration(
   creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
-): Promise<RegistrationCredentialJSON> {
+): Promise<RegistrationResponseJSON> {
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
@@ -32,7 +34,9 @@ export async function startRegistration(
       ...creationOptionsJSON.user,
       id: utf8StringToBuffer(creationOptionsJSON.user.id),
     },
-    excludeCredentials: creationOptionsJSON.excludeCredentials.map(toPublicKeyCredentialDescriptor),
+    excludeCredentials: creationOptionsJSON.excludeCredentials?.map(
+      toPublicKeyCredentialDescriptor,
+    ),
   };
 
   // Finalize options
@@ -54,25 +58,22 @@ export async function startRegistration(
 
   const { id, rawId, response, type } = credential;
 
-  // Convert values to base64 to make it easier to send back to the server
-  const credentialJSON: RegistrationCredentialJSON = {
+  // Continue to play it safe with `getTransports()` for now, even when L3 types say it's required
+  let transports: AuthenticatorTransportFuture[] | undefined = undefined;
+  if (typeof response.getTransports === 'function') {
+    transports = response.getTransports();
+  }
+
+  return {
     id,
     rawId: bufferToBase64URLString(rawId),
     response: {
       attestationObject: bufferToBase64URLString(response.attestationObject),
       clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
+      transports,
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
-    authenticatorAttachment: credential.authenticatorAttachment,
+    authenticatorAttachment: toAuthenticatorAttachment(credential.authenticatorAttachment),
   };
-
-  /**
-   * Include the authenticator's transports if the browser supports querying for them
-   */
-  if (typeof response.getTransports === 'function') {
-    credentialJSON.transports = response.getTransports();
-  }
-
-  return credentialJSON;
 }

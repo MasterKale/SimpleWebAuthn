@@ -102,7 +102,7 @@ test('should return base64url-encoded response values', async () => {
           getPublicKeyAlgorithm: () => -999,
         },
         getClientExtensionResults: () => ({}),
-        type: 'webauthn.create',
+        type: 'public-key',
         authenticatorAttachment: '',
       });
     });
@@ -219,9 +219,9 @@ test('should return "cable" transport from response', async () => {
     type: 'webauthn.create',
   });
 
-  const response = await startRegistration(goodOpts1);
+  const regResponse = await startRegistration(goodOpts1);
 
-  expect(response.transports).toEqual(['cable']);
+  expect(regResponse.response.transports).toEqual(['cable']);
 });
 
 test('should cancel an existing call when executed again', async () => {

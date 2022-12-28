@@ -7,12 +7,18 @@ import type {
   AuthenticatorAssertionResponse,
   AuthenticatorAttestationResponse,
   PublicKeyCredential,
-  PublicKeyCredentialCreationOptions,
   PublicKeyCredentialDescriptor,
-  PublicKeyCredentialRequestOptions,
-  PublicKeyCredentialUserEntity,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
+  PublicKeyCredentialRpEntity,
+  PublicKeyCredentialType,
+  PublicKeyCredentialParameters,
+  AuthenticatorSelectionCriteria,
+  AttestationConveyancePreference,
+  UserVerificationRequirement,
+  AuthenticatorAttachment,
+  PublicKeyCredentialCreationOptions,
+  PublicKeyCredentialRequestOptions,
 } from './dom';
 
 export * from './dom';
@@ -20,12 +26,21 @@ export * from './dom';
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.create(...) in the browser.
+ *
+ * This should eventually get replaced with official TypeScript DOM types when WebAuthn L3 types
+ * eventually make it into the language:
+ *
+ * https://w3c.github.io/webauthn/#dictdef-publickeycredentialcreationoptionsjson
  */
-export interface PublicKeyCredentialCreationOptionsJSON
-  extends Omit<PublicKeyCredentialCreationOptions, 'challenge' | 'user' | 'excludeCredentials'> {
+export interface PublicKeyCredentialCreationOptionsJSON {
+  rp: PublicKeyCredentialRpEntity;
   user: PublicKeyCredentialUserEntityJSON;
   challenge: Base64URLString;
-  excludeCredentials: PublicKeyCredentialDescriptorJSON[];
+  pubKeyCredParams: PublicKeyCredentialParameters[];
+  timeout?: number;
+  excludeCredentials?: PublicKeyCredentialDescriptorJSON[];
+  authenticatorSelection?: AuthenticatorSelectionCriteria;
+  attestation?: AttestationConveyancePreference;
   extensions?: AuthenticationExtensionsClientInputs;
 }
 
@@ -33,22 +48,31 @@ export interface PublicKeyCredentialCreationOptionsJSON
  * A variant of PublicKeyCredentialRequestOptions suitable for JSON transmission to the browser to
  * (eventually) get passed into navigator.credentials.get(...) in the browser.
  */
-export interface PublicKeyCredentialRequestOptionsJSON
-  extends Omit<PublicKeyCredentialRequestOptions, 'challenge' | 'allowCredentials'> {
+export interface PublicKeyCredentialRequestOptionsJSON {
   challenge: Base64URLString;
+  timeout?: number;
+  rpId?: string;
   allowCredentials?: PublicKeyCredentialDescriptorJSON[];
+  userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;
 }
 
-export interface PublicKeyCredentialDescriptorJSON
-  extends Omit<PublicKeyCredentialDescriptorFuture, 'id' | 'transports'> {
+/**
+ * https://w3c.github.io/webauthn/#dictdef-publickeycredentialdescriptorjson
+ */
+export interface PublicKeyCredentialDescriptorJSON {
   id: Base64URLString;
+  type: PublicKeyCredentialType;
   transports?: AuthenticatorTransportFuture[];
 }
 
-export interface PublicKeyCredentialUserEntityJSON
-  extends Omit<PublicKeyCredentialUserEntity, 'id'> {
+/**
+ * https://w3c.github.io/webauthn/#dictdef-publickeycredentialuserentityjson
+ */
+export interface PublicKeyCredentialUserEntityJSON {
   id: string;
+  name: string;
+  displayName: string;
 }
 
 /**
@@ -61,13 +85,16 @@ export interface RegistrationCredential extends PublicKeyCredentialFuture {
 /**
  * A slightly-modified RegistrationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-registrationresponsejson
  */
-export interface RegistrationCredentialJSON
-  extends Omit<RegistrationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+export interface RegistrationResponseJSON {
+  id: Base64URLString;
   rawId: Base64URLString;
   response: AuthenticatorAttestationResponseJSON;
+  authenticatorAttachment?: AuthenticatorAttachment;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
-  transports?: AuthenticatorTransportFuture[];
+  type: PublicKeyCredentialType;
 }
 
 /**
@@ -80,43 +107,40 @@ export interface AuthenticationCredential extends PublicKeyCredentialFuture {
 /**
  * A slightly-modified AuthenticationCredential to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-authenticationresponsejson
  */
-export interface AuthenticationCredentialJSON
-  extends Omit<AuthenticationCredential, 'response' | 'rawId' | 'getClientExtensionResults'> {
+export interface AuthenticationResponseJSON {
+  id: Base64URLString;
   rawId: Base64URLString;
   response: AuthenticatorAssertionResponseJSON;
+  authenticatorAttachment?: AuthenticatorAttachment;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
+  type: PublicKeyCredentialType;
 }
 
 /**
  * A slightly-modified AuthenticatorAttestationResponse to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-authenticatorattestationresponsejson
  */
-export interface AuthenticatorAttestationResponseJSON
-  extends Omit<
-    AuthenticatorAttestationResponseFuture,
-    | 'clientDataJSON'
-    | 'attestationObject'
-    | 'getTransports'
-    | 'getAuthenticatorData'
-    | 'getPublicKey'
-    | 'getPublicKeyAlgorithm'
-  > {
+export interface AuthenticatorAttestationResponseJSON {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
+  // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
+  transports?: AuthenticatorTransportFuture[];
 }
 
 /**
  * A slightly-modified AuthenticatorAssertionResponse to simplify working with ArrayBuffers that
  * are Base64URL-encoded in the browser so that they can be sent as JSON to the server.
+ *
+ * https://w3c.github.io/webauthn/#dictdef-authenticatorassertionresponsejson
  */
-export interface AuthenticatorAssertionResponseJSON
-  extends Omit<
-    AuthenticatorAssertionResponse,
-    'authenticatorData' | 'clientDataJSON' | 'signature' | 'userHandle'
-  > {
-  authenticatorData: Base64URLString;
+export interface AuthenticatorAssertionResponseJSON {
   clientDataJSON: Base64URLString;
+  authenticatorData: Base64URLString;
   signature: Base64URLString;
   userHandle?: string;
 }
@@ -148,7 +172,7 @@ export type Base64URLString = string;
  * Properties marked optional are not supported in all browsers.
  */
 export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
-  getTransports: () => AuthenticatorTransportFuture[];
+  getTransports(): AuthenticatorTransportFuture[];
 }
 
 /**
@@ -169,11 +193,27 @@ export interface PublicKeyCredentialDescriptorFuture
 }
 
 /**
- * A super class of TypeScript's `PublicKeyCredential` that knows about upcoming WebAuthn methods
+ *
+ */
+export type PublicKeyCredentialJSON = RegistrationResponseJSON | AuthenticationResponseJSON;
+
+/**
+ * A super class of TypeScript's `PublicKeyCredential` that knows about upcoming WebAuthn features
  */
 export interface PublicKeyCredentialFuture extends PublicKeyCredential {
+  type: PublicKeyCredentialType;
   // See https://github.com/w3c/webauthn/issues/1745
   isConditionalMediationAvailable?(): Promise<boolean>;
+  // See https://w3c.github.io/webauthn/#sctn-parseCreationOptionsFromJSON
+  parseCreationOptionsFromJSON?(
+    options: PublicKeyCredentialCreationOptionsJSON,
+  ): PublicKeyCredentialCreationOptions;
+  // See https://w3c.github.io/webauthn/#sctn-parseRequestOptionsFromJSON
+  parseRequestOptionsFromJSON?(
+    options: PublicKeyCredentialRequestOptionsJSON,
+  ): PublicKeyCredentialRequestOptions;
+  // See https://w3c.github.io/webauthn/#dom-publickeycredential-tojson
+  toJSON?(): PublicKeyCredentialJSON;
 }
 
 /**

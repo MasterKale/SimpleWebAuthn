@@ -3,10 +3,7 @@ import { verifyAuthenticationResponse } from './verifyAuthenticationResponse';
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
 import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
 import { toHash } from '../helpers/toHash';
-import {
-  AuthenticatorDevice,
-  AuthenticationCredentialJSON,
-} from '@simplewebauthn/typescript-types';
+import { AuthenticatorDevice, AuthenticationResponseJSON } from '@simplewebauthn/typescript-types';
 import { isoUint8Array, isoBase64URL } from '../helpers/iso';
 
 let mockDecodeClientData: jest.SpyInstance;
@@ -24,7 +21,7 @@ afterEach(() => {
 
 test('should verify an assertion response', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: assertionResponse,
+    response: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
@@ -37,7 +34,7 @@ test('should verify an assertion response', async () => {
 
 test('should return authenticator info after verification', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: assertionResponse,
+    response: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
@@ -52,7 +49,7 @@ test('should return authenticator info after verification', async () => {
 test('should throw when response challenge is not expected value', async () => {
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: 'shouldhavebeenthisvalue',
       expectedOrigin: 'https://different.address',
       expectedRPID: 'dev.dontneeda.pw',
@@ -64,7 +61,7 @@ test('should throw when response challenge is not expected value', async () => {
 test('should throw when response origin is not expected value', async () => {
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: 'https://different.address',
       expectedRPID: 'dev.dontneeda.pw',
@@ -83,7 +80,7 @@ test('should throw when assertion type is not webauthn.create', async () => {
 
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
@@ -100,7 +97,7 @@ test('should throw error if user was not present', async () => {
 
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
@@ -119,7 +116,7 @@ test('should throw error if previous counter value is not less than in response'
 
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
@@ -137,7 +134,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
 
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
@@ -148,7 +145,7 @@ test('should throw error if assertion RP ID is unexpected value', async () => {
 
 test('should not compare counters if both are 0', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: assertionFirstTimeUsedResponse,
+    response: assertionFirstTimeUsedResponse,
     expectedChallenge: assertionFirstTimeUsedChallenge,
     expectedOrigin: assertionFirstTimeUsedOrigin,
     expectedRPID: 'dev.dontneeda.pw',
@@ -174,7 +171,7 @@ test('should throw an error if user verification is required but user was not ve
 
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
@@ -189,7 +186,7 @@ test.skip('should verify TPM assertion', async () => {
   const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBc3NlcnRpb24';
   jest.spyOn(isoBase64URL, 'toString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyAuthenticationResponse({
-    credential: {
+    response: {
       id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
       rawId: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
       response: {
@@ -202,7 +199,6 @@ test.skip('should verify TPM assertion', async () => {
       },
       type: 'public-key',
       clientExtensionResults: {},
-      authenticatorAttachment: '',
     },
     expectedChallenge,
     expectedOrigin: assertionOrigin,
@@ -219,7 +215,7 @@ test.skip('should verify TPM assertion', async () => {
 
 test('should support multiple possible origins', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: assertionResponse,
+    response: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: ['https://simplewebauthn.dev', assertionOrigin],
     expectedRPID: 'dev.dontneeda.pw',
@@ -233,7 +229,7 @@ test('should support multiple possible origins', async () => {
 test('should throw an error if origin not in list of expected origins', async () => {
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: ['https://simplewebauthn.dev', 'https://fizz.buzz'],
       expectedRPID: 'dev.dontneeda.pw',
@@ -244,7 +240,7 @@ test('should throw an error if origin not in list of expected origins', async ()
 
 test('should support multiple possible RP IDs', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: assertionResponse,
+    response: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: ['dev.dontneeda.pw', 'simplewebauthn.dev'],
@@ -258,7 +254,7 @@ test('should support multiple possible RP IDs', async () => {
 test('should throw an error if RP ID not in list of possible RP IDs', async () => {
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: assertionChallenge,
       expectedOrigin: assertionOrigin,
       expectedRPID: ['simplewebauthn.dev'],
@@ -269,7 +265,7 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
 
 test('should pass verification if custom challenge verifier returns true', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: {
+    response: {
       id: 'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
       rawId:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
@@ -283,7 +279,6 @@ test('should pass verification if custom challenge verifier returns true', async
       },
       type: 'public-key',
       clientExtensionResults: {},
-      authenticatorAttachment: '',
     },
     expectedChallenge: (challenge: string) => {
       const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
@@ -310,7 +305,7 @@ test('should pass verification if custom challenge verifier returns true', async
 test('should fail verification if custom challenge verifier returns false', async () => {
   await expect(
     verifyAuthenticationResponse({
-      credential: assertionResponse,
+      response: assertionResponse,
       expectedChallenge: challenge => challenge === 'willNeverMatch',
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
@@ -321,7 +316,7 @@ test('should fail verification if custom challenge verifier returns false', asyn
 
 test('should return authenticator extension output', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: {
+    response: {
       response: {
         clientDataJSON:
           'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiaVpzVkN6dHJEVzdEMlVfR0hDSWxZS0x3VjJiQ3NCVFJxVlFVbkpYbjlUayIsIm9yaWdpbiI6ImFuZHJvaWQ6YXBrLWtleS1oYXNoOmd4N3NxX3B4aHhocklRZEx5ZkcwcHhLd2lKN2hPazJESlE0eHZLZDQzOFEiLCJhbmRyb2lkUGFja2FnZU5hbWUiOiJjb20uZmlkby5leGFtcGxlLmZpZG8yYXBpZXhhbXBsZSJ9',
@@ -335,7 +330,6 @@ test('should return authenticator extension output', async () => {
       rawId: 'E_Pko4wN1BXE23S0ftN3eQ',
       type: 'public-key',
       clientExtensionResults: {},
-      authenticatorAttachment: '',
     },
     expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
     expectedRPID: 'try-webauthn.appspot.com',
@@ -368,7 +362,7 @@ test('should return authenticator extension output', async () => {
 
 test('should return credential backup info', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: assertionResponse,
+    response: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
@@ -384,7 +378,7 @@ test('should return credential backup info', async () => {
  * Assertion examples below
  */
 
-const assertionResponse: AuthenticationCredentialJSON = {
+const assertionResponse: AuthenticationResponseJSON = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   rawId: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   response: {
@@ -399,7 +393,6 @@ const assertionResponse: AuthenticationCredentialJSON = {
   },
   clientExtensionResults: {},
   type: 'public-key',
-  authenticatorAttachment: '',
 };
 const assertionChallenge = isoBase64URL.fromString('totallyUniqueValueEveryTime');
 const assertionOrigin = 'https://dev.dontneeda.pw';
@@ -417,7 +410,7 @@ const authenticator: AuthenticatorDevice = {
 /**
  * Represented a device that's being used on the website for the first time
  */
-const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
+const assertionFirstTimeUsedResponse: AuthenticationResponseJSON = {
   id: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   rawId: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   response: {
@@ -429,7 +422,6 @@ const assertionFirstTimeUsedResponse: AuthenticationCredentialJSON = {
   },
   type: 'public-key',
   clientExtensionResults: {},
-  authenticatorAttachment: '',
 };
 const assertionFirstTimeUsedChallenge = isoBase64URL.fromString('totallyUniqueValueEveryAssertion');
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
@@ -445,7 +437,7 @@ const authenticatorFirstTimeUsed: AuthenticatorDevice = {
 
 test('should return user verified flag after successful auth', async () => {
   const verification = await verifyAuthenticationResponse({
-    credential: assertionResponse,
+    response: assertionResponse,
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',

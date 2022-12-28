@@ -115,7 +115,7 @@ test('should return base64url-encoded response values', async () => {
           userHandle: Buffer.from(mockUserHandle, 'ascii'),
         },
         getClientExtensionResults: () => ({}),
-        type: 'webauthn.get',
+        type: 'public-key',
         authenticatorAttachment: '',
       });
     });
