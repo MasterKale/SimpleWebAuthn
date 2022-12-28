@@ -87,7 +87,6 @@ export async function startAuthentication(
     throw new Error('Authentication was not completed');
   }
 
-  // Manually construct an instance of AuthenticationResponseJSON
   const { id, rawId, response, type } = credential;
 
   let userHandle = undefined;

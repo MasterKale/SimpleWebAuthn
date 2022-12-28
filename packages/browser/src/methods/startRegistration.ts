@@ -53,7 +53,6 @@ export async function startRegistration(
     throw new Error('Registration was not completed');
   }
 
-  // Manually construct an instance of RegistrationResponseJSON
   const { id, rawId, response, type } = credential;
 
   return {
