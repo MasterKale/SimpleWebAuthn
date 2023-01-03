@@ -5,6 +5,8 @@
 
 A small library for accessing a runtime's WebCrypto API. Supports browsers, and Node projects using ESM and/or CommonJS.
 
+**This library is not officially supported for use outside of [SimpleWebAuthn](https://github.com/MasterKale/SimpleWebAuthn)!**
+
 ## Install
 
 ```sh
