@@ -62,7 +62,7 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
  * defaults.
  */
 const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
-  residentKey: 'required',
+  residentKey: 'preferred',
   userVerification: 'preferred',
 };
 
