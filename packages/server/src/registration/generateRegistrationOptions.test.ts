@@ -52,6 +52,9 @@ test('should generate credential request options suitable for sending via JSON',
       residentKey: 'preferred',
       userVerification: 'preferred',
     },
+    extensions: {
+      credProps: true,
+    }
   });
 });
 
@@ -135,9 +138,30 @@ test('should set extensions if specified', () => {
     extensions: { appid: 'simplewebauthn' },
   });
 
-  expect(options.extensions).toEqual({
-    appid: 'simplewebauthn',
+  expect(options.extensions?.appid).toEqual('simplewebauthn');
+});
+
+test('should include credProps if extensions are not provided', () => {
+  const options = generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    userID: '1234',
+    userName: 'usernameHere',
   });
+
+  expect(options.extensions?.credProps).toEqual(true);
+});
+
+test('should include credProps if extensions are provided', () => {
+  const options = generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    userID: '1234',
+    userName: 'usernameHere',
+    extensions: { appid: 'simplewebauthn' },
+  });
+
+  expect(options.extensions?.credProps).toEqual(true);
 });
 
 test('should generate a challenge if one is not provided', () => {

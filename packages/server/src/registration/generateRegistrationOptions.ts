@@ -178,6 +178,9 @@ export function generateRegistrationOptions(
       id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),
     authenticatorSelection,
-    extensions,
+    extensions: {
+      ...extensions,
+      credProps: true,
+    },
   };
 }
