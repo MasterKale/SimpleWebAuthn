@@ -10,6 +10,8 @@ import http from 'http';
 import fs from 'fs';
 
 import express from 'express';
+import session from 'express-session';
+import memoryStore from 'memorystore';
 import dotenv from 'dotenv';
 import base64url from 'base64url';
 
@@ -42,6 +44,7 @@ import type {
 import { LoggedInUser } from './example-server';
 
 const app = express();
+const MemoryStore = memoryStore(session);
 
 const {
   ENABLE_CONFORMANCE,
@@ -51,6 +54,20 @@ const {
 
 app.use(express.static('./public/'));
 app.use(express.json());
+app.use(
+  session({
+    secret: 'secret123',
+    saveUninitialized: true,
+    resave: false,
+    cookie: {
+      maxAge: 86400000,
+      httpOnly: true, // Ensure to not expose session cookies to clientside scripts
+    },
+    store: new MemoryStore({
+      checkPeriod: 86_400_000, // prune expired entries every 24h
+    }),
+  }),
+);
 
 /**
  * If the words "metadata statements" mean anything to you, you'll want to enable this route. It
@@ -89,12 +106,6 @@ const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
     id: loggedInUserId,
     username: `user@${rpID}`,
     devices: [],
-    /**
-     * A simple way of storing a user's current challenge being signed by registration or authentication.
-     * It should be expired after `timeout` milliseconds (optional argument for `generate` methods,
-     * defaults to 60000ms)
-     */
-    currentChallenge: undefined,
   },
 };
 
@@ -145,7 +156,7 @@ app.get('/generate-registration-options', (req, res) => {
    * The server needs to temporarily remember this value for verification, so don't lose it until
    * after you verify an authenticator response.
    */
-  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = options.challenge;
+  req.session.currentChallenge = options.challenge;
 
   res.send(options);
 });
@@ -155,7 +166,7 @@ app.post('/verify-registration', async (req, res) => {
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
-  const expectedChallenge = user.currentChallenge;
+  const expectedChallenge = req.session.currentChallenge;
 
   let verification: VerifiedRegistrationResponse;
   try {
@@ -194,6 +205,8 @@ app.post('/verify-registration', async (req, res) => {
     }
   }
 
+  req.session.currentChallenge = undefined;
+
   res.send({ verified });
 });
 
@@ -221,7 +234,7 @@ app.get('/generate-authentication-options', (req, res) => {
    * The server needs to temporarily remember this value for verification, so don't lose it until
    * after you verify an authenticator response.
    */
-  inMemoryUserDeviceDB[loggedInUserId].currentChallenge = options.challenge;
+  req.session.currentChallenge = options.challenge;
 
   res.send(options);
 });
@@ -231,7 +244,7 @@ app.post('/verify-authentication', async (req, res) => {
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
-  const expectedChallenge = user.currentChallenge;
+  const expectedChallenge = req.session.currentChallenge;
 
   let dbAuthenticator;
   const bodyCredIDBuffer = base64url.toBuffer(body.rawId);
@@ -270,6 +283,8 @@ app.post('/verify-authentication', async (req, res) => {
     // Update the authenticator's counter in the DB to the newest count in the authentication
     dbAuthenticator.counter = authenticationInfo.newCounter;
   }
+
+  req.session.currentChallenge = undefined;
 
   res.send({ verified });
 });
