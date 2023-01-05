@@ -54,15 +54,20 @@ const {
 
 app.use(express.static('./public/'));
 app.use(express.json());
-app.use( session( {
-  secret: 'secret123',
-  saveUninitialized: true,
-  resave: false,
-  cookie: { maxAge: 86400000 },
-  store: new MemoryStore( {
-    checkPeriod: 86_400_000 // prune expired entries every 24h
-  } ),
-} ) );
+app.use(
+  session({
+    secret: 'secret123',
+    saveUninitialized: true,
+    resave: false,
+    cookie: {
+      maxAge: 86400000,
+      httpOnly: true, // Ensure to not expose session cookies to clientside scripts
+    },
+    store: new MemoryStore({
+      checkPeriod: 86_400_000, // prune expired entries every 24h
+    }),
+  }),
+);
 
 /**
  * If the words "metadata statements" mean anything to you, you'll want to enable this route. It
