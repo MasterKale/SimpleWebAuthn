@@ -1,5 +1,5 @@
 {
-  "version": "6.2.2",
+  "version": "7.0.0",
   "npmClient": "npm",
   "useNx": true,
   "command": {
@@ -14,7 +14,5 @@
       "message": "chore(release): publish %s"
     }
   },
-  "packages": [
-    "packages/*"
-  ]
+  "packages": ["packages/*"]
 }
