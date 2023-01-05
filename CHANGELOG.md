@@ -1,5 +1,137 @@
 # Changelog
 
+## v7.0.0 - The one that sets the library loose
+
+The highlight of this release is the rearchitecture of **@simplewebauthn/server** to start allowing it to be used in more environments than Node. This was accomplished by refactoring the library completely away from Node's `Buffer` type and `crypto` package, and instead leveraging `Uint8Array` and the [WebCrypto Web API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) for all cryptographic operations. This means that, hypothetically, this library can now also work in any non-Node environment that provides access to the WebCrypto API on the global `crypto` object.
+
+**Existing Node support is still first-class!** In fact because @simplewebauth/server still builds to CommonJS it will continue to be tricky to incorporate the library in non-Node, ESM-only environments that do not support CommonJS modules (whether natively, via a bundler, etc...) A future update will attempt to fix this to offer better support for use in ESM-only projects with support for WebCrypto (e.g. Deno).
+
+**Please read all of the changes below!** There are significant breaking changes in this update and additional information has been included to help adapt existing projects to the newest version of these libraries.
+
+**Packages:**
+
+- @simplewebauthn/browser@7.0.0
+- @simplewebauthn/server@7.0.0
+- @simplewebauthn/typescript-types@7.0.0
+- @simplewebauthn/iso-webcrypto@7.0.0
+
+**Changes:**
+
+- **[server]** A new "isomorphic" library architecture allows for use of this library in non-Node environments. In addition, the library now targets **Node 16** and above ([#299](https://github.com/MasterKale/SimpleWebAuthn/pull/299))
+- **[server]** `@simplewebauthn/server/helpers` now includes several new helpers for working with WebAuthn-related data types that should work in all run times:
+  - `isoCBOR` for working with CBOR-encoded values
+  - `isoCrypto` for leveraging the WebCrypto API when working with various WebAuthn/FIDO2 data structures
+  - `isoBase64URL` for encoding and decoding values into base64url (with optional base64 support)
+  - `isoUint8Array` for working with `Uint8Array`s
+  - `cose` for working with COSE-related methods and types
+- **[server]** Certificate chains using self-signed X.509 root certificates now validate more reliably ([#310](https://github.com/MasterKale/SimpleWebAuthn/pull/310))
+- **[server]** Code execution times for some common use cases are approximately 60-90% faster ([#311](https://github.com/MasterKale/SimpleWebAuthn/pull/311), [#315](https://github.com/MasterKale/SimpleWebAuthn/pull/315))
+- **[iso-webcrypto]** This new library helps **@simplewebauthn/server** reference the WebCrypto API in more environments than Node. This package is available on NPM, but **it is not officially supported for use outside of @simplewebauthn/server!**
+
+### Breaking Changes
+
+- **[server]** The following values returned from `verifyRegistrationResponse()` are now a `Uint8Array` instead of a `Buffer`. They will need to be passed into `Buffer.from(...)` to convert them to `Buffer` if needed:
+  - `aaguid`
+  - `authData`
+  - `clientDataHash`
+  - `credentialID`
+  - `credentialPublicKey`
+  - `rpIdHash`
+- **[server]** The following values returned from `verifyAuthenticationResponse()` are now a `Uint8Array` instead of a `Buffer`. They will need to be passed into `Buffer.from(...)` to convert them to `Buffer` if needed:
+  - `credentialID`
+- **[server]** The `isBase64URLString()` helper is now `isoBase64URL.isBase64url()`
+- **[server]** The `decodeCborFirst()` helper is now `isoCBOR.decodeFirst()`
+- **[server]** The `convertPublicKeyToPEM()` helper has been removed
+- **[typescript-types] [server] [browser]** New JSON-serialization-friendly data structures added to the WebAuthn L3 spec have been preemptively mapped into this project. Some types, values, and methods have been refactored or replaced accordingly ([#320](https://github.com/MasterKale/SimpleWebAuthn/pull/320)):
+  - The `RegistrationCredentialJSON` type has been replaced by the `RegistrationResponseJSON` type
+  - The `AuthenticationCredentialJSON` type has been replaced by the `AuthenticationResponseJSON` type
+  - `RegistrationCredentialJSON.transports` has been relocated into `RegistrationResponseJSON.response.transports` to mirror response structure in the WebAuthn spec
+  - The `verifyRegistrationResponse()` method has had its `credential` argument renamed to `response`
+  - The `verifyAuthenticationResponse()` method has had its `credential` argument renamed to `response`
+- **[server]** `generateRegistrationOptions()` now marks user verification as `"preferred"` during registration and authentication (to reduce some user friction at the browser+authenticator level), and requires user verification during response verification. See below for refactor tips ([#307](https://github.com/MasterKale/SimpleWebAuthn/pull/307))
+
+<details>
+  <summary>Refactor Tips</summary>
+  RP's implementing a second-factor flow with WebAuthn, where UV is not important (because username+password are provided before WebAuthn is leveraged for the second factor), should not require user verification when verifying responses:
+
+  ### `verifyRegistrationResponse()`
+
+  **Before**
+
+  ```js
+  const verification = await verifyRegistrationResponse({
+    credential: attestationFIDOU2F,
+    // ...
+  });
+  ```
+
+  **After**
+
+  ```js
+  const verification = await verifyRegistrationResponse({
+    credential: attestationFIDOU2F,
+    // ...
+    requireUserVerification: false,
+  });
+  ```
+
+  ### `verifyAuthenticationResponse()`
+
+  **Before**
+
+  ```js
+  const verification = await verifyAuthenticationResponse({
+    credential: assertionResponse,
+    // ...
+  });
+  ```
+
+  **After**
+
+  ```js
+  const verification = await verifyAuthenticationResponse({
+    credential: assertionResponse,
+    // ...
+    requireUserVerification: false,
+  });
+  ```
+</details>
+
+- **[server]** `generateRegistrationOptions()` now defaults to preferring the creation of discoverable credentials. See below for refactor tips ([#324](https://github.com/MasterKale/SimpleWebAuthn/pull/324))
+
+<details>
+  <summary>Refactor Tips</summary>
+  RP's that do not require support for discoverable credentials from authenticators will need to update their calls to `generateRegistrationOptions()` accordingly:
+
+  ### `generateRegistrationOptions()`
+
+  **Before**
+
+  ```js
+  const options = generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'simplewebauthn.dev',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
+  ```
+
+  **After**
+
+  ```js
+  const options = generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'simplewebauthn.dev',
+    userID: '1234',
+    userName: 'usernameHere',
+    authenticatorSelection: {
+      // See https://www.w3.org/TR/webauthn-2/#enumdef-residentkeyrequirement
+      residentKey: 'discouraged',
+    },
+  });
+  ```
+</details>
+
 ## v6.2.2
 
 **Packages:**
@@ -9,8 +141,8 @@
 
 **Changes:**
 
-- [browser] `browserSupportsWebAuthnAutofill()` no longer supports the old Chrome Canary way of testing for conditional UI support ([#298](https://github.com/MasterKale/SimpleWebAuthn/pull/298))
-- [server] Version sync
+- **[browser]** `browserSupportsWebAuthnAutofill()` no longer supports the old Chrome Canary way of testing for conditional UI support ([#298](https://github.com/MasterKale/SimpleWebAuthn/pull/298))
+- **[server]** Version sync
 
 ## v6.2.1
 
@@ -23,10 +155,10 @@
 
 **Changes:**
 
-- [browser] Multiple calls to `startRegistration()` and `startAuthentication()` will now more reliably cancel the preceding call ([#275](https://github.com/MasterKale/SimpleWebAuthn/pull/275))
-- [server] Version sync
-- [testing] Version sync
-- [typescript-types] Version sync
+- **[browser]** Multiple calls to `startRegistration()` and `startAuthentication()` will now more reliably cancel the preceding call ([#275](https://github.com/MasterKale/SimpleWebAuthn/pull/275))
+- **[server]** Version sync
+- **[testing]** Version sync
+- **[typescript-types]** Version sync
 
 ## v6.2.0
 
