@@ -13,9 +13,10 @@ import {
   MetadataStatement,
   SettingsService,
 } from '@simplewebauthn/server';
+import { isoUint8Array } from '@simplewebauthn/server/helpers';
 import {
-  AuthenticationCredentialJSON,
-  RegistrationCredentialJSON,
+  RegistrationResponseJSON,
+  AuthenticationResponseJSON,
 } from '@simplewebauthn/typescript-types';
 
 import { rpID, expectedOrigin } from './index';
@@ -152,7 +153,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
  * [FIDO2] Server Tests > MakeCredential Response
  */
 fidoConformanceRouter.post('/attestation/result', async (req, res) => {
-  const body: RegistrationCredentialJSON = req.body;
+  const body: RegistrationResponseJSON = req.body;
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
 
@@ -161,10 +162,11 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   let verification;
   try {
     verification = await verifyRegistrationResponse({
-      credential: body,
+      response: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       supportedAlgorithmIDs,
+      requireUserVerification: false,
     });
   } catch (error) {
     const _error: Error = error as Error;
@@ -231,7 +233,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
 });
 
 fidoConformanceRouter.post('/assertion/result', async (req, res) => {
-  const body: AuthenticationCredentialJSON = req.body;
+  const body: AuthenticationResponseJSON = req.body;
   const { id } = body;
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
@@ -247,7 +249,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   }
 
   const credIDBuffer = base64url.toBuffer(id);
-  const existingDevice = user.devices.find(device => device.credentialID.equals(credIDBuffer));
+  const existingDevice = user.devices.find(device => isoUint8Array.areEqual(device.credentialID, credIDBuffer));
 
   if (!existingDevice) {
     const msg = `Could not find device matching ${id}`;
@@ -258,12 +260,13 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   let verification;
   try {
     verification = await verifyAuthenticationResponse({
-      credential: body,
+      response: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: existingDevice,
       advancedFIDOConfig: { userVerification },
+      requireUserVerification: false,
     });
   } catch (error) {
     const _error = error as Error;

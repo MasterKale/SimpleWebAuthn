@@ -23,6 +23,7 @@ import {
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
+import { isoUint8Array } from '@simplewebauthn/server/helpers';
 import type {
   GenerateRegistrationOptionsOpts,
   GenerateAuthenticationOptionsOpts,
@@ -33,8 +34,8 @@ import type {
 } from '@simplewebauthn/server';
 
 import type {
-  RegistrationCredentialJSON,
-  AuthenticationCredentialJSON,
+  RegistrationResponseJSON,
+  AuthenticationResponseJSON,
   AuthenticatorDevice,
 } from '@simplewebauthn/typescript-types';
 
@@ -129,13 +130,8 @@ app.get('/generate-registration-options', (req, res) => {
       type: 'public-key',
       transports: dev.transports,
     })),
-    /**
-     * The optional authenticatorSelection property allows for specifying more constraints around
-     * the types of authenticators that users to can use for registration
-     */
     authenticatorSelection: {
-      userVerification: 'required',
-      residentKey: 'required',
+      residentKey: 'discouraged',
     },
     /**
      * Support the two most common algorithms: ES256, and RS256
@@ -155,7 +151,7 @@ app.get('/generate-registration-options', (req, res) => {
 });
 
 app.post('/verify-registration', async (req, res) => {
-  const body: RegistrationCredentialJSON = req.body;
+  const body: RegistrationResponseJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
@@ -164,7 +160,7 @@ app.post('/verify-registration', async (req, res) => {
   let verification: VerifiedRegistrationResponse;
   try {
     const opts: VerifyRegistrationResponseOpts = {
-      credential: body,
+      response: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
@@ -182,7 +178,7 @@ app.post('/verify-registration', async (req, res) => {
   if (verified && registrationInfo) {
     const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-    const existingDevice = user.devices.find(device => device.credentialID.equals(credentialID));
+    const existingDevice = user.devices.find(device => isoUint8Array.areEqual(device.credentialID, credentialID));
 
     if (!existingDevice) {
       /**
@@ -192,7 +188,7 @@ app.post('/verify-registration', async (req, res) => {
         credentialPublicKey,
         credentialID,
         counter,
-        transports: body.transports,
+        transports: body.response.transports,
       };
       user.devices.push(newDevice);
     }
@@ -231,7 +227,7 @@ app.get('/generate-authentication-options', (req, res) => {
 });
 
 app.post('/verify-authentication', async (req, res) => {
-  const body: AuthenticationCredentialJSON = req.body;
+  const body: AuthenticationResponseJSON = req.body;
 
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
@@ -241,7 +237,7 @@ app.post('/verify-authentication', async (req, res) => {
   const bodyCredIDBuffer = base64url.toBuffer(body.rawId);
   // "Query the DB" here for an authenticator matching `credentialID`
   for (const dev of user.devices) {
-    if (dev.credentialID.equals(bodyCredIDBuffer)) {
+    if (isoUint8Array.areEqual(dev.credentialID, bodyCredIDBuffer)) {
       dbAuthenticator = dev;
       break;
     }
@@ -254,7 +250,7 @@ app.post('/verify-authentication', async (req, res) => {
   let verification: VerifiedAuthenticationResponse;
   try {
     const opts: VerifyAuthenticationResponseOpts = {
-      credential: body,
+      response: body,
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,

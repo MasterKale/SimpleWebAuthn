@@ -38,17 +38,21 @@
        */
       fetch('/generate-authentication-options')
         .then(resp => resp.json())
-        .then((opts) => {
+        .then(opts => {
           console.log('Authentication Options (Autofill)', opts);
           startAuthentication(opts, true)
-            .then(async (asseResp) => {
+            .then(async asseResp => {
               // We can assume the DOM has loaded by now because it had to for the user to be able
               // to interact with an input to choose a credential from the autofill
               const elemSuccess = document.querySelector('#authSuccess');
               const elemError = document.querySelector('#authError');
               const elemDebug = document.querySelector('#authDebug');
 
-              printDebug(elemDebug, 'Authentication Response (Autofill)', JSON.stringify(asseResp, null, 2));
+              printDebug(
+                elemDebug,
+                'Authentication Response (Autofill)',
+                JSON.stringify(asseResp, null, 2),
+              );
 
               const verificationResp = await fetch('/verify-authentication', {
                 method: 'POST',
@@ -59,7 +63,11 @@
               });
 
               const verificationJSON = await verificationResp.json();
-              printDebug(elemDebug, 'Server Response (Autofill)', JSON.stringify(verificationJSON, null, 2));
+              printDebug(
+                elemDebug,
+                'Server Response (Autofill)',
+                JSON.stringify(verificationJSON, null, 2),
+              );
 
               if (verificationJSON && verificationJSON.verified) {
                 elemSuccess.innerHTML = `User authenticated!`;
@@ -69,7 +77,7 @@
                 )}</pre>`;
               }
             })
-            .catch((err) => {
+            .catch(err => {
               console.error('(Autofill)', err);
             });
         });
@@ -98,11 +106,11 @@
           <form onsubmit="stopSubmit(event)">
             <section id="inputUsername">
               <label for="username">Username</label>
-              <input type="text" name="username" autocomplete="webauthn" autofocus>
-              <br>
+              <input type="text" name="username" autocomplete="webauthn" autofocus />
+              <br />
               <label for="password">Password</label>
-              <input type="password" name="password" autocomplete="webauthn">
-              <br>
+              <input type="password" name="password" autocomplete="webauthn" />
+              <br />
             </section>
             <button id="btnAuthBegin">
               <strong>🔐&nbsp;Authenticate</strong>
@@ -120,10 +128,7 @@
       <p class="systemError"></p>
     </div>
     <script>
-      const {
-        browserSupportsWebAuthn,
-        startRegistration,
-      } = SimpleWebAuthnBrowser;
+      const { browserSupportsWebAuthn, startRegistration } = SimpleWebAuthnBrowser;
 
       function stopSubmit(event) {
         event.preventDefault();
@@ -143,7 +148,8 @@
       // Hide the Begin button if the browser is incapable of using WebAuthn
       if (!browserSupportsWebAuthn()) {
         document.querySelector('.controls').style.display = 'none';
-        document.querySelector('.systemError').innerText = "It seems this browser doesn't support WebAuthn...";
+        document.querySelector('.systemError').innerText =
+          "It seems this browser doesn't support WebAuthn...";
       } else {
         function hideAuthForm() {
           document.getElementById('inputUsername').style.display = 'none';
@@ -167,13 +173,6 @@
           let attResp;
           try {
             const opts = await resp.json();
-
-            // Require a resident key for this demo
-            opts.authenticatorSelection.residentKey = 'required';
-            opts.authenticatorSelection.requireResidentKey = true;
-            opts.extensions = {
-              credProps: true,
-            };
 
             printDebug(elemDebug, 'Registration Options', JSON.stringify(opts, null, 2));
 
@@ -211,7 +210,7 @@
           }
         });
 
-         /**
+        /**
          * Authentication
          */
         document.querySelector('#btnAuthBegin').addEventListener('click', async () => {
@@ -260,7 +259,6 @@
           }
         });
       }
-
     </script>
   </body>
 </html>
