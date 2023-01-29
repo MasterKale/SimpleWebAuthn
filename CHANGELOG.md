@@ -1,5 +1,19 @@
 # Changelog
 
+## v7.0.1
+
+**Packages:**
+
+- @simplewebauthn/browser@7.0.1
+- @simplewebauthn/iso-webcrypto@7.0.1
+- @simplewebauthn/server@7.0.1
+
+**Changes:**
+
+- **[server]** Update dependencies for better deduping in projects using **@simplewebauthn/server** ([#341](https://github.com/MasterKale/SimpleWebAuthn/pull/341))
+- **[browser]** Version sync
+- **[iso-webcrypto]** Version sync
+
 ## v7.0.0 - The one that sets the library loose
 
 The highlight of this release is the rearchitecture of **@simplewebauthn/server** to start allowing it to be used in more environments than Node. This was accomplished by refactoring the library completely away from Node's `Buffer` type and `crypto` package, and instead leveraging `Uint8Array` and the [WebCrypto Web API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) for all cryptographic operations. This means that, hypothetically, this library can now also work in any non-Node environment that provides access to the WebCrypto API on the global `crypto` object.
