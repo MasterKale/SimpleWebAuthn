@@ -32,7 +32,7 @@
     "node"
   ],
   "devDependencies": {
-    "@simplewebauthn/typescript-types": "^7.0.0",
+    "@simplewebauthn/typescript-types": "*",
     "@types/node": "^18.11.9"
   }
 }
