@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/iso-webcrypto",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "A small library for accessing a runtime's WebCrypto API",
   "main": "dist/node.js",
   "types": "./dist/node.d.ts",
