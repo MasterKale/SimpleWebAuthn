@@ -1,5 +1,15 @@
 # Changelog
 
+## v7.1.0
+
+**Packages:**
+
+- @simplewebauthn/browser@7.1.0
+
+**Changes:**
+
+- **[browser]** `startRegistration()` and `startAuthentication()` now pass through all `NotAllowedError`'s without trying to interpret what caused them ([#353](https://github.com/MasterKale/SimpleWebAuthn/pull/353))
+
 ## v7.0.1
 
 **Packages:**
