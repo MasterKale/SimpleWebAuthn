@@ -36,10 +36,11 @@ assignees: ''
 
 <!-- Run the following command and paste in the output: -->
 
-```
+```sh
 $ npm list --depth=0 | grep @simplewebauthn
+├── @simplewebauthn/browser@_._._
 ├── @simplewebauthn/server@_._._
-├── @simplewebauthn/typescript-types@_._._
+# ...
 ```
 
 ## Additional context
