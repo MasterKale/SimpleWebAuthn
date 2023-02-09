@@ -10,8 +10,9 @@ type WebAuthnErrorName =
   | 'SecurityError'
   | 'UnknownError';
 
-export function generateCustomError(name: WebAuthnErrorName): Error {
+export function generateCustomError(name: WebAuthnErrorName, message = ''): Error {
   const customError = new Error();
   customError.name = name;
+  customError.message = message;
   return customError;
 }

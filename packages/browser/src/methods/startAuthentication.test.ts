@@ -332,29 +332,38 @@ describe('WebAuthnError', () => {
   });
 
   describe('NotAllowedError', () => {
-    const NotAllowedError = generateCustomError('NotAllowedError');
-
-    test('should identify unrecognized allowed credentials', async () => {
+    test('should pass through error message (iOS Safari - Operation failed)', async () => {
+      /**
+       * Thrown when biometric is not enrolled, or a Safari bug prevents conditional UI from being
+       * aborted properly between page reloads.
+       *
+       * See https://github.com/MasterKale/SimpleWebAuthn/discussions/350#discussioncomment-4896572
+       */
+      const NotAllowedError = generateCustomError('NotAllowedError', 'Operation failed.');
       mockNavigatorGet.mockRejectedValueOnce(NotAllowedError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/allowed credentials/i);
+      rejected.toThrow(Error);
+      rejected.toThrow(/operation failed/i);
       rejected.toHaveProperty('name', 'NotAllowedError');
     });
 
-    test('should identify cancellation or timeout', async () => {
+    test('should pass through error message (Chrome M110 - Bad TLS Cert)', async () => {
+      /**
+       * Starting from Chrome M110, WebAuthn is blocked if the site is being displayed on a URL with
+       * TLS certificate issues. This includes during development.
+       *
+       * See https://github.com/MasterKale/SimpleWebAuthn/discussions/351#discussioncomment-4910458
+       */
+      const NotAllowedError = generateCustomError(
+        'NotAllowedError',
+        'WebAuthn is not supported on sites with TLS certificate errors.'
+      );
       mockNavigatorGet.mockRejectedValueOnce(NotAllowedError);
 
-      const opts = {
-        ...goodOpts1,
-        allowCredentials: [],
-      };
-
-      const rejected = await expect(startAuthentication(opts)).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/cancel/i);
-      rejected.toThrow(/timed out/i);
+      const rejected = await expect(startAuthentication(goodOpts1)).rejects;
+      rejected.toThrow(Error);
+      rejected.toThrow(/sites with TLS certificate errors/i);
       rejected.toHaveProperty('name', 'NotAllowedError');
     });
   });
