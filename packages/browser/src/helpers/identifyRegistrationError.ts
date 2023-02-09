@@ -41,12 +41,10 @@ export function identifyRegistrationError({
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 3)
     return new WebAuthnError('The authenticator was previously registered', 'InvalidStateError');
   } else if (error.name === 'NotAllowedError') {
-    // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 20)
-    // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 21)
-    return new WebAuthnError(
-      'User clicked cancel, or the registration ceremony timed out',
-      'NotAllowedError',
-    );
+    /**
+     * Pass the error directly through. Platforms are overloading this error beyond what the spec
+     * defines and we don't want to overwrite potentially useful error messages.
+     */
   } else if (error.name === 'NotSupportedError') {
     const validPubKeyCredParams = publicKey.pubKeyCredParams.filter(
       param => param.type === 'public-key',

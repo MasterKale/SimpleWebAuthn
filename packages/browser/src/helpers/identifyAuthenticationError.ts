@@ -23,21 +23,10 @@ export function identifyAuthenticationError({
       return new WebAuthnError('Authentication ceremony was sent an abort signal', 'AbortError');
     }
   } else if (error.name === 'NotAllowedError') {
-    if (publicKey.allowCredentials?.length) {
-      // https://www.w3.org/TR/webauthn-2/#sctn-discover-from-external-source (Step 17)
-      // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 6)
-      return new WebAuthnError(
-        'No available authenticator recognized any of the allowed credentials',
-        'NotAllowedError',
-      );
-    }
-
-    // https://www.w3.org/TR/webauthn-2/#sctn-discover-from-external-source (Step 18)
-    // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 7)
-    return new WebAuthnError(
-      'User clicked cancel, or the authentication ceremony timed out',
-      'NotAllowedError',
-    );
+    /**
+     * Pass the error directly through. Platforms are overloading this error beyond what the spec
+     * defines and we don't want to overwrite potentially useful error messages.
+     */
   } else if (error.name === 'SecurityError') {
     const effectiveDomain = window.location.hostname;
     if (!isValidDomain(effectiveDomain)) {
