@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discuss a general WebAuthn question or issue
+    url: https://github.com/MasterKale/SimpleWebAuthn/discussions/new/choose
+    about: Have a question about WebAuthn use? Is a certain authenticator and/or browser combo acting strange? Start a Discussion instead.
