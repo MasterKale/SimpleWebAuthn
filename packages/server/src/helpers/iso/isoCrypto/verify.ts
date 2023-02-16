@@ -5,7 +5,7 @@ import {
   isCOSEPublicKeyEC2,
   isCOSEPublicKeyOKP,
   isCOSEPublicKeyRSA,
-} from '../../cose';
+} from '../../cose.js';
 import { verifyEC2 } from './verifyEC2';
 import { verifyRSA } from './verifyRSA';
 import { verifyOKP } from './verifyOKP';

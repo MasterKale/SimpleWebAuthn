@@ -5,8 +5,8 @@ import type {
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 
-import { isoBase64URL, isoUint8Array } from '../helpers/iso';
-import { generateChallenge } from '../helpers/generateChallenge';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.js';
+import { generateChallenge } from '../helpers/generateChallenge.js';
 
 export type GenerateAuthenticationOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptorFuture[];

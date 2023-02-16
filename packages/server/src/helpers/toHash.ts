@@ -1,5 +1,5 @@
-import { COSEALG } from './cose';
-import { isoUint8Array, isoCrypto } from './iso';
+import { COSEALG } from './cose.js';
+import { isoUint8Array, isoCrypto } from './iso/index.js';
 
 /**
  * Returns hash digest of the given data, using the given algorithm when provided. Defaults to using

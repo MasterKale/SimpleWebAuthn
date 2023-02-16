@@ -1,6 +1,6 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
-import { COSEPublicKeyOKP, COSEKEYS, isCOSEAlg, COSECRV } from '../../cose';
+import { COSEPublicKeyOKP, COSEKEYS, isCOSEAlg, COSECRV } from '../../cose.js';
 import { isoBase64URL } from '../../index';
 import { SubtleCryptoCrv } from './structs';
 import { importKey } from './importKey';

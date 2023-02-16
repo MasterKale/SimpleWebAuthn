@@ -5,9 +5,9 @@ import type { AttestationFormatVerifierOpts } from '../verifyRegistrationRespons
 
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { toHash } from '../../helpers/toHash';
+import { toHash } from '../../helpers/toHash.js';
 import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import { isoUint8Array } from '../../helpers/iso';
+import { isoUint8Array } from '../../helpers/iso/index.js';
 
 export async function verifyAttestationApple(
   options: AttestationFormatVerifierOpts,

@@ -8,11 +8,11 @@ import { generateChallenge } from './generateChallenge';
 import { getCertificateInfo } from './getCertificateInfo';
 import { isCertRevoked } from './isCertRevoked';
 import { parseAuthenticatorData } from './parseAuthenticatorData';
-import { toHash } from './toHash';
+import { toHash } from './toHash.js';
 import { validateCertificatePath } from './validateCertificatePath';
 import { verifySignature } from './verifySignature';
-import { isoCBOR, isoBase64URL, isoUint8Array, isoCrypto } from './iso';
-import * as cose from './cose';
+import { isoCBOR, isoBase64URL, isoUint8Array, isoCrypto } from './iso/index.js';
+import * as cose from './cose.js';
 
 export {
   convertAAGUIDToString,
@@ -42,7 +42,7 @@ import type {
 } from './decodeAttestationObject';
 import type { CertificateInfo } from './getCertificateInfo';
 import type { ClientDataJSON } from './decodeClientDataJSON';
-import type { COSEPublicKey } from './cose';
+import type { COSEPublicKey } from './cose.js';
 import type { ParsedAuthenticatorData } from './parseAuthenticatorData';
 
 export type {

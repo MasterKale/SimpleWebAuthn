@@ -1,5 +1,5 @@
-import { COSEALG, COSEPublicKey } from './cose';
-import { isoCrypto } from './iso';
+import { COSEALG, COSEPublicKey } from './cose.js';
+import { isoCrypto } from './iso/index.js';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
 import { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE';
 

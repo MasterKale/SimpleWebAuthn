@@ -10,7 +10,7 @@ import {
   COSEKEYS,
   COSEPublicKeyEC2,
   COSEPublicKeyRSA,
-} from './cose';
+} from './cose.js';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
 
 export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPublicKey {

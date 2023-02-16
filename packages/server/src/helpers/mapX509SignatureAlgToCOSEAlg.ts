@@ -1,4 +1,4 @@
-import { COSEALG } from './cose';
+import { COSEALG } from './cose.js';
 
 /**
  * Map X.509 signature algorithm OIDs to COSE algorithm IDs

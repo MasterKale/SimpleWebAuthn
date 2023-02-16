@@ -2,12 +2,12 @@
  * @packageDocumentation
  * @module @simplewebauthn/server
  */
-import { generateRegistrationOptions } from './registration/generateRegistrationOptions';
-import { verifyRegistrationResponse } from './registration/verifyRegistrationResponse';
-import { generateAuthenticationOptions } from './authentication/generateAuthenticationOptions';
-import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse';
-import { MetadataService } from './services/metadataService';
-import { SettingsService } from './services/settingsService';
+import { generateRegistrationOptions } from './registration/generateRegistrationOptions.js';
+import { verifyRegistrationResponse } from './registration/verifyRegistrationResponse.js';
+import { generateAuthenticationOptions } from './authentication/generateAuthenticationOptions.js';
+import { verifyAuthenticationResponse } from './authentication/verifyAuthenticationResponse.js';
+import { MetadataService } from './services/metadataService.js';
+import { SettingsService } from './services/settingsService.js';
 
 export {
   generateRegistrationOptions,
@@ -18,17 +18,17 @@ export {
   SettingsService,
 };
 
-import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions';
-import type { GenerateAuthenticationOptionsOpts } from './authentication/generateAuthenticationOptions';
-import type { MetadataStatement } from './metadata/mdsTypes';
+import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions.js';
+import type { GenerateAuthenticationOptionsOpts } from './authentication/generateAuthenticationOptions.js';
+import type { MetadataStatement } from './metadata/mdsTypes.js';
 import type {
   VerifiedRegistrationResponse,
   VerifyRegistrationResponseOpts,
-} from './registration/verifyRegistrationResponse';
+} from './registration/verifyRegistrationResponse.js';
 import type {
   VerifiedAuthenticationResponse,
   VerifyAuthenticationResponseOpts,
-} from './authentication/verifyAuthenticationResponse';
+} from './authentication/verifyAuthenticationResponse.js';
 
 export type {
   GenerateRegistrationOptionsOpts,

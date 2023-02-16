@@ -1,6 +1,6 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
-import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose';
+import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose.js';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
 import { importKey } from './importKey';
 import { isoBase64URL } from '../index';

@@ -1,10 +1,10 @@
 import { Base64URLString } from '@simplewebauthn/typescript-types';
 
-import type { MetadataStatement, AlgSign } from '../metadata/mdsTypes';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../helpers/validateCertificatePath';
-import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEALG, COSECRV, COSEKEYS, COSEKTY, isCOSEPublicKeyEC2 } from '../helpers/cose';
+import type { MetadataStatement, AlgSign } from '../metadata/mdsTypes.js';
+import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.js';
+import { validateCertificatePath } from '../helpers/validateCertificatePath.js';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.js';
+import { COSEALG, COSECRV, COSEKEYS, COSEKTY, isCOSEPublicKeyEC2 } from '../helpers/cose.js';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as

@@ -1,4 +1,4 @@
-import { COSEALG } from '../../cose';
+import { COSEALG } from '../../cose.js';
 import { SubtleCryptoKeyAlgName } from './structs';
 
 /**

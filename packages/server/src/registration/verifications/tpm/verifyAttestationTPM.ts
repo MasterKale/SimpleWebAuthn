@@ -17,13 +17,13 @@ import {
   isCOSEPublicKeyRSA,
   isCOSEPublicKeyEC2,
   COSEALG,
-} from '../../../helpers/cose';
-import { toHash } from '../../../helpers/toHash';
+} from '../../../helpers/cose.js';
+import { toHash } from '../../../helpers/toHash.js';
 import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
 import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
-import { verifySignature } from '../../../helpers/verifySignature';
-import { isoUint8Array } from '../../../helpers/iso';
+import { verifySignature } from '../../../helpers/verifySignature.js';
+import { isoUint8Array } from '../../../helpers/iso/index.js';
 import { MetadataService } from '../../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
 

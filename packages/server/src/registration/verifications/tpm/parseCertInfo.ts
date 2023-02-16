@@ -1,5 +1,5 @@
 import { TPM_ST, TPM_ALG } from './constants';
-import { isoUint8Array } from '../../../helpers/iso';
+import { isoUint8Array } from '../../../helpers/iso/index.js';
 
 /**
  * Cut up a TPM attestation's certInfo into intelligible chunks

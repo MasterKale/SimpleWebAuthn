@@ -1,4 +1,4 @@
-import { isoCBOR } from './iso';
+import { isoCBOR } from './iso/index.js';
 
 /**
  * Convert authenticator extension data buffer to a proper object

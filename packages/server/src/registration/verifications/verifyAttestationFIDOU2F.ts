@@ -3,9 +3,9 @@ import type { AttestationFormatVerifierOpts } from '../verifyRegistrationRespons
 import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { verifySignature } from '../../helpers/verifySignature';
-import { isoUint8Array } from '../../helpers/iso';
-import { COSEALG } from '../../helpers/cose';
+import { verifySignature } from '../../helpers/verifySignature.js';
+import { isoUint8Array } from '../../helpers/iso/index.js';
+import { COSEALG } from '../../helpers/cose.js';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'

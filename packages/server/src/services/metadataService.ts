@@ -1,20 +1,20 @@
 import fetch from 'cross-fetch';
 
-import { validateCertificatePath } from '../helpers/validateCertificatePath';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
-import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
+import { validateCertificatePath } from '../helpers/validateCertificatePath.js';
+import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.js';
+import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.js';
 import type {
   MDSJWTHeader,
   MDSJWTPayload,
   MetadataStatement,
   MetadataBLOBPayloadEntry,
-} from '../metadata/mdsTypes';
-import { SettingsService } from '../services/settingsService';
-import { getLogger } from '../helpers/logging';
-import { convertPEMToBytes } from '../helpers/convertPEMToBytes';
+} from '../metadata/mdsTypes.js';
+import { SettingsService } from '../services/settingsService.js';
+import { getLogger } from '../helpers/logging.js';
+import { convertPEMToBytes } from '../helpers/convertPEMToBytes.js';
 
-import { parseJWT } from '../metadata/parseJWT';
-import { verifyJWT } from '../metadata/verifyJWT';
+import { parseJWT } from '../metadata/parseJWT.js';
+import { verifyJWT } from '../metadata/verifyJWT.js';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {

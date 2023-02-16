@@ -9,16 +9,16 @@ import {
   AttestationStatement,
   decodeAttestationObject,
 } from '../helpers/decodeAttestationObject';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
-import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
-import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
-import { toHash } from '../helpers/toHash';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.js';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.js';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.js';
+import { toHash } from '../helpers/toHash.js';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEKEYS } from '../helpers/cose';
+import { COSEKEYS } from '../helpers/cose.js';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
-import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import { isoBase64URL } from '../helpers/iso';
+import { parseBackupFlags } from '../helpers/parseBackupFlags.js';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID.js';
+import { isoBase64URL } from '../helpers/iso/index.js';
 import { SettingsService } from '../services/settingsService';
 
 import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';

@@ -6,10 +6,10 @@ import type { AttestationFormatVerifierOpts } from '../verifyRegistrationRespons
 
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { verifySignature } from '../../helpers/verifySignature';
+import { verifySignature } from '../../helpers/verifySignature.js';
 import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import { isCOSEAlg } from '../../helpers/cose';
-import { isoUint8Array } from '../../helpers/iso';
+import { isCOSEAlg } from '../../helpers/cose.js';
+import { isoUint8Array } from '../../helpers/iso/index.js';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 

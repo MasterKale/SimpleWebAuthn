@@ -1,5 +1,5 @@
 import { SubtleCryptoAlg } from './structs';
-import { COSEALG } from '../../cose';
+import { COSEALG } from '../../cose.js';
 
 /**
  * Convert a COSE alg ID into a corresponding string value that WebCrypto APIs expect

@@ -1,5 +1,5 @@
-import { toHash } from './toHash';
-import { isoUint8Array } from './iso';
+import { toHash } from './toHash.js';
+import { isoUint8Array } from './iso/index.js';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Raises an Error if no

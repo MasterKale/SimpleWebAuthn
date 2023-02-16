@@ -2,8 +2,8 @@ import {
   decodeAuthenticatorExtensions,
   AuthenticationExtensionsAuthenticatorOutputs,
 } from './decodeAuthenticatorExtensions';
-import { isoCBOR, isoUint8Array } from './iso';
-import { COSEPublicKey } from './cose';
+import { isoCBOR, isoUint8Array } from './iso/index.js';
+import { COSEPublicKey } from './cose.js';
 
 /**
  * Make sense of the authData buffer contained in an Attestation

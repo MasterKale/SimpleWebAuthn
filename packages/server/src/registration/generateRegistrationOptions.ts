@@ -8,8 +8,8 @@ import type {
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/typescript-types';
 
-import { generateChallenge } from '../helpers/generateChallenge';
-import { isoBase64URL, isoUint8Array } from '../helpers/iso';
+import { generateChallenge } from '../helpers/generateChallenge.js';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.js';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;

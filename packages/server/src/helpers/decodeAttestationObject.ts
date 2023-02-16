@@ -1,4 +1,4 @@
-import { isoCBOR } from './iso';
+import { isoCBOR } from './iso/index.js';
 
 /**
  * Convert an AttestationObject buffer to a proper object

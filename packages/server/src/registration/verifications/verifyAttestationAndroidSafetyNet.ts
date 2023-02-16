@@ -1,11 +1,11 @@
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
 
-import { toHash } from '../../helpers/toHash';
-import { verifySignature } from '../../helpers/verifySignature';
+import { toHash } from '../../helpers/toHash.js';
+import { verifySignature } from '../../helpers/verifySignature.js';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { isoUint8Array, isoBase64URL } from '../../helpers/iso';
+import { isoUint8Array, isoBase64URL } from '../../helpers/iso/index.js';
 import { MetadataService } from '../../services/metadataService';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
 

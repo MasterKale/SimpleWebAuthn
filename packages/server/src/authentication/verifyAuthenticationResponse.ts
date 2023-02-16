@@ -5,14 +5,14 @@ import {
   UserVerificationRequirement,
 } from '@simplewebauthn/typescript-types';
 
-import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
-import { toHash } from '../helpers/toHash';
-import { verifySignature } from '../helpers/verifySignature';
-import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
-import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
-import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import { isoUint8Array, isoBase64URL } from '../helpers/iso';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.js';
+import { toHash } from '../helpers/toHash.js';
+import { verifySignature } from '../helpers/verifySignature.js';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.js';
+import { parseBackupFlags } from '../helpers/parseBackupFlags.js';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.js';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID.js';
+import { isoUint8Array, isoBase64URL } from '../helpers/iso/index.js';
 
 export type VerifyAuthenticationResponseOpts = {
   response: AuthenticationResponseJSON;
