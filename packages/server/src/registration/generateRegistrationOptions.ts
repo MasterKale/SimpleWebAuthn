@@ -67,10 +67,12 @@ const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
 };
 
 /**
- * Filter out known bad/deprecated/etc... algorithm ID's so they're not used for new attestations.
- * See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
+ * Use the most commonly-supported algorithms
+ * See the following:
+ *   - https://www.iana.org/assignments/cose/cose.xhtml#algorithms
+ *   - https://w3c.github.io/webauthn/#dom-publickeycredentialcreationoptions-pubkeycredparams
  */
-const defaultSupportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers.filter(id => id !== -65535);
+const defaultSupportedAlgorithmIDs: COSEAlgorithmIdentifier[] = [-8, -7, -257];
 
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
