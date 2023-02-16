@@ -7,13 +7,20 @@
     "lib": [
       "ES2021",
     ],
+    // "module": "CommonJS", // Regular CJS output
+    "module": "ESNext",
+    "moduleResolution": "node16",
     "baseUrl": "./src",
     "outDir": "./dist",
     "typeRoots": [
       "./types",
       "./node_modules/@types",
-      "../../node_modules/@types"
+      "./node_modules/@hexagon/base64/types",
+      "../../node_modules/@types",
     ],
     "experimentalDecorators": true
+  },
+  "ts-node": {
+    "experimentalResolver": true
   }
 }
