@@ -9,7 +9,7 @@ import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
-import { WebAuthnError } from '../helpers/structs';
+import { WebAuthnError } from '../helpers/webAuthnError';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
@@ -299,7 +299,7 @@ test('should return authenticatorAttachment if present', async () => {
     return new Promise(resolve => {
       resolve({
         response: {},
-        getClientExtensionResults: () => {},
+        getClientExtensionResults: () => { },
         authenticatorAttachment: 'cross-platform',
       });
     });
@@ -328,6 +328,8 @@ describe('WebAuthnError', () => {
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/abort signal/i);
       rejected.toHaveProperty('name', 'AbortError');
+      rejected.toHaveProperty('code', 'ERROR_CEREMONY_ABORTED');
+      rejected.toHaveProperty('cause', AbortError);
     });
   });
 
@@ -346,6 +348,8 @@ describe('WebAuthnError', () => {
       rejected.toThrow(Error);
       rejected.toThrow(/operation failed/i);
       rejected.toHaveProperty('name', 'NotAllowedError');
+      rejected.toHaveProperty('code', 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
+      rejected.toHaveProperty('cause', NotAllowedError);
     });
 
     test('should pass through error message (Chrome M110 - Bad TLS Cert)', async () => {
@@ -365,6 +369,8 @@ describe('WebAuthnError', () => {
       rejected.toThrow(Error);
       rejected.toThrow(/sites with TLS certificate errors/i);
       rejected.toHaveProperty('name', 'NotAllowedError');
+      rejected.toHaveProperty('code', 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
+      rejected.toHaveProperty('cause', NotAllowedError);
     });
   });
 
@@ -391,6 +397,8 @@ describe('WebAuthnError', () => {
       rejected.toThrow(/1\.2\.3\.4/);
       rejected.toThrow(/invalid domain/i);
       rejected.toHaveProperty('name', 'SecurityError');
+      rejected.toHaveProperty('code', 'ERROR_INVALID_DOMAIN');
+      rejected.toHaveProperty('cause', SecurityError);
     });
 
     test('should identify invalid RP ID', async () => {
@@ -403,6 +411,8 @@ describe('WebAuthnError', () => {
       rejected.toThrow(goodOpts1.rpId);
       rejected.toThrow(/invalid for this domain/i);
       rejected.toHaveProperty('name', 'SecurityError');
+      rejected.toHaveProperty('code', 'ERROR_INVALID_RP_ID');
+      rejected.toHaveProperty('cause', SecurityError);
     });
   });
 
@@ -418,6 +428,8 @@ describe('WebAuthnError', () => {
       rejected.toThrow(/unable to process the specified options/i);
       rejected.toThrow(/could not create a new assertion signature/i);
       rejected.toHaveProperty('name', 'UnknownError');
+      rejected.toHaveProperty('code', 'ERROR_AUTHENTICATOR_GENERAL_ERROR');
+      rejected.toHaveProperty('cause', UnknownError);
     });
   });
 });
