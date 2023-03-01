@@ -17,14 +17,40 @@
  * scenarios a given error would be raised.
  */
 export class WebAuthnError extends Error {
-  constructor(message: string, cause: Error, name?: string) {
+  code: SimpleWebAuthnErrorCode;
+
+  constructor({
+    message,
+    code,
+    cause,
+    name,
+  }: {
+    message: string,
+    code: SimpleWebAuthnErrorCode,
+    cause: Error,
+    name?: string,
+  }) {
     /**
      * `cause` is supported in evergreen browsers, but not IE10, so this ts-ignore is to
      * help Rollup complete the ES5 build.
      */
     // @ts-ignore
     super(message, { cause })
-    // this.name = name ?? cause.name;
     this.name = name ?? cause.name;
+    this.code = code;
   }
 }
+
+export type SimpleWebAuthnErrorCode =
+  'ERROR_CEREMONY_ABORTED'
+  | 'ERROR_INVALID_DOMAIN'
+  | 'ERROR_INVALID_RP_ID'
+  | 'ERROR_INVALID_USER_ID_LENGTH'
+  | 'ERROR_AUTHENTICATOR_GENERAL_ERROR'
+  | 'ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT'
+  | 'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT'
+  | 'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED'
+  | 'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG'
+  | 'ERROR_MALFORMED_PUBKEYCREDPARAMS'
+  | 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY'
+  ;
