@@ -1,5 +1,5 @@
 import { isValidDomain } from './isValidDomain';
-import { WebAuthnError } from './structs';
+import { WebAuthnError } from './webAuthnError';
 
 /**
  * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.get()`
