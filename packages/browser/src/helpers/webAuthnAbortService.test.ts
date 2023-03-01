@@ -14,7 +14,7 @@ test('should call abort() on existing controller when creating a new signal', ()
   // Spy on the existing instance of AbortController
   const abortSpy = jest.fn();
   // @ts-ignore
-  webauthnAbortService.controller?.abort = abortSpy;
+  webauthnAbortService.controller.abort = abortSpy;
 
   // Generate a new signal, which should call `abort()` on the existing controller
   webauthnAbortService.createNewAbortSignal();
