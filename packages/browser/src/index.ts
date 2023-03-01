@@ -16,4 +16,4 @@ export {
   platformAuthenticatorIsAvailable,
 };
 
-export type { SimpleWebAuthnErrorCode } from './helpers/webAuthnError';
+export type { WebAuthnErrorCode } from './helpers/webAuthnError';

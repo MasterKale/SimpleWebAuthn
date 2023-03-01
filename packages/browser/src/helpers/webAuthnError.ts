@@ -17,7 +17,7 @@
  * scenarios a given error would be raised.
  */
 export class WebAuthnError extends Error {
-  code: SimpleWebAuthnErrorCode;
+  code: WebAuthnErrorCode;
 
   constructor({
     message,
@@ -26,7 +26,7 @@ export class WebAuthnError extends Error {
     name,
   }: {
     message: string,
-    code: SimpleWebAuthnErrorCode,
+    code: WebAuthnErrorCode,
     cause: Error,
     name?: string,
   }) {
@@ -41,7 +41,7 @@ export class WebAuthnError extends Error {
   }
 }
 
-export type SimpleWebAuthnErrorCode =
+export type WebAuthnErrorCode =
   'ERROR_CEREMONY_ABORTED'
   | 'ERROR_INVALID_DOMAIN'
   | 'ERROR_INVALID_RP_ID'
