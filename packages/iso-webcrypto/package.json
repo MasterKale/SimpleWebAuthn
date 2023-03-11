@@ -31,7 +31,7 @@
     "browser",
     "node"
   ],
-  "devDependencies": {
+  "dependencies": {
     "@simplewebauthn/typescript-types": "*",
     "@types/node": "^18.11.9"
   }

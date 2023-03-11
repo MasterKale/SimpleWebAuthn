@@ -54,15 +54,13 @@
     "@peculiar/asn1-rsa": "^2.3.4",
     "@peculiar/asn1-schema": "^2.3.3",
     "@peculiar/asn1-x509": "^2.3.4",
-    "@simplewebauthn/iso-webcrypto": "^7.0.1",
+    "@simplewebauthn/iso-webcrypto": "*",
+    "@simplewebauthn/typescript-types": "*",
+    "@types/debug": "^4.1.7",
+    "@types/node": "^18.11.9",
     "cbor-x": "^1.4.1",
     "cross-fetch": "^3.1.5",
     "debug": "^4.3.2"
   },
-  "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb",
-  "devDependencies": {
-    "@simplewebauthn/typescript-types": "*",
-    "@types/debug": "^4.1.7",
-    "@types/node": "^18.11.9"
-  }
+  "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb"
 }
