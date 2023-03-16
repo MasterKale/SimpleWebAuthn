@@ -18,7 +18,7 @@ export function identifyAuthenticationError({
   }
 
   if (error.name === 'AbortError') {
-    if (options.signal === new AbortController().signal) {
+    if (options.signal instanceof AbortSignal) {
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 16)
       return new WebAuthnError({
         message: 'Authentication ceremony was sent an abort signal',
