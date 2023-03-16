@@ -1,5 +1,20 @@
 # Changelog
 
+## v7.2.0
+
+**Packages:**
+
+- @simplewebauthn/browser@7.2.0
+- @simplewebauthn/iso-webcrypto@7.2.0
+- @simplewebauthn/server@7.2.0
+
+**Changes:**
+
+- **[server]** `generateRegistrationOptions()` defaults to `-8`, `-7`, and `-257` for supported public key algorithms ([#361](https://github.com/MasterKale/SimpleWebAuthn/pull/361))
+- **[browser] [iso-webcrypto] [server]** Users will no longer need to also `npm install @simplewebauthn/typescript-types` to pull in type definitions when using these libraries ([#370](https://github.com/MasterKale/SimpleWebAuthn/pull/370))
+- **[browser]** Errors raised by `startRegistration()` and `startAuthentication()` now include a `code` property to help programmatically detect identified errors. A new `cause` property is also populated that will always include the original error raised by the WebAuthn API call ([#367](https://github.com/MasterKale/SimpleWebAuthn/pull/367))
+- **[browser]** Aborting conditional UI (i.e. calling `startAuthentication(..., true)` and then subsequently calling `startAuthentication()` for modal UI) will now throw an `AbortError` instead of a `string` ([#371](https://github.com/MasterKale/SimpleWebAuthn/pull/371))
+
 ## v7.1.0
 
 **Packages:**
