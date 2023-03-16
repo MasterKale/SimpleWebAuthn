@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/server",
-  "version": "7.0.1",
+  "version": "7.2.0",
   "description": "SimpleWebAuthn for Servers",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -54,7 +54,7 @@
     "@peculiar/asn1-rsa": "^2.3.4",
     "@peculiar/asn1-schema": "^2.3.3",
     "@peculiar/asn1-x509": "^2.3.4",
-    "@simplewebauthn/iso-webcrypto": "*",
+    "@simplewebauthn/iso-webcrypto": "^7.2.0",
     "@simplewebauthn/typescript-types": "*",
     "@types/debug": "^4.1.7",
     "@types/node": "^18.11.9",
