@@ -1,11 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2018",
-    "module": "ES2020",
+    "target": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "node",
     "lib": [
-      "ES2018",
+      "ES2022",
       "DOM"
     ],
     "baseUrl": "./src",

@@ -15,3 +15,5 @@ export {
   browserSupportsWebAuthnAutofill,
   platformAuthenticatorIsAvailable,
 };
+
+export type { WebAuthnErrorCode } from './helpers/webAuthnError';

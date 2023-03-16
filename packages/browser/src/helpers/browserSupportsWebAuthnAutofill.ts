@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { PublicKeyCredentialFuture } from '@simplewebauthn/typescript-types';
 
 /**
