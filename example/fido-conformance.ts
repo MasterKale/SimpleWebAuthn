@@ -1,28 +1,29 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import fs from 'fs';
-import express from 'express';
-import fetch from 'node-fetch';
 import base64url from 'base64url';
+import express from 'express';
+import fs from 'fs';
+import fetch from 'node-fetch';
 
 import {
-  generateRegistrationOptions,
-  verifyRegistrationResponse,
-  generateAuthenticationOptions,
-  verifyAuthenticationResponse,
   MetadataService,
   MetadataStatement,
   SettingsService,
+  generateAuthenticationOptions,
+  generateRegistrationOptions,
+  verifyAuthenticationResponse,
+  verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { isoUint8Array } from '@simplewebauthn/server/helpers';
 import {
-  RegistrationResponseJSON,
   AuthenticationResponseJSON,
+  RegistrationResponseJSON,
 } from '@simplewebauthn/typescript-types';
 
-import { rpID, expectedOrigin } from './index';
 import { LoggedInUser } from './example-server';
+import { expectedOrigin, rpID } from './index';
 
 interface LoggedInFIDOUser extends LoggedInUser {
+  currentChallenge?: string;
   currentAuthenticationUserVerification?: UserVerificationRequirement;
 }
 
