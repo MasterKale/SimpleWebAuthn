@@ -140,7 +140,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
     supportedAlgorithmIDs,
   });
 
-  user.currentChallenge = opts.challenge;
+  req.session.currentChallenge = opts.challenge;
 
   return res.send({
     ...opts,
@@ -157,7 +157,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
 
-  const expectedChallenge = user.currentChallenge;
+  const expectedChallenge = req.session.currentChallenge;
 
   let verification;
   try {
@@ -222,7 +222,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
     })),
   });
 
-  user.currentChallenge = opts.challenge;
+  req.session.currentChallenge = opts.challenge;
   user.currentAuthenticationUserVerification = userVerification;
 
   return res.send({
@@ -239,7 +239,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
 
   // Pull up values specified when generation authentication options
-  const expectedChallenge = user.currentChallenge;
+  const expectedChallenge = req.session.currentChallenge;
   const userVerification = user.currentAuthenticationUserVerification;
 
   if (!id) {
