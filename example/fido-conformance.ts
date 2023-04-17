@@ -144,6 +144,9 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
 
   req.session.currentChallenge = opts.challenge;
 
+  // Only return the extensions we're given
+  opts.extensions = extensions;
+
   return res.send({
     ...opts,
     status: 'ok',
