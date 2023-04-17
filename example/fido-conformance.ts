@@ -57,8 +57,10 @@ try {
 
 /**
  * Initialize MetadataService with Conformance Testing-specific statements.
+ *
+ * (Grabbed this URL from the POST made on https://mds3.fido.tools/ when you submit your site's URL)
  */
-fetch('https://mds3.certinfra.fidoalliance.org/getEndpoints', {
+fetch('https://mds3.fido.tools/getEndpoints', {
   method: 'POST',
   body: JSON.stringify({ endpoint: `${expectedOrigin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
