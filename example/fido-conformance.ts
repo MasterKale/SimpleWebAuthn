@@ -57,8 +57,10 @@ try {
 
 /**
  * Initialize MetadataService with Conformance Testing-specific statements.
+ *
+ * (Grabbed this URL from the POST made on https://mds3.fido.tools/ when you submit your site's URL)
  */
-fetch('https://mds3.certinfra.fidoalliance.org/getEndpoints', {
+fetch('https://mds3.fido.tools/getEndpoints', {
   method: 'POST',
   body: JSON.stringify({ endpoint: `${expectedOrigin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
@@ -140,7 +142,10 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
     supportedAlgorithmIDs,
   });
 
-  user.currentChallenge = opts.challenge;
+  req.session.currentChallenge = opts.challenge;
+
+  // Only return the extensions we're given
+  opts.extensions = extensions;
 
   return res.send({
     ...opts,
@@ -157,7 +162,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
 
-  const expectedChallenge = user.currentChallenge;
+  const expectedChallenge = req.session.currentChallenge;
 
   let verification;
   try {
@@ -222,7 +227,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
     })),
   });
 
-  user.currentChallenge = opts.challenge;
+  req.session.currentChallenge = opts.challenge;
   user.currentAuthenticationUserVerification = userVerification;
 
   return res.send({
@@ -239,7 +244,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
 
   // Pull up values specified when generation authentication options
-  const expectedChallenge = user.currentChallenge;
+  const expectedChallenge = req.session.currentChallenge;
   const userVerification = user.currentAuthenticationUserVerification;
 
   if (!id) {
