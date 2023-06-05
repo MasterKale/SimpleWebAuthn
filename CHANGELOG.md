@@ -1,5 +1,15 @@
 # Changelog
 
+## v7.3.0
+
+**Packages:**
+
+- @simplewebauthn/server@7.3.0
+
+**Changes:**
+
+- **[server]** Improved signature verification of the latest FIDO MDS JWTs ([#390](https://github.com/MasterKale/SimpleWebAuthn/pull/390))
+
 ## v7.2.0
 
 **Packages:**
