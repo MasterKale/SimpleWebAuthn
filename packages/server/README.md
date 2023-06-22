@@ -26,10 +26,10 @@ You can find in-depth documentation on this package here: https://simplewebauthn
 
 SimpleWebAuthn supports [all current WebAuthn attestation formats](https://w3c.github.io/webauthn/#sctn-defined-attestation-formats), including:
 
-- **Packed**
-- **TPM**
 - **Android Key**
 - **Android SafetyNet**
-- **FIDO U2F**
-- **None**
 - **Apple**
+- **FIDO U2F**
+- **Packed**
+- **TPM**
+- **None**
