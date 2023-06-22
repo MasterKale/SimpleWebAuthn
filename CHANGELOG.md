@@ -1,5 +1,16 @@
 # Changelog
 
+## v7.3.1
+
+**Packages:**
+
+- @simplewebauthn/server@7.3.1
+
+**Changes:**
+
+- **[server]** The `AttestationStatement.size` property declaration is now more tolerant of older versions of TypeScript
+- **[server]** Declared minimum supported TypeScript version of 4.4+
+
 ## v7.3.0
 
 **Packages:**
