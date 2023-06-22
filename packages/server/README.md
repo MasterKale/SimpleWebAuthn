@@ -4,6 +4,7 @@
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/server)
 ![node-lts (scoped)](https://img.shields.io/node/v/@simplewebauthn/server?style=for-the-badge&logo=Node.js)
+![typescript minimum version 4.3](https://img.shields.io/badge/TypeScript-%3E%3D_4.3-3178C6?style=for-the-badge&logo=TypeScript)
 
 - [Installation](#installation)
 - [Usage](#usage)
