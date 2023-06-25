@@ -250,6 +250,56 @@ test('should return authenticatorAttachment if present', async () => {
   expect(response.authenticatorAttachment).toEqual('cross-platform');
 });
 
+test('should return convenience values if getters present', async () => {
+  /**
+   * I call them "convenience values" because the getters for public key algorithm,
+   * public key bytes, and authenticator data are alternative ways to access information
+   * that's already buried in the response.
+   */
+  // Mock extension return values from authenticator
+  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+    return new Promise(resolve => {
+      resolve({
+        response: {
+          getPublicKeyAlgorithm: () => 777,
+          getPublicKey: () => new Uint8Array([0, 0, 0, 0]).buffer,
+          getAuthenticatorData: () => new Uint8Array([0, 0, 0, 0]).buffer,
+        },
+        getClientExtensionResults: () => { },
+      });
+    });
+  });
+
+  const response = await startRegistration(goodOpts1);
+
+  expect(response.response.publicKeyAlgorithm).toEqual(777);
+  expect(response.response.publicKey).toEqual('AAAAAA');
+  expect(response.response.authenticatorData).toEqual('AAAAAA');
+});
+
+test('should not return convenience values if getters missing', async () => {
+  /**
+   * I call them "convenience values" because the getters for public key algorithm,
+   * public key bytes, and authenticator data are alternative ways to access information
+   * that's already buried in the response.
+   */
+  // Mock extension return values from authenticator
+  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+    return new Promise(resolve => {
+      resolve({
+        response: {},
+        getClientExtensionResults: () => { },
+      });
+    });
+  });
+
+  const response = await startRegistration(goodOpts1);
+
+  expect(response.response.publicKeyAlgorithm).toBeUndefined();
+  expect(response.response.publicKey).toBeUndefined();
+  expect(response.response.authenticatorData).toBeUndefined();
+});
+
 describe('WebAuthnError', () => {
   describe('AbortError', () => {
     const AbortError = generateCustomError('AbortError');
