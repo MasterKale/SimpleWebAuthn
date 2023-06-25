@@ -180,7 +180,15 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
  * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
  * know about it (sometime after 4.6.3)
  */
-export type AuthenticatorTransportFuture = 'ble' | 'internal' | 'nfc' | 'usb' | 'cable' | 'hybrid';
+export type AuthenticatorTransportFuture =
+  'ble'
+  | 'cable'
+  | 'hybrid'
+  | 'internal'
+  | 'nfc'
+  | 'smart-card'
+  | 'usb'
+  ;
 
 /**
  * A super class of TypeScript's `PublicKeyCredentialDescriptor` that knows about the latest
