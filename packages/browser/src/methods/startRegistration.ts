@@ -64,6 +64,26 @@ export async function startRegistration(
     transports = response.getTransports();
   }
 
+  // L3 says this is required, but browser and webview support are still not guaranteed.
+  let responsePublicKeyAlgorithm: number | undefined = undefined;
+  if (typeof response.getPublicKeyAlgorithm === 'function') {
+    responsePublicKeyAlgorithm = response.getPublicKeyAlgorithm();
+  }
+
+  let responsePublicKey: string | undefined = undefined;
+  if (typeof response.getPublicKey === 'function') {
+    const _publicKey = response.getPublicKey();
+    if (_publicKey !== null) {
+      responsePublicKey = bufferToBase64URLString(_publicKey);
+    }
+  }
+
+  // L3 says this is required, but browser and webview support are still not guaranteed.
+  let responseAuthenticatorData: string | undefined;
+  if (typeof response.getAuthenticatorData === 'function') {
+    responseAuthenticatorData = bufferToBase64URLString(response.getAuthenticatorData());
+  }
+
   return {
     id,
     rawId: bufferToBase64URLString(rawId),
@@ -71,6 +91,9 @@ export async function startRegistration(
       attestationObject: bufferToBase64URLString(response.attestationObject),
       clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
       transports,
+      publicKeyAlgorithm: responsePublicKeyAlgorithm,
+      publicKey: responsePublicKey,
+      authenticatorData: responseAuthenticatorData,
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
