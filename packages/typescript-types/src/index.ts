@@ -133,9 +133,9 @@ export interface AuthenticatorAttestationResponseJSON {
   authenticatorData?: Base64URLString;
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
   transports?: AuthenticatorTransportFuture[];
-  publicKey?: Base64URLString;
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
   publicKeyAlgorithm?: COSEAlgorithmIdentifier;
+  publicKey?: Base64URLString;
 }
 
 /**
