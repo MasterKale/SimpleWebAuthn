@@ -19,6 +19,7 @@ import type {
   AuthenticatorAttachment,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialRequestOptions,
+  COSEAlgorithmIdentifier,
 } from './dom';
 
 export * from './dom';
@@ -129,7 +130,12 @@ export interface AuthenticatorAttestationResponseJSON {
   clientDataJSON: Base64URLString;
   attestationObject: Base64URLString;
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
+  authenticatorData?: Base64URLString;
+  // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
   transports?: AuthenticatorTransportFuture[];
+  publicKey?: Base64URLString;
+  // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
+  publicKeyAlgorithm?: COSEAlgorithmIdentifier;
 }
 
 /**
