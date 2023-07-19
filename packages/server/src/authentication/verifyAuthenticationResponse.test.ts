@@ -44,6 +44,7 @@ test('should return authenticator info after verification', async () => {
 
   expect(verification.authenticationInfo.newCounter).toEqual(144);
   expect(verification.authenticationInfo.credentialID).toEqual(authenticator.credentialID);
+  expect(verification.authenticationInfo?.origin).toEqual(assertionOrigin);
 });
 
 test('should throw when response challenge is not expected value', async () => {
@@ -224,6 +225,7 @@ test('should support multiple possible origins', async () => {
   });
 
   expect(verification.verified).toEqual(true);
+  expect(verification.authenticationInfo?.origin).toEqual(assertionOrigin);
 });
 
 test('should throw an error if origin not in list of expected origins', async () => {
@@ -372,6 +374,7 @@ test('should return credential backup info', async () => {
 
   expect(verification.authenticationInfo?.credentialDeviceType).toEqual('singleDevice');
   expect(verification.authenticationInfo?.credentialBackedUp).toEqual(false);
+  expect(verification.authenticationInfo?.origin).toEqual(assertionOrigin);
 });
 
 /**

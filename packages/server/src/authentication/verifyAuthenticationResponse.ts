@@ -215,6 +215,7 @@ export async function verifyAuthenticationResponse(
       credentialDeviceType,
       credentialBackedUp,
       authenticatorExtensionResults: extensionsData,
+      origin: clientDataJSON.origin,
     },
   };
 
@@ -236,6 +237,7 @@ export async function verifyAuthenticationResponse(
  * @param authenticationInfo.credentialBackedUp Whether or not the multi-device credential has been
  * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
  * reference!**
+ * @param authenticationInfo.origin The origin of the website that the authentication occurred on
  * @param authenticationInfo?.authenticatorExtensionResults The authenticator extensions returned
  * by the browser
  */
@@ -247,6 +249,7 @@ export type VerifiedAuthenticationResponse = {
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
+    origin: string;
     authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };
