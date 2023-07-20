@@ -70,6 +70,7 @@ test('should verify FIDO U2F attestation', async () => {
     isoBase64URL.toBuffer(attestationFIDOU2F.response.attestationObject),
   );
   expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should verify Packed (EC2) attestation', async () => {
@@ -177,6 +178,7 @@ test('should verify None attestation w/RSA public key', async () => {
     isoBase64URL.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
   );
   expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should throw when response challenge is not expected value', async () => {
@@ -419,6 +421,7 @@ test('should validate TPM RSA response (SHA256)', async () => {
     isoBase64URL.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
   );
   expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should validate TPM RSA response (SHA1)', async () => {
@@ -455,6 +458,7 @@ test('should validate TPM RSA response (SHA1)', async () => {
     isoBase64URL.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
   );
   expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should validate Android-Key response', async () => {
@@ -491,6 +495,7 @@ test('should validate Android-Key response', async () => {
     isoBase64URL.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
   );
   expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should support multiple possible origins', async () => {
@@ -503,6 +508,20 @@ test('should support multiple possible origins', async () => {
 
   expect(verification.verified).toBe(true);
   expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
+});
+
+test('should not set RPID in registrationInfo when not expected', async () => {
+  const verification = await verifyRegistrationResponse({
+    response: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: undefined,
+  });
+
+  expect(verification.verified).toBe(true);
+  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  expect(verification.registrationInfo?.rpID).toBeUndefined();
 });
 
 test('should throw an error if origin not in list of expected origins', async () => {

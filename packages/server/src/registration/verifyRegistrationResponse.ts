@@ -141,6 +141,7 @@ export async function verifyRegistrationResponse(
     parsedAuthData;
 
   // Make sure the response's RP ID is ours
+  let matchedRPID: string | undefined;
   if (expectedRPID) {
     let expectedRPIDs: string[] = [];
     if (typeof expectedRPID === 'string') {
@@ -149,7 +150,7 @@ export async function verifyRegistrationResponse(
       expectedRPIDs = expectedRPID;
     }
 
-    await matchExpectedRPID(rpIdHash, expectedRPIDs);
+    matchedRPID = await matchExpectedRPID(rpIdHash, expectedRPIDs);
   }
 
   // Make sure someone was physically present
@@ -247,6 +248,7 @@ export async function verifyRegistrationResponse(
       credentialDeviceType,
       credentialBackedUp,
       origin: clientDataJSON.origin,
+      rpID: matchedRPID,
       authenticatorExtensionResults: extensionsData,
     };
   }
@@ -275,6 +277,8 @@ export async function verifyRegistrationResponse(
  * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
  * reference!**
  * @param registrationInfo.origin The origin of the website that the registration occurred on
+ * @param registrationInfo?.rpID The RP ID that the registration occurred on, if one or more were
+ * specified in the registration options
  * @param registrationInfo?.authenticatorExtensionResults The authenticator extensions returned
  * by the browser
  */
@@ -292,6 +296,7 @@ export type VerifiedRegistrationResponse = {
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
     origin: string;
+    rpID?: string;
     authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };

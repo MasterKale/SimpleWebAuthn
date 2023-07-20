@@ -2,19 +2,22 @@ import { toHash } from './toHash';
 import { isoUint8Array } from './iso';
 
 /**
- * Go through each expected RP ID and try to find one that matches. Raises an Error if no
+ * Go through each expected RP ID and try to find one that matches. Returns the unhashed RP ID
+ * that matched the hash in the response.
+ *
+ * Raises an `UnexpectedRPIDHash` error if no match is found
  */
 export async function matchExpectedRPID(
   rpIDHash: Uint8Array,
   expectedRPIDs: string[],
-): Promise<void> {
+): Promise<string> {
   try {
-    await Promise.any(
+    const matchedRPID = await Promise.any<string>(
       expectedRPIDs.map(expected => {
         return new Promise((resolve, reject) => {
           toHash(isoUint8Array.fromASCIIString(expected)).then(expectedRPIDHash => {
             if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
-              resolve(true);
+              resolve(expected);
             } else {
               reject();
             }
@@ -22,6 +25,8 @@ export async function matchExpectedRPID(
         });
       }),
     );
+
+    return matchedRPID;
   } catch (err) {
     const _err = err as Error;
 

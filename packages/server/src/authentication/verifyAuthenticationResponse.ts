@@ -154,7 +154,7 @@ export async function verifyAuthenticationResponse(
     expectedRPIDs = expectedRPID;
   }
 
-  await matchExpectedRPID(rpIdHash, expectedRPIDs);
+  const matchedRPID = await matchExpectedRPID(rpIdHash, expectedRPIDs);
 
   if (advancedFIDOConfig !== undefined) {
     const { userVerification: fidoUserVerification } = advancedFIDOConfig;
@@ -216,6 +216,7 @@ export async function verifyAuthenticationResponse(
       credentialBackedUp,
       authenticatorExtensionResults: extensionsData,
       origin: clientDataJSON.origin,
+      rpID: matchedRPID,
     },
   };
 
@@ -238,6 +239,7 @@ export async function verifyAuthenticationResponse(
  * backed up. Always `false` for single-device credentials. **Should be kept in a DB for later
  * reference!**
  * @param authenticationInfo.origin The origin of the website that the authentication occurred on
+ * @param authenticationInfo.rpID The RP ID that the authentication occurred on
  * @param authenticationInfo?.authenticatorExtensionResults The authenticator extensions returned
  * by the browser
  */
@@ -250,6 +252,7 @@ export type VerifiedAuthenticationResponse = {
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
     origin: string;
+    rpID: string;
     authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };
