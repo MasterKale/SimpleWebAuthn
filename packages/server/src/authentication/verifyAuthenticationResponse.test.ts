@@ -227,7 +227,6 @@ test('should support multiple possible origins', async () => {
 
   expect(verification.verified).toEqual(true);
   expect(verification.authenticationInfo?.origin).toEqual(assertionOrigin);
-  expect(verification.authenticationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should throw an error if origin not in list of expected origins', async () => {
@@ -253,6 +252,7 @@ test('should support multiple possible RP IDs', async () => {
   });
 
   expect(verification.verified).toEqual(true);
+  expect(verification.authenticationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should throw an error if RP ID not in list of possible RP IDs', async () => {
@@ -376,8 +376,6 @@ test('should return credential backup info', async () => {
 
   expect(verification.authenticationInfo?.credentialDeviceType).toEqual('singleDevice');
   expect(verification.authenticationInfo?.credentialBackedUp).toEqual(false);
-  expect(verification.authenticationInfo?.origin).toEqual(assertionOrigin);
-  expect(verification.authenticationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 /**

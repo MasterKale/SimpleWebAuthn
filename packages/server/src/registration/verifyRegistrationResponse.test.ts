@@ -520,7 +520,6 @@ test('should not set RPID in registrationInfo when not expected', async () => {
   });
 
   expect(verification.verified).toBe(true);
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
   expect(verification.registrationInfo?.rpID).toBeUndefined();
 });
 
