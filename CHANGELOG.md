@@ -1,5 +1,21 @@
 # Changelog
 
+## v7.4.0
+
+**Packages:**
+
+ - @simplewebauthn/browser@7.4.0
+ - @simplewebauthn/iso-webcrypto@7.4.0
+ - @simplewebauthn/server@7.4.0
+ - @simplewebauthn/typescript-types@7.4.0
+
+**Changes:**
+
+- **[browser] [typescript-types]** `AuthenticatorAttestationResponseJSON` now includes additional, optional `publicKeyAlgorithm`, `publicKey`, and `authenticatorData` convenience values that track JSON interface changes in WebAuthn L3 draft ([#400](https://github.com/MasterKale/SimpleWebAuthn/pull/400))
+- **[iso-crypto]** Version sync
+- **[server]** `verifyRegistrationResponse()` and `verifyAuthenticationResponse()` now return the matched origin and RP ID in their to output to help RP's that use the same verification logic with multiple origins and RP ID's understand where a response was generated and for which RP ([#415](https://github.com/MasterKale/SimpleWebAuthn/pull/415))
+- **[typescript-types]** `"smart-card"` is now a recognized value for `AuthenticatorTransportFuture` ([#399](https://github.com/MasterKale/SimpleWebAuthn/pull/399))
+
 ## v7.3.1
 
 **Packages:**
