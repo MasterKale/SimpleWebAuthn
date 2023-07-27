@@ -44,6 +44,8 @@ test('should return authenticator info after verification', async () => {
 
   expect(verification.authenticationInfo.newCounter).toEqual(144);
   expect(verification.authenticationInfo.credentialID).toEqual(authenticator.credentialID);
+  expect(verification.authenticationInfo?.origin).toEqual(assertionOrigin);
+  expect(verification.authenticationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should throw when response challenge is not expected value', async () => {
@@ -224,6 +226,7 @@ test('should support multiple possible origins', async () => {
   });
 
   expect(verification.verified).toEqual(true);
+  expect(verification.authenticationInfo?.origin).toEqual(assertionOrigin);
 });
 
 test('should throw an error if origin not in list of expected origins', async () => {
@@ -249,6 +252,7 @@ test('should support multiple possible RP IDs', async () => {
   });
 
   expect(verification.verified).toEqual(true);
+  expect(verification.authenticationInfo?.rpID).toEqual('dev.dontneeda.pw');
 });
 
 test('should throw an error if RP ID not in list of possible RP IDs', async () => {
