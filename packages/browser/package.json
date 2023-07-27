@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/browser",
-  "version": "7.2.0",
+  "version": "7.4.0",
   "description": "SimpleWebAuthn for Browsers",
   "main": "dist/bundle/index.js",
   "unpkg": "dist/bundle/index.umd.min.js",
@@ -31,7 +31,7 @@
     "umd"
   ],
   "dependencies": {
-    "@simplewebauthn/typescript-types": "*"
+    "@simplewebauthn/typescript-types": "^7.4.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",
