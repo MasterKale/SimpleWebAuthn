@@ -13,7 +13,6 @@ import express from 'express';
 import session from 'express-session';
 import memoryStore from 'memorystore';
 import dotenv from 'dotenv';
-import base64url from 'base64url';
 
 dotenv.config();
 
@@ -25,7 +24,7 @@ import {
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
-import { isoUint8Array } from '@simplewebauthn/server/helpers';
+import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
 import type {
   GenerateRegistrationOptionsOpts,
   GenerateAuthenticationOptionsOpts,
@@ -247,7 +246,7 @@ app.post('/verify-authentication', async (req, res) => {
   const expectedChallenge = req.session.currentChallenge;
 
   let dbAuthenticator;
-  const bodyCredIDBuffer = base64url.toBuffer(body.rawId);
+  const bodyCredIDBuffer = isoBase64URL.toBuffer(body.rawId);
   // "Query the DB" here for an authenticator matching `credentialID`
   for (const dev of user.devices) {
     if (isoUint8Array.areEqual(dev.credentialID, bodyCredIDBuffer)) {

@@ -2,7 +2,6 @@
 import fs from 'fs';
 import express from 'express';
 import fetch from 'node-fetch';
-import base64url from 'base64url';
 
 import {
   generateRegistrationOptions,
@@ -13,7 +12,7 @@ import {
   MetadataStatement,
   SettingsService,
 } from '@simplewebauthn/server';
-import { isoUint8Array } from '@simplewebauthn/server/helpers';
+import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
 import {
   RegistrationResponseJSON,
   AuthenticationResponseJSON,
@@ -253,7 +252,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
     return res.status(400).send({ errorMessage: msg });
   }
 
-  const credIDBuffer = base64url.toBuffer(id);
+  const credIDBuffer = isoBase64URL.toBuffer(id);
   const existingDevice = user.devices.find(device => isoUint8Array.areEqual(device.credentialID, credIDBuffer));
 
   if (!existingDevice) {
