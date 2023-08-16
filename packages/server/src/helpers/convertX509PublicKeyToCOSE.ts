@@ -1,8 +1,12 @@
-import { AsnParser } from '@peculiar/asn1-schema';
-import { Certificate } from '@peculiar/asn1-x509';
-import { ECParameters, id_ecPublicKey, id_secp256r1, id_secp384r1 } from '@peculiar/asn1-ecc';
-import { RSAPublicKey } from '@peculiar/asn1-rsa';
-
+import {
+  AsnParser,
+  Certificate,
+  ECParameters,
+  RSAPublicKey,
+  id_ecPublicKey,
+  id_secp256r1,
+  id_secp384r1,
+} from '../deps.ts';
 import {
   COSEPublicKey,
   COSEKTY,

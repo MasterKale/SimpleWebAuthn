@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { AsnSerializer } from '@peculiar/asn1-schema';
-
+import { AsnSerializer } from '../deps.ts';
 import { isCertRevoked } from './isCertRevoked.ts';
 import { verifySignature } from './verifySignature.ts';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';

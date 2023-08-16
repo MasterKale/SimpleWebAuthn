@@ -1,6 +1,6 @@
-import { fetch } from '../deps.ts';
-import { AsnParser } from '@peculiar/asn1-schema';
 import {
+  fetch,
+  AsnParser,
   CertificateList,
   Certificate,
   AuthorityKeyIdentifier,
@@ -9,8 +9,7 @@ import {
   id_ce_subjectKeyIdentifier,
   id_ce_cRLDistributionPoints,
   CRLDistributionPoints,
-} from '@peculiar/asn1-x509';
-
+} from '../deps.ts';
 import { isoUint8Array } from './iso/index.ts';
 
 /**
