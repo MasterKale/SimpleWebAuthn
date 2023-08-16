@@ -41,6 +41,16 @@ await build({
       'fido',
       'node',
     ],
+    typesVersions: {
+      "*": {
+        ".": [
+          "esm/index.d.ts"
+        ],
+        "helpers": [
+          "esm/helpers/index.d.ts"
+        ]
+      }
+    },
   },
   // Map from Deno package to NPM package for Node build
   mappings: {
