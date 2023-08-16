@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import * as cborx from 'cbor-x';
+import * as cborx from 'https://deno.land/x/cbor@v1.5.2/index.js';
 
 /**
  * This encoder should keep CBOR data the same length when data is re-encoded

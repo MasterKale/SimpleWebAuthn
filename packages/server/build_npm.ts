@@ -58,8 +58,12 @@ await build({
   mappings: {
     'https://deno.land/x/b64@1.1.27/src/base64.js': {
       name: '@hexagon/base64',
-      version: '^1.1.25'
-    }
+      version: '^1.1.25',
+    },
+    'https://deno.land/x/cbor@v1.5.2/index.js': {
+      name: 'cbor-x',
+      version: '^1.5.2',
+    },
   },
   // TypeScript tsconfig.json config
   compilerOptions: {
