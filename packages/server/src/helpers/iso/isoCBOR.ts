@@ -41,6 +41,6 @@ export function decodeFirst<Type>(input: Uint8Array): Type {
 /**
  * Encode data to CBOR
  */
-export function encode(input: any): Uint8Array {
+export function encode(input: unknown): Uint8Array {
   return encoder.encode(input);
 }

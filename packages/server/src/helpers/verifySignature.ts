@@ -6,7 +6,7 @@ import { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE.ts';
 /**
  * Verify an authenticator's signature
  */
-export async function verifySignature(opts: {
+export function verifySignature(opts: {
   signature: Uint8Array;
   data: Uint8Array;
   credentialPublicKey?: Uint8Array;

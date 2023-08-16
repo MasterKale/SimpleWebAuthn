@@ -1,6 +1,6 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
-export async function importKey(opts: {
+export function importKey(opts: {
   keyData: JsonWebKey;
   algorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams;
 }): Promise<CryptoKey> {

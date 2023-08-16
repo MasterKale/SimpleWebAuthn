@@ -14,7 +14,7 @@ import { unwrapEC2Signature } from './unwrapEC2Signature.ts';
 /**
  * Verify signatures with their public key. Supports EC2 and RSA public keys.
  */
-export async function verify(opts: {
+export function verify(opts: {
   cosePublicKey: COSEPublicKey;
   signature: Uint8Array;
   data: Uint8Array;

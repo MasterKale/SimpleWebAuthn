@@ -269,9 +269,9 @@ export class BaseMetadataService {
   /**
    * A helper method to pause execution until the service is ready
    */
-  private async pauseUntilReady(): Promise<void> {
+  private pauseUntilReady(): Promise<void> {
     if (this.state === SERVICE_STATE.READY) {
-      return;
+      return new Promise((resolve) => { resolve(); });
     }
 
     // State isn't ready, so set up polling
@@ -281,7 +281,7 @@ export class BaseMetadataService {
       let iterations = totalTimeoutMS / intervalMS;
 
       // Check service state every `intervalMS` milliseconds
-      const intervalID: NodeJS.Timeout = globalThis.setInterval(() => {
+      const intervalID = globalThis.setInterval(() => {
         if (iterations < 1) {
           clearInterval(intervalID);
           reject(`State did not become ready in ${totalTimeoutMS / 1000} seconds`);

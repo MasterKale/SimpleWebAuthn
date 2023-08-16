@@ -1,4 +1,3 @@
-import { webcrypto } from 'node:crypto';
 // Silence some console output
 // jest.spyOn(console, 'log').mockImplementation();
 // jest.spyOn(console, 'debug').mockImplementation();

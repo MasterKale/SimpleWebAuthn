@@ -90,14 +90,14 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
   try {
     const respCRL = await fetch(crlURL);
     certListBytes = await respCRL.arrayBuffer();
-  } catch (err) {
+  } catch (_err) {
     return false;
   }
 
   let data: CertificateList;
   try {
     data = AsnParser.parse(certListBytes, CertificateList);
-  } catch (err) {
+  } catch (_err) {
     // Something was malformed with the CRL, so pass
     return false;
   }

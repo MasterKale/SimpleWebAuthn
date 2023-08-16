@@ -58,7 +58,7 @@ describe('Method: getStatement()', () => {
 
   test('should return undefined if aaguid is undefined', async () => {
     // TypeScript will prevent you from passing `undefined`, but JS won't so test it
-    // @ts-ignore
+    // @ts-ignore 2345
     const statement = await MetadataService.getStatement(undefined);
 
     expect(statement).toBeUndefined();

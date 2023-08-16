@@ -1,6 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
 import { SettingsService } from './settingsService.ts';
 
 import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';

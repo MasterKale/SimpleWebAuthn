@@ -13,7 +13,7 @@ import { verifyRSA } from '../helpers/iso/isoCrypto/verifyRSA.ts';
  *
  * (Pulled from https://www.rfc-editor.org/rfc/rfc7515#section-4.1.1)
  */
-export async function verifyJWT(jwt: string, leafCert: Uint8Array): Promise<boolean> {
+export function verifyJWT(jwt: string, leafCert: Uint8Array): Promise<boolean> {
   const [header, payload, signature] = jwt.split('.');
 
   const certCOSE = convertX509PublicKeyToCOSE(leafCert);
