@@ -11,7 +11,7 @@ import {
   CRLDistributionPoints,
 } from '@peculiar/asn1-x509';
 
-import { isoUint8Array } from './iso';
+import { isoUint8Array } from './iso/index.ts';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID

@@ -1,6 +1,6 @@
-import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata';
-import { MetadataStatement } from '../metadata/mdsTypes';
-import { isoBase64URL } from '../helpers/iso';
+import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata.ts';
+import { MetadataStatement } from '../metadata/mdsTypes.ts';
+import { isoBase64URL } from '../helpers/iso/index.ts';
 
 test('should verify attestation with metadata (android-safetynet)', async () => {
   const metadataStatementJSONSafetyNet: MetadataStatement = {

@@ -10,8 +10,8 @@ import {
   COSEKEYS,
   COSEPublicKeyEC2,
   COSEPublicKeyRSA,
-} from './cose';
-import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
+} from './cose.ts';
+import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 
 export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();

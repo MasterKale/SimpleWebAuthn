@@ -1,5 +1,5 @@
-import { parseAuthenticatorData } from './parseAuthenticatorData';
-import { isoBase64URL } from './iso';
+import { parseAuthenticatorData } from './parseAuthenticatorData.ts';
+import { isoBase64URL } from './iso/index.ts';
 
 // Grabbed this from a Conformance test, contains attestation data
 const authDataWithAT = isoBase64URL.toBuffer(

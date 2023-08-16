@@ -1,4 +1,4 @@
-import { parseBackupFlags } from './parseBackupFlags';
+import { parseBackupFlags } from './parseBackupFlags.ts';
 
 test('should return single-device cred, not backed up', () => {
   const parsed = parseBackupFlags({ be: false, bs: false });

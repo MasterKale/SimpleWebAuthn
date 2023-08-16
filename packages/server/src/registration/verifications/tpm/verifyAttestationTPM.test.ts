@@ -1,5 +1,5 @@
-import { isoBase64URL } from '../../../helpers/iso';
-import { verifyRegistrationResponse } from '../../verifyRegistrationResponse';
+import { isoBase64URL } from '../../../helpers/iso/index.ts';
+import { verifyRegistrationResponse } from '../../verifyRegistrationResponse.ts';
 
 test('should verify TPM response', async () => {
   const expectedChallenge = 'a4de0d36-057d-4e9d-831a-2c578fa89170';

@@ -8,28 +8,28 @@ import {
   Name,
 } from '@peculiar/asn1-x509';
 
-import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse';
+import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse.ts';
 
-import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey';
+import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey.ts';
 import {
   COSEKEYS,
   isCOSEAlg,
   isCOSEPublicKeyRSA,
   isCOSEPublicKeyEC2,
   COSEALG,
-} from '../../../helpers/cose';
-import { toHash } from '../../../helpers/toHash';
-import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
-import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
-import { verifySignature } from '../../../helpers/verifySignature';
-import { isoUint8Array } from '../../../helpers/iso';
-import { MetadataService } from '../../../services/metadataService';
-import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
+} from '../../../helpers/cose.ts';
+import { toHash } from '../../../helpers/toHash.ts';
+import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../../helpers/validateCertificatePath.ts';
+import { getCertificateInfo } from '../../../helpers/getCertificateInfo.ts';
+import { verifySignature } from '../../../helpers/verifySignature.ts';
+import { isoUint8Array } from '../../../helpers/iso/index.ts';
+import { MetadataService } from '../../../services/metadataService.ts';
+import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata.ts';
 
-import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants';
-import { parseCertInfo } from './parseCertInfo';
-import { parsePubArea } from './parsePubArea';
+import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants.ts';
+import { parseCertInfo } from './parseCertInfo.ts';
+import { parsePubArea } from './parsePubArea.ts';
 
 export async function verifyAttestationTPM(
   options: AttestationFormatVerifierOpts,

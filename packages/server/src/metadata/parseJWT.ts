@@ -1,4 +1,4 @@
-import { isoBase64URL } from '../helpers/iso';
+import { isoBase64URL } from '../helpers/iso/index.ts';
 
 /**
  * Process a JWT into Javascript-friendly data structures

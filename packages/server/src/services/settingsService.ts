@@ -1,13 +1,13 @@
-import { AttestationFormat } from '../helpers/decodeAttestationObject';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
+import { AttestationFormat } from '../helpers/decodeAttestationObject.ts';
+import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
 
-import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet';
+import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
 import {
   Google_Hardware_Attestation_Root_1,
   Google_Hardware_Attestation_Root_2,
-} from './defaultRootCerts/android-key';
-import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple';
-import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds';
+} from './defaultRootCerts/android-key.ts';
+import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
+import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
 
 type RootCertIdentifier = AttestationFormat | 'mds';
 

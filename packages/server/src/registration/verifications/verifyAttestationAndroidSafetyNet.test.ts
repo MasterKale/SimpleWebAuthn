@@ -1,13 +1,13 @@
-import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet';
+import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet.ts';
 
 import {
   decodeAttestationObject,
   AttestationStatement,
-} from '../../helpers/decodeAttestationObject';
-import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData';
-import { toHash } from '../../helpers/toHash';
-import { isoBase64URL } from '../../helpers/iso';
-import { SettingsService } from '../../services/settingsService';
+} from '../../helpers/decodeAttestationObject.ts';
+import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData.ts';
+import { toHash } from '../../helpers/toHash.ts';
+import { isoBase64URL } from '../../helpers/iso/index.ts';
+import { SettingsService } from '../../services/settingsService.ts';
 
 const rootCertificates = SettingsService.getRootCertificates({
   identifier: 'android-safetynet',

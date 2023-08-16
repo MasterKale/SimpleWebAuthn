@@ -1,5 +1,5 @@
-import { decodeAuthenticatorExtensions } from './decodeAuthenticatorExtensions';
-import { isoUint8Array } from './iso';
+import { decodeAuthenticatorExtensions } from './decodeAuthenticatorExtensions.ts';
+import { isoUint8Array } from './iso/index.ts';
 
 test('should decode authenticator extensions', () => {
   const extensions = decodeAuthenticatorExtensions(

@@ -1,8 +1,8 @@
 jest.mock('../helpers/generateChallenge');
 
-import { isoBase64URL } from '../helpers/iso';
+import { isoBase64URL } from '../helpers/iso/index.ts';
 
-import { generateAuthenticationOptions } from './generateAuthenticationOptions';
+import { generateAuthenticationOptions } from './generateAuthenticationOptions.ts';
 
 const challengeString = 'dG90YWxseXJhbmRvbXZhbHVl';
 const challengeBuffer = isoBase64URL.toBuffer(challengeString);

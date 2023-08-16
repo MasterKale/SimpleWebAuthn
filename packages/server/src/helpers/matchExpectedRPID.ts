@@ -1,5 +1,5 @@
-import { toHash } from './toHash';
-import { isoUint8Array } from './iso';
+import { toHash } from './toHash.ts';
+import { isoUint8Array } from './iso/index.ts';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Returns the unhashed RP ID

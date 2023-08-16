@@ -8,26 +8,26 @@ import {
   AttestationFormat,
   AttestationStatement,
   decodeAttestationObject,
-} from '../helpers/decodeAttestationObject';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
-import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
-import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
-import { toHash } from '../helpers/toHash';
-import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEKEYS } from '../helpers/cose';
-import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
-import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import { isoBase64URL } from '../helpers/iso';
-import { SettingsService } from '../services/settingsService';
+} from '../helpers/decodeAttestationObject.ts';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
+import { toHash } from '../helpers/toHash.ts';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
+import { COSEKEYS } from '../helpers/cose.ts';
+import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
+import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
+import { isoBase64URL } from '../helpers/iso/index.ts';
+import { SettingsService } from '../services/settingsService.ts';
 
-import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
-import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F';
-import { verifyAttestationPacked } from './verifications/verifyAttestationPacked';
-import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet';
-import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM';
-import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey';
-import { verifyAttestationApple } from './verifications/verifyAttestationApple';
+import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions.ts';
+import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F.ts';
+import { verifyAttestationPacked } from './verifications/verifyAttestationPacked.ts';
+import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet.ts';
+import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM.ts';
+import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey.ts';
+import { verifyAttestationApple } from './verifications/verifyAttestationApple.ts';
 
 export type VerifyRegistrationResponseOpts = {
   response: RegistrationResponseJSON;

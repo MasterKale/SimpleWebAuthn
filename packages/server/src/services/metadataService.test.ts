@@ -1,8 +1,8 @@
 jest.mock('cross-fetch');
 import fetch from 'cross-fetch';
 
-import { MetadataService, BaseMetadataService } from './metadataService';
-import type { MetadataStatement } from '../metadata/mdsTypes';
+import { MetadataService, BaseMetadataService } from './metadataService.ts';
+import type { MetadataStatement } from '../metadata/mdsTypes.ts';
 
 const _fetch = fetch as unknown as jest.Mock;
 

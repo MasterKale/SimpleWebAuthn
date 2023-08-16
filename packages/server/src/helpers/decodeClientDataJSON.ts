@@ -1,4 +1,4 @@
-import { isoBase64URL } from './iso';
+import { isoBase64URL } from './iso/index.ts';
 
 /**
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON

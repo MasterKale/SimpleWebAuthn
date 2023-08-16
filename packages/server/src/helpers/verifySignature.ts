@@ -1,7 +1,7 @@
-import { COSEALG, COSEPublicKey } from './cose';
-import { isoCrypto } from './iso';
-import { decodeCredentialPublicKey } from './decodeCredentialPublicKey';
-import { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE';
+import { COSEALG, COSEPublicKey } from './cose.ts';
+import { isoCrypto } from './iso/index.ts';
+import { decodeCredentialPublicKey } from './decodeCredentialPublicKey.ts';
+import { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE.ts';
 
 /**
  * Verify an authenticator's signature

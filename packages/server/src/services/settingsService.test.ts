@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-import { SettingsService } from './settingsService';
+import { SettingsService } from './settingsService.ts';
 
-import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet';
-import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple';
+import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
+import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
 
 function pemToBuffer(pem: string): Buffer {
   const trimmed = pem

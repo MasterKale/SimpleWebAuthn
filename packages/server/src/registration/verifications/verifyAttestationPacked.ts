@@ -1,13 +1,13 @@
-import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 
-import { isCOSEAlg } from '../../helpers/cose';
-import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { getCertificateInfo } from '../../helpers/getCertificateInfo';
-import { verifySignature } from '../../helpers/verifySignature';
-import { isoUint8Array } from '../../helpers/iso';
-import { MetadataService } from '../../services/metadataService';
-import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
+import { isCOSEAlg } from '../../helpers/cose.ts';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { getCertificateInfo } from '../../helpers/getCertificateInfo.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { MetadataService } from '../../services/metadataService.ts';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata.ts';
 
 /**
  * Verify an attestation response with fmt 'packed'

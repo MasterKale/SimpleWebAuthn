@@ -1,7 +1,7 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
-import { COSEALG } from '../../cose';
-import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
+import { COSEALG } from '../../cose.ts';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
 
 /**
  * Generate a digest of the provided data.

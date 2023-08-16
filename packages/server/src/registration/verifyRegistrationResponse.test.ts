@@ -1,17 +1,17 @@
 import { RegistrationResponseJSON } from '@simplewebauthn/typescript-types';
 
-import { verifyRegistrationResponse } from './verifyRegistrationResponse';
+import { verifyRegistrationResponse } from './verifyRegistrationResponse.ts';
 
-import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject';
-import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
-import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
-import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
-import { toHash } from '../helpers/toHash';
-import { isoBase64URL, isoUint8Array } from '../helpers/iso';
-import { COSEPublicKey, COSEKEYS } from '../helpers/cose';
-import { SettingsService } from '../services/settingsService';
+import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject.ts';
+import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON.ts';
+import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData.ts';
+import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey.ts';
+import { toHash } from '../helpers/toHash.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+import { COSEPublicKey, COSEKEYS } from '../helpers/cose.ts';
+import { SettingsService } from '../services/settingsService.ts';
 
-import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
+import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F.ts';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -92,7 +92,7 @@ test('should verify Packed (EC2) attestation', async () => {
   expect(verification.registrationInfo?.credentialID).toEqual(
     isoBase64URL.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
-        'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
+      'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
     ),
   );
 });

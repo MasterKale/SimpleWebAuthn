@@ -1,4 +1,4 @@
-import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
+import { verifyRegistrationResponse } from '../verifyRegistrationResponse.ts';
 
 test('should verify Apple attestation', async () => {
   const verification = await verifyRegistrationResponse({

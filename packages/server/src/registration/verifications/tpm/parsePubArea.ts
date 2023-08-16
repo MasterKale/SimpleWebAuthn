@@ -1,5 +1,5 @@
-import { TPM_ALG, TPM_ECC_CURVE } from './constants';
-import { isoUint8Array } from '../../../helpers/iso';
+import { TPM_ALG, TPM_ECC_CURVE } from './constants.ts';
+import { isoUint8Array } from '../../../helpers/iso/index.ts';
 
 /**
  * Break apart a TPM attestation's pubArea buffer

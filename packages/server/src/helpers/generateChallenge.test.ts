@@ -1,4 +1,4 @@
-import { generateChallenge } from './generateChallenge';
+import { generateChallenge } from './generateChallenge.ts';
 
 test('should return a buffer of at least 32 bytes', () => {
   const challenge = generateChallenge();

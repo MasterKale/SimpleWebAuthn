@@ -1,4 +1,4 @@
-import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
+import { verifyRegistrationResponse } from '../verifyRegistrationResponse.ts';
 
 test('should verify (broken) Packed response from Chrome virtual authenticator', async () => {
   /**

@@ -1,5 +1,5 @@
-import { isoCBOR, isoUint8Array } from './iso';
-import { COSEPublicKeyEC2, COSEKEYS } from './cose';
+import { isoCBOR, isoUint8Array } from './iso/index.ts';
+import { COSEPublicKeyEC2, COSEKEYS } from './cose.ts';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key

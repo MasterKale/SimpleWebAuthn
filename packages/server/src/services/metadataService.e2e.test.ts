@@ -1,4 +1,4 @@
-import { BaseMetadataService } from './metadataService';
+import { BaseMetadataService } from './metadataService.ts';
 
 describe('end-to-end MetadataService tests', () => {
   test('should be able to load from FIDO MDS and get statement for YubiKey 5', async () => {

@@ -1,10 +1,10 @@
-import { verifyAuthenticationResponse } from './verifyAuthenticationResponse';
+import { verifyAuthenticationResponse } from './verifyAuthenticationResponse.ts';
 
-import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
-import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
-import { toHash } from '../helpers/toHash';
+import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON.ts';
+import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData.ts';
+import { toHash } from '../helpers/toHash.ts';
 import { AuthenticatorDevice, AuthenticationResponseJSON } from '@simplewebauthn/typescript-types';
-import { isoUint8Array, isoBase64URL } from '../helpers/iso';
+import { isoUint8Array, isoBase64URL } from '../helpers/iso/index.ts';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;

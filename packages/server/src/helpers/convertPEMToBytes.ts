@@ -1,4 +1,4 @@
-import { isoBase64URL } from './iso';
+import { isoBase64URL } from './iso/index.ts';
 
 /**
  * Take a certificate in PEM format and convert it to bytes

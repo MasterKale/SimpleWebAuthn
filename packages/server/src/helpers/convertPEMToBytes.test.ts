@@ -1,6 +1,6 @@
-import { isoBase64URL } from './iso';
+import { isoBase64URL } from './iso/index.ts';
 
-import { convertPEMToBytes } from './convertPEMToBytes';
+import { convertPEMToBytes } from './convertPEMToBytes.ts';
 
 test('should handle malformed cert with leading whitespaces', () => {
   const output = convertPEMToBytes(malformedLeadingWhitespace);

@@ -1,8 +1,8 @@
-import { convertX509PublicKeyToCOSE } from '../helpers/convertX509PublicKeyToCOSE';
-import { isoBase64URL, isoUint8Array } from '../helpers/iso';
-import { COSEALG, COSEKEYS, isCOSEPublicKeyEC2, isCOSEPublicKeyRSA } from '../helpers/cose';
-import { verifyEC2 } from '../helpers/iso/isoCrypto/verifyEC2';
-import { verifyRSA } from '../helpers/iso/isoCrypto/verifyRSA';
+import { convertX509PublicKeyToCOSE } from '../helpers/convertX509PublicKeyToCOSE.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+import { COSEALG, COSEKEYS, isCOSEPublicKeyEC2, isCOSEPublicKeyRSA } from '../helpers/cose.ts';
+import { verifyEC2 } from '../helpers/iso/isoCrypto/verifyEC2.ts';
+import { verifyRSA } from '../helpers/iso/isoCrypto/verifyRSA.ts';
 
 /**
  * Lightweight verification for FIDO MDS JWTs. Supports use of EC2 and RSA.

@@ -2,16 +2,16 @@ import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 import { KeyDescription, id_ce_keyDescription } from '@peculiar/asn1-android';
 
-import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 
-import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { verifySignature } from '../../helpers/verifySignature';
-import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import { isCOSEAlg } from '../../helpers/cose';
-import { isoUint8Array } from '../../helpers/iso';
-import { MetadataService } from '../../services/metadataService';
-import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS.ts';
+import { isCOSEAlg } from '../../helpers/cose.ts';
+import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { MetadataService } from '../../services/metadataService.ts';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata.ts';
 
 /**
  * Verify an attestation response with fmt 'android-key'

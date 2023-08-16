@@ -1,3 +1,3 @@
-export { digest } from './digest';
-export { getRandomValues } from './getRandomValues';
-export { verify } from './verify';
+export { digest } from './digest.ts';
+export { getRandomValues } from './getRandomValues.ts';
+export { verify } from './verify.ts';

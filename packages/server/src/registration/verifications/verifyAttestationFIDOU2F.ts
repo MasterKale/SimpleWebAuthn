@@ -1,11 +1,11 @@
-import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 
-import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { verifySignature } from '../../helpers/verifySignature';
-import { isoUint8Array } from '../../helpers/iso';
-import { COSEALG } from '../../helpers/cose';
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS.ts';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { COSEALG } from '../../helpers/cose.ts';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'

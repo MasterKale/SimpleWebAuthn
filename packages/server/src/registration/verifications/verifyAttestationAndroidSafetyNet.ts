@@ -1,13 +1,13 @@
-import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 
-import { toHash } from '../../helpers/toHash';
-import { verifySignature } from '../../helpers/verifySignature';
-import { getCertificateInfo } from '../../helpers/getCertificateInfo';
-import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { isoUint8Array, isoBase64URL } from '../../helpers/iso';
-import { MetadataService } from '../../services/metadataService';
-import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
+import { toHash } from '../../helpers/toHash.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { getCertificateInfo } from '../../helpers/getCertificateInfo.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { isoUint8Array, isoBase64URL } from '../../helpers/iso/index.ts';
+import { MetadataService } from '../../services/metadataService.ts';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata.ts';
 
 /**
  * Verify an attestation response with fmt 'android-safetynet'

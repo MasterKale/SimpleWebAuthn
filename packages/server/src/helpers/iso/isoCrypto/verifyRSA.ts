@@ -1,10 +1,10 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
-import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose';
-import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
-import { importKey } from './importKey';
-import { isoBase64URL } from '../index';
-import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName';
+import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose.ts';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
+import { importKey } from './importKey.ts';
+import { isoBase64URL } from '../index.ts';
+import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName.ts';
 
 /**
  * Verify a signature using an RSA public key

@@ -1,7 +1,7 @@
-import { isoCBOR } from './iso';
+import { isoCBOR } from './iso/index.ts';
 
-import { convertCOSEtoPKCS } from './convertCOSEtoPKCS';
-import { COSEKEYS } from './cose';
+import { convertCOSEtoPKCS } from './convertCOSEtoPKCS.ts';
+import { COSEKEYS } from './cose.ts';
 
 test('should throw an error curve if, somehow, curve coordinate x is missing', () => {
   const mockCOSEKey = new Map<number, number | Buffer>();

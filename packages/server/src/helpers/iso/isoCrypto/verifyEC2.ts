@@ -1,10 +1,10 @@
 import WebCrypto from '@simplewebauthn/iso-webcrypto';
 
-import { COSEALG, COSECRV, COSEKEYS, COSEPublicKeyEC2 } from '../../cose';
-import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
-import { importKey } from './importKey';
-import { isoBase64URL } from '../index';
-import { SubtleCryptoCrv } from './structs';
+import { COSEALG, COSECRV, COSEKEYS, COSEPublicKeyEC2 } from '../../cose.ts';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
+import { importKey } from './importKey.ts';
+import { isoBase64URL } from '../index.ts';
+import { SubtleCryptoCrv } from './structs.ts';
 
 /**
  * Verify a signature using an EC2 public key

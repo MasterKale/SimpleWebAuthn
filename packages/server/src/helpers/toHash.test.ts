@@ -1,4 +1,4 @@
-import { toHash } from './toHash';
+import { toHash } from './toHash.ts';
 
 test('should return a buffer of at 32 bytes for input string', async () => {
   const hash = await toHash('string');

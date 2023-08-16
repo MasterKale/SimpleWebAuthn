@@ -1,9 +1,9 @@
 import {
   decodeAuthenticatorExtensions,
   AuthenticationExtensionsAuthenticatorOutputs,
-} from './decodeAuthenticatorExtensions';
-import { isoCBOR, isoUint8Array } from './iso';
-import { COSEPublicKey } from './cose';
+} from './decodeAuthenticatorExtensions.ts';
+import { isoCBOR, isoUint8Array } from './iso/index.ts';
+import { COSEPublicKey } from './cose.ts';
 
 /**
  * Make sense of the authData buffer contained in an Attestation

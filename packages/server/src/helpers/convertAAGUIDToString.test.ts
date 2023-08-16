@@ -1,4 +1,4 @@
-import { convertAAGUIDToString } from './convertAAGUIDToString';
+import { convertAAGUIDToString } from './convertAAGUIDToString.ts';
 
 test('should convert buffer to UUID string', () => {
   const uuid = convertAAGUIDToString(Buffer.from('adce000235bcc60a648b0b25f1f05503', 'hex'));

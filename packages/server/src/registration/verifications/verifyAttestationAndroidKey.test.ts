@@ -1,7 +1,7 @@
-import { SettingsService } from '../../services/settingsService';
-import { isoBase64URL } from '../../helpers/iso';
+import { SettingsService } from '../../services/settingsService.ts';
+import { isoBase64URL } from '../../helpers/iso/index.ts';
 
-import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
+import { verifyRegistrationResponse } from '../verifyRegistrationResponse.ts';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
