@@ -1,5 +1,9 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
+  "deno.path": "/opt/homebrew/bin/deno",
+  "deno.enablePaths": [
+    "./packages/server",
+  ],
   "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
