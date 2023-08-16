@@ -108,6 +108,7 @@ export enum COSECRV {
   P384 = 2,
   P521 = 3,
   ED25519 = 6,
+  SECP256K1 = 8,
 }
 
 export function isCOSECrv(crv: number | undefined): crv is COSECRV {
