@@ -23,10 +23,10 @@ export { default as WebCrypto } from '../../iso-webcrypto/src/browser.ts';
 export * as cborx from 'https://deno.land/x/cbor@v1.5.2/index.js';
 
 // NPM: cross-fetch
-export { default as fetch } from 'npm:cross-fetch';
+export { default as fetch } from 'npm:cross-fetch@^3.1.5';
 
 // NPM: debug
-export { default as debug, Debugger } from 'npm:debug';
+export { default as debug, Debugger } from 'npm:debug@^4.3.2';
 
 // NPM: @peculiar libraries
 export { AsnParser, AsnSerializer } from 'npm:@peculiar/asn1-schema@^2.3.3';
