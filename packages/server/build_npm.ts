@@ -1,6 +1,7 @@
 import { build, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
 
 const outDir = './npm';
+const lernaPackageJSON: { version: string } = JSON.parse(await Deno.readTextFile('./package.json'));
 
 await emptyDir(outDir);
 
@@ -19,8 +20,7 @@ await build({
   // package.json values
   package: {
     name: '@simplewebauthn/server',
-    // version: Deno.args[0],
-    version: '7.4.0',
+    version: lernaPackageJSON.version,
     description: 'SimpleWebAuthn for Servers',
     license: 'MIT',
     author: 'Matthew Miller <matthew@millerti.me>',
