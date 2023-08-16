@@ -6,8 +6,8 @@ await emptyDir(outDir);
 
 await build({
   entryPoints: [
-    './src/index.ts',
-    { name: 'helpers', path: './src/helpers/index.ts' },
+    { name: '.', path: './src/index.ts' },
+    { name: './helpers', path: './src/helpers/index.ts' },
   ],
   outDir,
   shims: {
