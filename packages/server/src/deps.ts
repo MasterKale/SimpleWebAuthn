@@ -1,19 +1,19 @@
 // @simplewebauthn/typescript-types
 export type {
+  AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
-  PublicKeyCredentialRequestOptionsJSON,
-  PublicKeyCredentialDescriptorFuture,
-  UserVerificationRequirement,
   AuthenticationResponseJSON,
   AuthenticatorDevice,
-  CredentialDeviceType,
-  Base64URLString,
-  AttestationConveyancePreference,
   AuthenticatorSelectionCriteria,
+  Base64URLString,
   COSEAlgorithmIdentifier,
+  CredentialDeviceType,
   PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
+  PublicKeyCredentialRequestOptionsJSON,
   RegistrationResponseJSON,
+  UserVerificationRequirement,
 } from '../../typescript-types/src/index.ts';
 
 // @simplewebauthn/iso-webcrypto
@@ -56,4 +56,4 @@ export {
   id_secp384r1,
 } from 'npm:@peculiar/asn1-ecc@^2.3.4';
 export { RSAPublicKey } from 'npm:@peculiar/asn1-rsa@^2.3.4';
-export { KeyDescription, id_ce_keyDescription } from 'npm:@peculiar/asn1-android@^2.3.3';
+export { id_ce_keyDescription, KeyDescription } from 'npm:@peculiar/asn1-android@^2.3.3';

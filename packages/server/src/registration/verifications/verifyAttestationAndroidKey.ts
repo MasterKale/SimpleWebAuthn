@@ -1,4 +1,4 @@
-import { AsnParser, Certificate, KeyDescription, id_ce_keyDescription } from '../../deps.ts';
+import { AsnParser, Certificate, id_ce_keyDescription, KeyDescription } from '../../deps.ts';
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
@@ -53,7 +53,7 @@ export async function verifyAttestationAndroidKey(
 
   // Find Android KeyStore Extension in certificate extensions
   const extKeyStore = parsedCert.tbsCertificate.extensions?.find(
-    ext => ext.extnID === id_ce_keyDescription,
+    (ext) => ext.extnID === id_ce_keyDescription,
   );
 
   if (!extKeyStore) {

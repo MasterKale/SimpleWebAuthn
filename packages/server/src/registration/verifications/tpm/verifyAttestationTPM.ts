@@ -1,20 +1,20 @@
 import {
   AsnParser,
   Certificate,
-  id_ce_subjectAltName,
-  SubjectAlternativeName,
-  id_ce_extKeyUsage,
   ExtendedKeyUsage,
+  id_ce_extKeyUsage,
+  id_ce_subjectAltName,
   Name,
+  SubjectAlternativeName,
 } from '../../../deps.ts';
 import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse.ts';
 import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey.ts';
 import {
+  COSEALG,
   COSEKEYS,
   isCOSEAlg,
-  isCOSEPublicKeyRSA,
   isCOSEPublicKeyEC2,
-  COSEALG,
+  isCOSEPublicKeyRSA,
 } from '../../../helpers/cose.ts';
 import { toHash } from '../../../helpers/toHash.ts';
 import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM.ts';
@@ -25,7 +25,7 @@ import { isoUint8Array } from '../../../helpers/iso/index.ts';
 import { MetadataService } from '../../../services/metadataService.ts';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata.ts';
 
-import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants.ts';
+import { TPM_ECC_CURVE_COSE_CRV_MAP, TPM_MANUFACTURERS } from './constants.ts';
 import { parseCertInfo } from './parseCertInfo.ts';
 import { parsePubArea } from './parsePubArea.ts';
 
@@ -82,9 +82,11 @@ export async function verifyAttestationTPM(
   if (pubType === 'TPM_ALG_RSA') {
     if (!isCOSEPublicKeyRSA(cosePublicKey)) {
       throw new Error(
-        `Credential public key with kty ${cosePublicKey.get(
-          COSEKEYS.kty,
-        )} did not match ${pubType}`,
+        `Credential public key with kty ${
+          cosePublicKey.get(
+            COSEKEYS.kty,
+          )
+        } did not match ${pubType}`,
       );
     }
 
@@ -119,9 +121,11 @@ export async function verifyAttestationTPM(
   } else if (pubType === 'TPM_ALG_ECC') {
     if (!isCOSEPublicKeyEC2(cosePublicKey)) {
       throw new Error(
-        `Credential public key with kty ${cosePublicKey.get(
-          COSEKEYS.kty,
-        )} did not match ${pubType}`,
+        `Credential public key with kty ${
+          cosePublicKey.get(
+            COSEKEYS.kty,
+          )
+        } did not match ${pubType}`,
       );
     }
 
@@ -239,7 +243,7 @@ export async function verifyAttestationTPM(
 
   let subjectAltNamePresent: SubjectAlternativeName | undefined;
   let extKeyUsage: ExtendedKeyUsage | undefined;
-  parsedCert.tbsCertificate.extensions.forEach(ext => {
+  parsedCert.tbsCertificate.extensions.forEach((ext) => {
     if (ext.extnID === id_ce_subjectAltName) {
       subjectAltNamePresent = AsnParser.parse(ext.extnValue, SubjectAlternativeName);
     } else if (ext.extnID === id_ce_extKeyUsage) {
@@ -362,8 +366,8 @@ function getTcgAtTpmValues(root: Name): {
    *
    * Both structures have been seen in the wild and need to be supported
    */
-  root.forEach(relName => {
-    relName.forEach(attr => {
+  root.forEach((relName) => {
+    relName.forEach((attr) => {
       if (attr.type === oidManufacturer) {
         tcgAtTpmManufacturer = attr.value.toString();
       } else if (attr.type === oidModel) {

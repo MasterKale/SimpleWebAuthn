@@ -1,4 +1,4 @@
-import { TPM_ST, TPM_ALG } from './constants.ts';
+import { TPM_ALG, TPM_ST } from './constants.ts';
 import { isoUint8Array } from '../../../helpers/iso/index.ts';
 
 /**
@@ -20,36 +20,36 @@ export function parseCertInfo(certInfo: Uint8Array): ParsedCertInfo {
   // The name of a parent entity, can be ignored
   const qualifiedSignerLength = dataView.getUint16(pointer);
   pointer += 2;
-  const qualifiedSigner = certInfo.slice(pointer, (pointer += qualifiedSignerLength));
+  const qualifiedSigner = certInfo.slice(pointer, pointer += qualifiedSignerLength);
 
   // Get the expected hash of `attsToBeSigned`
   const extraDataLength = dataView.getUint16(pointer);
   pointer += 2;
-  const extraData = certInfo.slice(pointer, (pointer += extraDataLength));
+  const extraData = certInfo.slice(pointer, pointer += extraDataLength);
 
   // Information about the TPM device's internal clock, can be ignored
-  const clock = certInfo.slice(pointer, (pointer += 8));
+  const clock = certInfo.slice(pointer, pointer += 8);
   const resetCount = dataView.getUint32(pointer);
   pointer += 4;
   const restartCount = dataView.getUint32(pointer);
   pointer += 4;
-  const safe = !!certInfo.slice(pointer, (pointer += 1));
+  const safe = !!certInfo.slice(pointer, pointer += 1);
 
   const clockInfo = { clock, resetCount, restartCount, safe };
 
   // TPM device firmware version
-  const firmwareVersion = certInfo.slice(pointer, (pointer += 8));
+  const firmwareVersion = certInfo.slice(pointer, pointer += 8);
 
   // Attested Name
   const attestedNameLength = dataView.getUint16(pointer);
   pointer += 2;
-  const attestedName = certInfo.slice(pointer, (pointer += attestedNameLength));
+  const attestedName = certInfo.slice(pointer, pointer += attestedNameLength);
   const attestedNameDataView = isoUint8Array.toDataView(attestedName);
 
   // Attested qualified name, can be ignored
   const qualifiedNameLength = dataView.getUint16(pointer);
   pointer += 2;
-  const qualifiedName = certInfo.slice(pointer, (pointer += qualifiedNameLength));
+  const qualifiedName = certInfo.slice(pointer, pointer += qualifiedNameLength);
 
   const attested = {
     nameAlg: TPM_ALG[attestedNameDataView.getUint16(0)],

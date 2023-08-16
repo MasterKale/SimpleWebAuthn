@@ -1,7 +1,7 @@
 import type {
   AuthenticationExtensionsClientInputs,
-  PublicKeyCredentialRequestOptionsJSON,
   PublicKeyCredentialDescriptorFuture,
+  PublicKeyCredentialRequestOptionsJSON,
   UserVerificationRequirement,
 } from '../deps.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
@@ -51,7 +51,7 @@ export function generateAuthenticationOptions(
 
   return {
     challenge: isoBase64URL.fromBuffer(_challenge),
-    allowCredentials: allowCredentials?.map(cred => ({
+    allowCredentials: allowCredentials?.map((cred) => ({
       ...cred,
       id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),

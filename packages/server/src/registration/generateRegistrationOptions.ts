@@ -115,7 +115,7 @@ export function generateRegistrationOptions(
   /**
    * Prepare pubKeyCredParams from the array of algorithm ID's
    */
-  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs.map(id => ({
+  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs.map((id) => ({
     alg: id,
     type: 'public-key',
   }));
@@ -174,7 +174,7 @@ export function generateRegistrationOptions(
     pubKeyCredParams,
     timeout,
     attestation: attestationType,
-    excludeCredentials: excludeCredentials.map(cred => ({
+    excludeCredentials: excludeCredentials.map((cred) => ({
       ...cred,
       id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),

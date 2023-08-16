@@ -5,8 +5,8 @@ import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import type {
   MDSJWTHeader,
   MDSJWTPayload,
-  MetadataStatement,
   MetadataBLOBPayloadEntry,
+  MetadataStatement,
 } from '../metadata/mdsTypes.ts';
 import { SettingsService } from '../services/settingsService.ts';
 import { getLogger } from '../helpers/logging.ts';
@@ -81,7 +81,7 @@ export class BaseMetadataService {
     if (statements?.length) {
       let statementsAdded = 0;
 
-      statements.forEach(statement => {
+      statements.forEach((statement) => {
         // Only cache statements that are for FIDO2-compatible authenticators
         if (statement.aaguid) {
           this.statementCache[statement.aaguid] = {
@@ -270,7 +270,9 @@ export class BaseMetadataService {
    */
   private pauseUntilReady(): Promise<void> {
     if (this.state === SERVICE_STATE.READY) {
-      return new Promise((resolve) => { resolve(); });
+      return new Promise((resolve) => {
+        resolve();
+      });
     }
 
     // State isn't ready, so set up polling

@@ -10,12 +10,12 @@ import { MetadataService } from './services/metadataService.ts';
 import { SettingsService } from './services/settingsService.ts';
 
 export {
-  generateRegistrationOptions,
-  verifyRegistrationResponse,
   generateAuthenticationOptions as generateAuthenticationOptions,
-  verifyAuthenticationResponse,
+  generateRegistrationOptions,
   MetadataService,
   SettingsService,
+  verifyAuthenticationResponse,
+  verifyRegistrationResponse,
 };
 
 import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions.ts';
@@ -31,11 +31,11 @@ import type {
 } from './authentication/verifyAuthenticationResponse.ts';
 
 export type {
-  GenerateRegistrationOptionsOpts,
   GenerateAuthenticationOptionsOpts,
+  GenerateRegistrationOptionsOpts,
   MetadataStatement,
-  VerifyRegistrationResponseOpts,
-  VerifyAuthenticationResponseOpts,
-  VerifiedRegistrationResponse,
   VerifiedAuthenticationResponse,
+  VerifiedRegistrationResponse,
+  VerifyAuthenticationResponseOpts,
+  VerifyRegistrationResponseOpts,
 };

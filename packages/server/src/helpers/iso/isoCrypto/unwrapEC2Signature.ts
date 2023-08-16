@@ -1,4 +1,4 @@
-import { ECDSASigValue, AsnParser } from '../../../deps.ts';
+import { AsnParser, ECDSASigValue } from '../../../deps.ts';
 import { isoUint8Array } from '../index.ts';
 
 /**

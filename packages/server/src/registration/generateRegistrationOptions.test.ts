@@ -48,7 +48,7 @@ test('should generate credential request options suitable for sending via JSON',
     },
     extensions: {
       credProps: true,
-    }
+    },
   });
 });
 

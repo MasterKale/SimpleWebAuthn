@@ -11,28 +11,28 @@ import { parseAuthenticatorData } from './parseAuthenticatorData.ts';
 import { toHash } from './toHash.ts';
 import { validateCertificatePath } from './validateCertificatePath.ts';
 import { verifySignature } from './verifySignature.ts';
-import { isoCBOR, isoBase64URL, isoUint8Array, isoCrypto } from './iso/index.ts';
+import { isoBase64URL, isoCBOR, isoCrypto, isoUint8Array } from './iso/index.ts';
 import * as cose from './cose.ts';
 
 export {
   convertAAGUIDToString,
   convertCertBufferToPEM,
   convertCOSEtoPKCS,
+  cose,
   decodeAttestationObject,
   decodeClientDataJSON,
   decodeCredentialPublicKey,
   generateChallenge,
   getCertificateInfo,
   isCertRevoked,
+  isoBase64URL,
+  isoCBOR,
+  isoCrypto,
+  isoUint8Array,
   parseAuthenticatorData,
   toHash,
   validateCertificatePath,
   verifySignature,
-  isoCBOR,
-  isoCrypto,
-  isoBase64URL,
-  isoUint8Array,
-  cose,
 };
 
 import type {

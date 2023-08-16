@@ -11,7 +11,7 @@ import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
 import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
 import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
-import { isoUint8Array, isoBase64URL } from '../helpers/iso/index.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
 export type VerifyAuthenticationResponseOpts = {
   response: AuthenticationResponseJSON;

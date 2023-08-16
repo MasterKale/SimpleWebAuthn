@@ -2,16 +2,16 @@ import {
   AsnParser,
   Certificate,
   ECParameters,
-  RSAPublicKey,
   id_ecPublicKey,
   id_secp256r1,
   id_secp384r1,
+  RSAPublicKey,
 } from '../deps.ts';
 import {
-  COSEPublicKey,
-  COSEKTY,
   COSECRV,
   COSEKEYS,
+  COSEKTY,
+  COSEPublicKey,
   COSEPublicKeyEC2,
   COSEPublicKeyRSA,
 } from './cose.ts';
@@ -63,7 +63,7 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
       // Public key is in "uncompressed form", so we can split the remaining bytes in half
       let pointer = 1;
       const halfLength = (subjectPublicKey.length - 1) / 2;
-      x = subjectPublicKey.slice(pointer, (pointer += halfLength));
+      x = subjectPublicKey.slice(pointer, pointer += halfLength);
       y = subjectPublicKey.slice(pointer);
     } else {
       throw new Error('TODO: Figure out how to handle public keys in "compressed form"');

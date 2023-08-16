@@ -1,7 +1,7 @@
 import type {
-  RegistrationResponseJSON,
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
+  RegistrationResponseJSON,
 } from '../deps.ts';
 import {
   AttestationFormat,
@@ -106,9 +106,11 @@ export async function verifyRegistrationResponse(
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
       throw new Error(
-        `Unexpected registration response origin "${origin}", expected one of: ${expectedOrigin.join(
-          ', ',
-        )}`,
+        `Unexpected registration response origin "${origin}", expected one of: ${
+          expectedOrigin.join(
+            ', ',
+          )
+        }`,
       );
     }
   } else {

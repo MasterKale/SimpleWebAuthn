@@ -36,7 +36,7 @@ export async function verifyAttestationApple(
     throw new Error('credCert missing extensions (Apple)');
   }
 
-  const extCertNonce = extensions.find(ext => ext.extnID === '1.2.840.113635.100.8.2');
+  const extCertNonce = extensions.find((ext) => ext.extnID === '1.2.840.113635.100.8.2');
 
   if (!extCertNonce) {
     throw new Error('credCert missing "1.2.840.113635.100.8.2" extension (Apple)');

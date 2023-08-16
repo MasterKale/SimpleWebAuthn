@@ -32,7 +32,7 @@ export function verifyJWT(jwt: string, leafCert: Uint8Array): Promise<boolean> {
       data,
       signature: signatureBytes,
       cosePublicKey: certCOSE,
-    })
+    });
   }
 
   const kty = certCOSE.get(COSEKEYS.kty);

@@ -1,4 +1,4 @@
-import base64 from "https://deno.land/x/b64@1.1.27/src/base64.js";
+import base64 from 'https://deno.land/x/b64@1.1.27/src/base64.js';
 
 /**
  * Decode from a Base64URL-encoded string to an ArrayBuffer. Best used when converting a

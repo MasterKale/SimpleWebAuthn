@@ -3,8 +3,8 @@ import { verifyAuthenticationResponse } from './verifyAuthenticationResponse.ts'
 import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON.ts';
 import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';
-import { AuthenticatorDevice, AuthenticationResponseJSON } from '@simplewebauthn/typescript-types';
-import { isoUint8Array, isoBase64URL } from '../helpers/iso/index.ts';
+import { AuthenticationResponseJSON, AuthenticatorDevice } from '@simplewebauthn/typescript-types';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
 let mockDecodeClientData: jest.SpyInstance;
 let mockParseAuthData: jest.SpyInstance;
@@ -270,7 +270,8 @@ test('should throw an error if RP ID not in list of possible RP IDs', async () =
 test('should pass verification if custom challenge verifier returns true', async () => {
   const verification = await verifyAuthenticationResponse({
     response: {
-      id: 'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
+      id:
+        'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
       rawId:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
       response: {
@@ -310,7 +311,7 @@ test('should fail verification if custom challenge verifier returns false', asyn
   await expect(
     verifyAuthenticationResponse({
       response: assertionResponse,
-      expectedChallenge: challenge => challenge === 'willNeverMatch',
+      expectedChallenge: (challenge) => challenge === 'willNeverMatch',
       expectedOrigin: assertionOrigin,
       expectedRPID: 'dev.dontneeda.pw',
       authenticator: authenticator,
@@ -387,12 +388,10 @@ const assertionResponse: AuthenticationResponseJSON = {
   rawId: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   response: {
     authenticatorData: 'PdxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KABAAAAkA==',
-    clientDataJSON:
-      'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sVWFXMWwiLCJj' +
+    clientDataJSON: 'eyJjaGFsbGVuZ2UiOiJkRzkwWVd4c2VWVnVhWEYxWlZaaGJIVmxSWFpsY25sVWFXMWwiLCJj' +
       'bGllbnRFeHRlbnNpb25zIjp7fSwiaGFzaEFsZ29yaXRobSI6IlNIQS0yNTYiLCJvcmlnaW4iOiJodHRwczovL2Rldi5k' +
       'b250bmVlZGEucHciLCJ0eXBlIjoid2ViYXV0aG4uZ2V0In0=',
-    signature:
-      'MEUCIQDYXBOpCWSWq2Ll4558GJKD2RoWg958lvJSB_GdeokxogIgWuEVQ7ee6AswQY0OsuQ6y8Ks6' +
+    signature: 'MEUCIQDYXBOpCWSWq2Ll4558GJKD2RoWg958lvJSB_GdeokxogIgWuEVQ7ee6AswQY0OsuQ6y8Ks6' +
       'jhd45bDx92wjXKs900=',
   },
   clientExtensionResults: {},

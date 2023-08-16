@@ -1,8 +1,8 @@
 import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet.ts';
 
 import {
-  decodeAttestationObject,
   AttestationStatement,
+  decodeAttestationObject,
 } from '../../helpers/decodeAttestationObject.ts';
 import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../../helpers/toHash.ts';
@@ -119,8 +119,7 @@ const attestationAndroidSafetyNet = {
   id: 'AQy9gSmVYQXGuzd492rA2qEqwN7SYE_xOCjduU4QVagRwnX30mbfW75Lu4TwXHe-gc1O2PnJF7JVJA9dyJm83Xs',
   rawId: 'AQy9gSmVYQXGuzd492rA2qEqwN7SYE_xOCjduU4QVagRwnX30mbfW75Lu4TwXHe-gc1O2PnJF7JVJA9dyJm83Xs',
   response: {
-    attestationObject:
-      'o2NmbXRxYW5kcm9pZC1zYWZldHluZXRnYXR0U3RtdKJjdmVyaDE3MTIyMDM3aHJlc' +
+    attestationObject: 'o2NmbXRxYW5kcm9pZC1zYWZldHluZXRnYXR0U3RtdKJjdmVyaDE3MTIyMDM3aHJlc' +
       '3BvbnNlWRS9ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbmcxWXlJNld5Sk5TVWxHYTJwRFEwSkljV2RCZDBsQ1FXZEpVV' +
       'kpZY205T01GcFBaRkpyUWtGQlFVRkJRVkIxYm5wQlRrSm5hM0ZvYTJsSE9YY3dRa0ZSYzBaQlJFSkRUVkZ6ZDBOU' +
       'ldVUldVVkZIUlhkS1ZsVjZSV1ZOUW5kSFFURlZSVU5vVFZaU01qbDJXako0YkVsR1VubGtXRTR3U1VaT2JHTnVXb' +
@@ -205,8 +204,7 @@ const attestationAndroidSafetyNet = {
       'yKa_0ZbCmVrGvuaivigRQAAAAC5P9lh8uZGL7EiggAiR954AEEBDL2BKZVhBca7N3j3asDaoSrA3tJgT_E4KN25T' +
       'hBVqBHCdffSZt9bvku7hPBcd76BzU7Y-ckXslUkD13Imbzde6UBAgMmIAEhWCCT4hId3ByJ_agRyznv1xIazx2nl' +
       'VEGyvN7intoZr7C2CJYIKo3XB-cca9aUOLC-xhp3GfhyfTS0hjws5zL_bT_N1AL',
-    clientDataJSON:
-      'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWDNaV1VHOUZOREpF' +
+    clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWDNaV1VHOUZOREpF' +
       'YUMxM2F6Tmlka2h0WVd0MGFWWjJSVmxETFV4M1FsZyIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
       'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0',
   },

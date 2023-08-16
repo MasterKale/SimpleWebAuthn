@@ -5,7 +5,7 @@ import { verifySignature } from '../../helpers/verifySignature.ts';
 import { getCertificateInfo } from '../../helpers/getCertificateInfo.ts';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
-import { isoUint8Array, isoBase64URL } from '../../helpers/iso/index.ts';
+import { isoBase64URL, isoUint8Array } from '../../helpers/iso/index.ts';
 import { MetadataService } from '../../services/metadataService.ts';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata.ts';
 

@@ -1,5 +1,5 @@
 import type { Base64URLString } from '../deps.ts';
-import type { MetadataStatement, AlgSign } from '../metadata/mdsTypes.ts';
+import type { AlgSign, MetadataStatement } from '../metadata/mdsTypes.ts';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
 import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
@@ -24,7 +24,7 @@ export async function verifyAttestationWithMetadata({
 
   // Make sure the alg in the attestation statement matches one of the ones specified in metadata
   const keypairCOSEAlgs: Set<COSEInfo> = new Set();
-  authenticationAlgorithms.forEach(algSign => {
+  authenticationAlgorithms.forEach((algSign) => {
     // Map algSign string to { kty, alg, crv }
     const algSignCOSEINFO = algSignToCOSEInfoMap[algSign];
 
@@ -100,7 +100,7 @@ export async function verifyAttestationWithMetadata({
      * ```
      */
     const debugMDSAlgs = authenticationAlgorithms.map(
-      algSign => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`,
+      (algSign) => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`,
     );
     const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, '');
 
@@ -118,7 +118,7 @@ export async function verifyAttestationWithMetadata({
    * Confirm the attestation statement's algorithm is one supported according to metadata
    */
   if (attestationStatementAlg !== undefined && authenticatorGetInfo?.algorithms !== undefined) {
-    const getInfoAlgs = authenticatorGetInfo.algorithms.map(_alg => _alg.alg);
+    const getInfoAlgs = authenticatorGetInfo.algorithms.map((_alg) => _alg.alg);
     if (getInfoAlgs.indexOf(attestationStatementAlg) < 0) {
       throw new Error(
         `Attestation statement alg ${attestationStatementAlg} did not match one of ${getInfoAlgs}`,

@@ -1,6 +1,6 @@
 import {
-  decodeAuthenticatorExtensions,
   AuthenticationExtensionsAuthenticatorOutputs,
+  decodeAuthenticatorExtensions,
 } from './decodeAuthenticatorExtensions.ts';
 import { isoCBOR, isoUint8Array } from './iso/index.ts';
 import { COSEPublicKey } from './cose.ts';
@@ -18,9 +18,9 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
   let pointer = 0;
   const dataView = isoUint8Array.toDataView(authData);
 
-  const rpIdHash = authData.slice(pointer, (pointer += 32));
+  const rpIdHash = authData.slice(pointer, pointer += 32);
 
-  const flagsBuf = authData.slice(pointer, (pointer += 1));
+  const flagsBuf = authData.slice(pointer, pointer += 1);
   const flagsInt = flagsBuf[0];
 
   // Bit positions can be referenced here:
@@ -44,12 +44,12 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
   let credentialPublicKey: Uint8Array | undefined = undefined;
 
   if (flags.at) {
-    aaguid = authData.slice(pointer, (pointer += 16));
+    aaguid = authData.slice(pointer, pointer += 16);
 
     const credIDLen = dataView.getUint16(pointer);
     pointer += 2;
 
-    credentialID = authData.slice(pointer, (pointer += credIDLen));
+    credentialID = authData.slice(pointer, pointer += credIDLen);
 
     // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
     const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(authData.slice(pointer));

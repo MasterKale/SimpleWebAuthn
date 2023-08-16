@@ -13,9 +13,9 @@ export async function matchExpectedRPID(
 ): Promise<string> {
   try {
     const matchedRPID = await Promise.any<string>(
-      expectedRPIDs.map(expected => {
+      expectedRPIDs.map((expected) => {
         return new Promise((resolve, reject) => {
-          toHash(isoUint8Array.fromASCIIString(expected)).then(expectedRPIDHash => {
+          toHash(isoUint8Array.fromASCIIString(expected)).then((expectedRPIDHash) => {
             if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
               resolve(expected);
             } else {

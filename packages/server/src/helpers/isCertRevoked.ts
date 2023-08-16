@@ -1,14 +1,14 @@
 import {
-  fetch,
   AsnParser,
-  CertificateList,
-  Certificate,
   AuthorityKeyIdentifier,
-  id_ce_authorityKeyIdentifier,
-  SubjectKeyIdentifier,
-  id_ce_subjectKeyIdentifier,
-  id_ce_cRLDistributionPoints,
+  Certificate,
+  CertificateList,
   CRLDistributionPoints,
+  fetch,
+  id_ce_authorityKeyIdentifier,
+  id_ce_cRLDistributionPoints,
+  id_ce_subjectKeyIdentifier,
+  SubjectKeyIdentifier,
 } from '../deps.ts';
 import { isoUint8Array } from './iso/index.ts';
 
@@ -40,7 +40,7 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
   let extSubjectKeyID: SubjectKeyIdentifier | undefined;
   let extCRLDistributionPoints: CRLDistributionPoints | undefined;
 
-  extensions.forEach(ext => {
+  extensions.forEach((ext) => {
     if (ext.extnID === id_ce_authorityKeyIdentifier) {
       extAuthorityKeyID = AsnParser.parse(ext.extnValue, AuthorityKeyIdentifier);
     } else if (ext.extnID === id_ce_subjectKeyIdentifier) {

@@ -38,7 +38,7 @@ export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
   // Slice out the authPolicy of dynamic length
   const authPolicyLength = dataView.getUint16(pointer);
   pointer += 2;
-  const authPolicy = pubArea.slice(pointer, (pointer += authPolicyLength));
+  const authPolicy = pubArea.slice(pointer, pointer += authPolicyLength);
 
   // Extract additional curve params according to type
   const parameters: { rsa?: RSAParameters; ecc?: ECCParameters } = {};
@@ -67,7 +67,7 @@ export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
     const uniqueLength = dataView.getUint16(pointer);
     pointer += 2;
 
-    unique = pubArea.slice(pointer, (pointer += uniqueLength));
+    unique = pubArea.slice(pointer, pointer += uniqueLength);
   } else if (type === 'TPM_ALG_ECC') {
     const symmetric = TPM_ALG[dataView.getUint16(pointer)];
     pointer += 2;
@@ -91,13 +91,13 @@ export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
     const uniqueXLength = dataView.getUint16(pointer);
     pointer += 2;
 
-    const uniqueX = pubArea.slice(pointer, (pointer += uniqueXLength));
+    const uniqueX = pubArea.slice(pointer, pointer += uniqueXLength);
 
     // Retrieve Y
     const uniqueYLength = dataView.getUint16(pointer);
     pointer += 2;
 
-    const uniqueY = pubArea.slice(pointer, (pointer += uniqueYLength));
+    const uniqueY = pubArea.slice(pointer, pointer += uniqueYLength);
 
     unique = isoUint8Array.concat([uniqueX, uniqueY]);
   } else {
