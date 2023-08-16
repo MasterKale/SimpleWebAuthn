@@ -58,7 +58,11 @@ await build({
       name: '@hexagon/base64',
       version: '^1.1.25'
     }
-  }
+  },
+  // TypeScript tsconfig.json config
+  compilerOptions: {
+    lib: ["ES2021"],
+  },
 });
 
 // Deno.copyFileSync('LICENSE', 'npm/LICENSE');
