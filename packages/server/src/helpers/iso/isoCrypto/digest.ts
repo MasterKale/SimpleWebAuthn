@@ -1,5 +1,4 @@
-import WebCrypto from '@simplewebauthn/iso-webcrypto';
-
+import { WebCrypto } from '../../../deps.ts';
 import { COSEALG } from '../../cose.ts';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
 

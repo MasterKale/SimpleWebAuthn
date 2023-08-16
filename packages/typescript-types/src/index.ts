@@ -20,7 +20,7 @@ import type {
   PublicKeyCredentialRpEntity,
   PublicKeyCredentialType,
   UserVerificationRequirement,
-} from './dom';
+} from './dom.ts';
 
 export type {
   AttestationConveyancePreference,
@@ -39,7 +39,7 @@ export type {
   PublicKeyCredentialRequestOptions,
   PublicKeyCredentialUserEntity,
   UserVerificationRequirement,
-} from './dom';
+} from './dom.ts';
 
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to

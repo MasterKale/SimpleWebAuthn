@@ -1,4 +1,4 @@
-import WebCrypto from '@simplewebauthn/iso-webcrypto';
+import { WebCrypto } from '../../../deps.ts';
 
 export function importKey(opts: {
   keyData: JsonWebKey;

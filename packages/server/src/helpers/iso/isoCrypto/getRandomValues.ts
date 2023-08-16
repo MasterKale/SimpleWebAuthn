@@ -1,4 +1,4 @@
-import WebCrypto from '@simplewebauthn/iso-webcrypto';
+import { WebCrypto } from '../../../deps.ts';
 
 /**
  * Fill up the provided bytes array with random bytes equal to its length.

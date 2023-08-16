@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import { fetch } from '../deps.ts';
 import { AsnParser } from '@peculiar/asn1-schema';
 import {
   CertificateList,

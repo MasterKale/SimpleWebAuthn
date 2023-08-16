@@ -1,5 +1,4 @@
-import WebCrypto from '@simplewebauthn/iso-webcrypto';
-
+import { WebCrypto } from '../../../deps.ts';
 import { COSEPublicKeyOKP, COSEKEYS, isCOSEAlg, COSECRV } from '../../cose.ts';
 import { isoBase64URL } from '../../index.ts';
 import { SubtleCryptoCrv } from './structs.ts';

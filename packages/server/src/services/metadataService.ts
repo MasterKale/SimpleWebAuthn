@@ -1,5 +1,4 @@
-import fetch from 'cross-fetch';
-
+import { fetch } from '../deps.ts';
 import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
