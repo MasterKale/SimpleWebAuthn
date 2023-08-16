@@ -26,7 +26,8 @@ export * as cborx from 'https://deno.land/x/cbor@v1.5.2/index.js';
 export { default as fetch } from 'npm:cross-fetch@^3.1.5';
 
 // NPM: debug
-export { default as debug, Debugger } from 'npm:debug@^4.3.2';
+export { default as debug } from 'npm:debug@^4.3.2';
+export type { Debugger } from 'npm:@types/debug@^4.1.7';
 
 // NPM: @peculiar libraries
 export { AsnParser, AsnSerializer } from 'npm:@peculiar/asn1-schema@^2.3.3';
