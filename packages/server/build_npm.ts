@@ -11,7 +11,7 @@ await build({
   ],
   outDir,
   shims: {
-    deno: "dev",
+    deno: 'dev',
   },
   test: false,
   // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
@@ -44,14 +44,14 @@ await build({
       'node',
     ],
     typesVersions: {
-      "*": {
-        ".": [
-          "esm/index.d.ts"
+      '*': {
+        '.': [
+          'esm/index.d.ts',
         ],
-        "helpers": [
-          "esm/helpers/index.d.ts"
-        ]
-      }
+        'helpers': [
+          'esm/helpers/index.d.ts',
+        ],
+      },
     },
   },
   // Map from Deno package to NPM package for Node build
@@ -67,7 +67,7 @@ await build({
   },
   // TypeScript tsconfig.json config
   compilerOptions: {
-    lib: ["ES2021"],
+    lib: ['ES2021'],
   },
 });
 
