@@ -4,25 +4,42 @@
  */
 
 import type {
-  AuthenticatorAssertionResponse,
-  AuthenticatorAttestationResponse,
-  PublicKeyCredential,
-  PublicKeyCredentialDescriptor,
+  AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
+  AuthenticatorAssertionResponse,
+  AuthenticatorAttachment,
+  AuthenticatorAttestationResponse,
+  AuthenticatorSelectionCriteria,
+  COSEAlgorithmIdentifier,
+  PublicKeyCredential,
+  PublicKeyCredentialCreationOptions,
+  PublicKeyCredentialDescriptor,
+  PublicKeyCredentialParameters,
+  PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRpEntity,
   PublicKeyCredentialType,
-  PublicKeyCredentialParameters,
-  AuthenticatorSelectionCriteria,
-  AttestationConveyancePreference,
   UserVerificationRequirement,
-  AuthenticatorAttachment,
-  PublicKeyCredentialCreationOptions,
-  PublicKeyCredentialRequestOptions,
-  COSEAlgorithmIdentifier,
 } from './dom';
 
-export * from './dom';
+export type {
+  AttestationConveyancePreference,
+  AuthenticationExtensionsClientInputs,
+  AuthenticationExtensionsClientOutputs,
+  AuthenticatorAssertionResponse,
+  AuthenticatorAttestationResponse,
+  AuthenticatorSelectionCriteria,
+  AuthenticatorTransport,
+  COSEAlgorithmIdentifier,
+  Crypto,
+  PublicKeyCredential,
+  PublicKeyCredentialCreationOptions,
+  PublicKeyCredentialDescriptor,
+  PublicKeyCredentialParameters,
+  PublicKeyCredentialRequestOptions,
+  PublicKeyCredentialUserEntity,
+  UserVerificationRequirement,
+} from './dom';
 
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to

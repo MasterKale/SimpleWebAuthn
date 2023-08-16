@@ -9,7 +9,6 @@ export type {
   CredentialDeviceType,
   Base64URLString,
   AttestationConveyancePreference,
-  AuthenticationExtensionsClientInputs,
   AuthenticatorSelectionCriteria,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
