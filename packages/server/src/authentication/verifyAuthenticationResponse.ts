@@ -1,10 +1,9 @@
-import {
+import type {
   AuthenticationResponseJSON,
   AuthenticatorDevice,
   CredentialDeviceType,
   UserVerificationRequirement,
-} from '@simplewebauthn/typescript-types';
-
+} from '../deps.ts';
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { verifySignature } from '../helpers/verifySignature.ts';

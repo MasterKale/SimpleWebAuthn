@@ -1,4 +1,4 @@
-import { Base64URLString } from '@simplewebauthn/typescript-types';
+import type { Base64URLString } from '../deps.ts';
 
 /**
  * Metadata Service structures

@@ -1,9 +1,8 @@
-import {
+import type {
   RegistrationResponseJSON,
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
-} from '@simplewebauthn/typescript-types';
-
+} from '../deps.ts';
 import {
   AttestationFormat,
   AttestationStatement,

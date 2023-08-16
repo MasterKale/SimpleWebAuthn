@@ -1,5 +1,4 @@
-import { Base64URLString } from '@simplewebauthn/typescript-types';
-
+import type { Base64URLString } from '../deps.ts';
 import type { MetadataStatement, AlgSign } from '../metadata/mdsTypes.ts';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
 import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
