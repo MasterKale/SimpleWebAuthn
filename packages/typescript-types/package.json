@@ -1,31 +1,11 @@
 {
   "name": "@simplewebauthn/typescript-types",
   "version": "7.4.0",
-  "description": "TypeScript types used by the @simplewebauthn series of libraries",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "author": "Matthew Miller <matthew@millerti.me>",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
-    "directory": "packages/typescript-types"
-  },
-  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types#readme",
-  "publishConfig": {
-    "access": "public"
-  },
+  "description": "Lerna/npm wrapper around Deno for @simplewebauthn/typescript-types",
   "scripts": {
-    "build": "rimraf dist && npm run extract-dom-types && tsc",
+    "build": "npm run extract-dom-types && deno task build",
     "extract-dom-types": "ts-node extract-dom-types.ts",
     "prepublish": "npm run build"
   },
-  "keywords": [
-    "typescript",
-    "webauthn",
-    "passkeys",
-    "fido",
-    "types"
-  ],
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }
