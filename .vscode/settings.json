@@ -5,7 +5,6 @@
   "deno.enablePaths": [
     "./packages/server",
     "./packages/typescript-types",
-    "./packages/iso-webcrypto",
   ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
