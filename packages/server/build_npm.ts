@@ -13,6 +13,7 @@ await build({
   outDir,
   shims: {
     deno: 'dev',
+    crypto: true,
   },
   test: false,
   // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
@@ -67,11 +68,6 @@ await build({
     // Mapping for '../../typescript-types/src/index.ts' in deps.ts
     '../typescript-types/src/index.ts': {
       name: '@simplewebauthn/typescript-types',
-      version: '^7.4.0',
-    },
-    // Mapping for '../../iso-webcrypto/src/browser.ts' in deps.ts
-    '../iso-webcrypto/src/browser.ts': {
-      name: '@simplewebauthn/iso-webcrypto',
       version: '^7.4.0',
     },
   },

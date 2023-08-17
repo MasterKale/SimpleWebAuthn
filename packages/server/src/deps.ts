@@ -16,8 +16,7 @@ export type {
   UserVerificationRequirement,
 } from '../../typescript-types/src/index.ts';
 
-// @simplewebauthn/iso-webcrypto
-export { default as WebCrypto } from '../../iso-webcrypto/src/browser.ts';
+export { crypto as WebCrypto } from 'https://deno.land/std@0.198.0/crypto/mod.ts';
 
 // cbor (a.k.a. cbor-x in Node land)
 export * as cborx from 'https://deno.land/x/cbor@v1.5.2/index.js';
