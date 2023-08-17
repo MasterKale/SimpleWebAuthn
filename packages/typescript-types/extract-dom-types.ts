@@ -1,3 +1,9 @@
+/**
+ * The VS Code Deno extension will yell about the imports of 'ts-morph' and 'typescript', but
+ * we're still using npm to run this file so that it uses Lerna's Typescript as defined in the
+ * package.json in the root of the monorepo. This is why `npm run build` here will run this file
+ * before finally building the package using dnt.
+ */
 // n.b. ts-morph is a sibling devDependency of typescript, so that the module
 // loader will resolve our project's typescript package, not the transient
 // dependency of ts-morph. We only want to reference our typescript dependency
