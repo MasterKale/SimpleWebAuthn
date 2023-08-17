@@ -6,5 +6,9 @@
     "./packages/server",
     "./packages/typescript-types",
   ],
-  "editor.defaultFormatter": "denoland.vscode-deno"
+  "editor.defaultFormatter": "denoland.vscode-deno",
+  // Required for formatOnSave to work, see https://github.com/denoland/vscode_deno/issues/789
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  }
 }
