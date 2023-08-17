@@ -1,8 +1,10 @@
+import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
+
 import { verifyAttestationWithMetadata } from "./verifyAttestationWithMetadata.ts";
 import { MetadataStatement } from "../metadata/mdsTypes.ts";
 import { isoBase64URL } from "../helpers/iso/index.ts";
 
-test("should verify attestation with metadata (android-safetynet)", async () => {
+Deno.test("should verify attestation with metadata (android-safetynet)", async () => {
   const metadataStatementJSONSafetyNet: MetadataStatement = {
     legalHeader:
       "https://fidoalliance.org/metadata/metadata-statement-legal-header/",
@@ -54,10 +56,10 @@ test("should verify attestation with metadata (android-safetynet)", async () => 
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });
 
-test("should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator algorithm in metadata", async () => {
+Deno.test("should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator algorithm in metadata", async () => {
   const metadataStatement: MetadataStatement = {
     legalHeader:
       "https://fidoalliance.org/metadata/metadata-statement-legal-header/",
@@ -107,10 +109,10 @@ test("should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator alg
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });
 
-test("should not validate certificate path when authenticator is self-referencing its attestation statement certificates", async () => {
+Deno.test("should not validate certificate path when authenticator is self-referencing its attestation statement certificates", async () => {
   const metadataStatement: MetadataStatement = {
     legalHeader:
       "https://fidoalliance.org/metadata/metadata-statement-legal-header/",
@@ -176,10 +178,10 @@ test("should not validate certificate path when authenticator is self-referencin
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });
 
-test("should verify idmelon attestation with updated root certificate", async () => {
+Deno.test("should verify idmelon attestation with updated root certificate", async () => {
   /**
    * See https://github.com/MasterKale/SimpleWebAuthn/issues/302 for more context, basically
    * IDmelon's root cert in FIDO MDS was missing an extension. I worked with IDmelon to generate a
@@ -241,5 +243,5 @@ test("should verify idmelon attestation with updated root certificate", async ()
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });
