@@ -39,10 +39,17 @@ export function verifySignature(opts: {
     cosePublicKey = convertX509PublicKeyToCOSE(x509Certificate);
   }
 
-  return isoCrypto.verify({
-    cosePublicKey,
-    signature,
-    data,
-    shaHashOverride: hashAlgorithm,
-  });
+  return _verifySignatureInternals.stubThis(
+    isoCrypto.verify({
+      cosePublicKey,
+      signature,
+      data,
+      shaHashOverride: hashAlgorithm,
+    }),
+  );
 }
+
+// Make it possible to stub the return value during testing
+export const _verifySignatureInternals = {
+  stubThis: (value: Promise<boolean>) => value,
+};
