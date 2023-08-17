@@ -1,6 +1,8 @@
+import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
+
 import { verifyRegistrationResponse } from "../verifyRegistrationResponse.ts";
 
-test("should verify (broken) Packed response from Chrome virtual authenticator", async () => {
+Deno.test("should verify (broken) Packed response from Chrome virtual authenticator", async () => {
   /**
    * Chrome 89's WebAuthn dev tool enables developers to use "virtual" software authenticators in place
    * of typical authenticator hardware. Unfortunately a bug in these authenticators has leaf certs
@@ -30,5 +32,5 @@ test("should verify (broken) Packed response from Chrome virtual authenticator",
     expectedRPID: "dev.dontneeda.pw",
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
