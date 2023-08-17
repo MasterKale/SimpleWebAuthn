@@ -16,5 +16,10 @@ export async function generateChallenge(): Promise<Uint8Array> {
 
   await isoCrypto.getRandomValues(challenge);
 
-  return challenge;
+  return _generateChallengeInternals.stubThis(challenge);
 }
+
+// Make it possible to stub the return value during testing
+export const _generateChallengeInternals = {
+  stubThis: (value: Uint8Array) => value,
+};
