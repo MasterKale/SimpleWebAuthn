@@ -5,7 +5,7 @@
   "scripts": {
     "build": "deno task build",
     "build:lerna-debug": "deno task build > output.txt; cat output.txt; rm output.txt",
-    "test": "deno test",
+    "test": "deno test src/",
     "prepublish": "npm run build"
   },
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb"
