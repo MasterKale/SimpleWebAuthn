@@ -4,6 +4,6 @@
     "lineWidth": 100
   },
   "tasks": {
-    "build": "deno run -A build_npm.ts 0.0.1"
+    "build": "deno run -A build_npm.ts"
   }
 }
