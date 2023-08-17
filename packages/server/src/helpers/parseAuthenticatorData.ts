@@ -79,7 +79,7 @@ export function parseAuthenticatorData(
     throw new Error("Leftover bytes detected while parsing authenticator data");
   }
 
-  return {
+  return _parseAuthenticatorDataInternals.stubThis({
     rpIdHash,
     flagsBuf,
     flags,
@@ -90,7 +90,7 @@ export function parseAuthenticatorData(
     credentialPublicKey,
     extensionsData,
     extensionsDataBuffer,
-  };
+  });
 }
 
 export type ParsedAuthenticatorData = {
@@ -112,4 +112,9 @@ export type ParsedAuthenticatorData = {
   credentialPublicKey?: Uint8Array;
   extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
   extensionsDataBuffer?: Uint8Array;
+};
+
+// Make it possible to stub the return value during testing
+export const _parseAuthenticatorDataInternals = {
+  stubThis: (value: ParsedAuthenticatorData) => value,
 };

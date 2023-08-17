@@ -7,7 +7,7 @@ export function decodeClientDataJSON(data: string): ClientDataJSON {
   const toString = isoBase64URL.toString(data);
   const clientData: ClientDataJSON = JSON.parse(toString);
 
-  return clientData;
+  return _decodeClientDataJSONInternals.stubThis(clientData);
 }
 
 export type ClientDataJSON = {
@@ -19,4 +19,9 @@ export type ClientDataJSON = {
     id?: string;
     status: "present" | "supported" | "not-supported";
   };
+};
+
+// Make it possible to stub the return value during testing
+export const _decodeClientDataJSONInternals = {
+  stubThis: (value: ClientDataJSON) => value,
 };
