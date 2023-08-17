@@ -24,7 +24,9 @@ const encoder = new cborx.Encoder({
  * `false`
  */
 export function decodeFirst<Type>(input: Uint8Array): Type {
-  const decoded = encoder.decodeMultiple(input) as undefined | Type[];
+  // Make a copy so we don't mutate the original
+  const _input = new Uint8Array(input);
+  const decoded = encoder.decodeMultiple(_input) as undefined | Type[];
 
   if (decoded === undefined) {
     throw new Error("CBOR input data was empty");
