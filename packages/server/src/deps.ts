@@ -8,6 +8,7 @@ export type {
   Base64URLString,
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
+  Crypto,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
