@@ -2,12 +2,11 @@ import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
 
 import { verifyRegistrationResponse } from "../verifyRegistrationResponse.ts";
 
-//
 /**
  * TODO (Aug 2023): This test has to be ignored for now because Deno doesn't
- * support signature verification if the key algorithm and hash algorithm
- * aren't the same. In this test the key alg is P-384 and the hash alg is
- * SHA-256...
+ * support signature verification if the key curve and hash algorithm
+ * aren't one of two supported combinations. In this test the key curve is
+ * P-384 and the hash alg is SHA-256...
  *
  * See https://deno.land/x/deno@v1.36.1/ext/crypto/00_crypto.js?source#L1338
  *
