@@ -1,5 +1,5 @@
-import { toHash } from './toHash.ts';
-import { isoUint8Array } from './iso/index.ts';
+import { toHash } from "./toHash.ts";
+import { isoUint8Array } from "./iso/index.ts";
 
 /**
  * Go through each expected RP ID and try to find one that matches. Returns the unhashed RP ID
@@ -15,13 +15,15 @@ export async function matchExpectedRPID(
     const matchedRPID = await Promise.any<string>(
       expectedRPIDs.map((expected) => {
         return new Promise((resolve, reject) => {
-          toHash(isoUint8Array.fromASCIIString(expected)).then((expectedRPIDHash) => {
-            if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
-              resolve(expected);
-            } else {
-              reject();
-            }
-          });
+          toHash(isoUint8Array.fromASCIIString(expected)).then(
+            (expectedRPIDHash) => {
+              if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
+                resolve(expected);
+              } else {
+                reject();
+              }
+            },
+          );
         });
       }),
     );
@@ -31,7 +33,7 @@ export async function matchExpectedRPID(
     const _err = err as Error;
 
     // This means no matches were found
-    if (_err.name === 'AggregateError') {
+    if (_err.name === "AggregateError") {
       throw new UnexpectedRPIDHash();
     }
 
@@ -42,8 +44,8 @@ export async function matchExpectedRPID(
 
 class UnexpectedRPIDHash extends Error {
   constructor() {
-    const message = 'Unexpected RP ID hash';
+    const message = "Unexpected RP ID hash";
     super(message);
-    this.name = 'UnexpectedRPIDHash';
+    this.name = "UnexpectedRPIDHash";
   }
 }

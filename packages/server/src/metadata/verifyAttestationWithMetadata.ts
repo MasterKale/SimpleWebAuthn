@@ -1,9 +1,15 @@
-import type { Base64URLString } from '../deps.ts';
-import type { AlgSign, MetadataStatement } from '../metadata/mdsTypes.ts';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
-import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
-import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
-import { COSEALG, COSECRV, COSEKEYS, COSEKTY, isCOSEPublicKeyEC2 } from '../helpers/cose.ts';
+import type { Base64URLString } from "../deps.ts";
+import type { AlgSign, MetadataStatement } from "../metadata/mdsTypes.ts";
+import { convertCertBufferToPEM } from "../helpers/convertCertBufferToPEM.ts";
+import { validateCertificatePath } from "../helpers/validateCertificatePath.ts";
+import { decodeCredentialPublicKey } from "../helpers/decodeCredentialPublicKey.ts";
+import {
+  COSEALG,
+  COSECRV,
+  COSEKEYS,
+  COSEKTY,
+  isCOSEPublicKeyEC2,
+} from "../helpers/cose.ts";
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as
@@ -20,7 +26,11 @@ export async function verifyAttestationWithMetadata({
   x5c: Uint8Array[] | Base64URLString[];
   attestationStatementAlg?: number;
 }): Promise<boolean> {
-  const { authenticationAlgorithms, authenticatorGetInfo, attestationRootCertificates } = statement;
+  const {
+    authenticationAlgorithms,
+    authenticatorGetInfo,
+    attestationRootCertificates,
+  } = statement;
 
   // Make sure the alg in the attestation statement matches one of the ones specified in metadata
   const keypairCOSEAlgs: Set<COSEInfo> = new Set();
@@ -41,15 +51,15 @@ export async function verifyAttestationWithMetadata({
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
   if (!kty) {
-    throw new Error('Credential public key was missing kty');
+    throw new Error("Credential public key was missing kty");
   }
 
   if (!alg) {
-    throw new Error('Credential public key was missing alg');
+    throw new Error("Credential public key was missing alg");
   }
 
   if (!kty) {
-    throw new Error('Credential public key was missing kty');
+    throw new Error("Credential public key was missing kty");
   }
 
   // Assume everything is a number because these values should be
@@ -67,7 +77,10 @@ export async function verifyAttestationWithMetadata({
   let foundMatch = false;
   for (const keypairAlg of keypairCOSEAlgs) {
     // Make sure algorithm and key type match
-    if (keypairAlg.alg === publicKeyCOSEInfo.alg && keypairAlg.kty === publicKeyCOSEInfo.kty) {
+    if (
+      keypairAlg.alg === publicKeyCOSEInfo.alg &&
+      keypairAlg.kty === publicKeyCOSEInfo.kty
+    ) {
       // If not an RSA keypair then make sure curve numbers match too
       if (
         (keypairAlg.kty === COSEKTY.EC2 || keypairAlg.kty === COSEKTY.OKP) &&
@@ -100,9 +113,12 @@ export async function verifyAttestationWithMetadata({
      * ```
      */
     const debugMDSAlgs = authenticationAlgorithms.map(
-      (algSign) => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`,
+      (algSign) =>
+        `'${algSign}' (COSE info: ${
+          stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])
+        })`,
     );
-    const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, '');
+    const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, "");
 
     /**
      * Construct useful error output about the public key
@@ -117,7 +133,10 @@ export async function verifyAttestationWithMetadata({
   /**
    * Confirm the attestation statement's algorithm is one supported according to metadata
    */
-  if (attestationStatementAlg !== undefined && authenticatorGetInfo?.algorithms !== undefined) {
+  if (
+    attestationStatementAlg !== undefined &&
+    authenticatorGetInfo?.algorithms !== undefined
+  ) {
     const getInfoAlgs = authenticatorGetInfo.algorithms.map((_alg) => _alg.alg);
     if (getInfoAlgs.indexOf(attestationStatementAlg) < 0) {
       throw new Error(
@@ -128,7 +147,9 @@ export async function verifyAttestationWithMetadata({
 
   // Prepare to check the certificate chain
   const authenticatorCerts = x5c.map(convertCertBufferToPEM);
-  const statementRootCerts = attestationRootCertificates.map(convertCertBufferToPEM);
+  const statementRootCerts = attestationRootCertificates.map(
+    convertCertBufferToPEM,
+  );
 
   /**
    * If an authenticator returns exactly one certificate in its x5c, and that cert is found in the
@@ -136,7 +157,10 @@ export async function verifyAttestationWithMetadata({
    * certificate chain validation.
    */
   let authenticatorIsSelfReferencing = false;
-  if (authenticatorCerts.length === 1 && statementRootCerts.indexOf(authenticatorCerts[0]) >= 0) {
+  if (
+    authenticatorCerts.length === 1 &&
+    statementRootCerts.indexOf(authenticatorCerts[0]) >= 0
+  ) {
     authenticatorIsSelfReferencing = true;
   }
 
@@ -194,7 +218,7 @@ export const algSignToCOSEInfoMap: { [key in AlgSign]: COSEInfo } = {
 function stringifyCOSEInfo(info: COSEInfo): string {
   const { kty, alg, crv } = info;
 
-  let toReturn = '';
+  let toReturn = "";
   if (kty !== COSEKTY.RSA) {
     toReturn = `{ kty: ${kty}, alg: ${alg}, crv: ${crv} }`;
   } else {

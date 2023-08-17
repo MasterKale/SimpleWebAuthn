@@ -3,9 +3,9 @@ import type {
   PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialRequestOptionsJSON,
   UserVerificationRequirement,
-} from '../deps.ts';
-import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
-import { generateChallenge } from '../helpers/generateChallenge.ts';
+} from "../deps.ts";
+import { isoBase64URL, isoUint8Array } from "../helpers/iso/index.ts";
+import { generateChallenge } from "../helpers/generateChallenge.ts";
 
 export type GenerateAuthenticationOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptorFuture[];
@@ -36,7 +36,7 @@ export function generateAuthenticationOptions(
     allowCredentials,
     challenge = generateChallenge(),
     timeout = 60000,
-    userVerification = 'preferred',
+    userVerification = "preferred",
     extensions,
     rpID,
   } = options;
@@ -45,7 +45,7 @@ export function generateAuthenticationOptions(
    * Preserve ability to specify `string` values for challenges
    */
   let _challenge = challenge;
-  if (typeof _challenge === 'string') {
+  if (typeof _challenge === "string") {
     _challenge = isoUint8Array.fromUTF8String(_challenge);
   }
 

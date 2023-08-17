@@ -1,12 +1,12 @@
-import { generateChallenge } from './generateChallenge.ts';
+import { generateChallenge } from "./generateChallenge.ts";
 
-test('should return a buffer of at least 32 bytes', () => {
+test("should return a buffer of at least 32 bytes", () => {
   const challenge = generateChallenge();
 
   expect(challenge.byteLength).toBeGreaterThanOrEqual(32);
 });
 
-test('should return random bytes on each execution', () => {
+test("should return random bytes on each execution", () => {
   const challenge1 = generateChallenge();
   const challenge2 = generateChallenge();
 

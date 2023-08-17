@@ -1,4 +1,9 @@
-import { AsnParser, BasicConstraints, Certificate, id_ce_basicConstraints } from '../deps.ts';
+import {
+  AsnParser,
+  BasicConstraints,
+  Certificate,
+  id_ce_basicConstraints,
+} from "../deps.ts";
 
 export type CertificateInfo = {
   issuer: Issuer;
@@ -26,11 +31,11 @@ type Subject = {
   combined: string;
 };
 
-const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
-  '2.5.4.6': 'C',
-  '2.5.4.10': 'O',
-  '2.5.4.11': 'OU',
-  '2.5.4.3': 'CN',
+const issuerSubjectIDKey: { [key: string]: "C" | "O" | "OU" | "CN" } = {
+  "2.5.4.6": "C",
+  "2.5.4.10": "O",
+  "2.5.4.11": "OU",
+  "2.5.4.3": "CN",
 };
 
 /**
@@ -38,12 +43,14 @@ const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
  *
  * @param pemCertificate Result from call to `convertASN1toPEM(x5c[0])`
  */
-export function getCertificateInfo(leafCertBuffer: Uint8Array): CertificateInfo {
+export function getCertificateInfo(
+  leafCertBuffer: Uint8Array,
+): CertificateInfo {
   const x509 = AsnParser.parse(leafCertBuffer, Certificate);
   const parsedCert = x509.tbsCertificate;
 
   // Issuer
-  const issuer: Issuer = { combined: '' };
+  const issuer: Issuer = { combined: "" };
   parsedCert.issuer.forEach(([iss]) => {
     const key = issuerSubjectIDKey[iss.type];
     if (key) {
@@ -53,7 +60,7 @@ export function getCertificateInfo(leafCertBuffer: Uint8Array): CertificateInfo 
   issuer.combined = issuerSubjectToString(issuer);
 
   // Subject
-  const subject: Subject = { combined: '' };
+  const subject: Subject = { combined: "" };
   parsedCert.subject.forEach(([iss]) => {
     const key = issuerSubjectIDKey[iss.type];
     if (key) {
@@ -67,7 +74,10 @@ export function getCertificateInfo(leafCertBuffer: Uint8Array): CertificateInfo 
     // console.log(parsedCert.extensions);
     for (const ext of parsedCert.extensions) {
       if (ext.extnID === id_ce_basicConstraints) {
-        const basicConstraints = AsnParser.parse(ext.extnValue, BasicConstraints);
+        const basicConstraints = AsnParser.parse(
+          ext.extnValue,
+          BasicConstraints,
+        );
         basicConstraintsCA = basicConstraints.cA;
       }
     }
@@ -110,5 +120,5 @@ function issuerSubjectToString(input: Issuer | Subject): string {
     parts.push(input.CN);
   }
 
-  return parts.join(' : ');
+  return parts.join(" : ");
 }

@@ -1,5 +1,5 @@
-import { TPM_ALG, TPM_ST } from './constants.ts';
-import { isoUint8Array } from '../../../helpers/iso/index.ts';
+import { TPM_ALG, TPM_ST } from "./constants.ts";
+import { isoUint8Array } from "../../../helpers/iso/index.ts";
 
 /**
  * Cut up a TPM attestation's certInfo into intelligible chunks
@@ -20,7 +20,10 @@ export function parseCertInfo(certInfo: Uint8Array): ParsedCertInfo {
   // The name of a parent entity, can be ignored
   const qualifiedSignerLength = dataView.getUint16(pointer);
   pointer += 2;
-  const qualifiedSigner = certInfo.slice(pointer, pointer += qualifiedSignerLength);
+  const qualifiedSigner = certInfo.slice(
+    pointer,
+    pointer += qualifiedSignerLength,
+  );
 
   // Get the expected hash of `attsToBeSigned`
   const extraDataLength = dataView.getUint16(pointer);

@@ -1,5 +1,5 @@
-import { isoCBOR, isoUint8Array } from './iso/index.ts';
-import { COSEKEYS, COSEPublicKeyEC2 } from './cose.ts';
+import { isoCBOR, isoUint8Array } from "./iso/index.ts";
+import { COSEKEYS, COSEPublicKeyEC2 } from "./cose.ts";
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
@@ -15,7 +15,7 @@ export function convertCOSEtoPKCS(cosePublicKey: Uint8Array): Uint8Array {
   const y = struct.get(COSEKEYS.y);
 
   if (!x) {
-    throw new Error('COSE public key was missing x');
+    throw new Error("COSE public key was missing x");
   }
 
   if (y) {

@@ -1,24 +1,24 @@
-jest.mock('../helpers/generateChallenge');
+jest.mock("../helpers/generateChallenge");
 
-import { isoBase64URL } from '../helpers/iso/index.ts';
+import { isoBase64URL } from "../helpers/iso/index.ts";
 
-import { generateAuthenticationOptions } from './generateAuthenticationOptions.ts';
+import { generateAuthenticationOptions } from "./generateAuthenticationOptions.ts";
 
-const challengeString = 'dG90YWxseXJhbmRvbXZhbHVl';
+const challengeString = "dG90YWxseXJhbmRvbXZhbHVl";
 const challengeBuffer = isoBase64URL.toBuffer(challengeString);
 
-test('should generate credential request options suitable for sending via JSON', () => {
+test("should generate credential request options suitable for sending via JSON", () => {
   const options = generateAuthenticationOptions({
     allowCredentials: [
       {
-        id: Buffer.from('1234', 'ascii'),
-        type: 'public-key',
-        transports: ['usb', 'nfc'],
+        id: Buffer.from("1234", "ascii"),
+        type: "public-key",
+        transports: ["usb", "nfc"],
       },
       {
-        id: Buffer.from('5678', 'ascii'),
-        type: 'public-key',
-        transports: ['internal'],
+        id: Buffer.from("5678", "ascii"),
+        type: "public-key",
+        transports: ["internal"],
       },
     ],
     timeout: 1,
@@ -30,27 +30,27 @@ test('should generate credential request options suitable for sending via JSON',
     challenge: challengeString,
     allowCredentials: [
       {
-        id: 'MTIzNA',
-        type: 'public-key',
-        transports: ['usb', 'nfc'],
+        id: "MTIzNA",
+        type: "public-key",
+        transports: ["usb", "nfc"],
       },
       {
-        id: 'NTY3OA',
-        type: 'public-key',
-        transports: ['internal'],
+        id: "NTY3OA",
+        type: "public-key",
+        transports: ["internal"],
       },
     ],
     timeout: 1,
-    userVerification: 'preferred',
+    userVerification: "preferred",
   });
 });
 
-test('defaults to 60 seconds if no timeout is specified', () => {
+test("defaults to 60 seconds if no timeout is specified", () => {
   const options = generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
+      { id: Buffer.from("1234", "ascii"), type: "public-key" },
+      { id: Buffer.from("5678", "ascii"), type: "public-key" },
     ],
   });
 
@@ -61,21 +61,21 @@ test('should set userVerification to "preferred" if not specified', () => {
   const options = generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
+      { id: Buffer.from("1234", "ascii"), type: "public-key" },
+      { id: Buffer.from("5678", "ascii"), type: "public-key" },
     ],
   });
 
-  expect(options.userVerification).toEqual('preferred');
+  expect(options.userVerification).toEqual("preferred");
 });
 
-test('should not set allowCredentials if not specified', () => {
-  const options = generateAuthenticationOptions({ rpID: 'test' });
+test("should not set allowCredentials if not specified", () => {
+  const options = generateAuthenticationOptions({ rpID: "test" });
 
   expect(options.allowCredentials).toEqual(undefined);
 });
 
-test('should generate without params', () => {
+test("should generate without params", () => {
   const options = generateAuthenticationOptions();
   const { challenge, ...otherFields } = options;
   expect(otherFields).toEqual({
@@ -83,44 +83,44 @@ test('should generate without params', () => {
     extensions: undefined,
     rpId: undefined,
     timeout: 60000,
-    userVerification: 'preferred',
+    userVerification: "preferred",
   });
-  expect(typeof challenge).toEqual('string');
+  expect(typeof challenge).toEqual("string");
 });
 
-test('should set userVerification if specified', () => {
+test("should set userVerification if specified", () => {
   const options = generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
+      { id: Buffer.from("1234", "ascii"), type: "public-key" },
+      { id: Buffer.from("5678", "ascii"), type: "public-key" },
     ],
-    userVerification: 'required',
+    userVerification: "required",
   });
 
-  expect(options.userVerification).toEqual('required');
+  expect(options.userVerification).toEqual("required");
 });
 
-test('should set extensions if specified', () => {
+test("should set extensions if specified", () => {
   const options = generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
+      { id: Buffer.from("1234", "ascii"), type: "public-key" },
+      { id: Buffer.from("5678", "ascii"), type: "public-key" },
     ],
-    extensions: { appid: 'simplewebauthn' },
+    extensions: { appid: "simplewebauthn" },
   });
 
   expect(options.extensions).toEqual({
-    appid: 'simplewebauthn',
+    appid: "simplewebauthn",
   });
 });
 
-test('should generate a challenge if one is not provided', () => {
+test("should generate a challenge if one is not provided", () => {
   const opts = {
     allowCredentials: [
-      { id: Buffer.from('1234', 'ascii'), type: 'public-key' },
-      { id: Buffer.from('5678', 'ascii'), type: 'public-key' },
+      { id: Buffer.from("1234", "ascii"), type: "public-key" },
+      { id: Buffer.from("5678", "ascii"), type: "public-key" },
     ],
   };
 
@@ -128,11 +128,11 @@ test('should generate a challenge if one is not provided', () => {
   const options = generateAuthenticationOptions(opts);
 
   // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
-  expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
+  expect(options.challenge).toEqual("AQIDBAUGBwgJCgsMDQ4PEA");
 });
 
-test('should set rpId if specified', () => {
-  const rpID = 'simplewebauthn.dev';
+test("should set rpId if specified", () => {
+  const rpID = "simplewebauthn.dev";
 
   const opts = generateAuthenticationOptions({
     allowCredentials: [],

@@ -1,42 +1,44 @@
-import { SettingsService } from './settingsService.ts';
+import { SettingsService } from "./settingsService.ts";
 
-import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
-import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
+import { GlobalSign_Root_CA } from "./defaultRootCerts/android-safetynet.ts";
+import { Apple_WebAuthn_Root_CA } from "./defaultRootCerts/apple.ts";
 
 function pemToBuffer(pem: string): Buffer {
   const trimmed = pem
-    .replace('-----BEGIN CERTIFICATE-----', '')
-    .replace('-----END CERTIFICATE-----', '')
-    .replace('\n', '');
-  return Buffer.from(trimmed, 'base64');
+    .replace("-----BEGIN CERTIFICATE-----", "")
+    .replace("-----END CERTIFICATE-----", "")
+    .replace("\n", "");
+  return Buffer.from(trimmed, "base64");
 }
 
-describe('setRootCertificate/getRootCertificate', () => {
-  test('should accept cert as Buffer', () => {
+describe("setRootCertificate/getRootCertificate", () => {
+  test("should accept cert as Buffer", () => {
     const gsr1Buffer = pemToBuffer(GlobalSign_Root_CA);
     SettingsService.setRootCertificates({
-      identifier: 'android-safetynet',
+      identifier: "android-safetynet",
       certificates: [gsr1Buffer],
     });
 
-    const certs = SettingsService.getRootCertificates({ identifier: 'android-safetynet' });
+    const certs = SettingsService.getRootCertificates({
+      identifier: "android-safetynet",
+    });
 
     expect(certs).toEqual([GlobalSign_Root_CA]);
   });
 
-  test('should accept cert as PEM string', () => {
+  test("should accept cert as PEM string", () => {
     SettingsService.setRootCertificates({
-      identifier: 'apple',
+      identifier: "apple",
       certificates: [Apple_WebAuthn_Root_CA],
     });
 
-    const certs = SettingsService.getRootCertificates({ identifier: 'apple' });
+    const certs = SettingsService.getRootCertificates({ identifier: "apple" });
 
     expect(certs).toEqual([Apple_WebAuthn_Root_CA]);
   });
 
-  test('should return empty array when certificate is not set', () => {
-    const certs = SettingsService.getRootCertificates({ identifier: 'none' });
+  test("should return empty array when certificate is not set", () => {
+    const certs = SettingsService.getRootCertificates({ identifier: "none" });
 
     expect(Array.isArray(certs)).toEqual(true);
     expect(certs.length).toEqual(0);

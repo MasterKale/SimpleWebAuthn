@@ -5,7 +5,7 @@
  * with specific server-like runtimes that expose global Web APIs (CloudFlare Workers, Deno, Bun,
  * etc...), while also supporting execution in Node.
  */
-export * as isoBase64URL from './isoBase64URL.ts';
-export * as isoCBOR from './isoCBOR.ts';
-export * as isoCrypto from './isoCrypto/index.ts';
-export * as isoUint8Array from './isoUint8Array.ts';
+export * as isoBase64URL from "./isoBase64URL.ts";
+export * as isoCBOR from "./isoCBOR.ts";
+export * as isoCrypto from "./isoCrypto/index.ts";
+export * as isoUint8Array from "./isoUint8Array.ts";

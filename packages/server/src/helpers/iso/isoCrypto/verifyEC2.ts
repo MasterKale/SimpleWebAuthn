@@ -1,9 +1,9 @@
-import { WebCrypto } from '../../../deps.ts';
-import { COSEALG, COSECRV, COSEKEYS, COSEPublicKeyEC2 } from '../../cose.ts';
-import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
-import { importKey } from './importKey.ts';
-import { isoBase64URL } from '../index.ts';
-import { SubtleCryptoCrv } from './structs.ts';
+import { COSEALG, COSECRV, COSEKEYS, COSEPublicKeyEC2 } from "../../cose.ts";
+import { mapCoseAlgToWebCryptoAlg } from "./mapCoseAlgToWebCryptoAlg.ts";
+import { importKey } from "./importKey.ts";
+import { isoBase64URL } from "../index.ts";
+import { SubtleCryptoCrv } from "./structs.ts";
+import { getWebCrypto } from "./getWebCrypto.ts";
 
 /**
  * Verify a signature using an EC2 public key
@@ -16,6 +16,8 @@ export async function verifyEC2(opts: {
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 
+  const WebCrypto = await getWebCrypto();
+
   // Import the public key
   const alg = cosePublicKey.get(COSEKEYS.alg);
   const crv = cosePublicKey.get(COSEKEYS.crv);
@@ -23,34 +25,34 @@ export async function verifyEC2(opts: {
   const y = cosePublicKey.get(COSEKEYS.y);
 
   if (!alg) {
-    throw new Error('Public key was missing alg (EC2)');
+    throw new Error("Public key was missing alg (EC2)");
   }
 
   if (!crv) {
-    throw new Error('Public key was missing crv (EC2)');
+    throw new Error("Public key was missing crv (EC2)");
   }
 
   if (!x) {
-    throw new Error('Public key was missing x (EC2)');
+    throw new Error("Public key was missing x (EC2)");
   }
 
   if (!y) {
-    throw new Error('Public key was missing y (EC2)');
+    throw new Error("Public key was missing y (EC2)");
   }
 
   let _crv: SubtleCryptoCrv;
   if (crv === COSECRV.P256) {
-    _crv = 'P-256';
+    _crv = "P-256";
   } else if (crv === COSECRV.P384) {
-    _crv = 'P-384';
+    _crv = "P-384";
   } else if (crv === COSECRV.P521) {
-    _crv = 'P-521';
+    _crv = "P-521";
   } else {
     throw new Error(`Unexpected COSE crv value of ${crv} (EC2)`);
   }
 
   const keyData: JsonWebKey = {
-    kty: 'EC',
+    kty: "EC",
     crv: _crv,
     x: isoBase64URL.fromBuffer(x),
     y: isoBase64URL.fromBuffer(y),
@@ -64,7 +66,7 @@ export async function verifyEC2(opts: {
      * would then map here to `'RSASSA-PKCS1-v1_5'`. We always want `'ECDSA'` here so we'll
      * hard-code this.
      */
-    name: 'ECDSA',
+    name: "ECDSA",
     namedCurve: _crv,
   };
 
@@ -80,7 +82,7 @@ export async function verifyEC2(opts: {
   }
 
   const verifyAlgorithm: EcdsaParams = {
-    name: 'ECDSA',
+    name: "ECDSA",
     hash: { name: subtleAlg },
   };
 

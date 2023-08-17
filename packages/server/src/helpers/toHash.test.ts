@@ -1,11 +1,11 @@
-import { toHash } from './toHash.ts';
+import { toHash } from "./toHash.ts";
 
-test('should return a buffer of at 32 bytes for input string', async () => {
-  const hash = await toHash('string');
+test("should return a buffer of at 32 bytes for input string", async () => {
+  const hash = await toHash("string");
   expect(hash.byteLength).toEqual(32);
 });
 
-test('should return a buffer of at 32 bytes for input Buffer', async () => {
+test("should return a buffer of at 32 bytes for input Buffer", async () => {
   const hash = await toHash(Buffer.alloc(10));
   expect(hash.byteLength).toEqual(32);
 });

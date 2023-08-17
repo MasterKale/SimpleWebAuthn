@@ -1,7 +1,7 @@
-import { COSEALG, COSEPublicKey } from './cose.ts';
-import { isoCrypto } from './iso/index.ts';
-import { decodeCredentialPublicKey } from './decodeCredentialPublicKey.ts';
-import { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE.ts';
+import { COSEALG, COSEPublicKey } from "./cose.ts";
+import { isoCrypto } from "./iso/index.ts";
+import { decodeCredentialPublicKey } from "./decodeCredentialPublicKey.ts";
+import { convertX509PublicKeyToCOSE } from "./convertX509PublicKeyToCOSE.ts";
 
 /**
  * Verify an authenticator's signature
@@ -13,14 +13,22 @@ export function verifySignature(opts: {
   x509Certificate?: Uint8Array;
   hashAlgorithm?: COSEALG;
 }): Promise<boolean> {
-  const { signature, data, credentialPublicKey, x509Certificate, hashAlgorithm } = opts;
+  const {
+    signature,
+    data,
+    credentialPublicKey,
+    x509Certificate,
+    hashAlgorithm,
+  } = opts;
 
   if (!x509Certificate && !credentialPublicKey) {
     throw new Error('Must declare either "leafCert" or "credentialPublicKey"');
   }
 
   if (x509Certificate && credentialPublicKey) {
-    throw new Error('Must not declare both "leafCert" and "credentialPublicKey"');
+    throw new Error(
+      'Must not declare both "leafCert" and "credentialPublicKey"',
+    );
   }
 
   let cosePublicKey: COSEPublicKey = new Map();

@@ -1,5 +1,5 @@
-import { TPM_ALG, TPM_ECC_CURVE } from './constants.ts';
-import { isoUint8Array } from '../../../helpers/iso/index.ts';
+import { TPM_ALG, TPM_ECC_CURVE } from "./constants.ts";
+import { isoUint8Array } from "../../../helpers/iso/index.ts";
 
 /**
  * Break apart a TPM attestation's pubArea buffer
@@ -44,7 +44,7 @@ export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
   const parameters: { rsa?: RSAParameters; ecc?: ECCParameters } = {};
   let unique = Uint8Array.from([]);
 
-  if (type === 'TPM_ALG_RSA') {
+  if (type === "TPM_ALG_RSA") {
     const symmetric = TPM_ALG[dataView.getUint16(pointer)];
     pointer += 2;
 
@@ -68,7 +68,7 @@ export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
     pointer += 2;
 
     unique = pubArea.slice(pointer, pointer += uniqueLength);
-  } else if (type === 'TPM_ALG_ECC') {
+  } else if (type === "TPM_ALG_ECC") {
     const symmetric = TPM_ALG[dataView.getUint16(pointer)];
     pointer += 2;
 
@@ -115,7 +115,7 @@ export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
 }
 
 type ParsedPubArea = {
-  type: 'TPM_ALG_RSA' | 'TPM_ALG_ECC';
+  type: "TPM_ALG_RSA" | "TPM_ALG_ECC";
   nameAlg: string;
   objectAttributes: {
     fixedTPM: boolean;

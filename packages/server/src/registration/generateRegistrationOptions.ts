@@ -6,9 +6,9 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
-} from '../deps.ts';
-import { generateChallenge } from '../helpers/generateChallenge.ts';
-import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+} from "../deps.ts";
+import { generateChallenge } from "../helpers/generateChallenge.ts";
+import { isoBase64URL, isoUint8Array } from "../helpers/iso/index.ts";
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
@@ -61,8 +61,8 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
  * defaults.
  */
 const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
-  residentKey: 'preferred',
-  userVerification: 'preferred',
+  residentKey: "preferred",
+  userVerification: "preferred",
 };
 
 /**
@@ -105,7 +105,7 @@ export function generateRegistrationOptions(
     challenge = generateChallenge(),
     userDisplayName = userName,
     timeout = 60000,
-    attestationType = 'none',
+    attestationType = "none",
     excludeCredentials = [],
     authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
@@ -115,10 +115,11 @@ export function generateRegistrationOptions(
   /**
    * Prepare pubKeyCredParams from the array of algorithm ID's
    */
-  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs.map((id) => ({
-    alg: id,
-    type: 'public-key',
-  }));
+  const pubKeyCredParams: PublicKeyCredentialParameters[] =
+    supportedAlgorithmIDs.map((id) => ({
+      alg: id,
+      type: "public-key",
+    }));
 
   /**
    * Capture some of the nuances of how `residentKey` and `requireResidentKey` how either is set
@@ -132,7 +133,7 @@ export function generateRegistrationOptions(
      * See https://www.w3.org/TR/webauthn-2/#dom-authenticatorselectioncriteria-residentkey
      */
     if (authenticatorSelection.requireResidentKey) {
-      authenticatorSelection.residentKey = 'required';
+      authenticatorSelection.residentKey = "required";
     } else {
       /**
        * FIDO Conformance v1.7.2 fails the first test if we do this, even though this is
@@ -149,14 +150,15 @@ export function generateRegistrationOptions(
      *
      * See https://www.w3.org/TR/webauthn-2/#dom-authenticatorselectioncriteria-requireresidentkey
      */
-    authenticatorSelection.requireResidentKey = authenticatorSelection.residentKey === 'required';
+    authenticatorSelection.requireResidentKey =
+      authenticatorSelection.residentKey === "required";
   }
 
   /**
    * Preserve ability to specify `string` values for challenges
    */
   let _challenge = challenge;
-  if (typeof _challenge === 'string') {
+  if (typeof _challenge === "string") {
     _challenge = isoUint8Array.fromASCIIString(_challenge);
   }
 

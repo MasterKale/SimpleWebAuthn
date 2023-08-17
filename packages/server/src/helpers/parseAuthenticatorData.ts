@@ -1,14 +1,16 @@
 import {
   AuthenticationExtensionsAuthenticatorOutputs,
   decodeAuthenticatorExtensions,
-} from './decodeAuthenticatorExtensions.ts';
-import { isoCBOR, isoUint8Array } from './iso/index.ts';
-import { COSEPublicKey } from './cose.ts';
+} from "./decodeAuthenticatorExtensions.ts";
+import { isoCBOR, isoUint8Array } from "./iso/index.ts";
+import { COSEPublicKey } from "./cose.ts";
 
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
-export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticatorData {
+export function parseAuthenticatorData(
+  authData: Uint8Array,
+): ParsedAuthenticatorData {
   if (authData.byteLength < 37) {
     throw new Error(
       `Authenticator data was ${authData.byteLength} bytes, expected at least 37 bytes`,
@@ -52,14 +54,17 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
     credentialID = authData.slice(pointer, pointer += credIDLen);
 
     // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
-    const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(authData.slice(pointer));
+    const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(
+      authData.slice(pointer),
+    );
     const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
 
     credentialPublicKey = firstEncoded;
     pointer += firstEncoded.byteLength;
   }
 
-  let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
+  let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined =
+    undefined;
   let extensionsDataBuffer: Uint8Array | undefined = undefined;
 
   if (flags.ed) {
@@ -71,7 +76,7 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
 
   // Pointer should be at the end of the authenticator data, otherwise too much data was sent
   if (authData.byteLength > pointer) {
-    throw new Error('Leftover bytes detected while parsing authenticator data');
+    throw new Error("Leftover bytes detected while parsing authenticator data");
   }
 
   return {

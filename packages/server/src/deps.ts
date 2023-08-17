@@ -15,22 +15,20 @@ export type {
   PublicKeyCredentialRequestOptionsJSON,
   RegistrationResponseJSON,
   UserVerificationRequirement,
-} from '../../typescript-types/src/index.ts';
-
-export { crypto as WebCrypto } from 'https://deno.land/std@0.198.0/crypto/mod.ts';
+} from "../../typescript-types/src/index.ts";
 
 // cbor (a.k.a. cbor-x in Node land)
-export * as cborx from 'https://deno.land/x/cbor@v1.5.2/index.js';
+export * as cborx from "https://deno.land/x/cbor@v1.5.2/index.js";
 
 // NPM: cross-fetch
-export { default as fetch } from 'npm:cross-fetch@^3.1.5';
+export { default as fetch } from "npm:cross-fetch@^3.1.5";
 
 // NPM: debug
-export { default as debug } from 'npm:debug@^4.3.2';
-export type { Debugger } from 'npm:@types/debug@^4.1.7';
+export { default as debug } from "npm:debug@^4.3.2";
+export type { Debugger } from "npm:@types/debug@^4.1.7";
 
 // NPM: @peculiar libraries
-export { AsnParser, AsnSerializer } from 'npm:@peculiar/asn1-schema@^2.3.3';
+export { AsnParser, AsnSerializer } from "npm:@peculiar/asn1-schema@^2.3.3";
 export {
   AuthorityKeyIdentifier,
   BasicConstraints,
@@ -47,13 +45,16 @@ export {
   Name,
   SubjectAlternativeName,
   SubjectKeyIdentifier,
-} from 'npm:@peculiar/asn1-x509@^2.3.4';
+} from "npm:@peculiar/asn1-x509@^2.3.4";
 export {
   ECDSASigValue,
   ECParameters,
   id_ecPublicKey,
   id_secp256r1,
   id_secp384r1,
-} from 'npm:@peculiar/asn1-ecc@^2.3.4';
-export { RSAPublicKey } from 'npm:@peculiar/asn1-rsa@^2.3.4';
-export { id_ce_keyDescription, KeyDescription } from 'npm:@peculiar/asn1-android@^2.3.3';
+} from "npm:@peculiar/asn1-ecc@^2.3.4";
+export { RSAPublicKey } from "npm:@peculiar/asn1-rsa@^2.3.4";
+export {
+  id_ce_keyDescription,
+  KeyDescription,
+} from "npm:@peculiar/asn1-android@^2.3.3";

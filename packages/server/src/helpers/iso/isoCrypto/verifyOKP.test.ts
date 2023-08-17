@@ -1,7 +1,13 @@
-import { COSEALG, COSECRV, COSEKEYS, COSEKTY, COSEPublicKeyOKP } from '../../cose.ts';
-import { verifyOKP } from './verifyOKP.ts';
+import {
+  COSEALG,
+  COSECRV,
+  COSEKEYS,
+  COSEKTY,
+  COSEPublicKeyOKP,
+} from "../../cose.ts";
+import { verifyOKP } from "./verifyOKP.ts";
 
-test('should verify a signature signed with an Ed25519 public key', async () => {
+test("should verify a signature signed with an Ed25519 public key", async () => {
   const cosePublicKey: COSEPublicKeyOKP = new Map();
   cosePublicKey.set(COSEKEYS.kty, COSEKTY.OKP);
   cosePublicKey.set(COSEKEYS.alg, COSEALG.EdDSA);

@@ -1,15 +1,15 @@
-import { AttestationFormat } from '../helpers/decodeAttestationObject.ts';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
+import { AttestationFormat } from "../helpers/decodeAttestationObject.ts";
+import { convertCertBufferToPEM } from "../helpers/convertCertBufferToPEM.ts";
 
-import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
+import { GlobalSign_Root_CA } from "./defaultRootCerts/android-safetynet.ts";
 import {
   Google_Hardware_Attestation_Root_1,
   Google_Hardware_Attestation_Root_2,
-} from './defaultRootCerts/android-key.ts';
-import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
-import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
+} from "./defaultRootCerts/android-key.ts";
+import { Apple_WebAuthn_Root_CA } from "./defaultRootCerts/apple.ts";
+import { GlobalSign_Root_CA_R3 } from "./defaultRootCerts/mds.ts";
 
-type RootCertIdentifier = AttestationFormat | 'mds';
+type RootCertIdentifier = AttestationFormat | "mds";
 
 class BaseSettingsService {
   // Certificates are stored as PEM-formatted strings
@@ -57,21 +57,24 @@ export const SettingsService = new BaseSettingsService();
 
 // Initialize default certificates
 SettingsService.setRootCertificates({
-  identifier: 'android-key',
-  certificates: [Google_Hardware_Attestation_Root_1, Google_Hardware_Attestation_Root_2],
+  identifier: "android-key",
+  certificates: [
+    Google_Hardware_Attestation_Root_1,
+    Google_Hardware_Attestation_Root_2,
+  ],
 });
 
 SettingsService.setRootCertificates({
-  identifier: 'android-safetynet',
+  identifier: "android-safetynet",
   certificates: [GlobalSign_Root_CA],
 });
 
 SettingsService.setRootCertificates({
-  identifier: 'apple',
+  identifier: "apple",
   certificates: [Apple_WebAuthn_Root_CA],
 });
 
 SettingsService.setRootCertificates({
-  identifier: 'mds',
+  identifier: "mds",
   certificates: [GlobalSign_Root_CA_R3],
 });
