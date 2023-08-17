@@ -1,8 +1,14 @@
-import { decodeAttestationObject } from "./decodeAttestationObject.ts";
+import {
+  assert,
+  assertEquals,
+} from "https://deno.land/std@0.198.0/assert/mod.ts";
 
-test("should decode base64url-encoded indirect attestationObject", () => {
+import { decodeAttestationObject } from "./decodeAttestationObject.ts";
+import { isoBase64URL } from "./iso/index.ts";
+
+Deno.test("should decode base64url-encoded indirect attestationObject", () => {
   const decoded = decodeAttestationObject(
-    Buffer.from(
+    isoBase64URL.toBuffer(
       "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjEAbElFazplpnc037DORGDZNjDq86cN9vm6" +
         "+APoAM20wtBAAAAAAAAAAAAAAAAAAAAAAAAAAAAQKmPuEwByQJ3e89TccUSrCGDkNWquhevjLLn/" +
         "KNZZaxQQ0steueoG2g12dvnUNbiso8kVJDyLa+6UiA34eniujWlAQIDJiABIVggiUk8wN2j" +
@@ -11,14 +17,20 @@ test("should decode base64url-encoded indirect attestationObject", () => {
     ),
   );
 
-  expect(decoded.get("fmt")).toEqual("none");
-  expect(decoded.get("attStmt")).toEqual(new Map());
-  expect(decoded.get("authData")).toBeDefined();
+  assertEquals(
+    decoded.get("fmt"),
+    "none",
+  );
+  assertEquals(
+    decoded.get("attStmt"),
+    new Map(),
+  );
+  assert(decoded.get("authData"));
 });
 
-test("should decode base64url-encoded direct attestationObject", () => {
+Deno.test("should decode base64url-encoded direct attestationObject", () => {
   const decoded = decodeAttestationObject(
-    Buffer.from(
+    isoBase64URL.toBuffer(
       "o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAK40WxA0t7py7AjEXvwGwTlmqlvrOk" +
         "s5g9lf+9zXzRiVAiEA3bv60xyXveKDOusYzniD7CDSostCet9PYK7FLdnTdZNjeDVjgVkCwTCCAr0wggGloAMCAQICBCrn" +
         "YmMwDQYJKoZIhvcNAQELBQAwLjEsMCoGA1UEAxMjWXViaWNvIFUyRiBSb290IENBIFNlcmlhbCA0NTcyMDA2MzEwIBcNMT" +
@@ -38,8 +50,11 @@ test("should decode base64url-encoded direct attestationObject", () => {
     ),
   );
 
-  expect(decoded.get("fmt")).toEqual("fido-u2f");
-  expect(decoded.get("attStmt").get("sig")).toBeDefined();
-  expect(decoded.get("attStmt").get("x5c")).toBeDefined();
-  expect(decoded.get("authData")).toBeDefined();
+  assertEquals(
+    decoded.get("fmt"),
+    "fido-u2f",
+  );
+  assert(decoded.get("attStmt").get("sig"));
+  assert(decoded.get("attStmt").get("x5c"));
+  assert(decoded.get("authData"));
 });
