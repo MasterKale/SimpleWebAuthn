@@ -7,3 +7,5 @@ setupTests.ts
 tsconfig.json
 # Use Deno for linting the server package instead
 packages/server/
+packages/typescript-tyes/
+packages/iso-webcrypto/
