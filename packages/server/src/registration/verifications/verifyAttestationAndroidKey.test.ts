@@ -1,6 +1,6 @@
-import { SettingsService } from "../../services/settingsService.ts";
-import { isoBase64URL } from "../../helpers/iso/index.ts";
+import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
 
+import { SettingsService } from "../../services/settingsService.ts";
 import { verifyRegistrationResponse } from "../verifyRegistrationResponse.ts";
 
 /**
@@ -12,9 +12,7 @@ SettingsService.setRootCertificates({
   certificates: [],
 });
 
-test("should verify Android KeyStore response", async () => {
-  const expectedChallenge = "4ab7dfd1-a695-4777-985f-ad2993828e99";
-  jest.spyOn(isoBase64URL, "fromString").mockReturnValueOnce(expectedChallenge);
+Deno.test("should verify Android KeyStore response", async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: "V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw",
@@ -29,11 +27,11 @@ test("should verify Android KeyStore response", async () => {
       type: "public-key",
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge: "4ab7dfd1-a695-4777-985f-ad2993828e99",
     expectedOrigin: "https://dev.dontneeda.pw",
     expectedRPID: "dev.dontneeda.pw",
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
