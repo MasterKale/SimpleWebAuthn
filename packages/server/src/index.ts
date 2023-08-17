@@ -10,7 +10,7 @@ import { MetadataService } from "./services/metadataService.ts";
 import { SettingsService } from "./services/settingsService.ts";
 
 export {
-  generateAuthenticationOptions as generateAuthenticationOptions,
+  generateAuthenticationOptions,
   generateRegistrationOptions,
   MetadataService,
   SettingsService,
