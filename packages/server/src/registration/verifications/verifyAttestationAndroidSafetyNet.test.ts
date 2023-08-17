@@ -1,9 +1,13 @@
+import {
+  assert,
+  assertRejects,
+} from "https://deno.land/std@0.198.0/assert/mod.ts";
+import { FakeTime } from "https://deno.land/std@0.198.0/testing/time.ts";
+
+import { RegistrationResponseJSON } from "../../deps.ts";
 import { verifyAttestationAndroidSafetyNet } from "./verifyAttestationAndroidSafetyNet.ts";
 
-import {
-  AttestationStatement,
-  decodeAttestationObject,
-} from "../../helpers/decodeAttestationObject.ts";
+import { decodeAttestationObject } from "../../helpers/decodeAttestationObject.ts";
 import { parseAuthenticatorData } from "../../helpers/parseAuthenticatorData.ts";
 import { toHash } from "../../helpers/toHash.ts";
 import { isoBase64URL } from "../../helpers/iso/index.ts";
@@ -13,46 +17,56 @@ const rootCertificates = SettingsService.getRootCertificates({
   identifier: "android-safetynet",
 });
 
-let authData: Uint8Array;
-let attStmt: AttestationStatement;
-let clientDataHash: Uint8Array;
-let aaguid: Uint8Array;
-let credentialID: Uint8Array;
-let credentialPublicKey: Uint8Array;
-let rpIdHash: Uint8Array;
-let spyDate: jest.SpyInstance;
-
-beforeEach(async () => {
-  const { attestationObject, clientDataJSON } =
-    attestationAndroidSafetyNet.response;
+/**
+ * Parse the responses below for values needed in each test
+ */
+async function getResponseValues(response: RegistrationResponseJSON) {
+  const { attestationObject, clientDataJSON } = response.response;
   const decodedAttestationObject = decodeAttestationObject(
     isoBase64URL.toBuffer(attestationObject),
   );
 
-  authData = decodedAttestationObject.get("authData");
-  attStmt = decodedAttestationObject.get("attStmt");
-  clientDataHash = await toHash(isoBase64URL.toBuffer(clientDataJSON));
+  const authData = decodedAttestationObject.get("authData");
+  const attStmt = decodedAttestationObject.get("attStmt");
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(clientDataJSON));
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  aaguid = parsedAuthData.aaguid!;
-  credentialID = parsedAuthData.credentialID!;
-  credentialPublicKey = parsedAuthData.credentialPublicKey!;
+  const aaguid = parsedAuthData.aaguid!;
+  const credentialID = parsedAuthData.credentialID!;
+  const credentialPublicKey = parsedAuthData.credentialPublicKey!;
+  const rpIdHash = parsedAuthData.rpIdHash;
 
-  spyDate = jest.spyOn(globalThis.Date, "now");
-});
-
-afterEach(() => {
-  spyDate.mockRestore();
-});
+  return {
+    authData,
+    attStmt,
+    clientDataHash,
+    parsedAuthData,
+    aaguid,
+    credentialID,
+    credentialPublicKey,
+    rpIdHash,
+  };
+}
 
 /**
- * We need to use the `verifyTimestampMS` escape hatch until I can figure out how to generate a
- * signature after modifying the payload with a `timestampMs` we can dynamically set
+ * We need to use the `verifyTimestampMS` escape hatch until I can figure out
+ * how to generate a signature after modifying the payload with a `timestampMs`
+ * we can dynamically set
  */
-test("should verify Android SafetyNet attestation", async () => {
+Deno.test("should verify Android SafetyNet attestation", async () => {
+  const {
+    attStmt,
+    authData,
+    clientDataHash,
+    aaguid,
+    credentialID,
+    credentialPublicKey,
+    rpIdHash,
+  } = await getResponseValues(attestationAndroidSafetyNet);
+
   // notBefore: 2017-06-15T00:00:42.000Z
   // notAfter: 2021-12-15T00:00:42.000Z
-  spyDate.mockReturnValue(new Date("2021-11-15T00:00:42.000Z"));
+  const mockDate = new FakeTime(new Date("2021-11-15T00:00:42.000Z"));
 
   const verified = await verifyAttestationAndroidSafetyNet({
     attStmt,
@@ -66,58 +80,72 @@ test("should verify Android SafetyNet attestation", async () => {
     rpIdHash,
   });
 
-  expect(verified).toEqual(true);
+  assert(verified);
+
+  mockDate.restore();
 });
 
-test("should throw error when timestamp is not within one minute of now", async () => {
-  await expect(
-    verifyAttestationAndroidSafetyNet({
-      attStmt,
-      authData,
-      clientDataHash,
-      aaguid,
-      rootCertificates,
-      credentialID,
-      credentialPublicKey,
-      rpIdHash,
-    }),
-  ).rejects.toThrow(/has expired/i);
+Deno.test("should throw error when timestamp is not within one minute of now", async () => {
+  const {
+    attStmt,
+    authData,
+    clientDataHash,
+    aaguid,
+    credentialID,
+    credentialPublicKey,
+    rpIdHash,
+  } = await getResponseValues(attestationAndroidSafetyNet);
+
+  await assertRejects(
+    () =>
+      verifyAttestationAndroidSafetyNet({
+        attStmt,
+        authData,
+        clientDataHash,
+        aaguid,
+        rootCertificates,
+        credentialID,
+        credentialPublicKey,
+        rpIdHash,
+      }),
+    Error,
+    "has expired",
+  );
 });
 
-test("should validate response with cert path completed with GlobalSign R1 root cert", async () => {
+Deno.test("should validate response with cert path completed with GlobalSign R1 root cert", async () => {
+  const {
+    aaguid,
+    attStmt,
+    authData,
+    clientDataHash,
+    credentialID,
+    credentialPublicKey,
+    rpIdHash,
+  } = await getResponseValues(safetyNetUsingGSR1RootCert);
+
   // notBefore: 2006-12-15T08:00:00.000Z
   // notAfter: 2021-12-15T08:00:00.000Z
-  spyDate.mockReturnValue(new Date("2021-11-15T00:00:42.000Z"));
-
-  const { attestationObject, clientDataJSON } =
-    safetyNetUsingGSR1RootCert.response;
-  const decodedAttestationObject = decodeAttestationObject(
-    isoBase64URL.toBuffer(attestationObject),
-  );
-
-  const _authData = decodedAttestationObject.get("authData");
-  const _attStmt = decodedAttestationObject.get("attStmt");
-  const _clientDataHash = await toHash(isoBase64URL.toBuffer(clientDataJSON));
-
-  const parsedAuthData = parseAuthenticatorData(_authData);
-  const _aaguid = parsedAuthData.aaguid!;
+  const mockDate = new FakeTime(new Date("2021-11-15T00:00:42.000Z"));
 
   const verified = await verifyAttestationAndroidSafetyNet({
-    attStmt: _attStmt,
-    authData: _authData,
-    clientDataHash: _clientDataHash,
+    attStmt,
+    authData,
+    clientDataHash,
     verifyTimestampMS: false,
-    aaguid: _aaguid,
+    aaguid,
     rootCertificates,
     credentialID,
     credentialPublicKey,
     rpIdHash,
   });
 
-  expect(verified).toEqual(true);
+  assert(verified);
+
+  mockDate.restore();
 });
 
-const attestationAndroidSafetyNet = {
+const attestationAndroidSafetyNet: RegistrationResponseJSON = {
   id:
     "AQy9gSmVYQXGuzd492rA2qEqwN7SYE_xOCjduU4QVagRwnX30mbfW75Lu4TwXHe-gc1O2PnJF7JVJA9dyJm83Xs",
   rawId:
@@ -214,11 +242,11 @@ const attestationAndroidSafetyNet = {
       "YUMxM2F6Tmlka2h0WVd0MGFWWjJSVmxETFV4M1FsZyIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh" +
       "LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0",
   },
-  getClientExtensionResults: () => ({}),
+  clientExtensionResults: {},
   type: "public-key",
 };
 
-const safetyNetUsingGSR1RootCert = {
+const safetyNetUsingGSR1RootCert: RegistrationResponseJSON = {
   id:
     "AQsMmnEQ8OxpZxijXBMT4tyamgkqC_3hr18_e8KeK8nG69ijcTaXNKX_CRmYiW0fegPE0N_3NVHEaj_kit7LPNM",
   rawId:
@@ -357,10 +385,10 @@ const safetyNetUsingGSR1RootCert = {
       "92NUd9sRVM1fVR6FRFZY_P7fnCq3crgiWCALN83GhRoAD4faTpk1bp7bGclHRleO922RvPUpSnBb-w",
     clientDataJSON:
       "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQUhOWlE1WWFoZVpZOF9lYXdvM0VITHlXdjhCemlqaXFzQlVlNDZ2LVFTZyIsIm9yaWdpbiI6Imh0dHA6XC9cL2xvY2FsaG9zdDo0MjAwIiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoiY29tLmFuZHJvaWQuY2hyb21lIn0",
+    transports: [],
   },
   type: "public-key",
   clientExtensionResults: {},
-  transports: [],
 };
 
 /**
