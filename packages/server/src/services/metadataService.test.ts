@@ -1,86 +1,102 @@
-jest.mock("cross-fetch");
-import fetch from "cross-fetch";
+import {
+  assertEquals,
+  assertRejects,
+} from "https://deno.land/std@0.198.0/assert/mod.ts";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  it,
+} from "https://deno.land/std@0.198.0/testing/bdd.ts";
+import {
+  assertSpyCallArg,
+  assertSpyCalls,
+  Stub,
+  stub,
+} from "https://deno.land/std@0.198.0/testing/mock.ts";
+
+import { _fetchInternals } from "../helpers/fetch.ts";
 
 import { BaseMetadataService, MetadataService } from "./metadataService.ts";
 import type { MetadataStatement } from "../metadata/mdsTypes.ts";
 
-const _fetch = fetch as unknown as jest.Mock;
+// const _fetch = fetch as unknown as jest.Mock;
+let mockFetch: Stub;
 
 describe("Method: initialize()", () => {
   beforeEach(() => {
-    _fetch.mockReset();
+    mockFetch = stub(_fetchInternals, "stubThis");
   });
 
-  test("should default to querying MDS v3", async () => {
+  afterEach(() => {
+    mockFetch.restore();
+  });
+
+  it("should default to querying MDS v3", async () => {
     await MetadataService.initialize();
 
-    expect(_fetch).toHaveBeenCalledTimes(1);
-    expect(_fetch).toHaveBeenCalledWith("https://mds.fidoalliance.org/");
+    assertSpyCalls(mockFetch, 1);
+    assertSpyCallArg(mockFetch, 0, 0, "https://mds.fidoalliance.org/");
   });
 
-  test("should query provided MDS server URLs", async () => {
+  it("should query provided MDS server URLs", async () => {
     const mdsServers = ["https://custom-mds1.com", "https://custom-mds2.com"];
 
     await MetadataService.initialize({
       mdsServers,
     });
 
-    expect(_fetch).toHaveBeenCalledTimes(mdsServers.length);
-    expect(_fetch).toHaveBeenNthCalledWith(1, mdsServers[0]);
-    expect(_fetch).toHaveBeenNthCalledWith(2, mdsServers[1]);
+    assertSpyCalls(mockFetch, mdsServers.length);
+    assertSpyCallArg(mockFetch, 0, 0, mdsServers[0]);
+    assertSpyCallArg(mockFetch, 1, 0, mdsServers[1]);
   });
 
-  test("should not query any servers on empty list of URLs", async () => {
+  it("should not query any servers on empty list of URLs", async () => {
     await MetadataService.initialize({ mdsServers: [] });
 
-    expect(_fetch).not.toHaveBeenCalled();
+    assertSpyCalls(mockFetch, 0);
   });
 
-  test("should load local statements", async () => {
+  it("should load local statements", async () => {
     await MetadataService.initialize({
       statements: [localStatement],
     });
 
     const statement = await MetadataService.getStatement(localStatementAAGUID);
 
-    expect(statement).toEqual(localStatement);
+    assertEquals(statement, localStatement);
   });
 });
 
 describe("Method: getStatement()", () => {
-  test("should return undefined if service not initialized", async () => {
+  it("should return undefined if service not initialized", async () => {
     // For lack of a way to "uninitialize" the singleton, create a new instance
     const service = new BaseMetadataService();
     const statement = await service.getStatement("not-a-real-aaguid");
 
-    expect(statement).toBeUndefined();
+    assertEquals(statement, undefined);
   });
 
-  test("should return undefined if aaguid is undefined", async () => {
+  it("should return undefined if aaguid is undefined", async () => {
     // TypeScript will prevent you from passing `undefined`, but JS won't so test it
     // @ts-ignore 2345
     const statement = await MetadataService.getStatement(undefined);
 
-    expect(statement).toBeUndefined();
+    assertEquals(statement, undefined);
   });
 
-  test("should throw after initialization on AAGUID with no statement", async () => {
-    // Require the `catch` to be evaluated
-    expect.assertions(1);
-
+  it("should throw after initialization on AAGUID with no statement", async () => {
     await MetadataService.initialize({
       mdsServers: [],
       statements: [],
     });
 
-    try {
-      await MetadataService.getStatement("not-a-real-aaguid");
-    } catch (err) {
-      expect(err).not.toBeUndefined();
-    }
+    assertRejects(
+      () => MetadataService.getStatement("not-a-real-aaguid"),
+    );
   });
 
-  test('should return undefined after initialization on AAGUID with no statement and verificationMode is "permissive"', async () => {
+  it('should return undefined after initialization on AAGUID with no statement and verificationMode is "permissive"', async () => {
     await MetadataService.initialize({
       mdsServers: [],
       statements: [],
@@ -89,7 +105,7 @@ describe("Method: getStatement()", () => {
 
     const statement = await MetadataService.getStatement("not-a-real-aaguid");
 
-    expect(statement).toBeUndefined();
+    assertEquals(statement, undefined);
   });
 });
 
