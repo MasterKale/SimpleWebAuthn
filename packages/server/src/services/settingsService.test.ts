@@ -1,46 +1,39 @@
+import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
+
 import { SettingsService } from "./settingsService.ts";
+import { convertPEMToBytes } from "../helpers/convertPEMToBytes.ts";
 
 import { GlobalSign_Root_CA } from "./defaultRootCerts/android-safetynet.ts";
 import { Apple_WebAuthn_Root_CA } from "./defaultRootCerts/apple.ts";
 
-function pemToBuffer(pem: string): Buffer {
-  const trimmed = pem
-    .replace("-----BEGIN CERTIFICATE-----", "")
-    .replace("-----END CERTIFICATE-----", "")
-    .replace("\n", "");
-  return Buffer.from(trimmed, "base64");
-}
-
-describe("setRootCertificate/getRootCertificate", () => {
-  test("should accept cert as Buffer", () => {
-    const gsr1Buffer = pemToBuffer(GlobalSign_Root_CA);
-    SettingsService.setRootCertificates({
-      identifier: "android-safetynet",
-      certificates: [gsr1Buffer],
-    });
-
-    const certs = SettingsService.getRootCertificates({
-      identifier: "android-safetynet",
-    });
-
-    expect(certs).toEqual([GlobalSign_Root_CA]);
+Deno.test("should accept cert as Buffer", () => {
+  const gsr1Buffer = convertPEMToBytes(GlobalSign_Root_CA);
+  SettingsService.setRootCertificates({
+    identifier: "android-safetynet",
+    certificates: [gsr1Buffer],
   });
 
-  test("should accept cert as PEM string", () => {
-    SettingsService.setRootCertificates({
-      identifier: "apple",
-      certificates: [Apple_WebAuthn_Root_CA],
-    });
-
-    const certs = SettingsService.getRootCertificates({ identifier: "apple" });
-
-    expect(certs).toEqual([Apple_WebAuthn_Root_CA]);
+  const certs = SettingsService.getRootCertificates({
+    identifier: "android-safetynet",
   });
 
-  test("should return empty array when certificate is not set", () => {
-    const certs = SettingsService.getRootCertificates({ identifier: "none" });
+  assertEquals(certs, [GlobalSign_Root_CA]);
+});
 
-    expect(Array.isArray(certs)).toEqual(true);
-    expect(certs.length).toEqual(0);
+Deno.test("should accept cert as PEM string", () => {
+  SettingsService.setRootCertificates({
+    identifier: "apple",
+    certificates: [Apple_WebAuthn_Root_CA],
   });
+
+  const certs = SettingsService.getRootCertificates({ identifier: "apple" });
+
+  assertEquals(certs, [Apple_WebAuthn_Root_CA]);
+});
+
+Deno.test("should return empty array when certificate is not set", () => {
+  const certs = SettingsService.getRootCertificates({ identifier: "none" });
+
+  assertEquals(Array.isArray(certs), true);
+  assertEquals(certs.length, 0);
 });
