@@ -1,22 +1,26 @@
-jest.mock("../helpers/generateChallenge");
+import {
+  assert,
+  assertEquals,
+  assertExists,
+} from "https://deno.land/std@0.198.0/assert/mod.ts";
 
-import { isoBase64URL } from "../helpers/iso/index.ts";
+import { isoBase64URL, isoUint8Array } from "../helpers/iso/index.ts";
 
 import { generateAuthenticationOptions } from "./generateAuthenticationOptions.ts";
 
 const challengeString = "dG90YWxseXJhbmRvbXZhbHVl";
 const challengeBuffer = isoBase64URL.toBuffer(challengeString);
 
-test("should generate credential request options suitable for sending via JSON", () => {
-  const options = generateAuthenticationOptions({
+Deno.test("should generate credential request options suitable for sending via JSON", async () => {
+  const options = await generateAuthenticationOptions({
     allowCredentials: [
       {
-        id: Buffer.from("1234", "ascii"),
+        id: isoUint8Array.fromASCIIString("1234"),
         type: "public-key",
         transports: ["usb", "nfc"],
       },
       {
-        id: Buffer.from("5678", "ascii"),
+        id: isoUint8Array.fromASCIIString("5678"),
         type: "public-key",
         transports: ["internal"],
       },
@@ -25,7 +29,7 @@ test("should generate credential request options suitable for sending via JSON",
     challenge: challengeBuffer,
   });
 
-  expect(options).toEqual({
+  assertEquals(options, {
     // base64url-encoded
     challenge: challengeString,
     allowCredentials: [
@@ -42,103 +46,104 @@ test("should generate credential request options suitable for sending via JSON",
     ],
     timeout: 1,
     userVerification: "preferred",
+    extensions: undefined,
+    rpId: undefined,
   });
 });
 
-test("defaults to 60 seconds if no timeout is specified", () => {
-  const options = generateAuthenticationOptions({
+Deno.test("defaults to 60 seconds if no timeout is specified", async () => {
+  const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from("1234", "ascii"), type: "public-key" },
-      { id: Buffer.from("5678", "ascii"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("1234"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("5678"), type: "public-key" },
     ],
   });
 
-  expect(options.timeout).toEqual(60000);
+  assertEquals(options.timeout, 60000);
 });
 
-test('should set userVerification to "preferred" if not specified', () => {
-  const options = generateAuthenticationOptions({
+Deno.test('should set userVerification to "preferred" if not specified', async () => {
+  const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from("1234", "ascii"), type: "public-key" },
-      { id: Buffer.from("5678", "ascii"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("1234"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("5678"), type: "public-key" },
     ],
   });
 
-  expect(options.userVerification).toEqual("preferred");
+  assertEquals(options.userVerification, "preferred");
 });
 
-test("should not set allowCredentials if not specified", () => {
-  const options = generateAuthenticationOptions({ rpID: "test" });
+Deno.test("should not set allowCredentials if not specified", async () => {
+  const options = await generateAuthenticationOptions({ rpID: "test" });
 
-  expect(options.allowCredentials).toEqual(undefined);
+  assertEquals(options.allowCredentials, undefined);
 });
 
-test("should generate without params", () => {
-  const options = generateAuthenticationOptions();
+Deno.test("should generate without params", async () => {
+  const options = await generateAuthenticationOptions();
   const { challenge, ...otherFields } = options;
-  expect(otherFields).toEqual({
+  assertEquals(otherFields, {
     allowCredentials: undefined,
     extensions: undefined,
     rpId: undefined,
     timeout: 60000,
     userVerification: "preferred",
   });
-  expect(typeof challenge).toEqual("string");
+  assertEquals(typeof challenge, "string");
 });
 
-test("should set userVerification if specified", () => {
-  const options = generateAuthenticationOptions({
+Deno.test("should set userVerification if specified", async () => {
+  const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from("1234", "ascii"), type: "public-key" },
-      { id: Buffer.from("5678", "ascii"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("1234"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("5678"), type: "public-key" },
     ],
     userVerification: "required",
   });
 
-  expect(options.userVerification).toEqual("required");
+  assertEquals(options.userVerification, "required");
 });
 
-test("should set extensions if specified", () => {
-  const options = generateAuthenticationOptions({
+Deno.test("should set extensions if specified", async () => {
+  const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: Buffer.from("1234", "ascii"), type: "public-key" },
-      { id: Buffer.from("5678", "ascii"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("1234"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("5678"), type: "public-key" },
     ],
     extensions: { appid: "simplewebauthn" },
   });
 
-  expect(options.extensions).toEqual({
-    appid: "simplewebauthn",
-  });
+  assertEquals(options.extensions, { appid: "simplewebauthn" });
 });
 
-test("should generate a challenge if one is not provided", () => {
+Deno.test("should generate a challenge if one is not provided", async () => {
   const opts = {
     allowCredentials: [
-      { id: Buffer.from("1234", "ascii"), type: "public-key" },
-      { id: Buffer.from("5678", "ascii"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("1234"), type: "public-key" },
+      { id: isoUint8Array.fromASCIIString("5678"), type: "public-key" },
     ],
   };
 
   // @ts-ignore 2345
-  const options = generateAuthenticationOptions(opts);
+  const options = await generateAuthenticationOptions(opts);
 
-  // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
-  expect(options.challenge).toEqual("AQIDBAUGBwgJCgsMDQ4PEA");
+  // Assert basic properties of the challenge
+  assert(options.challenge.length >= 16);
+  assert(isoBase64URL.isBase64url(options.challenge));
 });
 
-test("should set rpId if specified", () => {
+Deno.test("should set rpId if specified", async () => {
   const rpID = "simplewebauthn.dev";
 
-  const opts = generateAuthenticationOptions({
+  const opts = await generateAuthenticationOptions({
     allowCredentials: [],
     rpID,
   });
 
-  expect(opts.rpId).toBeDefined();
-  expect(opts.rpId).toEqual(rpID);
+  assertExists(opts.rpId);
+  assertEquals(opts.rpId, rpID);
 });
