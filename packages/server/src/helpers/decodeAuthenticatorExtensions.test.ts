@@ -1,7 +1,9 @@
+import { assertObjectMatch } from "https://deno.land/std@0.198.0/assert/mod.ts";
+
 import { decodeAuthenticatorExtensions } from "./decodeAuthenticatorExtensions.ts";
 import { isoUint8Array } from "./iso/index.ts";
 
-test("should decode authenticator extensions", () => {
+Deno.test("should decode authenticator extensions", () => {
   const extensions = decodeAuthenticatorExtensions(
     isoUint8Array.fromHex(
       "A16C6465766963655075624B6579A56364706B584DA5010203262001215820991AABED9D" +
@@ -12,17 +14,20 @@ test("should decode authenticator extensions", () => {
         "65406573636F70654100666161677569645000000000000000000000000000000000",
     ),
   );
-  expect(extensions).toMatchObject({
-    devicePubKey: {
-      dpk: isoUint8Array.fromHex(
-        "A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA",
-      ),
-      sig: isoUint8Array.fromHex(
-        "3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E",
-      ),
-      nonce: isoUint8Array.fromHex(""),
-      scope: isoUint8Array.fromHex("00"),
-      aaguid: isoUint8Array.fromHex("00000000000000000000000000000000"),
+  assertObjectMatch(
+    extensions!,
+    {
+      devicePubKey: {
+        dpk: isoUint8Array.fromHex(
+          "A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA",
+        ),
+        sig: isoUint8Array.fromHex(
+          "3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E",
+        ),
+        nonce: isoUint8Array.fromHex(""),
+        scope: isoUint8Array.fromHex("00"),
+        aaguid: isoUint8Array.fromHex("00000000000000000000000000000000"),
+      },
     },
-  });
+  );
 });
