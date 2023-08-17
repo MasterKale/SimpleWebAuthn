@@ -4,6 +4,7 @@
   "deno.path": "/opt/homebrew/bin/deno",
   "deno.enablePaths": [
     "./packages/server",
+    "./packages/typescript-types",
   ],
   "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
