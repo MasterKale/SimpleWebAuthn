@@ -1,6 +1,20 @@
+import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
+
 import { verifyRegistrationResponse } from "../verifyRegistrationResponse.ts";
 
-test("should verify Apple attestation", async () => {
+//
+/**
+ * TODO (Aug 2023): This test has to be ignored for now because Deno doesn't
+ * support signature verification if the key algorithm and hash algorithm
+ * aren't the same. In this test the key alg is P-384 and the hash alg is
+ * SHA-256...
+ *
+ * See https://deno.land/x/deno@v1.36.1/ext/crypto/00_crypto.js?source#L1338
+ *
+ * I raised an issue about this here:
+ * https://github.com/denoland/deno/issues/20198
+ */
+Deno.test("should verify Apple attestation", { ignore: true }, async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: "J4lAqPXhefDrUD7oh5LQMbBH5TE",
@@ -20,5 +34,5 @@ test("should verify Apple attestation", async () => {
     expectedRPID: "dev.dontneeda.pw",
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
