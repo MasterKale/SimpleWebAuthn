@@ -3,7 +3,7 @@ import { isoCrypto } from "./iso/index.ts";
 /**
  * Generate a suitably random value to be used as an attestation or assertion challenge
  */
-export function generateChallenge(): Uint8Array {
+export async function generateChallenge(): Promise<Uint8Array> {
   /**
    * WebAuthn spec says that 16 bytes is a good minimum:
    *
@@ -14,7 +14,7 @@ export function generateChallenge(): Uint8Array {
    */
   const challenge = new Uint8Array(32);
 
-  isoCrypto.getRandomValues(challenge);
+  await isoCrypto.getRandomValues(challenge);
 
   return challenge;
 }
