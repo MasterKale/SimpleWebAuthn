@@ -7,12 +7,13 @@
       "ignoreChanges": [
         "*.config.js",
         ".eslintrc.js",
-        ".prettierignore",
         ".gitignore",
         ".eslintignore"
       ],
       "message": "chore(release): publish %s"
     }
   },
-  "packages": ["packages/*"]
+  "packages": [
+    "packages/*"
+  ]
 }
