@@ -1,14 +1,19 @@
+import {
+  assert,
+  assertNotEquals,
+} from "https://deno.land/std@0.198.0/assert/mod.ts";
+
 import { generateChallenge } from "./generateChallenge.ts";
 
-test("should return a buffer of at least 32 bytes", () => {
-  const challenge = generateChallenge();
+Deno.test("should return a buffer of at least 32 bytes", async () => {
+  const challenge = await generateChallenge();
 
-  expect(challenge.byteLength).toBeGreaterThanOrEqual(32);
+  assert(challenge.byteLength >= 32);
 });
 
-test("should return random bytes on each execution", () => {
-  const challenge1 = generateChallenge();
-  const challenge2 = generateChallenge();
+Deno.test("should return random bytes on each execution", async () => {
+  const challenge1 = await generateChallenge();
+  const challenge2 = await generateChallenge();
 
-  expect(challenge1).not.toEqual(challenge2);
+  assertNotEquals(challenge1, challenge2);
 });
