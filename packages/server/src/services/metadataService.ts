@@ -1,4 +1,3 @@
-import { fetch } from "../deps.ts";
 import { validateCertificatePath } from "../helpers/validateCertificatePath.ts";
 import { convertCertBufferToPEM } from "../helpers/convertCertBufferToPEM.ts";
 import { convertAAGUIDToString } from "../helpers/convertAAGUIDToString.ts";
@@ -11,6 +10,7 @@ import type {
 import { SettingsService } from "../services/settingsService.ts";
 import { getLogger } from "../helpers/logging.ts";
 import { convertPEMToBytes } from "../helpers/convertPEMToBytes.ts";
+import { fetch } from "../helpers/fetch.ts";
 
 import { parseJWT } from "../metadata/parseJWT.ts";
 import { verifyJWT } from "../metadata/verifyJWT.ts";
