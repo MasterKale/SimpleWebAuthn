@@ -64,6 +64,16 @@ await build({
       name: 'cbor-x',
       version: '^1.5.2',
     },
+    // Mapping for '../../typescript-types/src/index.ts' in deps.ts
+    '../typescript-types/src/index.ts': {
+      name: '@simplewebauthn/typescript-types',
+      version: '^7.4.0',
+    },
+    // Mapping for '../../iso-webcrypto/src/browser.ts' in deps.ts
+    '../iso-webcrypto/src/browser.ts': {
+      name: '@simplewebauthn/iso-webcrypto',
+      version: '^7.4.0',
+    },
   },
   // TypeScript tsconfig.json config
   compilerOptions: {
