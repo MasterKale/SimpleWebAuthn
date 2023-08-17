@@ -1,17 +1,17 @@
+import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
+
 import { decodeClientDataJSON } from "./decodeClientDataJSON.ts";
 
-test("should convert base64url-encoded attestation clientDataJSON to JSON", () => {
-  expect(
+Deno.test("should convert base64url-encoded attestation clientDataJSON to JSON", () => {
+  assertEquals(
     decodeClientDataJSON(
-      "eyJjaGFsbGVuZ2UiOiJVMmQ0TjNZME0wOU1jbGRQYjFSNVpFeG5UbG95IiwiY2xpZW50RXh0ZW5zaW9ucyI6e30" +
-        "sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9jbG92ZXIubWlsbGVydGltZS5kZX" +
-        "Y6MzAwMCIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ==",
+      "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiWko0YW12QnpOUGVMb3lLVE04bDlqamFmMDhXc0V0TG5OSENGZnhacGEybjlfU21NUnR5VjZlYlNPSUFfUGNsOHBaUjl5Y1ZhaW5SdV9rUDhRaTZiemciLCJvcmlnaW4iOiJodHRwczovL3dlYmF1dGhuLmlvIn0",
     ),
-  ).toEqual({
-    challenge: "U2d4N3Y0M09McldPb1R5ZExnTloy",
-    clientExtensions: {},
-    hashAlgorithm: "SHA-256",
-    origin: "https://clover.millertime.dev:3000",
-    type: "webauthn.create",
-  });
+    {
+      type: "webauthn.create",
+      challenge:
+        "ZJ4amvBzNPeLoyKTM8l9jjaf08WsEtLnNHCFfxZpa2n9_SmMRtyV6ebSOIA_Pcl8pZR9ycVainRu_kP8Qi6bzg",
+      origin: "https://webauthn.io",
+    },
+  );
 });
