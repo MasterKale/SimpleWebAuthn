@@ -13,10 +13,9 @@ await build({
   shims: {
     deno: 'dev',
   },
+  // Keeping declarations in a single types/ directory to mimic the original file structure
   declaration: 'separate',
   test: false,
-  // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
-  typeCheck: false,
   // package.json values
   package: {
     name: '@simplewebauthn/typescript-types',
