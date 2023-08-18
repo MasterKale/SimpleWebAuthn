@@ -41,6 +41,9 @@ jobs:
     # Install deps
     - run: npm ci
 
+    # Build and test dnt packages
+    - run: npm run build:types   # browser tests will need this to be built
+    - run: npm run build:server  # dnt will test everything in Node too
+
     # Test packages
     - run: npm run test:browser
-    - run: npm run build:server  # dnt will test everything in Node too
