@@ -28,7 +28,7 @@ export async function getWebCrypto(): Promise<Crypto> {
     const _crypto: Crypto = globalThis.crypto;
 
     if (!_crypto) {
-      // We tried to access it both in Node and
+      // We tried to access it both in Node and globally, so bail out
       throw new MissingWebCrypto();
     }
 
