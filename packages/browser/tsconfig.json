@@ -15,12 +15,6 @@
     "removeComments": true,
     "sourceMap": false,
     "noEmit": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      // TODO: Why can't `npm run test` find these types?
-      "./node_modules/@simplewebauthn/typescript-types/npm/types",
-      "../../node_modules/@types",
-    ]
   },
   "include": [
     "./src/**/*.ts"
