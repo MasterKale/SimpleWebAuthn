@@ -17,13 +17,27 @@ jobs:
     strategy:
       matrix:
         node-version: [ 16, 18 ]
+        deno-version: [ 'v1.36.x' ]
 
     steps:
     - uses: actions/checkout@v3
+
+    # Node
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run bootstrap:ci
-    - run: npm test
+    - run: npm run test:browser
+
+    # Deno
+    - name: Setup Deno (${{ matrix.deno-version }})
+      uses: maximousblk/setup-deno@v2
+      with:
+        deno-version: ${{ matrix.deno-version }}
+    - run: deno -V
+    - run: npm run test:server
+    - run: npm run test:types
+    - run: npm run build:server
+    - run: npm run build:types
