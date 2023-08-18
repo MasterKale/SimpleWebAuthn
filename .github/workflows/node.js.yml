@@ -38,9 +38,8 @@ jobs:
         deno-version: ${{ matrix.deno-version }}
     - run: deno -V
 
-    # Install Lerna deps
+    # Install deps
     - run: npm ci
-    - run: npm run bootstrap:ci
 
     # Test browser
     - run: npm run test:browser

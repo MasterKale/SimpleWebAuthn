@@ -7,12 +7,10 @@
     "packages/typescript-types/npm/"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "bootstrap:ci": "lerna bootstrap --hoist",
     "clean": "lerna clean -y && rm -f ./packages/**/package-lock.json && rm -rf ./packages/**/dist && rm -rf ./packages/**/npm",
-    "get-it-onto-npm": "lerna bootstrap && rm -f ./packages/**/package-lock.json && lerna publish",
+    "get-it-onto-npm": "npm install && rm -f ./packages/**/package-lock.json && lerna publish",
     "lint": "deno lint packages/**/src/**/*.ts example/**/*.ts",
-    "docs": "npm run bootstrap:ci && typedoc --tsconfig tsconfigdoc.json",
+    "docs": "npm ci && typedoc --tsconfig tsconfigdoc.json",
     "test": "npm run test:browser; npm run test:server",
     "test:browser": "lerna run test --scope=@simplewebauthn/browser",
     "test:server": "(cd ./packages/server && npm run test)",
