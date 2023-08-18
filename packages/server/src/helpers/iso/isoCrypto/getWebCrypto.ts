@@ -18,7 +18,7 @@ export async function getWebCrypto(): Promise<Crypto> {
     // @ts-ignore: We'll handle any errors...
     // dnt-shim-ignore
     const _crypto = await require("node:crypto");
-    webCrypto = _crypto as unknown as Crypto;
+    webCrypto = _crypto.webcrypto as unknown as Crypto;
   } catch (_err) {
     /**
      * Naively attempt to access Crypto as a global object, which popular alternative run-times
