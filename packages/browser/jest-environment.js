@@ -1,9 +1,9 @@
-import Environment from 'jest-environment-jsdom';
+import { TestEnvironment } from 'jest-environment-jsdom';
 
 /**
  * Set up a custom JSDOM-based test environment for Jest so we can add things JSDOM doesn't support
  */
-class CustomTestEnvironment extends Environment {
+class CustomTestEnvironment extends TestEnvironment {
   async setup() {
     await super.setup();
     /**
