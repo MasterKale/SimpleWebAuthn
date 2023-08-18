@@ -1,5 +1,4 @@
-<!-- omit in toc -->
-# SimpleWebAuthn Project
+# SimpleWebAuthn Project <!-- omit in toc -->
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=simplewebauthn)
