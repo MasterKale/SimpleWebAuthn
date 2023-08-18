@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import express from 'express';
 import fetch from 'node-fetch';

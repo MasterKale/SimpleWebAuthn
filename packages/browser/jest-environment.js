@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import Environment from 'jest-environment-jsdom';
 
 /**

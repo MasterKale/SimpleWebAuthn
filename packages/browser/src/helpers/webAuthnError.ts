@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 /**
  * A custom Error used to return a more nuanced error detailing _why_ one of the eight documented
  * errors in the spec was raised after calling `navigator.credentials.create()` or

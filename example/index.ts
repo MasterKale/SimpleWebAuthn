@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /**
  * An example Express server showing off a simple integration of @simplewebauthn/server.
  *
