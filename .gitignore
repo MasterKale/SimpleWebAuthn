@@ -1,6 +1,7 @@
 node_modules/
 dist/
 npm/
+npm-test/
 coverage/
 .DS_Store
 docs/
