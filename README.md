@@ -39,21 +39,30 @@ with WebAuthn.
 
 ## Development
 
+Install the following before proceeding:
+
+- **Node.js 18**
+- **Deno 1.36.x**
+
 After pulling down the code, set up dependencies:
 
 ```sh
 $> npm install
 ```
 
-To run unit tests for all tracked lerna packages, run the following:
+To run unit tests for all workspace packages, use the `test` series of scripts:
 
 ```sh
-$> npx lerna run test
+# Run All tests
+$> npm run test
+# Run an individual package's tests
+$> npm run test:browser
+$> npm run test:server
 ```
 
-Running Jest in watch mode for a specific project requires the use of
-`lerna exec`:
+Tests can be run in watch mode with the `dev` series of scripts:
 
 ```sh
-$> npx lerna exec npm run test:watch --scope=@simplewebauthn/server
+$> npm run dev:browser
+$> npm run dev:server
 ```
