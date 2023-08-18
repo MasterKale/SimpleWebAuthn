@@ -1,6 +1,11 @@
 {
   "name": "simplewebauthn-monorepo",
   "private": true,
+  "workspaces": [
+    "packages/browser/",
+    "packages/server/npm/",
+    "packages/typescript-types/npm/"
+  ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "bootstrap:ci": "lerna bootstrap --hoist",

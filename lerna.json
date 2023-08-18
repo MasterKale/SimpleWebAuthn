@@ -13,7 +13,9 @@
     }
   },
   "packages": [
-    "packages/*"
+    "packages/browser",
+    "packages/server/npm",
+    "packages/typescript-types/npm"
   ],
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }
