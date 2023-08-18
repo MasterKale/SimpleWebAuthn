@@ -20,7 +20,7 @@ import type {
   PublicKeyCredentialRpEntity,
   PublicKeyCredentialType,
   UserVerificationRequirement,
-} from "./dom.ts";
+} from './dom.ts';
 
 export type {
   AttestationConveyancePreference,
@@ -42,7 +42,7 @@ export type {
   PublicKeyCredentialType,
   PublicKeyCredentialUserEntity,
   UserVerificationRequirement,
-} from "./dom.ts";
+} from './dom.ts';
 
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
@@ -197,8 +197,7 @@ export type Base64URLString = string;
  *
  * Properties marked optional are not supported in all browsers.
  */
-export interface AuthenticatorAttestationResponseFuture
-  extends AuthenticatorAttestationResponse {
+export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
   getTransports(): AuthenticatorTransportFuture[];
 }
 
@@ -208,13 +207,13 @@ export interface AuthenticatorAttestationResponseFuture
  * know about it (sometime after 4.6.3)
  */
 export type AuthenticatorTransportFuture =
-  | "ble"
-  | "cable"
-  | "hybrid"
-  | "internal"
-  | "nfc"
-  | "smart-card"
-  | "usb";
+  | 'ble'
+  | 'cable'
+  | 'hybrid'
+  | 'internal'
+  | 'nfc'
+  | 'smart-card'
+  | 'usb';
 
 /**
  * A super class of TypeScript's `PublicKeyCredentialDescriptor` that knows about the latest
@@ -222,7 +221,7 @@ export type AuthenticatorTransportFuture =
  * know about it (sometime after 4.6.3)
  */
 export interface PublicKeyCredentialDescriptorFuture
-  extends Omit<PublicKeyCredentialDescriptor, "transports"> {
+  extends Omit<PublicKeyCredentialDescriptor, 'transports'> {
   transports?: AuthenticatorTransportFuture[];
 }
 
@@ -255,4 +254,4 @@ export interface PublicKeyCredentialFuture extends PublicKeyCredential {
  * - `"singleDevice"` credentials will never be backed up
  * - `"multiDevice"` credentials can be backed up
  */
-export type CredentialDeviceType = "singleDevice" | "multiDevice";
+export type CredentialDeviceType = 'singleDevice' | 'multiDevice';

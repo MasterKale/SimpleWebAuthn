@@ -1,15 +1,9 @@
-import type { Base64URLString } from "../deps.ts";
-import type { AlgSign, MetadataStatement } from "../metadata/mdsTypes.ts";
-import { convertCertBufferToPEM } from "../helpers/convertCertBufferToPEM.ts";
-import { validateCertificatePath } from "../helpers/validateCertificatePath.ts";
-import { decodeCredentialPublicKey } from "../helpers/decodeCredentialPublicKey.ts";
-import {
-  COSEALG,
-  COSECRV,
-  COSEKEYS,
-  COSEKTY,
-  isCOSEPublicKeyEC2,
-} from "../helpers/cose.ts";
+import type { Base64URLString } from '../deps.ts';
+import type { AlgSign, MetadataStatement } from '../metadata/mdsTypes.ts';
+import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
+import { COSEALG, COSECRV, COSEKEYS, COSEKTY, isCOSEPublicKeyEC2 } from '../helpers/cose.ts';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as
@@ -51,15 +45,15 @@ export async function verifyAttestationWithMetadata({
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
   if (!kty) {
-    throw new Error("Credential public key was missing kty");
+    throw new Error('Credential public key was missing kty');
   }
 
   if (!alg) {
-    throw new Error("Credential public key was missing alg");
+    throw new Error('Credential public key was missing alg');
   }
 
   if (!kty) {
-    throw new Error("Credential public key was missing kty");
+    throw new Error('Credential public key was missing kty');
   }
 
   // Assume everything is a number because these values should be
@@ -113,12 +107,9 @@ export async function verifyAttestationWithMetadata({
      * ```
      */
     const debugMDSAlgs = authenticationAlgorithms.map(
-      (algSign) =>
-        `'${algSign}' (COSE info: ${
-          stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])
-        })`,
+      (algSign) => `'${algSign}' (COSE info: ${stringifyCOSEInfo(algSignToCOSEInfoMap[algSign])})`,
     );
-    const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, "");
+    const strMDSAlgs = JSON.stringify(debugMDSAlgs, null, 2).replace(/"/g, '');
 
     /**
      * Construct useful error output about the public key
@@ -218,7 +209,7 @@ export const algSignToCOSEInfoMap: { [key in AlgSign]: COSEInfo } = {
 function stringifyCOSEInfo(info: COSEInfo): string {
   const { kty, alg, crv } = info;
 
-  let toReturn = "";
+  let toReturn = '';
   if (kty !== COSEKTY.RSA) {
     toReturn = `{ kty: ${kty}, alg: ${alg}, crv: ${crv} }`;
   } else {

@@ -1,9 +1,9 @@
 import {
   AuthenticationExtensionsAuthenticatorOutputs,
   decodeAuthenticatorExtensions,
-} from "./decodeAuthenticatorExtensions.ts";
-import { isoCBOR, isoUint8Array } from "./iso/index.ts";
-import { COSEPublicKey } from "./cose.ts";
+} from './decodeAuthenticatorExtensions.ts';
+import { isoCBOR, isoUint8Array } from './iso/index.ts';
+import { COSEPublicKey } from './cose.ts';
 
 /**
  * Make sense of the authData buffer contained in an Attestation
@@ -63,8 +63,7 @@ export function parseAuthenticatorData(
     pointer += firstEncoded.byteLength;
   }
 
-  let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined =
-    undefined;
+  let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
   let extensionsDataBuffer: Uint8Array | undefined = undefined;
 
   if (flags.ed) {
@@ -76,7 +75,7 @@ export function parseAuthenticatorData(
 
   // Pointer should be at the end of the authenticator data, otherwise too much data was sent
   if (authData.byteLength > pointer) {
-    throw new Error("Leftover bytes detected while parsing authenticator data");
+    throw new Error('Leftover bytes detected while parsing authenticator data');
   }
 
   return _parseAuthenticatorDataInternals.stubThis({

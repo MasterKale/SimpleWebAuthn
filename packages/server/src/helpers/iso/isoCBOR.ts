@@ -1,4 +1,4 @@
-import { cborx } from "../../deps.ts";
+import { cborx } from '../../deps.ts';
 
 /**
  * This encoder should keep CBOR data the same length when data is re-encoded
@@ -28,7 +28,7 @@ export function decodeFirst<Type>(input: Uint8Array): Type {
   const decoded = encoder.decodeMultiple(_input) as undefined | Type[];
 
   if (decoded === undefined) {
-    throw new Error("CBOR input data was empty");
+    throw new Error('CBOR input data was empty');
   }
 
   /**

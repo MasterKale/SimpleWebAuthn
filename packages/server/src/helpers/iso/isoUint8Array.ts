@@ -15,10 +15,10 @@ export function areEqual(array1: Uint8Array, array2: Uint8Array): boolean {
  * A replacement for `Buffer.toString('hex')`
  */
 export function toHex(array: Uint8Array): string {
-  const hexParts = Array.from(array, (i) => i.toString(16).padStart(2, "0"));
+  const hexParts = Array.from(array, (i) => i.toString(16).padStart(2, '0'));
 
   // adce000235bcc60a648b0b25f1f05503
-  return hexParts.join("");
+  return hexParts.join('');
 }
 
 /**
@@ -35,7 +35,7 @@ export function fromHex(hex: string): Uint8Array {
     !/[^a-fA-F0-9]/u.test(hex);
 
   if (!isValid) {
-    throw new Error("Invalid hex string");
+    throw new Error('Invalid hex string');
   }
 
   const byteStrings = hex.match(/.{1,2}/g) ?? [];
@@ -64,7 +64,7 @@ export function concat(arrays: Uint8Array[]): Uint8Array {
  * Convert bytes into a UTF-8 string
  */
 export function toUTF8String(array: Uint8Array): string {
-  const decoder = new globalThis.TextDecoder("utf-8");
+  const decoder = new globalThis.TextDecoder('utf-8');
   return decoder.decode(array);
 }
 
@@ -80,7 +80,7 @@ export function fromUTF8String(utf8String: string): Uint8Array {
  * Convert an ASCII string to Uint8Array
  */
 export function fromASCIIString(value: string): Uint8Array {
-  return Uint8Array.from(value.split("").map((x) => x.charCodeAt(0)));
+  return Uint8Array.from(value.split('').map((x) => x.charCodeAt(0)));
 }
 
 /**

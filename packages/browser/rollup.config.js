@@ -9,7 +9,7 @@ import versionInjector from 'rollup-plugin-version-injector';
 const cleanTslibCommentInUMDBundleTargetingES5 = () => {
   return {
     name: 'cleanTslibCommentInUMDBundleTargetingES5',
-    renderChunk: async code => {
+    renderChunk: async (code) => {
       const comment = `
 /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -62,7 +62,11 @@ export default [
         plugins: [terser()],
       },
     ],
-    plugins: [typescript({ tsconfig: './tsconfig.json' }), nodeResolve(), swanVersionInjector],
+    plugins: [
+      typescript({ tsconfig: './tsconfig.json' }),
+      nodeResolve(),
+      swanVersionInjector,
+    ],
   },
   {
     input: 'src/index.ts',
@@ -73,6 +77,10 @@ export default [
       entryFileNames: 'bundle/[name].es5.umd.min.js',
       plugins: [terser(), cleanTslibCommentInUMDBundleTargetingES5()],
     },
-    plugins: [typescript({ tsconfig: './tsconfig.es5.json' }), nodeResolve(), swanVersionInjector],
+    plugins: [
+      typescript({ tsconfig: './tsconfig.es5.json' }),
+      nodeResolve(),
+      swanVersionInjector,
+    ],
   },
 ];

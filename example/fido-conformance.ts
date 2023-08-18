@@ -1,6 +1,6 @@
-import fs from "fs";
-import express from "express";
-import fetch from "node-fetch";
+import fs from 'fs';
+import express from 'express';
+import fetch from 'node-fetch';
 
 import {
   generateAuthenticationOptions,
@@ -10,15 +10,15 @@ import {
   SettingsService,
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
-} from "@simplewebauthn/server";
-import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
+} from '@simplewebauthn/server';
+import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
 import {
   AuthenticationResponseJSON,
   RegistrationResponseJSON,
-} from "@simplewebauthn/typescript-types";
+} from '@simplewebauthn/typescript-types';
 
-import { expectedOrigin, rpID } from "./index";
-import { LoggedInUser } from "./example-server";
+import { expectedOrigin, rpID } from './index';
+import { LoggedInUser } from './example-server';
 
 interface LoggedInFIDOUser extends LoggedInUser {
   currentAuthenticationUserVerification?: UserVerificationRequirement;
@@ -28,9 +28,9 @@ interface LoggedInFIDOUser extends LoggedInUser {
  * Create paths specifically for testing with the FIDO Conformance Tools
  */
 export const fidoConformanceRouter = express.Router();
-export const fidoRouteSuffix = "/fido";
+export const fidoRouteSuffix = '/fido';
 
-const rpName = "FIDO Conformance Test";
+const rpName = 'FIDO Conformance Test';
 
 /**
  * Load JSON metadata statements provided by the Conformance Tools
@@ -41,13 +41,13 @@ const statements: MetadataStatement[] = [];
 
 try {
   // Update this to whatever folder you extracted the statements to
-  const conformanceMetadataPath = "./fido-conformance-mds";
+  const conformanceMetadataPath = './fido-conformance-mds';
   const conformanceMetadataFilenames = fs.readdirSync(conformanceMetadataPath);
   for (const statementPath of conformanceMetadataFilenames) {
-    if (statementPath.endsWith(".json")) {
+    if (statementPath.endsWith('.json')) {
       const contents = fs.readFileSync(
         `${conformanceMetadataPath}/${statementPath}`,
-        "utf-8",
+        'utf-8',
       );
       statements.push(JSON.parse(contents));
     }
@@ -61,10 +61,10 @@ try {
  *
  * (Grabbed this URL from the POST made on https://mds3.fido.tools/ when you submit your site's URL)
  */
-fetch("https://mds3.fido.tools/getEndpoints", {
-  method: "POST",
+fetch('https://mds3.fido.tools/getEndpoints', {
+  method: 'POST',
   body: JSON.stringify({ endpoint: `${expectedOrigin}${fidoRouteSuffix}` }),
-  headers: { "Content-Type": "application/json" },
+  headers: { 'Content-Type': 'application/json' },
 })
   .then((resp) => resp.json())
   .then((json) => {
@@ -73,12 +73,12 @@ fetch("https://mds3.fido.tools/getEndpoints", {
     return MetadataService.initialize({
       statements,
       mdsServers,
-      verificationMode: "strict",
+      verificationMode: 'strict',
     });
   })
   .catch(console.error)
   .finally(() => {
-    console.log("🔐 FIDO Conformance routes ready");
+    console.log('🔐 FIDO Conformance routes ready');
   });
 
 const inMemoryUserDeviceDB: { [username: string]: LoggedInFIDOUser } = {
@@ -118,7 +118,7 @@ const supportedAlgorithmIDs = [
 /**
  * [FIDO2] Server Tests > MakeCredential Request
  */
-fidoConformanceRouter.post("/attestation/options", (req, res) => {
+fidoConformanceRouter.post('/attestation/options', (req, res) => {
   const { body } = req;
   const {
     username,
@@ -155,8 +155,8 @@ fidoConformanceRouter.post("/attestation/options", (req, res) => {
     extensions,
     excludeCredentials: devices.map((dev) => ({
       id: dev.credentialID,
-      type: "public-key",
-      transports: ["usb", "ble", "nfc", "internal"],
+      type: 'public-key',
+      transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
     supportedAlgorithmIDs,
   });
@@ -168,15 +168,15 @@ fidoConformanceRouter.post("/attestation/options", (req, res) => {
 
   return res.send({
     ...opts,
-    status: "ok",
-    errorMessage: "",
+    status: 'ok',
+    errorMessage: '',
   });
 });
 
 /**
  * [FIDO2] Server Tests > MakeCredential Response
  */
-fidoConformanceRouter.post("/attestation/result", async (req, res) => {
+fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   const body: RegistrationResponseJSON = req.body;
 
   const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
@@ -203,9 +203,7 @@ fidoConformanceRouter.post("/attestation/result", async (req, res) => {
   if (verified && registrationInfo) {
     const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-    const existingDevice = user.devices.find((device) =>
-      device.credentialID === credentialID
-    );
+    const existingDevice = user.devices.find((device) => device.credentialID === credentialID);
 
     if (!existingDevice) {
       /**
@@ -220,15 +218,15 @@ fidoConformanceRouter.post("/attestation/result", async (req, res) => {
   }
 
   return res.send({
-    status: verified ? "ok" : "",
-    errorMessage: "",
+    status: verified ? 'ok' : '',
+    errorMessage: '',
   });
 });
 
 /**
  * [FIDO2] Server Tests > GetAuthentication Request
  */
-fidoConformanceRouter.post("/assertion/options", (req, res) => {
+fidoConformanceRouter.post('/assertion/options', (req, res) => {
   const { body } = req;
   const { username, userVerification, extensions } = body;
 
@@ -243,8 +241,8 @@ fidoConformanceRouter.post("/assertion/options", (req, res) => {
     userVerification,
     allowCredentials: devices.map((dev) => ({
       id: dev.credentialID,
-      type: "public-key",
-      transports: ["usb", "ble", "nfc", "internal"],
+      type: 'public-key',
+      transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
   });
 
@@ -253,12 +251,12 @@ fidoConformanceRouter.post("/assertion/options", (req, res) => {
 
   return res.send({
     ...opts,
-    status: "ok",
-    errorMessage: "",
+    status: 'ok',
+    errorMessage: '',
   });
 });
 
-fidoConformanceRouter.post("/assertion/result", async (req, res) => {
+fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const body: AuthenticationResponseJSON = req.body;
   const { id } = body;
 
@@ -309,8 +307,8 @@ fidoConformanceRouter.post("/assertion/result", async (req, res) => {
   }
 
   return res.send({
-    status: verified ? "ok" : "",
-    errorMessage: "",
+    status: verified ? 'ok' : '',
+    errorMessage: '',
   });
 });
 
@@ -318,7 +316,7 @@ fidoConformanceRouter.post("/assertion/result", async (req, res) => {
  * A catch-all for future test routes we might need to support but haven't yet defined (helps with
  * discovering which routes, what methods, and what data need to be defined)
  */
-fidoConformanceRouter.all("*", (req, res, next) => {
+fidoConformanceRouter.all('*', (req, res, next) => {
   console.log(req.url);
   console.log(req.method);
   console.log(req.body);
@@ -355,16 +353,16 @@ X2S5Ht8+e+EQnezLJBJXtnkRWY+Zt491wgt/AwSs5PHHMv5QgjELOuMxQBc=
 
 // Set above root cert for use by MetadataService
 SettingsService.setRootCertificates({
-  identifier: "mds",
+  identifier: 'mds',
   certificates: [MDS3ROOT],
 });
 // Reset preset root certificates
-SettingsService.setRootCertificates({ identifier: "apple", certificates: [] });
+SettingsService.setRootCertificates({ identifier: 'apple', certificates: [] });
 SettingsService.setRootCertificates({
-  identifier: "android-key",
+  identifier: 'android-key',
   certificates: [],
 });
 SettingsService.setRootCertificates({
-  identifier: "android-safetynet",
+  identifier: 'android-safetynet',
   certificates: [],
 });

@@ -1,11 +1,11 @@
-import type { AttestationFormatVerifierOpts } from "../verifyRegistrationResponse.ts";
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 
-import { convertCOSEtoPKCS } from "../../helpers/convertCOSEtoPKCS.ts";
-import { convertCertBufferToPEM } from "../../helpers/convertCertBufferToPEM.ts";
-import { validateCertificatePath } from "../../helpers/validateCertificatePath.ts";
-import { verifySignature } from "../../helpers/verifySignature.ts";
-import { isoUint8Array } from "../../helpers/iso/index.ts";
-import { COSEALG } from "../../helpers/cose.ts";
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS.ts';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { COSEALG } from '../../helpers/cose.ts';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
@@ -34,18 +34,18 @@ export async function verifyAttestationFIDOU2F(
     publicKey,
   ]);
 
-  const sig = attStmt.get("sig");
-  const x5c = attStmt.get("x5c");
+  const sig = attStmt.get('sig');
+  const x5c = attStmt.get('x5c');
 
   if (!x5c) {
     throw new Error(
-      "No attestation certificate provided in attestation statement (FIDOU2F)",
+      'No attestation certificate provided in attestation statement (FIDOU2F)',
     );
   }
 
   if (!sig) {
     throw new Error(
-      "No attestation signature provided in attestation statement (FIDOU2F)",
+      'No attestation signature provided in attestation statement (FIDOU2F)',
     );
   }
 

@@ -1,4 +1,4 @@
-import { browserSupportsWebAuthn } from "./browserSupportsWebAuthn";
+import { browserSupportsWebAuthn } from './browserSupportsWebAuthn';
 
 /**
  * Determine whether the browser can communicate with a built-in authenticator, like

@@ -1,7 +1,9 @@
 import { build, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
 
 const outDir = './npm';
-const lernaPackageJSON: { version: string } = JSON.parse(await Deno.readTextFile('./package.json'));
+const lernaPackageJSON: { version: string } = JSON.parse(
+  await Deno.readTextFile('./package.json'),
+);
 
 await emptyDir(outDir);
 
@@ -28,7 +30,8 @@ await build({
       url: 'https://github.com/MasterKale/SimpleWebAuthn.git',
       directory: 'packages/typescript-types',
     },
-    homepage: "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types#readme",
+    homepage:
+      'https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types#readme',
     publishConfig: {
       access: 'public',
     },

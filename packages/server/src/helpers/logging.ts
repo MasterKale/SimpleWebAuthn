@@ -1,6 +1,6 @@
-import { debug, Debugger } from "../deps.ts";
+import { debug, Debugger } from '../deps.ts';
 
-const defaultLogger = debug("SimpleWebAuthn");
+const defaultLogger = debug('SimpleWebAuthn');
 
 /**
  * Generate an instance of a `debug` logger that extends off of the "simplewebauthn" namespace for

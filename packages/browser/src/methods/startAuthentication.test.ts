@@ -3,39 +3,38 @@ import {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialRequestOptionsJSON,
-} from "@simplewebauthn/typescript-types";
+} from '@simplewebauthn/typescript-types';
 
-import { browserSupportsWebAuthn } from "../helpers/browserSupportsWebAuthn";
-import { browserSupportsWebAuthnAutofill } from "../helpers/browserSupportsWebAuthnAutofill";
-import { utf8StringToBuffer } from "../helpers/utf8StringToBuffer";
-import { bufferToBase64URLString } from "../helpers/bufferToBase64URLString";
-import { WebAuthnError } from "../helpers/webAuthnError";
-import { generateCustomError } from "../helpers/__jest__/generateCustomError";
-import { webauthnAbortService } from "../helpers/webAuthnAbortService";
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
+import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
+import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
+import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
+import { WebAuthnError } from '../helpers/webAuthnError';
+import { generateCustomError } from '../helpers/__jest__/generateCustomError';
+import { webauthnAbortService } from '../helpers/webAuthnAbortService';
 
-import { startAuthentication } from "./startAuthentication";
+import { startAuthentication } from './startAuthentication';
 
-jest.mock("../helpers/browserSupportsWebAuthn");
-jest.mock("../helpers/browserSupportsWebAuthnAutofill");
+jest.mock('../helpers/browserSupportsWebAuthn');
+jest.mock('../helpers/browserSupportsWebAuthnAutofill');
 
 const mockNavigatorGet = window.navigator.credentials.get as jest.Mock;
 const mockSupportsWebAuthn = browserSupportsWebAuthn as jest.Mock;
 const mockSupportsAutofill = browserSupportsWebAuthnAutofill as jest.Mock;
 
-const mockAuthenticatorData = "mockAuthenticatorData";
-const mockClientDataJSON = "mockClientDataJSON";
-const mockSignature = "mockSignature";
-const mockUserHandle = "mockUserHandle";
+const mockAuthenticatorData = 'mockAuthenticatorData';
+const mockClientDataJSON = 'mockClientDataJSON';
+const mockSignature = 'mockSignature';
+const mockUserHandle = 'mockUserHandle';
 
 // With ASCII challenge
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(utf8StringToBuffer("fizz")),
+  challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
   allowCredentials: [
     {
-      id:
-        "C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg",
-      type: "public-key",
-      transports: ["nfc"],
+      id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
+      type: 'public-key',
+      transports: ['nfc'],
     },
   ],
   timeout: 1,
@@ -43,7 +42,7 @@ const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
 
 // With UTF-8 challenge
 const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(utf8StringToBuffer("やれやれだぜ")),
+  challenge: bufferToBase64URLString(utf8StringToBuffer('やれやれだぜ')),
   allowCredentials: [],
   timeout: 1,
 };
@@ -73,7 +72,7 @@ afterEach(() => {
   mockSupportsAutofill.mockReset();
 });
 
-test("should convert options before passing to navigator.credentials.get(...)", async () => {
+test('should convert options before passing to navigator.credentials.get(...)', async () => {
   await startAuthentication(goodOpts1);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
@@ -87,63 +86,63 @@ test("should convert options before passing to navigator.credentials.get(...)", 
   expect(credId.byteLength).toEqual(64);
 });
 
-test("should support optional allowCredential", async () => {
+test('should support optional allowCredential', async () => {
   await startAuthentication({
-    challenge: bufferToBase64URLString(utf8StringToBuffer("fizz")),
+    challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
     timeout: 1,
   });
 
   expect(mockNavigatorGet.mock.calls[0][0].allowCredentials).toEqual(undefined);
 });
 
-test("should convert allow allowCredential to undefined when empty", async () => {
+test('should convert allow allowCredential to undefined when empty', async () => {
   await startAuthentication({
-    challenge: bufferToBase64URLString(utf8StringToBuffer("fizz")),
+    challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
     timeout: 1,
     allowCredentials: [],
   });
   expect(mockNavigatorGet.mock.calls[0][0].allowCredentials).toEqual(undefined);
 });
 
-test("should return base64url-encoded response values", async () => {
+test('should return base64url-encoded response values', async () => {
   mockNavigatorGet.mockImplementation((): Promise<AuthenticationCredential> => {
     return new Promise((resolve) => {
       resolve({
-        id: "foobar",
-        rawId: Buffer.from("foobar", "ascii"),
+        id: 'foobar',
+        rawId: Buffer.from('foobar', 'ascii'),
         response: {
-          authenticatorData: Buffer.from(mockAuthenticatorData, "ascii"),
-          clientDataJSON: Buffer.from(mockClientDataJSON, "ascii"),
-          signature: Buffer.from(mockSignature, "ascii"),
-          userHandle: Buffer.from(mockUserHandle, "ascii"),
+          authenticatorData: Buffer.from(mockAuthenticatorData, 'ascii'),
+          clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
+          signature: Buffer.from(mockSignature, 'ascii'),
+          userHandle: Buffer.from(mockUserHandle, 'ascii'),
         },
         getClientExtensionResults: () => ({}),
-        type: "public-key",
-        authenticatorAttachment: "",
+        type: 'public-key',
+        authenticatorAttachment: '',
       });
     });
   });
 
   const response = await startAuthentication(goodOpts1);
 
-  expect(response.rawId).toEqual("Zm9vYmFy");
+  expect(response.rawId).toEqual('Zm9vYmFy');
   expect(response.response.authenticatorData).toEqual(
-    "bW9ja0F1dGhlbnRpY2F0b3JEYXRh",
+    'bW9ja0F1dGhlbnRpY2F0b3JEYXRh',
   );
-  expect(response.response.clientDataJSON).toEqual("bW9ja0NsaWVudERhdGFKU09O");
-  expect(response.response.signature).toEqual("bW9ja1NpZ25hdHVyZQ");
-  expect(response.response.userHandle).toEqual("mockUserHandle");
+  expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWVudERhdGFKU09O');
+  expect(response.response.signature).toEqual('bW9ja1NpZ25hdHVyZQ');
+  expect(response.response.userHandle).toEqual('mockUserHandle');
 });
 
-test("should throw error if WebAuthn isn't supported", async () => {
+test('should throw error if WebAuthn isn\'t supported', async () => {
   mockSupportsWebAuthn.mockReturnValue(false);
 
   await expect(startAuthentication(goodOpts1)).rejects.toThrow(
-    "WebAuthn is not supported in this browser",
+    'WebAuthn is not supported in this browser',
   );
 });
 
-test("should throw error if assertion is cancelled for some reason", async () => {
+test('should throw error if assertion is cancelled for some reason', async () => {
   mockNavigatorGet.mockImplementation((): Promise<null> => {
     return new Promise((resolve) => {
       resolve(null);
@@ -151,11 +150,11 @@ test("should throw error if assertion is cancelled for some reason", async () =>
   });
 
   await expect(startAuthentication(goodOpts1)).rejects.toThrow(
-    "Authentication was not completed",
+    'Authentication was not completed',
   );
 });
 
-test("should handle UTF-8 challenges", async () => {
+test('should handle UTF-8 challenges', async () => {
   await startAuthentication(goodOpts2UTF8);
 
   const argsPublicKey = mockNavigatorGet.mock.calls[0][0].publicKey;
@@ -184,14 +183,14 @@ test("should handle UTF-8 challenges", async () => {
   );
 });
 
-test("should send extensions to authenticator if present in options", async () => {
+test('should send extensions to authenticator if present in options', async () => {
   const extensions: AuthenticationExtensionsClientInputs = {
     credProps: true,
-    appid: "appidHere",
+    appid: 'appidHere',
     // @ts-ignore: Send arbitrary extensions
     uvm: true,
     // @ts-ignore: Send arbitrary extensions
-    appidExclude: "appidExcludeHere",
+    appidExclude: 'appidExcludeHere',
   };
   const optsWithExts: PublicKeyCredentialRequestOptionsJSON = {
     ...goodOpts1,
@@ -204,7 +203,7 @@ test("should send extensions to authenticator if present in options", async () =
   expect(argsExtensions).toEqual(extensions);
 });
 
-test("should not set any extensions if not present in options", async () => {
+test('should not set any extensions if not present in options', async () => {
   await startAuthentication(goodOpts1);
 
   const argsExtensions = mockNavigatorGet.mock.calls[0][0].publicKey.extensions;
@@ -212,7 +211,7 @@ test("should not set any extensions if not present in options", async () => {
   expect(argsExtensions).toEqual(undefined);
 });
 
-test("should include extension results", async () => {
+test('should include extension results', async () => {
   const extResults: AuthenticationExtensionsClientOutputs = {
     appid: true,
     credProps: {
@@ -233,7 +232,7 @@ test("should include extension results", async () => {
   expect(response.clientExtensionResults).toEqual(extResults);
 });
 
-test("should include extension results when no extensions specified", async () => {
+test('should include extension results when no extensions specified', async () => {
   const response = await startAuthentication(goodOpts1);
 
   expect(response.clientExtensionResults).toEqual({});
@@ -245,7 +244,7 @@ test('should support "cable" transport', async () => {
     allowCredentials: [
       {
         ...goodOpts1.allowCredentials![0],
-        transports: ["cable"],
+        transports: ['cable'],
       },
     ],
   };
@@ -256,12 +255,12 @@ test('should support "cable" transport', async () => {
     mockNavigatorGet.mock.calls[0][0].publicKey.allowCredentials[0]
       .transports[0],
   ).toEqual(
-    "cable",
+    'cable',
   );
 });
 
-test("should cancel an existing call when executed again", async () => {
-  const abortSpy = jest.spyOn(AbortController.prototype, "abort");
+test('should cancel an existing call when executed again', async () => {
+  const abortSpy = jest.spyOn(AbortController.prototype, 'abort');
 
   // Fire off a request and immediately attempt a second one
   startAuthentication(goodOpts1);
@@ -269,13 +268,13 @@ test("should cancel an existing call when executed again", async () => {
   expect(abortSpy).toHaveBeenCalledTimes(1);
 });
 
-test("should set up autofill a.k.a. Conditional UI", async () => {
+test('should set up autofill a.k.a. Conditional UI', async () => {
   const opts: PublicKeyCredentialRequestOptionsJSON = {
     ...goodOpts1,
     allowCredentials: [
       {
         ...goodOpts1.allowCredentials![0],
-        transports: ["cable"],
+        transports: ['cable'],
       },
     ],
   };
@@ -290,7 +289,7 @@ test("should set up autofill a.k.a. Conditional UI", async () => {
   await startAuthentication(opts, true);
 
   // The most important bit
-  expect(mockNavigatorGet.mock.calls[0][0].mediation).toEqual("conditional");
+  expect(mockNavigatorGet.mock.calls[0][0].mediation).toEqual('conditional');
   // The latest version of https://github.com/w3c/webauthn/pull/1576 says allowCredentials should
   // be an "empty list", as opposed to being undefined
   expect(mockNavigatorGet.mock.calls[0][0].publicKey.allowCredentials)
@@ -299,7 +298,7 @@ test("should set up autofill a.k.a. Conditional UI", async () => {
     .toEqual(0);
 });
 
-test("should throw error if autofill not supported", async () => {
+test('should throw error if autofill not supported', async () => {
   mockSupportsAutofill.mockResolvedValue(false);
 
   const rejected = await expect(startAuthentication(goodOpts1, true)).rejects;
@@ -307,7 +306,7 @@ test("should throw error if autofill not supported", async () => {
   rejected.toThrow(/does not support webauthn autofill/i);
 });
 
-test("should throw error if no acceptable <input> is found", async () => {
+test('should throw error if no acceptable <input> is found', async () => {
   // <input> is missing "webauthn" from the autocomplete attribute
   document.body.innerHTML = `
     <form>
@@ -322,26 +321,26 @@ test("should throw error if no acceptable <input> is found", async () => {
   rejected.toThrow(/no <input>/i);
 });
 
-test("should return authenticatorAttachment if present", async () => {
+test('should return authenticatorAttachment if present', async () => {
   // Mock extension return values from authenticator
   mockNavigatorGet.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({
         response: {},
         getClientExtensionResults: () => {},
-        authenticatorAttachment: "cross-platform",
+        authenticatorAttachment: 'cross-platform',
       });
     });
   });
 
   const response = await startAuthentication(goodOpts1);
 
-  expect(response.authenticatorAttachment).toEqual("cross-platform");
+  expect(response.authenticatorAttachment).toEqual('cross-platform');
 });
 
-describe("WebAuthnError", () => {
-  describe("AbortError", () => {
-    const AbortError = generateCustomError("AbortError");
+describe('WebAuthnError', () => {
+  describe('AbortError', () => {
+    const AbortError = generateCustomError('AbortError');
 
     /**
      * We can't actually test this because nothing in startAuthentication() propagates the abort
@@ -350,20 +349,20 @@ describe("WebAuthnError", () => {
      *
      * As a matter of fact I couldn't actually get any browser to respect the abort signal...
      */
-    test.skip("should identify abort signal", async () => {
+    test.skip('should identify abort signal', async () => {
       mockNavigatorGet.mockRejectedValueOnce(AbortError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/abort signal/i);
-      rejected.toHaveProperty("name", "AbortError");
-      rejected.toHaveProperty("code", "ERROR_CEREMONY_ABORTED");
-      rejected.toHaveProperty("cause", AbortError);
+      rejected.toHaveProperty('name', 'AbortError');
+      rejected.toHaveProperty('code', 'ERROR_CEREMONY_ABORTED');
+      rejected.toHaveProperty('cause', AbortError);
     });
   });
 
-  describe("NotAllowedError", () => {
-    test("should pass through error message (iOS Safari - Operation failed)", async () => {
+  describe('NotAllowedError', () => {
+    test('should pass through error message (iOS Safari - Operation failed)', async () => {
       /**
        * Thrown when biometric is not enrolled, or a Safari bug prevents conditional UI from being
        * aborted properly between page reloads.
@@ -371,20 +370,20 @@ describe("WebAuthnError", () => {
        * See https://github.com/MasterKale/SimpleWebAuthn/discussions/350#discussioncomment-4896572
        */
       const NotAllowedError = generateCustomError(
-        "NotAllowedError",
-        "Operation failed.",
+        'NotAllowedError',
+        'Operation failed.',
       );
       mockNavigatorGet.mockRejectedValueOnce(NotAllowedError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(Error);
       rejected.toThrow(/operation failed/i);
-      rejected.toHaveProperty("name", "NotAllowedError");
-      rejected.toHaveProperty("code", "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY");
-      rejected.toHaveProperty("cause", NotAllowedError);
+      rejected.toHaveProperty('name', 'NotAllowedError');
+      rejected.toHaveProperty('code', 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
+      rejected.toHaveProperty('cause', NotAllowedError);
     });
 
-    test("should pass through error message (Chrome M110 - Bad TLS Cert)", async () => {
+    test('should pass through error message (Chrome M110 - Bad TLS Cert)', async () => {
       /**
        * Starting from Chrome M110, WebAuthn is blocked if the site is being displayed on a URL with
        * TLS certificate issues. This includes during development.
@@ -392,22 +391,22 @@ describe("WebAuthnError", () => {
        * See https://github.com/MasterKale/SimpleWebAuthn/discussions/351#discussioncomment-4910458
        */
       const NotAllowedError = generateCustomError(
-        "NotAllowedError",
-        "WebAuthn is not supported on sites with TLS certificate errors.",
+        'NotAllowedError',
+        'WebAuthn is not supported on sites with TLS certificate errors.',
       );
       mockNavigatorGet.mockRejectedValueOnce(NotAllowedError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
       rejected.toThrow(Error);
       rejected.toThrow(/sites with TLS certificate errors/i);
-      rejected.toHaveProperty("name", "NotAllowedError");
-      rejected.toHaveProperty("code", "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY");
-      rejected.toHaveProperty("cause", NotAllowedError);
+      rejected.toHaveProperty('name', 'NotAllowedError');
+      rejected.toHaveProperty('code', 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
+      rejected.toHaveProperty('cause', NotAllowedError);
     });
   });
 
-  describe("SecurityError", () => {
-    const SecurityError = generateCustomError("SecurityError");
+  describe('SecurityError', () => {
+    const SecurityError = generateCustomError('SecurityError');
 
     let _originalHostName: string;
 
@@ -419,8 +418,8 @@ describe("WebAuthnError", () => {
       window.location.hostname = _originalHostName;
     });
 
-    test("should identify invalid domain", async () => {
-      window.location.hostname = "1.2.3.4";
+    test('should identify invalid domain', async () => {
+      window.location.hostname = '1.2.3.4';
 
       mockNavigatorGet.mockRejectedValueOnce(SecurityError);
 
@@ -428,13 +427,13 @@ describe("WebAuthnError", () => {
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(/1\.2\.3\.4/);
       rejected.toThrow(/invalid domain/i);
-      rejected.toHaveProperty("name", "SecurityError");
-      rejected.toHaveProperty("code", "ERROR_INVALID_DOMAIN");
-      rejected.toHaveProperty("cause", SecurityError);
+      rejected.toHaveProperty('name', 'SecurityError');
+      rejected.toHaveProperty('code', 'ERROR_INVALID_DOMAIN');
+      rejected.toHaveProperty('cause', SecurityError);
     });
 
-    test("should identify invalid RP ID", async () => {
-      window.location.hostname = "simplewebauthn.com";
+    test('should identify invalid RP ID', async () => {
+      window.location.hostname = 'simplewebauthn.com';
 
       mockNavigatorGet.mockRejectedValueOnce(SecurityError);
 
@@ -442,16 +441,16 @@ describe("WebAuthnError", () => {
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(goodOpts1.rpId);
       rejected.toThrow(/invalid for this domain/i);
-      rejected.toHaveProperty("name", "SecurityError");
-      rejected.toHaveProperty("code", "ERROR_INVALID_RP_ID");
-      rejected.toHaveProperty("cause", SecurityError);
+      rejected.toHaveProperty('name', 'SecurityError');
+      rejected.toHaveProperty('code', 'ERROR_INVALID_RP_ID');
+      rejected.toHaveProperty('cause', SecurityError);
     });
   });
 
-  describe("UnknownError", () => {
-    const UnknownError = generateCustomError("UnknownError");
+  describe('UnknownError', () => {
+    const UnknownError = generateCustomError('UnknownError');
 
-    test("should identify potential authenticator issues", async () => {
+    test('should identify potential authenticator issues', async () => {
       mockNavigatorGet.mockRejectedValueOnce(UnknownError);
 
       const rejected = await expect(startAuthentication(goodOpts1)).rejects;
@@ -459,9 +458,9 @@ describe("WebAuthnError", () => {
       rejected.toThrow(/authenticator/i);
       rejected.toThrow(/unable to process the specified options/i);
       rejected.toThrow(/could not create a new assertion signature/i);
-      rejected.toHaveProperty("name", "UnknownError");
-      rejected.toHaveProperty("code", "ERROR_AUTHENTICATOR_GENERAL_ERROR");
-      rejected.toHaveProperty("cause", UnknownError);
+      rejected.toHaveProperty('name', 'UnknownError');
+      rejected.toHaveProperty('code', 'ERROR_AUTHENTICATOR_GENERAL_ERROR');
+      rejected.toHaveProperty('cause', UnknownError);
     });
   });
 });

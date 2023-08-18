@@ -1,4 +1,4 @@
-import { isoCBOR } from "./iso/index.ts";
+import { isoCBOR } from './iso/index.ts';
 
 /**
  * Convert authenticator extension data buffer to a proper object

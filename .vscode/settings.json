@@ -4,10 +4,10 @@
   "deno.path": "/opt/homebrew/bin/deno",
   "deno.enablePaths": [
     "./packages/server",
-    "./packages/typescript-types",
+    "./packages/typescript-types"
   ],
   "editor.rulers": [
-    80
+    100
   ],
   "editor.defaultFormatter": "denoland.vscode-deno",
   // Required for formatOnSave to work, see https://github.com/denoland/vscode_deno/issues/789

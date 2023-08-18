@@ -1,4 +1,4 @@
-import { getWebCrypto } from "./getWebCrypto.ts";
+import { getWebCrypto } from './getWebCrypto.ts';
 
 export async function importKey(opts: {
   keyData: JsonWebKey;
@@ -8,7 +8,7 @@ export async function importKey(opts: {
 
   const { keyData, algorithm } = opts;
 
-  return WebCrypto.subtle.importKey("jwk", keyData, algorithm, false, [
-    "verify",
+  return WebCrypto.subtle.importKey('jwk', keyData, algorithm, false, [
+    'verify',
   ]);
 }

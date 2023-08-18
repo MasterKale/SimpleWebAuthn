@@ -1,4 +1,4 @@
-import { COSEALG } from "./cose.ts";
+import { COSEALG } from './cose.ts';
 
 /**
  * Map X.509 signature algorithm OIDs to COSE algorithm IDs
@@ -11,19 +11,19 @@ export function mapX509SignatureAlgToCOSEAlg(
 ): COSEALG {
   let alg: COSEALG;
 
-  if (signatureAlgorithm === "1.2.840.10045.4.3.2") {
+  if (signatureAlgorithm === '1.2.840.10045.4.3.2') {
     alg = COSEALG.ES256;
-  } else if (signatureAlgorithm === "1.2.840.10045.4.3.3") {
+  } else if (signatureAlgorithm === '1.2.840.10045.4.3.3') {
     alg = COSEALG.ES384;
-  } else if (signatureAlgorithm === "1.2.840.10045.4.3.4") {
+  } else if (signatureAlgorithm === '1.2.840.10045.4.3.4') {
     alg = COSEALG.ES512;
-  } else if (signatureAlgorithm === "1.2.840.113549.1.1.11") {
+  } else if (signatureAlgorithm === '1.2.840.113549.1.1.11') {
     alg = COSEALG.RS256;
-  } else if (signatureAlgorithm === "1.2.840.113549.1.1.12") {
+  } else if (signatureAlgorithm === '1.2.840.113549.1.1.12') {
     alg = COSEALG.RS384;
-  } else if (signatureAlgorithm === "1.2.840.113549.1.1.13") {
+  } else if (signatureAlgorithm === '1.2.840.113549.1.1.13') {
     alg = COSEALG.RS512;
-  } else if (signatureAlgorithm === "1.2.840.113549.1.1.5") {
+  } else if (signatureAlgorithm === '1.2.840.113549.1.1.5') {
     alg = COSEALG.RS1;
   } else {
     throw new Error(

@@ -1,4 +1,4 @@
-import { getWebCrypto } from "./getWebCrypto.ts";
+import { getWebCrypto } from './getWebCrypto.ts';
 
 /**
  * Fill up the provided bytes array with random bytes equal to its length.

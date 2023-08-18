@@ -1,4 +1,4 @@
-import type { Crypto } from "../../../deps.ts";
+import type { Crypto } from '../../../deps.ts';
 
 let webCrypto: Crypto | undefined = undefined;
 
@@ -17,7 +17,7 @@ export async function getWebCrypto(): Promise<Crypto> {
      */
     // @ts-ignore: We'll handle any errors...
     // dnt-shim-ignore
-    const _crypto = await require("node:crypto");
+    const _crypto = await require('node:crypto');
     webCrypto = _crypto.webcrypto as unknown as Crypto;
   } catch (_err) {
     /**
@@ -40,8 +40,8 @@ export async function getWebCrypto(): Promise<Crypto> {
 
 class MissingWebCrypto extends Error {
   constructor() {
-    const message = "An instance of the Crypto API could not be located";
+    const message = 'An instance of the Crypto API could not be located';
     super(message);
-    this.name = "MissingWebCrypto";
+    this.name = 'MissingWebCrypto';
   }
 }

@@ -1,9 +1,4 @@
-import {
-  AsnParser,
-  BasicConstraints,
-  Certificate,
-  id_ce_basicConstraints,
-} from "../deps.ts";
+import { AsnParser, BasicConstraints, Certificate, id_ce_basicConstraints } from '../deps.ts';
 
 export type CertificateInfo = {
   issuer: Issuer;
@@ -31,11 +26,11 @@ type Subject = {
   combined: string;
 };
 
-const issuerSubjectIDKey: { [key: string]: "C" | "O" | "OU" | "CN" } = {
-  "2.5.4.6": "C",
-  "2.5.4.10": "O",
-  "2.5.4.11": "OU",
-  "2.5.4.3": "CN",
+const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
+  '2.5.4.6': 'C',
+  '2.5.4.10': 'O',
+  '2.5.4.11': 'OU',
+  '2.5.4.3': 'CN',
 };
 
 /**
@@ -50,7 +45,7 @@ export function getCertificateInfo(
   const parsedCert = x509.tbsCertificate;
 
   // Issuer
-  const issuer: Issuer = { combined: "" };
+  const issuer: Issuer = { combined: '' };
   parsedCert.issuer.forEach(([iss]) => {
     const key = issuerSubjectIDKey[iss.type];
     if (key) {
@@ -60,7 +55,7 @@ export function getCertificateInfo(
   issuer.combined = issuerSubjectToString(issuer);
 
   // Subject
-  const subject: Subject = { combined: "" };
+  const subject: Subject = { combined: '' };
   parsedCert.subject.forEach(([iss]) => {
     const key = issuerSubjectIDKey[iss.type];
     if (key) {
@@ -120,5 +115,5 @@ function issuerSubjectToString(input: Issuer | Subject): string {
     parts.push(input.CN);
   }
 
-  return parts.join(" : ");
+  return parts.join(' : ');
 }

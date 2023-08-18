@@ -1,9 +1,9 @@
-import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from "../../cose.ts";
-import { mapCoseAlgToWebCryptoAlg } from "./mapCoseAlgToWebCryptoAlg.ts";
-import { importKey } from "./importKey.ts";
-import { isoBase64URL } from "../index.ts";
-import { mapCoseAlgToWebCryptoKeyAlgName } from "./mapCoseAlgToWebCryptoKeyAlgName.ts";
-import { getWebCrypto } from "./getWebCrypto.ts";
+import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose.ts';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
+import { importKey } from './importKey.ts';
+import { isoBase64URL } from '../index.ts';
+import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName.ts';
+import { getWebCrypto } from './getWebCrypto.ts';
 
 /**
  * Verify a signature using an RSA public key
@@ -23,7 +23,7 @@ export async function verifyRSA(opts: {
   const e = cosePublicKey.get(COSEKEYS.e);
 
   if (!alg) {
-    throw new Error("Public key was missing alg (RSA)");
+    throw new Error('Public key was missing alg (RSA)');
   }
 
   if (!isCOSEAlg(alg)) {
@@ -31,16 +31,16 @@ export async function verifyRSA(opts: {
   }
 
   if (!n) {
-    throw new Error("Public key was missing n (RSA)");
+    throw new Error('Public key was missing n (RSA)');
   }
 
   if (!e) {
-    throw new Error("Public key was missing e (RSA)");
+    throw new Error('Public key was missing e (RSA)');
   }
 
   const keyData: JsonWebKey = {
-    kty: "RSA",
-    alg: "",
+    kty: 'RSA',
+    alg: '',
     n: isoBase64URL.fromBuffer(n),
     e: isoBase64URL.fromBuffer(e),
     ext: false,
@@ -59,17 +59,17 @@ export async function verifyRSA(opts: {
     keyAlgorithm.hash.name = mapCoseAlgToWebCryptoAlg(shaHashOverride);
   }
 
-  if (keyAlgorithm.name === "RSASSA-PKCS1-v1_5") {
-    if (keyAlgorithm.hash.name === "SHA-256") {
-      keyData.alg = "RS256";
-    } else if (keyAlgorithm.hash.name === "SHA-384") {
-      keyData.alg = "RS384";
-    } else if (keyAlgorithm.hash.name === "SHA-512") {
-      keyData.alg = "RS512";
-    } else if (keyAlgorithm.hash.name === "SHA-1") {
-      keyData.alg = "RS1";
+  if (keyAlgorithm.name === 'RSASSA-PKCS1-v1_5') {
+    if (keyAlgorithm.hash.name === 'SHA-256') {
+      keyData.alg = 'RS256';
+    } else if (keyAlgorithm.hash.name === 'SHA-384') {
+      keyData.alg = 'RS384';
+    } else if (keyAlgorithm.hash.name === 'SHA-512') {
+      keyData.alg = 'RS512';
+    } else if (keyAlgorithm.hash.name === 'SHA-1') {
+      keyData.alg = 'RS1';
     }
-  } else if (keyAlgorithm.name === "RSA-PSS") {
+  } else if (keyAlgorithm.name === 'RSA-PSS') {
     /**
      * salt length. The default value is 20 but the convention is to use hLen, the length of the
      * output of the hash function in bytes. A salt length of zero is permitted and will result in
@@ -80,14 +80,14 @@ export async function verifyRSA(opts: {
      */
     let saltLength = 0;
 
-    if (keyAlgorithm.hash.name === "SHA-256") {
-      keyData.alg = "PS256";
+    if (keyAlgorithm.hash.name === 'SHA-256') {
+      keyData.alg = 'PS256';
       saltLength = 32; // 256 bits => 32 bytes
-    } else if (keyAlgorithm.hash.name === "SHA-384") {
-      keyData.alg = "PS384";
+    } else if (keyAlgorithm.hash.name === 'SHA-384') {
+      keyData.alg = 'PS384';
       saltLength = 48; // 384 bits => 48 bytes
-    } else if (keyAlgorithm.hash.name === "SHA-512") {
-      keyData.alg = "PS512";
+    } else if (keyAlgorithm.hash.name === 'SHA-512') {
+      keyData.alg = 'PS512';
       saltLength = 64; // 512 bits => 64 bytes
     }
 

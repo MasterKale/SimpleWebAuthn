@@ -1,6 +1,6 @@
-import { COSEALG } from "../../cose.ts";
-import { mapCoseAlgToWebCryptoAlg } from "./mapCoseAlgToWebCryptoAlg.ts";
-import { getWebCrypto } from "./getWebCrypto.ts";
+import { COSEALG } from '../../cose.ts';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
+import { getWebCrypto } from './getWebCrypto.ts';
 
 /**
  * Generate a digest of the provided data.

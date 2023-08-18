@@ -1,8 +1,8 @@
-import { COSECRV, COSEKEYS, COSEPublicKeyOKP, isCOSEAlg } from "../../cose.ts";
-import { isoBase64URL } from "../../index.ts";
-import { SubtleCryptoCrv } from "./structs.ts";
-import { importKey } from "./importKey.ts";
-import { getWebCrypto } from "./getWebCrypto.ts";
+import { COSECRV, COSEKEYS, COSEPublicKeyOKP, isCOSEAlg } from '../../cose.ts';
+import { isoBase64URL } from '../../index.ts';
+import { SubtleCryptoCrv } from './structs.ts';
+import { importKey } from './importKey.ts';
+import { getWebCrypto } from './getWebCrypto.ts';
 
 export async function verifyOKP(opts: {
   cosePublicKey: COSEPublicKeyOKP;
@@ -18,7 +18,7 @@ export async function verifyOKP(opts: {
   const x = cosePublicKey.get(COSEKEYS.x);
 
   if (!alg) {
-    throw new Error("Public key was missing alg (OKP)");
+    throw new Error('Public key was missing alg (OKP)');
   }
 
   if (!isCOSEAlg(alg)) {
@@ -26,26 +26,26 @@ export async function verifyOKP(opts: {
   }
 
   if (!crv) {
-    throw new Error("Public key was missing crv (OKP)");
+    throw new Error('Public key was missing crv (OKP)');
   }
 
   if (!x) {
-    throw new Error("Public key was missing x (OKP)");
+    throw new Error('Public key was missing x (OKP)');
   }
 
   // Pulled key import steps from here:
   // https://wicg.github.io/webcrypto-secure-curves/#ed25519-operations
   let _crv: SubtleCryptoCrv;
   if (crv === COSECRV.ED25519) {
-    _crv = "Ed25519";
+    _crv = 'Ed25519';
   } else {
     throw new Error(`Unexpected COSE crv value of ${crv} (OKP)`);
   }
 
   const keyData: JsonWebKey = {
-    kty: "OKP",
+    kty: 'OKP',
     crv: _crv,
-    alg: "EdDSA",
+    alg: 'EdDSA',
     x: isoBase64URL.fromBuffer(x),
     ext: false,
   };

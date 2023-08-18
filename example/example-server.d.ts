@@ -1,4 +1,4 @@
-import type { AuthenticatorDevice } from "@simplewebauthn/typescript-types";
+import type { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
 
 /**
  * You'll need a database to store a few things:
@@ -37,7 +37,7 @@ interface LoggedInUser {
   devices: AuthenticatorDevice[];
 }
 
-declare module "express-session" {
+declare module 'express-session' {
   interface SessionData {
     /**
      * A simple way of storing a user's current challenge being signed by registration or authentication.

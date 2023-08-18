@@ -1,18 +1,13 @@
-import {
-  AsnParser,
-  Certificate,
-  id_ce_keyDescription,
-  KeyDescription,
-} from "../../deps.ts";
-import type { AttestationFormatVerifierOpts } from "../verifyRegistrationResponse.ts";
-import { convertCertBufferToPEM } from "../../helpers/convertCertBufferToPEM.ts";
-import { validateCertificatePath } from "../../helpers/validateCertificatePath.ts";
-import { verifySignature } from "../../helpers/verifySignature.ts";
-import { convertCOSEtoPKCS } from "../../helpers/convertCOSEtoPKCS.ts";
-import { isCOSEAlg } from "../../helpers/cose.ts";
-import { isoUint8Array } from "../../helpers/iso/index.ts";
-import { MetadataService } from "../../services/metadataService.ts";
-import { verifyAttestationWithMetadata } from "../../metadata/verifyAttestationWithMetadata.ts";
+import { AsnParser, Certificate, id_ce_keyDescription, KeyDescription } from '../../deps.ts';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS.ts';
+import { isCOSEAlg } from '../../helpers/cose.ts';
+import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { MetadataService } from '../../services/metadataService.ts';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata.ts';
 
 /**
  * Verify an attestation response with fmt 'android-key'
@@ -28,19 +23,19 @@ export async function verifyAttestationAndroidKey(
     aaguid,
     rootCertificates,
   } = options;
-  const x5c = attStmt.get("x5c");
-  const sig = attStmt.get("sig");
-  const alg = attStmt.get("alg");
+  const x5c = attStmt.get('x5c');
+  const sig = attStmt.get('sig');
+  const alg = attStmt.get('alg');
 
   if (!x5c) {
     throw new Error(
-      "No attestation certificate provided in attestation statement (AndroidKey)",
+      'No attestation certificate provided in attestation statement (AndroidKey)',
     );
   }
 
   if (!sig) {
     throw new Error(
-      "No attestation signature provided in attestation statement (AndroidKey)",
+      'No attestation signature provided in attestation statement (AndroidKey)',
     );
   }
 
@@ -66,7 +61,7 @@ export async function verifyAttestationAndroidKey(
 
   if (!isoUint8Array.areEqual(credPubKeyPKCS, parsedCertPubKey)) {
     throw new Error(
-      "Credential public key does not equal leaf cert public key (AndroidKey)",
+      'Credential public key does not equal leaf cert public key (AndroidKey)',
     );
   }
 
@@ -76,7 +71,7 @@ export async function verifyAttestationAndroidKey(
   );
 
   if (!extKeyStore) {
-    throw new Error("Certificate did not contain extKeyStore (AndroidKey)");
+    throw new Error('Certificate did not contain extKeyStore (AndroidKey)');
   }
 
   const parsedExtKeyStore = AsnParser.parse(
@@ -85,8 +80,7 @@ export async function verifyAttestationAndroidKey(
   );
 
   // Verify extKeyStore values
-  const { attestationChallenge, teeEnforced, softwareEnforced } =
-    parsedExtKeyStore;
+  const { attestationChallenge, teeEnforced, softwareEnforced } = parsedExtKeyStore;
 
   if (
     !isoUint8Array.areEqual(
@@ -95,7 +89,7 @@ export async function verifyAttestationAndroidKey(
     )
   ) {
     throw new Error(
-      "Attestation challenge was not equal to client data hash (AndroidKey)",
+      'Attestation challenge was not equal to client data hash (AndroidKey)',
     );
   }
 

@@ -2,17 +2,17 @@ import {
   AuthenticationCredential,
   AuthenticationResponseJSON,
   PublicKeyCredentialRequestOptionsJSON,
-} from "@simplewebauthn/typescript-types";
+} from '@simplewebauthn/typescript-types';
 
-import { bufferToBase64URLString } from "../helpers/bufferToBase64URLString";
-import { base64URLStringToBuffer } from "../helpers/base64URLStringToBuffer";
-import { bufferToUTF8String } from "../helpers/bufferToUTF8String";
-import { browserSupportsWebAuthn } from "../helpers/browserSupportsWebAuthn";
-import { browserSupportsWebAuthnAutofill } from "../helpers/browserSupportsWebAuthnAutofill";
-import { toPublicKeyCredentialDescriptor } from "../helpers/toPublicKeyCredentialDescriptor";
-import { identifyAuthenticationError } from "../helpers/identifyAuthenticationError";
-import { webauthnAbortService } from "../helpers/webAuthnAbortService";
-import { toAuthenticatorAttachment } from "../helpers/toAuthenticatorAttachment";
+import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
+import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
+import { bufferToUTF8String } from '../helpers/bufferToUTF8String';
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
+import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
+import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
+import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
+import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
@@ -26,7 +26,7 @@ export async function startAuthentication(
   useBrowserAutofill = false,
 ): Promise<AuthenticationResponseJSON> {
   if (!browserSupportsWebAuthn()) {
-    throw new Error("WebAuthn is not supported in this browser");
+    throw new Error('WebAuthn is not supported in this browser');
   }
 
   // We need to avoid passing empty array to avoid blocking retrieval
@@ -54,12 +54,12 @@ export async function startAuthentication(
    */
   if (useBrowserAutofill) {
     if (!(await browserSupportsWebAuthnAutofill())) {
-      throw Error("Browser does not support WebAuthn autofill");
+      throw Error('Browser does not support WebAuthn autofill');
     }
 
     // Check for an <input> with "webauthn" in its `autocomplete` attribute
     const eligibleInputs = document.querySelectorAll(
-      "input[autocomplete*='webauthn']",
+      'input[autocomplete*=\'webauthn\']',
     );
 
     // WebAuthn autofill requires at least one valid input
@@ -71,7 +71,7 @@ export async function startAuthentication(
 
     // `CredentialMediationRequirement` doesn't know about "conditional" yet as of
     // typescript@4.6.3
-    options.mediation = "conditional" as CredentialMediationRequirement;
+    options.mediation = 'conditional' as CredentialMediationRequirement;
     // Conditional UI requires an empty allow list
     publicKey.allowCredentials = [];
   }
@@ -84,14 +84,13 @@ export async function startAuthentication(
   // Wait for the user to complete assertion
   let credential;
   try {
-    credential =
-      (await navigator.credentials.get(options)) as AuthenticationCredential;
+    credential = (await navigator.credentials.get(options)) as AuthenticationCredential;
   } catch (err) {
     throw identifyAuthenticationError({ error: err as Error, options });
   }
 
   if (!credential) {
-    throw new Error("Authentication was not completed");
+    throw new Error('Authentication was not completed');
   }
 
   const { id, rawId, response, type } = credential;

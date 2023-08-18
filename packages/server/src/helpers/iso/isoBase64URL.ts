@@ -1,4 +1,4 @@
-import base64 from "https://deno.land/x/b64@1.1.27/src/base64.js";
+import base64 from 'https://deno.land/x/b64@1.1.27/src/base64.js';
 
 /**
  * Decode from a Base64URL-encoded string to an ArrayBuffer. Best used when converting a
@@ -10,9 +10,9 @@ import base64 from "https://deno.land/x/b64@1.1.27/src/base64.js";
  */
 export function toBuffer(
   base64urlString: string,
-  from: "base64" | "base64url" = "base64url",
+  from: 'base64' | 'base64url' = 'base64url',
 ): Uint8Array {
-  const _buffer = base64.toArrayBuffer(base64urlString, from === "base64url");
+  const _buffer = base64.toArrayBuffer(base64urlString, from === 'base64url');
   return new Uint8Array(_buffer);
 }
 
@@ -25,9 +25,9 @@ export function toBuffer(
  */
 export function fromBuffer(
   buffer: Uint8Array,
-  to: "base64" | "base64url" = "base64url",
+  to: 'base64' | 'base64url' = 'base64url',
 ): string {
-  return base64.fromArrayBuffer(buffer, to === "base64url");
+  return base64.fromArrayBuffer(buffer, to === 'base64url');
 }
 
 /**
@@ -65,6 +65,6 @@ export function isBase64(input: string): boolean {
  */
 export function isBase64url(input: string): boolean {
   // Trim padding characters from the string if present
-  input = input.replace(/=/g, "");
+  input = input.replace(/=/g, '');
   return base64.validate(input, true);
 }

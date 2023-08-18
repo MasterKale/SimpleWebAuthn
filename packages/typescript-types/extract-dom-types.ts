@@ -16,33 +16,33 @@ import {
   Structure,
   SyntaxKind,
   TypeAliasDeclaration,
-} from "ts-morph";
-import { version } from "typescript";
+} from 'ts-morph';
+import { version } from 'typescript';
 
 // List of types we directly reference from the dom lib. Only interface and type
 // alias identifiers are valid, since other syntax types (class, function, var)
 // are implementations, which will not be available outside of the browser.
 const types = [
-  "AuthenticatorAssertionResponse",
-  "AttestationConveyancePreference",
-  "AuthenticatorAttestationResponse",
-  "AuthenticatorTransport",
-  "AuthenticationExtensionsClientInputs",
-  "AuthenticationExtensionsClientOutputs",
-  "AuthenticatorSelectionCriteria",
-  "COSEAlgorithmIdentifier",
-  "Crypto",
-  "PublicKeyCredential",
-  "PublicKeyCredentialCreationOptions",
-  "PublicKeyCredentialDescriptor",
-  "PublicKeyCredentialParameters",
-  "PublicKeyCredentialRequestOptions",
-  "PublicKeyCredentialUserEntity",
-  "UserVerificationRequirement",
+  'AuthenticatorAssertionResponse',
+  'AttestationConveyancePreference',
+  'AuthenticatorAttestationResponse',
+  'AuthenticatorTransport',
+  'AuthenticationExtensionsClientInputs',
+  'AuthenticationExtensionsClientOutputs',
+  'AuthenticatorSelectionCriteria',
+  'COSEAlgorithmIdentifier',
+  'Crypto',
+  'PublicKeyCredential',
+  'PublicKeyCredentialCreationOptions',
+  'PublicKeyCredentialDescriptor',
+  'PublicKeyCredentialParameters',
+  'PublicKeyCredentialRequestOptions',
+  'PublicKeyCredentialUserEntity',
+  'UserVerificationRequirement',
 ];
 
 const project = new Project({ skipAddingFilesFromTsConfig: true });
-const domSourcePath = "typescript/lib/lib.dom.d.ts";
+const domSourcePath = 'typescript/lib/lib.dom.d.ts';
 const domSourceFile = project.addSourceFileAtPath(
   require.resolve(domSourcePath),
 );
@@ -91,9 +91,7 @@ outputSourceFile.addStatements([
   `// To regenerate, run the following command from the project root:`,
   `// npx lerna --scope=@simplewebauthn/typescript-types exec -- npm run extract-dom-types`,
 ]);
-const resolvedStructures = Array.from(resolvedNodes).map((node) =>
-  node.getStructure()
-);
+const resolvedStructures = Array.from(resolvedNodes).map((node) => node.getStructure());
 outputSourceFile.addInterfaces(
   resolvedStructures.filter(Structure.isInterface),
 );

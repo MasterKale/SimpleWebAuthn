@@ -1,15 +1,12 @@
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.198.0/assert/mod.ts";
+import { assert, assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-import { convertCertBufferToPEM } from "./convertCertBufferToPEM.ts";
+import { convertCertBufferToPEM } from './convertCertBufferToPEM.ts';
 
-Deno.test("should return pem when input is base64URLString", () => {
+Deno.test('should return pem when input is base64URLString', () => {
   const input =
-    "Y2VydEJ1ZmZlclN0cmluZyBjZXJ0QnVmZmVyU3RyaW5nIGNlcnRCdWZmZXJTdHJpbmcgY2VydEJ1ZmZlclN0cmluZyBjZXJ0QnVmZmVyU3RyaW5nIGNlcnRCdWZmZXJTdHJpbmcgY2VydEJ1ZmZlclN0cmluZw";
+    'Y2VydEJ1ZmZlclN0cmluZyBjZXJ0QnVmZmVyU3RyaW5nIGNlcnRCdWZmZXJTdHJpbmcgY2VydEJ1ZmZlclN0cmluZyBjZXJ0QnVmZmVyU3RyaW5nIGNlcnRCdWZmZXJTdHJpbmcgY2VydEJ1ZmZlclN0cmluZw';
   const actual = convertCertBufferToPEM(input);
-  const actualPemArr = actual.split("\n");
+  const actualPemArr = actual.split('\n');
 
   assertEquals(
     actual,
@@ -21,17 +18,17 @@ dHJpbmcgY2VydEJ1ZmZlclN0cmluZw==
 `,
   );
 
-  assertEquals(actualPemArr[0], "-----BEGIN CERTIFICATE-----");
+  assertEquals(actualPemArr[0], '-----BEGIN CERTIFICATE-----');
   assert(actualPemArr[1].length <= 64);
   assert(actualPemArr[2].length <= 64);
   assert(actualPemArr[3].length <= 64);
-  assertEquals(actualPemArr[4], "-----END CERTIFICATE-----");
+  assertEquals(actualPemArr[4], '-----END CERTIFICATE-----');
 });
 
-Deno.test("should return pem when input is buffer", () => {
+Deno.test('should return pem when input is buffer', () => {
   const input = new Uint8Array(128).fill(0);
   const actual = convertCertBufferToPEM(input);
-  const actualPemArr = actual.split("\n");
+  const actualPemArr = actual.split('\n');
   assertEquals(
     actual,
     `-----BEGIN CERTIFICATE-----
@@ -42,9 +39,9 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 `,
   );
 
-  assertEquals(actualPemArr[0], "-----BEGIN CERTIFICATE-----");
+  assertEquals(actualPemArr[0], '-----BEGIN CERTIFICATE-----');
   assert(actualPemArr[1].length <= 64);
   assert(actualPemArr[2].length <= 64);
   assert(actualPemArr[3].length <= 64);
-  assertEquals(actualPemArr[4], "-----END CERTIFICATE-----");
+  assertEquals(actualPemArr[4], '-----END CERTIFICATE-----');
 });

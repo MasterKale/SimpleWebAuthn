@@ -1,9 +1,9 @@
-import { AsnSerializer } from "../deps.ts";
-import { isCertRevoked } from "./isCertRevoked.ts";
-import { verifySignature } from "./verifySignature.ts";
-import { mapX509SignatureAlgToCOSEAlg } from "./mapX509SignatureAlgToCOSEAlg.ts";
-import { getCertificateInfo } from "./getCertificateInfo.ts";
-import { convertPEMToBytes } from "./convertPEMToBytes.ts";
+import { AsnSerializer } from '../deps.ts';
+import { isCertRevoked } from './isCertRevoked.ts';
+import { verifySignature } from './verifySignature.ts';
+import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
+import { getCertificateInfo } from './getCertificateInfo.ts';
+import { convertPEMToBytes } from './convertPEMToBytes.ts';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -56,7 +56,7 @@ export async function validateCertificatePath(
 
 async function _validatePath(certificates: string[]): Promise<boolean> {
   if (new Set(certificates).size !== certificates.length) {
-    throw new Error("Invalid certificate path: found duplicate certificates");
+    throw new Error('Invalid certificate path: found duplicate certificates');
   }
 
   // From leaf to root, make sure each cert is issued by the next certificate in the chain
@@ -66,7 +66,7 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     const isLeafCert = i === 0;
     const isRootCert = i + 1 >= certificates.length;
 
-    let issuerPem = "";
+    let issuerPem = '';
     if (isRootCert) {
       issuerPem = subjectPem;
     } else {
@@ -125,7 +125,7 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
     });
 
     if (!verified) {
-      throw new Error("Invalid certificate path: invalid signature");
+      throw new Error('Invalid certificate path: invalid signature');
     }
   }
 
@@ -135,15 +135,15 @@ async function _validatePath(certificates: string[]): Promise<boolean> {
 // Custom errors to help pass on certain errors
 class InvalidSubjectAndIssuer extends Error {
   constructor() {
-    const message = "Subject issuer did not match issuer subject";
+    const message = 'Subject issuer did not match issuer subject';
     super(message);
-    this.name = "InvalidSubjectAndIssuer";
+    this.name = 'InvalidSubjectAndIssuer';
   }
 }
 
 class CertificateNotYetValidOrExpired extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "CertificateNotYetValidOrExpired";
+    this.name = 'CertificateNotYetValidOrExpired';
   }
 }

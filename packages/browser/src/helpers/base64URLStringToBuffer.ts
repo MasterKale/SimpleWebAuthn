@@ -7,7 +7,7 @@
  */
 export function base64URLStringToBuffer(base64URLString: string): ArrayBuffer {
   // Convert from Base64URL to Base64
-  const base64 = base64URLString.replace(/-/g, "+").replace(/_/g, "/");
+  const base64 = base64URLString.replace(/-/g, '+').replace(/_/g, '/');
   /**
    * Pad with '=' until it's a multiple of four
    * (4 - (85 % 4 = 1) = 3) % 4 = 3 padding
@@ -16,7 +16,7 @@ export function base64URLStringToBuffer(base64URLString: string): ArrayBuffer {
    * (4 - (88 % 4 = 0) = 4) % 4 = 0 padding
    */
   const padLength = (4 - (base64.length % 4)) % 4;
-  const padded = base64.padEnd(base64.length + padLength, "=");
+  const padded = base64.padEnd(base64.length + padLength, '=');
 
   // Convert to a binary string
   const binary = atob(padded);

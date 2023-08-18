@@ -5,11 +5,11 @@ import {
   isCOSEPublicKeyEC2,
   isCOSEPublicKeyOKP,
   isCOSEPublicKeyRSA,
-} from "../../cose.ts";
-import { verifyEC2 } from "./verifyEC2.ts";
-import { verifyRSA } from "./verifyRSA.ts";
-import { verifyOKP } from "./verifyOKP.ts";
-import { unwrapEC2Signature } from "./unwrapEC2Signature.ts";
+} from '../../cose.ts';
+import { verifyEC2 } from './verifyEC2.ts';
+import { verifyRSA } from './verifyRSA.ts';
+import { verifyOKP } from './verifyOKP.ts';
+import { unwrapEC2Signature } from './unwrapEC2Signature.ts';
 
 /**
  * Verify signatures with their public key. Supports EC2 and RSA public keys.

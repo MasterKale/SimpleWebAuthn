@@ -1,10 +1,10 @@
-import { isoBase64URL } from "../helpers/iso/index.ts";
+import { isoBase64URL } from '../helpers/iso/index.ts';
 
 /**
  * Process a JWT into Javascript-friendly data structures
  */
 export function parseJWT<T1, T2>(jwt: string): [T1, T2, string] {
-  const parts = jwt.split(".");
+  const parts = jwt.split('.');
   return [
     JSON.parse(isoBase64URL.toString(parts[0])) as T1,
     JSON.parse(isoBase64URL.toString(parts[1])) as T2,

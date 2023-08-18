@@ -1,4 +1,4 @@
-import { PublicKeyCredentialFuture } from "@simplewebauthn/typescript-types";
+import { PublicKeyCredentialFuture } from '@simplewebauthn/typescript-types';
 
 /**
  * Determine if the browser supports conditional UI, so that WebAuthn credentials can

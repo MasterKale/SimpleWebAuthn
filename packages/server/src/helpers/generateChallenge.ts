@@ -1,4 +1,4 @@
-import { isoCrypto } from "./iso/index.ts";
+import { isoCrypto } from './iso/index.ts';
 
 /**
  * Generate a suitably random value to be used as an attestation or assertion challenge

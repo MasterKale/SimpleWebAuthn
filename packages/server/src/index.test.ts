@@ -1,27 +1,27 @@
-import { assert } from "https://deno.land/std@0.198.0/assert/mod.ts";
+import { assert } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-import * as index from "./index.ts";
+import * as index from './index.ts';
 
-Deno.test("should export method `generateRegistrationOptions`", () => {
+Deno.test('should export method `generateRegistrationOptions`', () => {
   assert(index.generateRegistrationOptions);
 });
 
-Deno.test("should export method `verifyRegistrationResponse`", () => {
+Deno.test('should export method `verifyRegistrationResponse`', () => {
   assert(index.verifyRegistrationResponse);
 });
 
-Deno.test("should export method `generateAuthenticationOptions`", () => {
+Deno.test('should export method `generateAuthenticationOptions`', () => {
   assert(index.generateAuthenticationOptions);
 });
 
-Deno.test("should export method `verifyAuthenticationResponse`", () => {
+Deno.test('should export method `verifyAuthenticationResponse`', () => {
   assert(index.verifyAuthenticationResponse);
 });
 
-Deno.test("should export service `MetadataService`", () => {
+Deno.test('should export service `MetadataService`', () => {
   assert(index.MetadataService);
 });
 
-Deno.test("should export service `SettingsService`", () => {
+Deno.test('should export service `SettingsService`', () => {
   assert(index.SettingsService);
 });

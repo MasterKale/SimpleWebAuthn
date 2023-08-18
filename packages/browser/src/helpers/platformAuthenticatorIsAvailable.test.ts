@@ -1,4 +1,4 @@
-import { platformAuthenticatorIsAvailable } from "./platformAuthenticatorIsAvailable";
+import { platformAuthenticatorIsAvailable } from './platformAuthenticatorIsAvailable';
 
 const mockIsUVPAA = jest.fn();
 
@@ -7,17 +7,17 @@ beforeEach(() => {
 
   // @ts-ignore 2741
   window.PublicKeyCredential = jest.fn().mockReturnValue(() => {});
-  window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable =
-    mockIsUVPAA.mockResolvedValue(true);
+  window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable = mockIsUVPAA
+    .mockResolvedValue(true);
 });
 
-test("should return true when platform authenticator is available", async () => {
+test('should return true when platform authenticator is available', async () => {
   const isAvailable = await platformAuthenticatorIsAvailable();
 
   expect(isAvailable).toEqual(true);
 });
 
-test("should return false when platform authenticator is unavailable", async () => {
+test('should return false when platform authenticator is unavailable', async () => {
   mockIsUVPAA.mockResolvedValue(false);
 
   const isAvailable = await platformAuthenticatorIsAvailable();
@@ -25,7 +25,7 @@ test("should return false when platform authenticator is unavailable", async () 
   expect(isAvailable).toEqual(false);
 });
 
-test("should return false when browser does not support WebAuthn", async () => {
+test('should return false when browser does not support WebAuthn', async () => {
   // This looks weird but it appeases the linter so it's _fiiiine_
   delete (window as { PublicKeyCredential: unknown }).PublicKeyCredential;
   const isAvailable = await platformAuthenticatorIsAvailable();

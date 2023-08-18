@@ -1,5 +1,5 @@
-import { TPM_ALG, TPM_ST } from "./constants.ts";
-import { isoUint8Array } from "../../../helpers/iso/index.ts";
+import { TPM_ALG, TPM_ST } from './constants.ts';
+import { isoUint8Array } from '../../../helpers/iso/index.ts';
 
 /**
  * Cut up a TPM attestation's certInfo into intelligible chunks

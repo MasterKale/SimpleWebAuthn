@@ -1,38 +1,38 @@
-import { assertEquals } from "https://deno.land/std@0.198.0/assert/mod.ts";
+import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-import { SettingsService } from "./settingsService.ts";
-import { convertPEMToBytes } from "../helpers/convertPEMToBytes.ts";
+import { SettingsService } from './settingsService.ts';
+import { convertPEMToBytes } from '../helpers/convertPEMToBytes.ts';
 
-import { GlobalSign_Root_CA } from "./defaultRootCerts/android-safetynet.ts";
-import { Apple_WebAuthn_Root_CA } from "./defaultRootCerts/apple.ts";
+import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
+import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
 
-Deno.test("should accept cert as Buffer", () => {
+Deno.test('should accept cert as Buffer', () => {
   const gsr1Buffer = convertPEMToBytes(GlobalSign_Root_CA);
   SettingsService.setRootCertificates({
-    identifier: "android-safetynet",
+    identifier: 'android-safetynet',
     certificates: [gsr1Buffer],
   });
 
   const certs = SettingsService.getRootCertificates({
-    identifier: "android-safetynet",
+    identifier: 'android-safetynet',
   });
 
   assertEquals(certs, [GlobalSign_Root_CA]);
 });
 
-Deno.test("should accept cert as PEM string", () => {
+Deno.test('should accept cert as PEM string', () => {
   SettingsService.setRootCertificates({
-    identifier: "apple",
+    identifier: 'apple',
     certificates: [Apple_WebAuthn_Root_CA],
   });
 
-  const certs = SettingsService.getRootCertificates({ identifier: "apple" });
+  const certs = SettingsService.getRootCertificates({ identifier: 'apple' });
 
   assertEquals(certs, [Apple_WebAuthn_Root_CA]);
 });
 
-Deno.test("should return empty array when certificate is not set", () => {
-  const certs = SettingsService.getRootCertificates({ identifier: "none" });
+Deno.test('should return empty array when certificate is not set', () => {
+  const certs = SettingsService.getRootCertificates({ identifier: 'none' });
 
   assertEquals(Array.isArray(certs), true);
   assertEquals(certs.length, 0);

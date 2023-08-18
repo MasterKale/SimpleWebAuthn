@@ -2,31 +2,31 @@ import type {
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
   RegistrationResponseJSON,
-} from "../deps.ts";
+} from '../deps.ts';
 import {
   AttestationFormat,
   AttestationStatement,
   decodeAttestationObject,
-} from "../helpers/decodeAttestationObject.ts";
-import { AuthenticationExtensionsAuthenticatorOutputs } from "../helpers/decodeAuthenticatorExtensions.ts";
-import { decodeClientDataJSON } from "../helpers/decodeClientDataJSON.ts";
-import { parseAuthenticatorData } from "../helpers/parseAuthenticatorData.ts";
-import { toHash } from "../helpers/toHash.ts";
-import { decodeCredentialPublicKey } from "../helpers/decodeCredentialPublicKey.ts";
-import { COSEKEYS } from "../helpers/cose.ts";
-import { convertAAGUIDToString } from "../helpers/convertAAGUIDToString.ts";
-import { parseBackupFlags } from "../helpers/parseBackupFlags.ts";
-import { matchExpectedRPID } from "../helpers/matchExpectedRPID.ts";
-import { isoBase64URL } from "../helpers/iso/index.ts";
-import { SettingsService } from "../services/settingsService.ts";
+} from '../helpers/decodeAttestationObject.ts';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
+import { toHash } from '../helpers/toHash.ts';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
+import { COSEKEYS } from '../helpers/cose.ts';
+import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
+import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
+import { isoBase64URL } from '../helpers/iso/index.ts';
+import { SettingsService } from '../services/settingsService.ts';
 
-import { supportedCOSEAlgorithmIdentifiers } from "./generateRegistrationOptions.ts";
-import { verifyAttestationFIDOU2F } from "./verifications/verifyAttestationFIDOU2F.ts";
-import { verifyAttestationPacked } from "./verifications/verifyAttestationPacked.ts";
-import { verifyAttestationAndroidSafetyNet } from "./verifications/verifyAttestationAndroidSafetyNet.ts";
-import { verifyAttestationTPM } from "./verifications/tpm/verifyAttestationTPM.ts";
-import { verifyAttestationAndroidKey } from "./verifications/verifyAttestationAndroidKey.ts";
-import { verifyAttestationApple } from "./verifications/verifyAttestationApple.ts";
+import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions.ts';
+import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F.ts';
+import { verifyAttestationPacked } from './verifications/verifyAttestationPacked.ts';
+import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet.ts';
+import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM.ts';
+import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey.ts';
+import { verifyAttestationApple } from './verifications/verifyAttestationApple.ts';
 
 export type VerifyRegistrationResponseOpts = {
   response: RegistrationResponseJSON;
@@ -63,21 +63,20 @@ export async function verifyRegistrationResponse(
     requireUserVerification = true,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
-  const { id, rawId, type: credentialType, response: attestationResponse } =
-    response;
+  const { id, rawId, type: credentialType, response: attestationResponse } = response;
 
   // Ensure credential specified an ID
   if (!id) {
-    throw new Error("Missing credential ID");
+    throw new Error('Missing credential ID');
   }
 
   // Ensure ID is base64url-encoded
   if (id !== rawId) {
-    throw new Error("Credential ID was not base64url-encoded");
+    throw new Error('Credential ID was not base64url-encoded');
   }
 
   // Make sure credential type is public-key
-  if (credentialType !== "public-key") {
+  if (credentialType !== 'public-key') {
     throw new Error(
       `Unexpected credential type ${credentialType}, expected "public-key"`,
     );
@@ -90,12 +89,12 @@ export async function verifyRegistrationResponse(
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an registration
-  if (type !== "webauthn.create") {
+  if (type !== 'webauthn.create') {
     throw new Error(`Unexpected registration response type: ${type}`);
   }
 
   // Ensure the device provided the challenge we gave it
-  if (typeof expectedChallenge === "function") {
+  if (typeof expectedChallenge === 'function') {
     if (!expectedChallenge(challenge)) {
       throw new Error(
         `Custom challenge verifier returned false for registration response challenge "${challenge}"`,
@@ -113,7 +112,7 @@ export async function verifyRegistrationResponse(
       throw new Error(
         `Unexpected registration response origin "${origin}", expected one of: ${
           expectedOrigin.join(
-            ", ",
+            ', ',
           )
         }`,
       );
@@ -127,12 +126,12 @@ export async function verifyRegistrationResponse(
   }
 
   if (tokenBinding) {
-    if (typeof tokenBinding !== "object") {
+    if (typeof tokenBinding !== 'object') {
       throw new Error(`Unexpected value for TokenBinding "${tokenBinding}"`);
     }
 
     if (
-      ["present", "supported", "not-supported"].indexOf(tokenBinding.status) < 0
+      ['present', 'supported', 'not-supported'].indexOf(tokenBinding.status) < 0
     ) {
       throw new Error(
         `Unexpected tokenBinding.status value of "${tokenBinding.status}"`,
@@ -144,9 +143,9 @@ export async function verifyRegistrationResponse(
     attestationResponse.attestationObject,
   );
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
-  const fmt = decodedAttestationObject.get("fmt");
-  const authData = decodedAttestationObject.get("authData");
-  const attStmt = decodedAttestationObject.get("attStmt");
+  const fmt = decodedAttestationObject.get('fmt');
+  const authData = decodedAttestationObject.get('authData');
+  const attStmt = decodedAttestationObject.get('attStmt');
 
   const parsedAuthData = parseAuthenticatorData(authData);
   const {
@@ -163,7 +162,7 @@ export async function verifyRegistrationResponse(
   let matchedRPID: string | undefined;
   if (expectedRPID) {
     let expectedRPIDs: string[] = [];
-    if (typeof expectedRPID === "string") {
+    if (typeof expectedRPID === 'string') {
       expectedRPIDs = [expectedRPID];
     } else {
       expectedRPIDs = expectedRPID;
@@ -174,38 +173,38 @@ export async function verifyRegistrationResponse(
 
   // Make sure someone was physically present
   if (!flags.up) {
-    throw new Error("User not present during registration");
+    throw new Error('User not present during registration');
   }
 
   // Enforce user verification if specified
   if (requireUserVerification && !flags.uv) {
     throw new Error(
-      "User verification required, but user could not be verified",
+      'User verification required, but user could not be verified',
     );
   }
 
   if (!credentialID) {
-    throw new Error("No credential ID was provided by authenticator");
+    throw new Error('No credential ID was provided by authenticator');
   }
 
   if (!credentialPublicKey) {
-    throw new Error("No public key was provided by authenticator");
+    throw new Error('No public key was provided by authenticator');
   }
 
   if (!aaguid) {
-    throw new Error("No AAGUID was present during registration");
+    throw new Error('No AAGUID was present during registration');
   }
 
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
   const alg = decodedPublicKey.get(COSEKEYS.alg);
 
-  if (typeof alg !== "number") {
-    throw new Error("Credential public key was missing numeric alg");
+  if (typeof alg !== 'number') {
+    throw new Error('Credential public key was missing numeric alg');
   }
 
   // Make sure the key algorithm is one we specified within the registration options
   if (!supportedAlgorithmIDs.includes(alg as number)) {
-    const supported = supportedAlgorithmIDs.join(", ");
+    const supported = supportedAlgorithmIDs.join(', ');
     throw new Error(
       `Unexpected public key alg "${alg}", expected one of "${supported}"`,
     );
@@ -234,21 +233,21 @@ export async function verifyRegistrationResponse(
    * Verification can only be performed when attestation = 'direct'
    */
   let verified = false;
-  if (fmt === "fido-u2f") {
+  if (fmt === 'fido-u2f') {
     verified = await verifyAttestationFIDOU2F(verifierOpts);
-  } else if (fmt === "packed") {
+  } else if (fmt === 'packed') {
     verified = await verifyAttestationPacked(verifierOpts);
-  } else if (fmt === "android-safetynet") {
+  } else if (fmt === 'android-safetynet') {
     verified = await verifyAttestationAndroidSafetyNet(verifierOpts);
-  } else if (fmt === "android-key") {
+  } else if (fmt === 'android-key') {
     verified = await verifyAttestationAndroidKey(verifierOpts);
-  } else if (fmt === "tpm") {
+  } else if (fmt === 'tpm') {
     verified = await verifyAttestationTPM(verifierOpts);
-  } else if (fmt === "apple") {
+  } else if (fmt === 'apple') {
     verified = await verifyAttestationApple(verifierOpts);
-  } else if (fmt === "none") {
+  } else if (fmt === 'none') {
     if (attStmt.size > 0) {
-      throw new Error("None attestation had unexpected attestation statement");
+      throw new Error('None attestation had unexpected attestation statement');
     }
     // This is the weaker of the attestations, so there's nothing else to really check
     verified = true;
@@ -319,15 +318,14 @@ export type VerifiedRegistrationResponse = {
     aaguid: string;
     credentialID: Uint8Array;
     credentialPublicKey: Uint8Array;
-    credentialType: "public-key";
+    credentialType: 'public-key';
     attestationObject: Uint8Array;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
     origin: string;
     rpID?: string;
-    authenticatorExtensionResults?:
-      AuthenticationExtensionsAuthenticatorOutputs;
+    authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };
 

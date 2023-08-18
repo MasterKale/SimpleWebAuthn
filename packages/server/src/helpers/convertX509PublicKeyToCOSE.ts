@@ -6,7 +6,7 @@ import {
   id_secp256r1,
   id_secp384r1,
   RSAPublicKey,
-} from "../deps.ts";
+} from '../deps.ts';
 import {
   COSECRV,
   COSEKEYS,
@@ -14,8 +14,8 @@ import {
   COSEPublicKey,
   COSEPublicKeyEC2,
   COSEPublicKeyRSA,
-} from "./cose.ts";
-import { mapX509SignatureAlgToCOSEAlg } from "./mapX509SignatureAlgToCOSEAlg.ts";
+} from './cose.ts';
+import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 
 export function convertX509PublicKeyToCOSE(
   x509Certificate: Uint8Array,
@@ -38,7 +38,7 @@ export function convertX509PublicKeyToCOSE(
      * EC2 Public Key
      */
     if (!subjectPublicKeyInfo.algorithm.parameters) {
-      throw new Error("Certificate public key was missing parameters (EC2)");
+      throw new Error('Certificate public key was missing parameters (EC2)');
     }
 
     const ecParameters = AsnParser.parse(
@@ -88,7 +88,7 @@ export function convertX509PublicKeyToCOSE(
     coseEC2PubKey.set(COSEKEYS.y, y);
 
     cosePublicKey = coseEC2PubKey;
-  } else if (publicKeyAlgorithmID === "1.2.840.113549.1.1.1") {
+  } else if (publicKeyAlgorithmID === '1.2.840.113549.1.1.1') {
     /**
      * RSA public key
      */

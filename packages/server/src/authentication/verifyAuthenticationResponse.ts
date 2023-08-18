@@ -3,15 +3,15 @@ import type {
   AuthenticatorDevice,
   CredentialDeviceType,
   UserVerificationRequirement,
-} from "../deps.ts";
-import { decodeClientDataJSON } from "../helpers/decodeClientDataJSON.ts";
-import { toHash } from "../helpers/toHash.ts";
-import { verifySignature } from "../helpers/verifySignature.ts";
-import { parseAuthenticatorData } from "../helpers/parseAuthenticatorData.ts";
-import { parseBackupFlags } from "../helpers/parseBackupFlags.ts";
-import { AuthenticationExtensionsAuthenticatorOutputs } from "../helpers/decodeAuthenticatorExtensions.ts";
-import { matchExpectedRPID } from "../helpers/matchExpectedRPID.ts";
-import { isoBase64URL, isoUint8Array } from "../helpers/iso/index.ts";
+} from '../deps.ts';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
+import { toHash } from '../helpers/toHash.ts';
+import { verifySignature } from '../helpers/verifySignature.ts';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
+import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
 export type VerifyAuthenticationResponseOpts = {
   response: AuthenticationResponseJSON;
@@ -56,32 +56,31 @@ export async function verifyAuthenticationResponse(
     requireUserVerification = true,
     advancedFIDOConfig,
   } = options;
-  const { id, rawId, type: credentialType, response: assertionResponse } =
-    response;
+  const { id, rawId, type: credentialType, response: assertionResponse } = response;
 
   // Ensure credential specified an ID
   if (!id) {
-    throw new Error("Missing credential ID");
+    throw new Error('Missing credential ID');
   }
 
   // Ensure ID is base64url-encoded
   if (id !== rawId) {
-    throw new Error("Credential ID was not base64url-encoded");
+    throw new Error('Credential ID was not base64url-encoded');
   }
 
   // Make sure credential type is public-key
-  if (credentialType !== "public-key") {
+  if (credentialType !== 'public-key') {
     throw new Error(
       `Unexpected credential type ${credentialType}, expected "public-key"`,
     );
   }
 
   if (!response) {
-    throw new Error("Credential missing response");
+    throw new Error('Credential missing response');
   }
 
-  if (typeof assertionResponse?.clientDataJSON !== "string") {
-    throw new Error("Credential response clientDataJSON was not a string");
+  if (typeof assertionResponse?.clientDataJSON !== 'string') {
+    throw new Error('Credential response clientDataJSON was not a string');
   }
 
   const clientDataJSON = decodeClientDataJSON(assertionResponse.clientDataJSON);
@@ -89,12 +88,12 @@ export async function verifyAuthenticationResponse(
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an authentication
-  if (type !== "webauthn.get") {
+  if (type !== 'webauthn.get') {
     throw new Error(`Unexpected authentication response type: ${type}`);
   }
 
   // Ensure the device provided the challenge we gave it
-  if (typeof expectedChallenge === "function") {
+  if (typeof expectedChallenge === 'function') {
     if (!expectedChallenge(challenge)) {
       throw new Error(
         `Custom challenge verifier returned false for registration response challenge "${challenge}"`,
@@ -109,7 +108,7 @@ export async function verifyAuthenticationResponse(
   // Check that the origin is our site
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
-      const joinedExpectedOrigin = expectedOrigin.join(", ");
+      const joinedExpectedOrigin = expectedOrigin.join(', ');
       throw new Error(
         `Unexpected authentication response origin "${origin}", expected one of: ${joinedExpectedOrigin}`,
       );
@@ -124,28 +123,28 @@ export async function verifyAuthenticationResponse(
 
   if (!isoBase64URL.isBase64url(assertionResponse.authenticatorData)) {
     throw new Error(
-      "Credential response authenticatorData was not a base64url string",
+      'Credential response authenticatorData was not a base64url string',
     );
   }
 
   if (!isoBase64URL.isBase64url(assertionResponse.signature)) {
-    throw new Error("Credential response signature was not a base64url string");
+    throw new Error('Credential response signature was not a base64url string');
   }
 
   if (
     assertionResponse.userHandle &&
-    typeof assertionResponse.userHandle !== "string"
+    typeof assertionResponse.userHandle !== 'string'
   ) {
-    throw new Error("Credential response userHandle was not a string");
+    throw new Error('Credential response userHandle was not a string');
   }
 
   if (tokenBinding) {
-    if (typeof tokenBinding !== "object") {
-      throw new Error("ClientDataJSON tokenBinding was not an object");
+    if (typeof tokenBinding !== 'object') {
+      throw new Error('ClientDataJSON tokenBinding was not an object');
     }
 
     if (
-      ["present", "supported", "notSupported"].indexOf(tokenBinding.status) < 0
+      ['present', 'supported', 'notSupported'].indexOf(tokenBinding.status) < 0
     ) {
       throw new Error(`Unexpected tokenBinding status ${tokenBinding.status}`);
     }
@@ -159,7 +158,7 @@ export async function verifyAuthenticationResponse(
 
   // Make sure the response's RP ID is ours
   let expectedRPIDs: string[] = [];
-  if (typeof expectedRPID === "string") {
+  if (typeof expectedRPID === 'string') {
     expectedRPIDs = [expectedRPID];
   } else {
     expectedRPIDs = expectedRPID;
@@ -173,16 +172,16 @@ export async function verifyAuthenticationResponse(
     /**
      * Use FIDO Conformance-defined rules for verifying UP and UV flags
      */
-    if (fidoUserVerification === "required") {
+    if (fidoUserVerification === 'required') {
       // Require `flags.uv` be true (implies `flags.up` is true)
       if (!flags.uv) {
         throw new Error(
-          "User verification required, but user could not be verified",
+          'User verification required, but user could not be verified',
         );
       }
     } else if (
-      fidoUserVerification === "preferred" ||
-      fidoUserVerification === "discouraged"
+      fidoUserVerification === 'preferred' ||
+      fidoUserVerification === 'discouraged'
     ) {
       // Ignore `flags.uv`
     }
@@ -192,13 +191,13 @@ export async function verifyAuthenticationResponse(
      */
     // WebAuthn only requires the user presence flag be true
     if (!flags.up) {
-      throw new Error("User not present during authentication");
+      throw new Error('User not present during authentication');
     }
 
     // Enforce user verification if required
     if (requireUserVerification && !flags.uv) {
       throw new Error(
-        "User verification required, but user could not be verified",
+        'User verification required, but user could not be verified',
       );
     }
   }
@@ -276,7 +275,6 @@ export type VerifiedAuthenticationResponse = {
     credentialBackedUp: boolean;
     origin: string;
     rpID: string;
-    authenticatorExtensionResults?:
-      AuthenticationExtensionsAuthenticatorOutputs;
+    authenticatorExtensionResults?: AuthenticationExtensionsAuthenticatorOutputs;
   };
 };

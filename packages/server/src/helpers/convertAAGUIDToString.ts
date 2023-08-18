@@ -1,4 +1,4 @@
-import { isoUint8Array } from "./iso/index.ts";
+import { isoUint8Array } from './iso/index.ts';
 
 /**
  * Convert the aaguid buffer in authData into a UUID string
@@ -16,5 +16,5 @@ export function convertAAGUIDToString(aaguid: Uint8Array): string {
   ];
 
   // Formatted: adce0002-35bc-c60a-648b-0b25f1f05503
-  return segments.join("-");
+  return segments.join('-');
 }

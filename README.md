@@ -9,15 +9,13 @@
 
 ## Overview
 
-This monorepo contains two complimentary libraries to help reduce the amount of
-work needed to incorporate WebAuthn into a website. The following packages are
-maintained here:
+This monorepo contains two complimentary libraries to help reduce the amount of work needed to
+incorporate WebAuthn into a website. The following packages are maintained here:
 
 - [@simplewebauthn/server](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/server)
 - [@simplewebauthn/browser](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/browser)
 
-An additional package is also included that contains shared TypeScript
-definitions:
+An additional package is also included that contains shared TypeScript definitions:
 
 - [@simplewebauthn/typescript-types](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types/)
 
@@ -25,16 +23,15 @@ See these packages' READMEs for more specific implementation information.
 
 **API Documentation**
 
-In-depth documentation for all of the packages in this project is available
-here: https://simplewebauthn.dev/docs/
+In-depth documentation for all of the packages in this project is available here:
+https://simplewebauthn.dev/docs/
 
 ## Example
 
 For a practical guide to implementing these libraries, take a look at the
-[example project](https://github.com/MasterKale/SimpleWebAuthn/tree/master/example).
-It includes a single-file Express server and a few HTML files that, combined
-with the packages in this repo, are close to all it takes to get up and running
-with WebAuthn.
+[example project](https://github.com/MasterKale/SimpleWebAuthn/tree/master/example). It includes a
+single-file Express server and a few HTML files that, combined with the packages in this repo, are
+close to all it takes to get up and running with WebAuthn.
 
 ## Development
 

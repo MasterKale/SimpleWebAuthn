@@ -8,9 +8,9 @@ import {
   id_ce_cRLDistributionPoints,
   id_ce_subjectKeyIdentifier,
   SubjectKeyIdentifier,
-} from "../deps.ts";
-import { isoUint8Array } from "./iso/index.ts";
-import { fetch } from "./fetch.ts";
+} from '../deps.ts';
+import { isoUint8Array } from './iso/index.ts';
+import { fetch } from './fetch.ts';
 
 /**
  * A cache of revoked cert serial numbers by Authority Key ID

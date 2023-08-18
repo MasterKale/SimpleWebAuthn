@@ -1,4 +1,4 @@
-import { isoBase64URL } from "./iso/index.ts";
+import { isoBase64URL } from './iso/index.ts';
 
 /**
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON
@@ -17,7 +17,7 @@ export type ClientDataJSON = {
   crossOrigin?: boolean;
   tokenBinding?: {
     id?: string;
-    status: "present" | "supported" | "not-supported";
+    status: 'present' | 'supported' | 'not-supported';
   };
 };
 

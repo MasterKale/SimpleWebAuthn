@@ -1,4 +1,4 @@
-import type { Base64URLString } from "../deps.ts";
+import type { Base64URLString } from '../deps.ts';
 
 /**
  * Metadata Service structures
@@ -52,21 +52,21 @@ export type StatusReport = {
 };
 
 export type AuthenticatorStatus =
-  | "NOT_FIDO_CERTIFIED"
-  | "FIDO_CERTIFIED"
-  | "USER_VERIFICATION_BYPASS"
-  | "ATTESTATION_KEY_COMPROMISE"
-  | "USER_KEY_REMOTE_COMPROMISE"
-  | "USER_KEY_PHYSICAL_COMPROMISE"
-  | "UPDATE_AVAILABLE"
-  | "REVOKED"
-  | "SELF_ASSERTION_SUBMITTED"
-  | "FIDO_CERTIFIED_L1"
-  | "FIDO_CERTIFIED_L1plus"
-  | "FIDO_CERTIFIED_L2"
-  | "FIDO_CERTIFIED_L2plus"
-  | "FIDO_CERTIFIED_L3"
-  | "FIDO_CERTIFIED_L3plus";
+  | 'NOT_FIDO_CERTIFIED'
+  | 'FIDO_CERTIFIED'
+  | 'USER_VERIFICATION_BYPASS'
+  | 'ATTESTATION_KEY_COMPROMISE'
+  | 'USER_KEY_REMOTE_COMPROMISE'
+  | 'USER_KEY_PHYSICAL_COMPROMISE'
+  | 'UPDATE_AVAILABLE'
+  | 'REVOKED'
+  | 'SELF_ASSERTION_SUBMITTED'
+  | 'FIDO_CERTIFIED_L1'
+  | 'FIDO_CERTIFIED_L1plus'
+  | 'FIDO_CERTIFIED_L2'
+  | 'FIDO_CERTIFIED_L2plus'
+  | 'FIDO_CERTIFIED_L3'
+  | 'FIDO_CERTIFIED_L3plus';
 
 /**
  * Types defined in the FIDO Metadata Statement spec
@@ -179,19 +179,19 @@ export type MetadataStatement = {
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#user-verification-methods
  */
 export type UserVerify =
-  | "presence_internal"
-  | "fingerprint_internal"
-  | "passcode_internal"
-  | "voiceprint_internal"
-  | "faceprint_internal"
-  | "location_internal"
-  | "eyeprint_internal"
-  | "pattern_internal"
-  | "handprint_internal"
-  | "passcode_external"
-  | "pattern_external"
-  | "none"
-  | "all";
+  | 'presence_internal'
+  | 'fingerprint_internal'
+  | 'passcode_internal'
+  | 'voiceprint_internal'
+  | 'faceprint_internal'
+  | 'location_internal'
+  | 'eyeprint_internal'
+  | 'pattern_internal'
+  | 'handprint_internal'
+  | 'passcode_external'
+  | 'pattern_external'
+  | 'none'
+  | 'all';
 
 /**
  * ALG_SIGN
@@ -202,20 +202,20 @@ export type UserVerify =
  */
 export type AlgSign = typeof AlgSign[number];
 const AlgSign = [
-  "secp256r1_ecdsa_sha256_raw",
-  "secp256r1_ecdsa_sha256_der",
-  "rsassa_pss_sha256_raw",
-  "rsassa_pss_sha256_der",
-  "secp256k1_ecdsa_sha256_raw",
-  "secp256k1_ecdsa_sha256_der",
-  "rsassa_pss_sha384_raw",
-  "rsassa_pkcsv15_sha256_raw",
-  "rsassa_pkcsv15_sha384_raw",
-  "rsassa_pkcsv15_sha512_raw",
-  "rsassa_pkcsv15_sha1_raw",
-  "secp384r1_ecdsa_sha384_raw",
-  "secp512r1_ecdsa_sha256_raw",
-  "ed25519_eddsa_sha512_raw",
+  'secp256r1_ecdsa_sha256_raw',
+  'secp256r1_ecdsa_sha256_der',
+  'rsassa_pss_sha256_raw',
+  'rsassa_pss_sha256_der',
+  'secp256k1_ecdsa_sha256_raw',
+  'secp256k1_ecdsa_sha256_der',
+  'rsassa_pss_sha384_raw',
+  'rsassa_pkcsv15_sha256_raw',
+  'rsassa_pkcsv15_sha384_raw',
+  'rsassa_pkcsv15_sha512_raw',
+  'rsassa_pkcsv15_sha1_raw',
+  'secp384r1_ecdsa_sha384_raw',
+  'secp512r1_ecdsa_sha256_raw',
+  'ed25519_eddsa_sha512_raw',
 ] as const;
 
 /**
@@ -223,66 +223,66 @@ const AlgSign = [
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#public-key-representation-formats
  */
 export type AlgKey =
-  | "ecc_x962_raw"
-  | "ecc_x962_der"
-  | "rsa_2048_raw"
-  | "rsa_2048_der"
-  | "cose";
+  | 'ecc_x962_raw'
+  | 'ecc_x962_der'
+  | 'rsa_2048_raw'
+  | 'rsa_2048_der'
+  | 'cose';
 
 /**
  * ATTESTATION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#authenticator-attestation-types
  */
 export type Attestation =
-  | "basic_full"
-  | "basic_surrogate"
-  | "ecdaa"
-  | "attca"
-  | "anonca"
-  | "none";
+  | 'basic_full'
+  | 'basic_surrogate'
+  | 'ecdaa'
+  | 'attca'
+  | 'anonca'
+  | 'none';
 
 /**
  * KEY_PROTECTION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#key-protection-types
  */
 export type KeyProtection =
-  | "software"
-  | "hardware"
-  | "tee"
-  | "secure_element"
-  | "remote_handle";
+  | 'software'
+  | 'hardware'
+  | 'tee'
+  | 'secure_element'
+  | 'remote_handle';
 
 /**
  * MATCHER_PROTECTION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#matcher-protection-types
  */
-export type MatcherProtection = "software" | "tee" | "on_chip";
+export type MatcherProtection = 'software' | 'tee' | 'on_chip';
 
 /**
  * ATTACHMENT_HINT
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#authenticator-attachment-hints
  */
 export type AttachmentHint =
-  | "internal"
-  | "external"
-  | "wired"
-  | "wireless"
-  | "nfc"
-  | "bluetooth"
-  | "network"
-  | "ready"
-  | "wifi_direct";
+  | 'internal'
+  | 'external'
+  | 'wired'
+  | 'wireless'
+  | 'nfc'
+  | 'bluetooth'
+  | 'network'
+  | 'ready'
+  | 'wifi_direct';
 
 /**
  * TRANSACTION_CONFIRMATION_DISPLAY
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#transaction-confirmation-display-types
  */
 export type TransactionConfirmationDisplay =
-  | "any"
-  | "privileged_software"
-  | "tee"
-  | "hardware"
-  | "remote";
+  | 'any'
+  | 'privileged_software'
+  | 'tee'
+  | 'hardware'
+  | 'remote';
 
 /**
  * https://fidoalliance.org/specs/fido-uaf-v1.2-ps-20201020/fido-uaf-protocol-v1.2-ps-20201020.html#version-interface
@@ -296,7 +296,7 @@ export type Version = {
  * https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticatorGetInfoz
  */
 export type AuthenticatorGetInfo = {
-  versions: ("FIDO_2_0" | "U2F_V2")[];
+  versions: ('FIDO_2_0' | 'U2F_V2')[];
   extensions?: string[];
   aaguid: string;
   options?: {
@@ -308,5 +308,5 @@ export type AuthenticatorGetInfo = {
   };
   maxMsgSize?: number;
   pinProtocols?: number[];
-  algorithms?: { type: "public-key"; alg: number }[];
+  algorithms?: { type: 'public-key'; alg: number }[];
 };

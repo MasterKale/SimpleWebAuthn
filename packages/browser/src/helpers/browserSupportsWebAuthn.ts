@@ -4,6 +4,6 @@
 export function browserSupportsWebAuthn(): boolean {
   return (
     window?.PublicKeyCredential !== undefined &&
-    typeof window.PublicKeyCredential === "function"
+    typeof window.PublicKeyCredential === 'function'
   );
 }
