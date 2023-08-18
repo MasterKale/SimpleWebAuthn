@@ -1,6 +1,6 @@
-import { AuthenticatorAttachment } from '@simplewebauthn/typescript-types';
+import { AuthenticatorAttachment } from "@simplewebauthn/typescript-types";
 
-const attachments: AuthenticatorAttachment[] = ['cross-platform', 'platform'];
+const attachments: AuthenticatorAttachment[] = ["cross-platform", "platform"];
 
 /**
  * If possible coerce a `string` value into a known `AuthenticatorAttachment`

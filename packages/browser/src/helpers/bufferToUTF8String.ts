@@ -3,5 +3,5 @@
  * string.
  */
 export function bufferToUTF8String(value: ArrayBuffer): string {
-  return new TextDecoder('utf-8').decode(value);
+  return new TextDecoder("utf-8").decode(value);
 }

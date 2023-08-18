@@ -1,4 +1,4 @@
-import { PublicKeyCredentialFuture } from '@simplewebauthn/typescript-types';
+import { PublicKeyCredentialFuture } from "@simplewebauthn/typescript-types";
 
 /**
  * Determine if the browser supports conditional UI, so that WebAuthn credentials can
@@ -11,8 +11,8 @@ export async function browserSupportsWebAuthnAutofill(): Promise<boolean> {
    * want. I think I'm fine with this for now since it's _supposed_ to be temporary, until TS types
    * have a chance to catch up.
    */
-  const globalPublicKeyCredential =
-    window.PublicKeyCredential as unknown as PublicKeyCredentialFuture;
+  const globalPublicKeyCredential = window
+    .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
   return (
     globalPublicKeyCredential.isConditionalMediationAvailable !== undefined &&
