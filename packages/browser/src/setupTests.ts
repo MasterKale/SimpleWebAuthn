@@ -7,7 +7,7 @@
  * JSDom doesn't seem to support `credentials`, so let's define them here so we can mock their
  * implementations in specific tests.
  */
-Object.defineProperty(window.navigator, "credentials", {
+Object.defineProperty(globalThis.window.navigator, "credentials", {
   writable: true,
   value: {
     create: jest.fn(),

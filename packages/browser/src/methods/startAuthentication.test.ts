@@ -50,7 +50,7 @@ const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
 
 beforeEach(() => {
   // Stub out a response so the method won't throw
-  mockNavigatorGet.mockImplementation((): Promise<any> => {
+  mockNavigatorGet.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({
         response: {},
@@ -63,7 +63,7 @@ beforeEach(() => {
   mockSupportsAutofill.mockResolvedValue(true);
 
   // Reset the abort service so we get an accurate call count
-  // @ts-ignore
+  // @ts-ignore: Ignore the fact that `controller` is private
   webauthnAbortService.controller = undefined;
 });
 
@@ -188,9 +188,9 @@ test("should send extensions to authenticator if present in options", async () =
   const extensions: AuthenticationExtensionsClientInputs = {
     credProps: true,
     appid: "appidHere",
-    // @ts-ignore
+    // @ts-ignore: Send arbitrary extensions
     uvm: true,
-    // @ts-ignore
+    // @ts-ignore: Send arbitrary extensions
     appidExclude: "appidExcludeHere",
   };
   const optsWithExts: PublicKeyCredentialRequestOptionsJSON = {
@@ -221,7 +221,7 @@ test("should include extension results", async () => {
   };
 
   // Mock extension return values from authenticator
-  mockNavigatorGet.mockImplementation((): Promise<any> => {
+  mockNavigatorGet.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({ response: {}, getClientExtensionResults: () => extResults });
     });
@@ -324,7 +324,7 @@ test("should throw error if no acceptable <input> is found", async () => {
 
 test("should return authenticatorAttachment if present", async () => {
   // Mock extension return values from authenticator
-  mockNavigatorGet.mockImplementation((): Promise<any> => {
+  mockNavigatorGet.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({
         response: {},

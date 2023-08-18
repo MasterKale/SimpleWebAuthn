@@ -29,11 +29,6 @@ export class WebAuthnError extends Error {
     cause: Error;
     name?: string;
   }) {
-    /**
-     * `cause` is supported in evergreen browsers, but not IE10, so this ts-ignore is to
-     * help Rollup complete the ES5 build.
-     */
-    // @ts-ignore
     super(message, { cause });
     this.name = name ?? cause.name;
     this.code = code;

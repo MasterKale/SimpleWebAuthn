@@ -26,7 +26,8 @@ test("should return false when platform authenticator is unavailable", async () 
 });
 
 test("should return false when browser does not support WebAuthn", async () => {
-  delete (window as any).PublicKeyCredential;
+  // This looks weird but it appeases the linter so it's _fiiiine_
+  delete (window as { PublicKeyCredential: unknown }).PublicKeyCredential;
   const isAvailable = await platformAuthenticatorIsAvailable();
 
   expect(isAvailable).toEqual(false);

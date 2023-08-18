@@ -4,7 +4,7 @@ import { PublicKeyCredentialFuture } from "@simplewebauthn/typescript-types";
  * Determine if the browser supports conditional UI, so that WebAuthn credentials can
  * be shown to the user in the browser's typical password autofill popup.
  */
-export async function browserSupportsWebAuthnAutofill(): Promise<boolean> {
+export function browserSupportsWebAuthnAutofill(): Promise<boolean> {
   /**
    * I don't like the `as unknown` here but there's a `declare var PublicKeyCredential` in
    * TS' DOM lib that's making it difficult for me to just go `as PublicKeyCredentialFuture` as I
@@ -14,8 +14,9 @@ export async function browserSupportsWebAuthnAutofill(): Promise<boolean> {
   const globalPublicKeyCredential = window
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
-  return (
-    globalPublicKeyCredential.isConditionalMediationAvailable !== undefined &&
-    globalPublicKeyCredential.isConditionalMediationAvailable()
-  );
+  if (globalPublicKeyCredential.isConditionalMediationAvailable === undefined) {
+    return new Promise((resolve) => resolve(false));
+  }
+
+  return globalPublicKeyCredential.isConditionalMediationAvailable();
 }

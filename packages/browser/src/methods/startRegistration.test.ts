@@ -53,7 +53,7 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
 
 beforeEach(() => {
   // Stub out a response so the method won't throw
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({ response: {}, getClientExtensionResults: () => ({}) });
     });
@@ -62,7 +62,7 @@ beforeEach(() => {
   mockSupportsWebauthn.mockReturnValue(true);
 
   // Reset the abort service so we get an accurate call count
-  // @ts-ignore
+  // @ts-ignore: Ignore the fact that `controller` is private
   webauthnAbortService.controller = undefined;
 });
 
@@ -146,9 +146,9 @@ test("should send extensions to authenticator if present in options", async () =
   const extensions: AuthenticationExtensionsClientInputs = {
     credProps: true,
     appid: "appidHere",
-    // @ts-ignore
+    // @ts-ignore: Send arbitrary extensions
     uvm: true,
-    // @ts-ignore
+    // @ts-ignore: Send arbitrary extensions
     appidExclude: "appidExcludeHere",
   };
   const optsWithExts: PublicKeyCredentialCreationOptionsJSON = {
@@ -181,7 +181,7 @@ test("should include extension results", async () => {
   };
 
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({ response: {}, getClientExtensionResults: () => extResults });
     });
@@ -247,7 +247,7 @@ test("should cancel an existing call when executed again", async () => {
 
 test("should return authenticatorAttachment if present", async () => {
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({
         response: {},
@@ -269,7 +269,7 @@ test("should return convenience values if getters present", async () => {
    * that's already buried in the response.
    */
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({
         response: {
@@ -296,7 +296,7 @@ test("should not return convenience values if getters missing", async () => {
    * that's already buried in the response.
    */
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
     return new Promise((resolve) => {
       resolve({
         response: {},
