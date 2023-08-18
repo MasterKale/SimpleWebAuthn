@@ -7,5 +7,12 @@
     "extract-dom-types": "ts-node extract-dom-types.ts",
     "prepublish": "npm run build"
   },
+  "lerna": {
+    "command": {
+      "publish": {
+        "directory": "./npm"
+      }
+    }
+  },
   "gitHead": "33ccf8c6c9add811c87d3089e24156c2342b3498"
 }

@@ -8,5 +8,12 @@
     "test": "deno test -A src/",
     "prepublish": "npm run build"
   },
+  "lerna": {
+    "command": {
+      "publish": {
+        "directory": "./npm"
+      }
+    }
+  },
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb"
 }
