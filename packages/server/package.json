@@ -6,6 +6,7 @@
     "build": "deno task build",
     "build:lerna-debug": "deno task build > output.txt; cat output.txt; rm output.txt",
     "test": "deno test -A src/",
+    "test:watch": "deno test -A --watch src/",
     "prepublish": "npm run build"
   },
   "lerna": {
