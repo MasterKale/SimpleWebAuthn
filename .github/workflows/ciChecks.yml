@@ -41,9 +41,6 @@ jobs:
     # Install deps
     - run: npm ci
 
-    # Test browser
+    # Test packages
     - run: npm run test:browser
-
-    # Test server, typescript-types
-    - run: npm run test:server
-    - run: npm run test:types
+    - run: npm run build:server  # dnt will test everything in Node too
