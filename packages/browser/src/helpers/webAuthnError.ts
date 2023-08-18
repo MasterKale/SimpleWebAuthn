@@ -29,6 +29,7 @@ export class WebAuthnError extends Error {
     cause: Error;
     name?: string;
   }) {
+    // @ts-ignore: help Rollup understand that `cause` is okay to set
     super(message, { cause });
     this.name = name ?? cause.name;
     this.code = code;
