@@ -31,7 +31,7 @@
     "umd"
   ],
   "dependencies": {
-    "@simplewebauthn/typescript-types": "^7.4.0"
+    "@simplewebauthn/typescript-types": "file:packages/typescript-types/npm"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",
