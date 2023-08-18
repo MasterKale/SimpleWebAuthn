@@ -1,7 +1,6 @@
 {
   "version": "7.4.0",
   "npmClient": "npm",
-  "useNx": true,
   "command": {
     "publish": {
       "ignoreChanges": [
@@ -15,5 +14,6 @@
   },
   "packages": [
     "packages/*"
-  ]
+  ],
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }

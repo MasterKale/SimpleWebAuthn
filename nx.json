@@ -1,23 +1,36 @@
 {
-  "implicitDependencies": {
-    "package.json": "*"
-  },
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "test"]
+        "cacheableOperations": [
+          "build",
+          "test"
+        ]
       }
     }
   },
   "targetDefaults": {
     "build": {
-      "outputs": ["./dist"]
+      "outputs": [
+        "{workspaceRoot}/dist",
+      ]
     }
   },
   "pluginsConfig": {
     "@nrwl/js": {
       "analyzeSourceFiles": false
     }
+  },
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "sharedGlobals": [],
+    "production": [
+      "default"
+    ]
   }
 }
