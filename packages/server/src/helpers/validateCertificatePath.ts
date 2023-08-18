@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { AsnSerializer } from "../deps.ts";
 import { isCertRevoked } from "./isCertRevoked.ts";
 import { verifySignature } from "./verifySignature.ts";
