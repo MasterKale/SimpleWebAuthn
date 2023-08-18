@@ -8,7 +8,7 @@
     "packages/typescript-types/npm/"
   ],
   "scripts": {
-    "clean": "lerna clean -y && rm -f ./packages/**/package-lock.json && rm -rf ./packages/**/dist && rm -rf ./packages/**/npm",
+    "clean": "rm -rf ./packages/**/node_modules && rm -rf ./packages/**/dist && rm -rf ./packages/**/npm",
     "get-it-onto-npm": "npm install && rm -f ./packages/**/package-lock.json && lerna publish",
     "lint": "deno lint packages/**/src/**/*.ts example/**/*.ts",
     "docs": "npm ci && typedoc --tsconfig tsconfigdoc.json",
