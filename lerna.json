@@ -12,8 +12,8 @@
   },
   "packages": [
     "packages/browser",
-    "packages/server/npm",
-    "packages/typescript-types/npm"
+    "packages/server",
+    "packages/typescript-types"
   ],
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }
