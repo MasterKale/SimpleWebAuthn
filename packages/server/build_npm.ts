@@ -68,6 +68,40 @@ await build({
       name: "cbor-x",
       version: "^1.5.2",
     },
+    "https://esm.sh/v131/debug@4.3.4/denonext/debug.mjs": {
+      name: "debug",
+      version: "^4.3.4",
+    },
+    "https://esm.sh/v131/@types/debug@4.1.8/index.d.ts": {
+      name: "@types/debug",
+      version: "^4.1.8",
+    },
+    "https://esm.sh/v131/cross-fetch@4.0.0/es2021/cross-fetch.mjs": {
+      name: "cross-fetch",
+      version: "^4.0.0",
+    },
+    "https://esm.sh/v131/@peculiar/asn1-schema@2.3.6/denonext/asn1-schema.mjs":
+      {
+        name: "@peculiar/asn1-schema",
+        version: "^2.3.6",
+      },
+    "https://esm.sh/v131/@peculiar/asn1-x509@2.3.6/es2021/asn1-x509.mjs": {
+      name: "@peculiar/asn1-x509",
+      version: "^2.3.6",
+    },
+    "https://esm.sh/v131/@peculiar/asn1-ecc@2.3.6/es2021/asn1-ecc.mjs": {
+      name: "@peculiar/asn1-ecc",
+      version: "^2.3.6",
+    },
+    "https://esm.sh/v131/@peculiar/asn1-rsa@2.3.6/es2021/asn1-rsa.mjs": {
+      name: "@peculiar/asn1-rsa",
+      version: "^2.3.6",
+    },
+    "https://esm.sh/v131/@peculiar/asn1-android@2.3.6/es2021/asn1-android.mjs":
+      {
+        name: "@peculiar/asn1-android",
+        version: "^2.3.6",
+      },
     // Mapping for '../../typescript-types/src/index.ts' in deps.ts
     "../typescript-types/src/index.ts": {
       name: "@simplewebauthn/typescript-types",
