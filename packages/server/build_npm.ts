@@ -17,7 +17,6 @@ await build({
     deno: "dev",
     crypto: false,
   },
-  test: false,
   // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
   typeCheck: false,
   // package.json values
