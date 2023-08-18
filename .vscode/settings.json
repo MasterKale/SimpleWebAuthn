@@ -13,5 +13,11 @@
   // Required for formatOnSave to work, see https://github.com/denoland/vscode_deno/issues/789
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
   }
 }
