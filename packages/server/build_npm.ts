@@ -5,7 +5,10 @@ const outDir = {
   test: './npm-test',
 } as const;
 const lernaPackageJSON: { version: string } = JSON.parse(
-  await Deno.readTextFile('./package.json'),
+  Deno.readTextFileSync('./package.json'),
+);
+const typesPackageJSON: { version: string } = JSON.parse(
+  Deno.readTextFileSync('../typescript-types/npm/package.json'),
 );
 
 // Clear both build directories
@@ -155,7 +158,7 @@ function getMappings(): BuildOptions['mappings'] {
     // Mapping for '../../typescript-types/src/index.ts' in deps.ts
     '../typescript-types/src/index.ts': {
       name: '@simplewebauthn/typescript-types',
-      version: '^7.4.0',
+      version: `^${typesPackageJSON.version}`,
     },
   };
 }
