@@ -46,6 +46,7 @@
   },
   "lint-staged": {
     "*.{ts,js}": [
+      "deno lint",
       "deno fmt",
       "git add"
     ]
