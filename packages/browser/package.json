@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+    "url": "git+https://github.com/MasterKale/SimpleWebAuthn.git",
     "directory": "packages/browser"
   },
   "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/browser#readme",
@@ -31,7 +31,7 @@
     "umd"
   ],
   "dependencies": {
-    "@simplewebauthn/typescript-types": "file:packages/typescript-types/npm"
+    "@simplewebauthn/typescript-types": "workspace:^"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",
