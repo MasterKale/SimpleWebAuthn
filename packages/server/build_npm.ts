@@ -100,7 +100,7 @@ await build({
   compilerOptions: getCompilerOptions(),
 });
 
-// Deno.copyFileSync('LICENSE', 'npm/LICENSE');
+Deno.copyFileSync('LICENSE.md', `${outDir.publish}/LICENSE.md`);
 Deno.copyFileSync('README.md', `${outDir.publish}/README.md`);
 
 /**
