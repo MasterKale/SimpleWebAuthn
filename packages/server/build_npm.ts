@@ -123,35 +123,35 @@ function getMappings(): BuildOptions['mappings'] {
       name: 'cbor-x',
       version: '^1.5.2',
     },
-    'https://esm.sh/v131/debug@4.3.4/denonext/debug.mjs': {
+    'https://esm.sh/debug@4.3.4': {
       name: 'debug',
       version: '^4.3.4',
     },
-    'https://esm.sh/v131/@types/debug@4.1.8/index.d.ts': {
+    'https://esm.sh/@types/debug@4.1.8': {
       name: '@types/debug',
       version: '^4.1.8',
     },
-    'https://esm.sh/v131/cross-fetch@4.0.0/es2021/cross-fetch.mjs': {
+    'https://esm.sh/cross-fetch@4.0.0': {
       name: 'cross-fetch',
       version: '^4.0.0',
     },
-    'https://esm.sh/v131/@peculiar/asn1-schema@2.3.6/denonext/asn1-schema.mjs': {
+    'https://esm.sh/@peculiar/asn1-schema@2.3.6': {
       name: '@peculiar/asn1-schema',
       version: '^2.3.6',
     },
-    'https://esm.sh/v131/@peculiar/asn1-x509@2.3.6/es2021/asn1-x509.mjs': {
+    'https://esm.sh/@peculiar/asn1-x509@2.3.6': {
       name: '@peculiar/asn1-x509',
       version: '^2.3.6',
     },
-    'https://esm.sh/v131/@peculiar/asn1-ecc@2.3.6/es2021/asn1-ecc.mjs': {
+    'https://esm.sh/@peculiar/asn1-ecc@2.3.6': {
       name: '@peculiar/asn1-ecc',
       version: '^2.3.6',
     },
-    'https://esm.sh/v131/@peculiar/asn1-rsa@2.3.6/es2021/asn1-rsa.mjs': {
+    'https://esm.sh/@peculiar/asn1-rsa@2.3.6': {
       name: '@peculiar/asn1-rsa',
       version: '^2.3.6',
     },
-    'https://esm.sh/v131/@peculiar/asn1-android@2.3.6/es2021/asn1-android.mjs': {
+    'https://esm.sh/@peculiar/asn1-android@2.3.6': {
       name: '@peculiar/asn1-android',
       version: '^2.3.6',
     },
