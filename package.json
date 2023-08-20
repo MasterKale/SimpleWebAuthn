@@ -2,16 +2,11 @@
   "name": "simplewebauthn-monorepo",
   "version": "0.0.0",
   "private": true,
-  "workspaces": [
-    "packages/browser",
-    "packages/server/npm",
-    "packages/typescript-types/npm"
-  ],
   "scripts": {
     "clean": "rm -rf ./packages/**/node_modules && rm -rf ./packages/**/dist && rm -rf ./packages/**/npm",
-    "get-it-onto-npm": "npm install && rm -f ./packages/**/package-lock.json && lerna publish",
+    "get-it-onto-npm": "pnpm install && rm -f ./packages/**/package-lock.json && lerna publish",
     "lint": "deno lint packages/**/src/**/*.ts example/**/*.ts",
-    "test": "npm run test:browser; npm run test:server",
+    "test": "pnpm run test:browser; pnpm run test:server",
     "test:browser": "lerna run test --scope=@simplewebauthn/browser",
     "test:server": "lerna run test --scope=@simplewebauthn/server",
     "build:browser": "lerna run build --scope=@simplewebauthn/browser",

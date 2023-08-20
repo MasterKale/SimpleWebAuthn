@@ -1,6 +1,6 @@
 {
   "version": "7.4.0",
-  "npmClient": "npm",
+  "npmClient": "pnpm",
   "command": {
     "publish": {
       "ignoreChanges": [
