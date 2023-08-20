@@ -12,9 +12,7 @@ await build({
     { name: '.', path: './src/index.ts' },
   ],
   outDir,
-  shims: {
-    deno: 'dev',
-  },
+  shims: {},
   // Keeping declarations in a single types/ directory to mimic the original file structure
   declaration: 'separate',
   test: false,
