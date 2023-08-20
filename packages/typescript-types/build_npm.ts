@@ -27,7 +27,7 @@ await build({
     author: 'Matthew Miller <matthew@millerti.me>',
     repository: {
       type: 'git',
-      url: 'https://github.com/MasterKale/SimpleWebAuthn.git',
+      url: 'git+https://github.com/MasterKale/SimpleWebAuthn.git',
       directory: 'packages/typescript-types',
     },
     homepage:
