@@ -13,12 +13,12 @@
     "lint": "deno lint packages/**/src/**/*.ts example/**/*.ts",
     "test": "npm run test:browser; npm run test:server",
     "test:browser": "lerna run test --scope=@simplewebauthn/browser",
-    "test:server": "(cd ./packages/server && npm run test)",
+    "test:server": "lerna run test --scope=@simplewebauthn/server",
     "build:browser": "lerna run build --scope=@simplewebauthn/browser",
-    "build:server": "(cd ./packages/server && npm run build)",
-    "build:types": "(cd ./packages/typescript-types && npm run build)",
-    "dev:browser": "lerna exec npm run test:watch --scope=@simplewebauthn/browser",
-    "dev:server": "(cd ./packages/server && npm run test:watch)"
+    "build:server": "lerna run build --scope=@simplewebauthn/server",
+    "build:types": "lerna run build --scope=@simplewebauthn/typescript-types",
+    "dev:browser": "lerna run test:watch --scope=@simplewebauthn/browser",
+    "dev:server": "lerna run test:watch --scope=@simplewebauthn/server"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
