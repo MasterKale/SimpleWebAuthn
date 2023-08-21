@@ -73,6 +73,9 @@ await build({
     publishConfig: {
       access: 'public',
     },
+    engines: {
+      node: '>=16.0.0',
+    },
     bugs: {
       url: 'https://github.com/MasterKale/SimpleWebAuthn/issues',
     },
