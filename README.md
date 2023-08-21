@@ -29,7 +29,7 @@ https://simplewebauthn.dev/docs/
 
 ## Installation
 
-These packages are all available on **npm**:
+These packages are all available on **npm** for use in **Node LTS 16.x** projects:
 
 ```sh
 npm install @simplewebauthn/browser
@@ -37,7 +37,7 @@ npm install @simplewebauthn/server
 npm install @simplewebauthn/typescript-types
 ```
 
-The following packages are available for import into Deno projects from **deno.land/x**:
+The following packages are available for import into **Deno v1.33.x** projects from **deno.land/x**:
 
 ```ts
 import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
