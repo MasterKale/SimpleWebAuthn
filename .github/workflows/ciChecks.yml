@@ -38,8 +38,28 @@ jobs:
         deno-version: ${{ matrix.deno-version }}
     - run: deno -V
 
+    # Install pnpm w/cache for quicker installs
+    # https://github.com/pnpm/action-setup#use-cache-to-reduce-installation-time
+    - name: Setup pnpm 8.6.12
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8.6.12
+        run_install: false
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
     # Install deps
-    - run: npm ci
+    - name: Install dependencies
+      run: pnpm install
 
     # Build and test dnt packages
     - run: npm run build:types   # browser tests will need this to be built
