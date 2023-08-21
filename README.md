@@ -4,6 +4,7 @@
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=simplewebauthn)
 
 - [Overview](#overview)
+- [Installation](#installation)
 - [Example](#example)
 - [Development](#development)
 
@@ -25,6 +26,23 @@ See these packages' READMEs for more specific implementation information.
 
 In-depth documentation for all of the packages in this project is available here:
 https://simplewebauthn.dev/docs/
+
+## Installation
+
+These packages are all available on **npm**:
+
+```sh
+npm install @simplewebauthn/browser
+npm install @simplewebauthn/server
+npm install @simplewebauthn/typescript-types
+```
+
+The following packages are available for import into Deno projects from **deno.land/x**:
+
+```ts
+import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
+import {...} from 'https://deno.land/x/simplewebauthn/deno/typescript-types.ts';
+```
 
 ## Example
 

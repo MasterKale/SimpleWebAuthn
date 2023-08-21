@@ -23,10 +23,10 @@ This package is available on **npm**:
 npm install @simplewebauthn/server
 ```
 
-It is also available for import into Deno projects on **deno.land/x**:
+It is also available for import into Deno projects from **deno.land/x**:
 
 ```ts
-TODO;
+import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
 ```
 
 ## Usage

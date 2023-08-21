@@ -15,8 +15,8 @@ This package is available on **npm**:
 npm install @simplewebauthn/typescript-types
 ```
 
-It is also available for import into Deno projects on **deno.land/x**:
+It is also available for import into Deno projects from **deno.land/x**:
 
 ```ts
-TODO;
+import {...} from 'https://deno.land/x/simplewebauthn/deno/typescript-types.ts';
 ```
