@@ -1,15 +1,19 @@
-<!-- omit in toc -->
-
-# @simplewebauthn/server
+# @simplewebauthn/server <!-- omit in toc -->
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/server)
-![node-lts (scoped)](https://img.shields.io/node/v/@simplewebauthn/server?style=for-the-badge&logo=Node.js)
-![typescript minimum version 4.4](https://img.shields.io/badge/TypeScript-%3E%3D_4.4-3178C6?style=for-the-badge&logo=TypeScript)
 
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Supported Attestation Formats](#supported-attestation-formats)
+
+## Requirements
+
+Both of the following runtimes are officially supported:
+
+- Node LTS 16.x
+- Deno v1.33.x
 
 ## Installation
 
@@ -17,6 +21,12 @@ This package is available on **npm**:
 
 ```sh
 npm install @simplewebauthn/server
+```
+
+It is also available for import into Deno projects on **deno.land/x**:
+
+```ts
+TODO;
 ```
 
 ## Usage
