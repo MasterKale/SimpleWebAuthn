@@ -1,5 +1,26 @@
 # Changelog
 
+## v8.0.0-alpha.0
+
+**Packages:**
+
+- @simplewebauthn/browser@8.0.0-alpha.0
+- @simplewebauthn/server@8.0.0-alpha.0
+- @simplewebauthn/typescript-types@8.0.0-alpha.0
+
+**Changes:**
+
+- TODO **[server] [typescript-types]** SimpleWebAuthn can now be used in runtimes other than Node.
+  Deno is now also a first-class runtime and will eventually be available at
+  https://deno.land/x/simplewebauthn (after I formally release this update.)
+
+### Breaking Changes
+
+- TODO [server] `generateRegistrationOptions()` and `generateAuthenticationOptions()` are now
+  asynchronous methods. Refactor the calls to handle the `Promise` that's now returned in whatever
+  way is appropriate for your project.
+- TODO (it's an alpha release, I'll finalize the changelog when I formally release this.)
+
 ## v7.4.0
 
 **Packages:**
