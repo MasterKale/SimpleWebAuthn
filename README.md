@@ -29,7 +29,8 @@ https://simplewebauthn.dev/docs/
 
 ## Installation
 
-These packages are all available on **npm** for use in **Node LTS 16.x** projects:
+These packages are all available on **npm** for use in **Node LTS 16.x** projects (and supports
+**both CommonJS and ESM**):
 
 ```sh
 npm install @simplewebauthn/browser

@@ -17,7 +17,7 @@ Both of the following runtimes are officially supported:
 
 ## Installation
 
-This package is available on **npm**:
+This package is available on **npm** and supports **both CommonJS and ESM** projects:
 
 ```sh
 npm install @simplewebauthn/server
