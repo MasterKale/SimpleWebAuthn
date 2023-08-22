@@ -1,18 +1,17 @@
-import {
+import type {
   AuthenticationResponseJSON,
   AuthenticatorDevice,
   CredentialDeviceType,
   UserVerificationRequirement,
-} from '@simplewebauthn/typescript-types';
-
-import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
-import { toHash } from '../helpers/toHash';
-import { verifySignature } from '../helpers/verifySignature';
-import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
-import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
-import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import { isoUint8Array, isoBase64URL } from '../helpers/iso';
+} from '../deps.ts';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
+import { toHash } from '../helpers/toHash.ts';
+import { verifySignature } from '../helpers/verifySignature.ts';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
+import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
 export type VerifyAuthenticationResponseOpts = {
   response: AuthenticationResponseJSON;
@@ -71,7 +70,9 @@ export async function verifyAuthenticationResponse(
 
   // Make sure credential type is public-key
   if (credentialType !== 'public-key') {
-    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
+    throw new Error(
+      `Unexpected credential type ${credentialType}, expected "public-key"`,
+    );
   }
 
   if (!response) {
@@ -121,14 +122,19 @@ export async function verifyAuthenticationResponse(
   }
 
   if (!isoBase64URL.isBase64url(assertionResponse.authenticatorData)) {
-    throw new Error('Credential response authenticatorData was not a base64url string');
+    throw new Error(
+      'Credential response authenticatorData was not a base64url string',
+    );
   }
 
   if (!isoBase64URL.isBase64url(assertionResponse.signature)) {
     throw new Error('Credential response signature was not a base64url string');
   }
 
-  if (assertionResponse.userHandle && typeof assertionResponse.userHandle !== 'string') {
+  if (
+    assertionResponse.userHandle &&
+    typeof assertionResponse.userHandle !== 'string'
+  ) {
     throw new Error('Credential response userHandle was not a string');
   }
 
@@ -137,12 +143,16 @@ export async function verifyAuthenticationResponse(
       throw new Error('ClientDataJSON tokenBinding was not an object');
     }
 
-    if (['present', 'supported', 'notSupported'].indexOf(tokenBinding.status) < 0) {
+    if (
+      ['present', 'supported', 'notSupported'].indexOf(tokenBinding.status) < 0
+    ) {
       throw new Error(`Unexpected tokenBinding status ${tokenBinding.status}`);
     }
   }
 
-  const authDataBuffer = isoBase64URL.toBuffer(assertionResponse.authenticatorData);
+  const authDataBuffer = isoBase64URL.toBuffer(
+    assertionResponse.authenticatorData,
+  );
   const parsedAuthData = parseAuthenticatorData(authDataBuffer);
   const { rpIdHash, flags, counter, extensionsData } = parsedAuthData;
 
@@ -165,9 +175,14 @@ export async function verifyAuthenticationResponse(
     if (fidoUserVerification === 'required') {
       // Require `flags.uv` be true (implies `flags.up` is true)
       if (!flags.uv) {
-        throw new Error('User verification required, but user could not be verified');
+        throw new Error(
+          'User verification required, but user could not be verified',
+        );
       }
-    } else if (fidoUserVerification === 'preferred' || fidoUserVerification === 'discouraged') {
+    } else if (
+      fidoUserVerification === 'preferred' ||
+      fidoUserVerification === 'discouraged'
+    ) {
       // Ignore `flags.uv`
     }
   } else {
@@ -181,16 +196,23 @@ export async function verifyAuthenticationResponse(
 
     // Enforce user verification if required
     if (requireUserVerification && !flags.uv) {
-      throw new Error('User verification required, but user could not be verified');
+      throw new Error(
+        'User verification required, but user could not be verified',
+      );
     }
   }
 
-  const clientDataHash = await toHash(isoBase64URL.toBuffer(assertionResponse.clientDataJSON));
+  const clientDataHash = await toHash(
+    isoBase64URL.toBuffer(assertionResponse.clientDataJSON),
+  );
   const signatureBase = isoUint8Array.concat([authDataBuffer, clientDataHash]);
 
   const signature = isoBase64URL.toBuffer(assertionResponse.signature);
 
-  if ((counter > 0 || authenticator.counter > 0) && counter <= authenticator.counter) {
+  if (
+    (counter > 0 || authenticator.counter > 0) &&
+    counter <= authenticator.counter
+  ) {
     // Error out when the counter in the DB is greater than or equal to the counter in the
     // dataStruct. It's related to how the authenticator maintains the number of times its been
     // used for this client. If this happens, then someone's somehow increased the counter

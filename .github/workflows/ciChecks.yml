@@ -1,0 +1,69 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: CI Checks
+
+on:
+  push:
+    branches: [ master, beta ]
+  pull_request:
+    branches: [ master, beta ]
+
+jobs:
+  unit_tests:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 16, 18 ]
+        # TODO: Find a better action, this one is limited to v1.33.1
+        # See https://github.com/maximousblk/setup-deno/issues
+        deno-version: [ 'v1.33.1' ]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Install Node
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: node -v
+
+    # Install Deno
+    - name: Setup Deno ${{ matrix.deno-version }}
+      uses: maximousblk/setup-deno@v2
+      with:
+        deno-version: ${{ matrix.deno-version }}
+    - run: deno -V
+
+    # Install pnpm w/cache for quicker installs
+    # https://github.com/pnpm/action-setup#use-cache-to-reduce-installation-time
+    - name: Setup pnpm 8.6.12
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8.6.12
+        run_install: false
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    # Install deps
+    - name: Install dependencies
+      run: pnpm install
+
+    # Build and test dnt packages
+    - run: npm run build:types   # browser tests will need this to be built
+    - run: npm run build:server  # dnt will test everything in Node too
+
+    # Test packages
+    - run: npm run test:browser

@@ -30,11 +30,14 @@ export function identifyRegistrationError({
     if (publicKey.authenticatorSelection?.requireResidentKey === true) {
       // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 4)
       return new WebAuthnError({
-        message: 'Discoverable credentials were required but no available authenticator supported it',
+        message:
+          'Discoverable credentials were required but no available authenticator supported it',
         code: 'ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT',
         cause: error,
       });
-    } else if (publicKey.authenticatorSelection?.userVerification === 'required') {
+    } else if (
+      publicKey.authenticatorSelection?.userVerification === 'required'
+    ) {
       // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 5)
       return new WebAuthnError({
         message: 'User verification was required but no available authenticator supported it',
@@ -48,7 +51,7 @@ export function identifyRegistrationError({
     return new WebAuthnError({
       message: 'The authenticator was previously registered',
       code: 'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED',
-      cause: error
+      cause: error,
     });
   } else if (error.name === 'NotAllowedError') {
     /**
@@ -62,7 +65,7 @@ export function identifyRegistrationError({
     });
   } else if (error.name === 'NotSupportedError') {
     const validPubKeyCredParams = publicKey.pubKeyCredParams.filter(
-      param => param.type === 'public-key',
+      (param) => param.type === 'public-key',
     );
 
     if (validPubKeyCredParams.length === 0) {
@@ -76,7 +79,8 @@ export function identifyRegistrationError({
 
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 2)
     return new WebAuthnError({
-      message: 'No available authenticator supported any of the specified pubKeyCredParams algorithms',
+      message:
+        'No available authenticator supported any of the specified pubKeyCredParams algorithms',
       code: 'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG',
       cause: error,
     });
@@ -87,7 +91,7 @@ export function identifyRegistrationError({
       return new WebAuthnError({
         message: `${window.location.hostname} is an invalid domain`,
         code: 'ERROR_INVALID_DOMAIN',
-        cause: error
+        cause: error,
       });
     } else if (publicKey.rp.id !== effectiveDomain) {
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 8)
@@ -110,7 +114,8 @@ export function identifyRegistrationError({
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 1)
     // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 8)
     return new WebAuthnError({
-      message: 'The authenticator was unable to process the specified options, or could not create a new credential',
+      message:
+        'The authenticator was unable to process the specified options, or could not create a new credential',
       code: 'ERROR_AUTHENTICATOR_GENERAL_ERROR',
       cause: error,
     });

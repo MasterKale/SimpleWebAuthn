@@ -1,4 +1,4 @@
-import base64 from '@hexagon/base64';
+import { base64 } from '../../deps.ts';
 
 /**
  * Decode from a Base64URL-encoded string to an ArrayBuffer. Best used when converting a
@@ -23,7 +23,10 @@ export function toBuffer(
  * @param buffer Value to encode to base64
  * @param to (optional) The encoding to use, in case it's desirable to encode to base64 instead
  */
-export function fromBuffer(buffer: Uint8Array, to: 'base64' | 'base64url' = 'base64url'): string {
+export function fromBuffer(
+  buffer: Uint8Array,
+  to: 'base64' | 'base64url' = 'base64url',
+): string {
   return base64.fromArrayBuffer(buffer, to === 'base64url');
 }
 

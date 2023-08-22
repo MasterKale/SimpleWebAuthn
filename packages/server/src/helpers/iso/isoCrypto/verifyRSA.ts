@@ -1,10 +1,9 @@
-import WebCrypto from '@simplewebauthn/iso-webcrypto';
-
-import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose';
-import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg';
-import { importKey } from './importKey';
-import { isoBase64URL } from '../index';
-import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName';
+import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose.ts';
+import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
+import { importKey } from './importKey.ts';
+import { isoBase64URL } from '../index.ts';
+import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName.ts';
+import { getWebCrypto } from './getWebCrypto.ts';
 
 /**
  * Verify a signature using an RSA public key
@@ -16,6 +15,8 @@ export async function verifyRSA(opts: {
   shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
+
+  const WebCrypto = await getWebCrypto();
 
   const alg = cosePublicKey.get(COSEKEYS.alg);
   const n = cosePublicKey.get(COSEKEYS.n);
@@ -92,7 +93,9 @@ export async function verifyRSA(opts: {
 
     (verifyAlgorithm as RsaPssParams).saltLength = saltLength;
   } else {
-    throw new Error(`Unexpected RSA key algorithm ${alg} (${keyAlgorithm.name})`);
+    throw new Error(
+      `Unexpected RSA key algorithm ${alg} (${keyAlgorithm.name})`,
+    );
   }
 
   const key = await importKey({

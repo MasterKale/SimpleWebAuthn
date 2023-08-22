@@ -5,16 +5,16 @@ import {
   isCOSEPublicKeyEC2,
   isCOSEPublicKeyOKP,
   isCOSEPublicKeyRSA,
-} from '../../cose';
-import { verifyEC2 } from './verifyEC2';
-import { verifyRSA } from './verifyRSA';
-import { verifyOKP } from './verifyOKP';
-import { unwrapEC2Signature } from './unwrapEC2Signature';
+} from '../../cose.ts';
+import { verifyEC2 } from './verifyEC2.ts';
+import { verifyRSA } from './verifyRSA.ts';
+import { verifyOKP } from './verifyOKP.ts';
+import { unwrapEC2Signature } from './unwrapEC2Signature.ts';
 
 /**
  * Verify signatures with their public key. Supports EC2 and RSA public keys.
  */
-export async function verify(opts: {
+export function verify(opts: {
   cosePublicKey: COSEPublicKey;
   signature: Uint8Array;
   data: Uint8Array;
@@ -24,7 +24,12 @@ export async function verify(opts: {
 
   if (isCOSEPublicKeyEC2(cosePublicKey)) {
     const unwrappedSignature = unwrapEC2Signature(signature);
-    return verifyEC2({ cosePublicKey, signature: unwrappedSignature, data, shaHashOverride });
+    return verifyEC2({
+      cosePublicKey,
+      signature: unwrappedSignature,
+      data,
+      shaHashOverride,
+    });
   } else if (isCOSEPublicKeyRSA(cosePublicKey)) {
     return verifyRSA({ cosePublicKey, signature, data, shaHashOverride });
   } else if (isCOSEPublicKeyOKP(cosePublicKey)) {

@@ -1,33 +1,32 @@
-import {
-  RegistrationResponseJSON,
+import type {
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
-} from '@simplewebauthn/typescript-types';
-
+  RegistrationResponseJSON,
+} from '../deps.ts';
 import {
   AttestationFormat,
   AttestationStatement,
   decodeAttestationObject,
-} from '../helpers/decodeAttestationObject';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions';
-import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON';
-import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData';
-import { toHash } from '../helpers/toHash';
-import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey';
-import { COSEKEYS } from '../helpers/cose';
-import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
-import { parseBackupFlags } from '../helpers/parseBackupFlags';
-import { matchExpectedRPID } from '../helpers/matchExpectedRPID';
-import { isoBase64URL } from '../helpers/iso';
-import { SettingsService } from '../services/settingsService';
+} from '../helpers/decodeAttestationObject.ts';
+import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
+import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
+import { toHash } from '../helpers/toHash.ts';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
+import { COSEKEYS } from '../helpers/cose.ts';
+import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
+import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
+import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
+import { isoBase64URL } from '../helpers/iso/index.ts';
+import { SettingsService } from '../services/settingsService.ts';
 
-import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions';
-import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F';
-import { verifyAttestationPacked } from './verifications/verifyAttestationPacked';
-import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet';
-import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM';
-import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey';
-import { verifyAttestationApple } from './verifications/verifyAttestationApple';
+import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions.ts';
+import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F.ts';
+import { verifyAttestationPacked } from './verifications/verifyAttestationPacked.ts';
+import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet.ts';
+import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM.ts';
+import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey.ts';
+import { verifyAttestationApple } from './verifications/verifyAttestationApple.ts';
 
 export type VerifyRegistrationResponseOpts = {
   response: RegistrationResponseJSON;
@@ -78,10 +77,14 @@ export async function verifyRegistrationResponse(
 
   // Make sure credential type is public-key
   if (credentialType !== 'public-key') {
-    throw new Error(`Unexpected credential type ${credentialType}, expected "public-key"`);
+    throw new Error(
+      `Unexpected credential type ${credentialType}, expected "public-key"`,
+    );
   }
 
-  const clientDataJSON = decodeClientDataJSON(attestationResponse.clientDataJSON);
+  const clientDataJSON = decodeClientDataJSON(
+    attestationResponse.clientDataJSON,
+  );
 
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
@@ -107,9 +110,11 @@ export async function verifyRegistrationResponse(
   if (Array.isArray(expectedOrigin)) {
     if (!expectedOrigin.includes(origin)) {
       throw new Error(
-        `Unexpected registration response origin "${origin}", expected one of: ${expectedOrigin.join(
-          ', ',
-        )}`,
+        `Unexpected registration response origin "${origin}", expected one of: ${
+          expectedOrigin.join(
+            ', ',
+          )
+        }`,
       );
     }
   } else {
@@ -125,20 +130,33 @@ export async function verifyRegistrationResponse(
       throw new Error(`Unexpected value for TokenBinding "${tokenBinding}"`);
     }
 
-    if (['present', 'supported', 'not-supported'].indexOf(tokenBinding.status) < 0) {
-      throw new Error(`Unexpected tokenBinding.status value of "${tokenBinding.status}"`);
+    if (
+      ['present', 'supported', 'not-supported'].indexOf(tokenBinding.status) < 0
+    ) {
+      throw new Error(
+        `Unexpected tokenBinding.status value of "${tokenBinding.status}"`,
+      );
     }
   }
 
-  const attestationObject = isoBase64URL.toBuffer(attestationResponse.attestationObject);
+  const attestationObject = isoBase64URL.toBuffer(
+    attestationResponse.attestationObject,
+  );
   const decodedAttestationObject = decodeAttestationObject(attestationObject);
   const fmt = decodedAttestationObject.get('fmt');
   const authData = decodedAttestationObject.get('authData');
   const attStmt = decodedAttestationObject.get('attStmt');
 
   const parsedAuthData = parseAuthenticatorData(authData);
-  const { aaguid, rpIdHash, flags, credentialID, counter, credentialPublicKey, extensionsData } =
-    parsedAuthData;
+  const {
+    aaguid,
+    rpIdHash,
+    flags,
+    credentialID,
+    counter,
+    credentialPublicKey,
+    extensionsData,
+  } = parsedAuthData;
 
   // Make sure the response's RP ID is ours
   let matchedRPID: string | undefined;
@@ -160,7 +178,9 @@ export async function verifyRegistrationResponse(
 
   // Enforce user verification if specified
   if (requireUserVerification && !flags.uv) {
-    throw new Error('User verification required, but user could not be verified');
+    throw new Error(
+      'User verification required, but user could not be verified',
+    );
   }
 
   if (!credentialID) {
@@ -185,11 +205,17 @@ export async function verifyRegistrationResponse(
   // Make sure the key algorithm is one we specified within the registration options
   if (!supportedAlgorithmIDs.includes(alg as number)) {
     const supported = supportedAlgorithmIDs.join(', ');
-    throw new Error(`Unexpected public key alg "${alg}", expected one of "${supported}"`);
+    throw new Error(
+      `Unexpected public key alg "${alg}", expected one of "${supported}"`,
+    );
   }
 
-  const clientDataHash = await toHash(isoBase64URL.toBuffer(attestationResponse.clientDataJSON));
-  const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
+  const clientDataHash = await toHash(
+    isoBase64URL.toBuffer(attestationResponse.clientDataJSON),
+  );
+  const rootCertificates = SettingsService.getRootCertificates({
+    identifier: fmt,
+  });
 
   // Prepare arguments to pass to the relevant verification method
   const verifierOpts: AttestationFormatVerifierOpts = {
@@ -234,7 +260,9 @@ export async function verifyRegistrationResponse(
   };
 
   if (toReturn.verified) {
-    const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
+    const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(
+      flags,
+    );
 
     toReturn.registrationInfo = {
       fmt,

@@ -15,9 +15,9 @@
       "runtimeExecutable": "npm",
       "skipFiles": [
         "<node_internals>/**",
-        "${workspaceFolder}/**/node_modules/**",
+        "${workspaceFolder}/**/node_modules/**"
       ],
-      "cwd": "${workspaceFolder}/example",
+      "cwd": "${workspaceFolder}/example"
     }
   ]
 }

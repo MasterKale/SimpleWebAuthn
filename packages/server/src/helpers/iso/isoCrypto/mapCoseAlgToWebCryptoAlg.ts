@@ -1,5 +1,5 @@
-import { SubtleCryptoAlg } from './structs';
-import { COSEALG } from '../../cose';
+import { SubtleCryptoAlg } from './structs.ts';
+import { COSEALG } from '../../cose.ts';
 
 /**
  * Convert a COSE alg ID into a corresponding string value that WebCrypto APIs expect
@@ -11,7 +11,10 @@ export function mapCoseAlgToWebCryptoAlg(alg: COSEALG): SubtleCryptoAlg {
     return 'SHA-256';
   } else if ([COSEALG.ES384, COSEALG.PS384, COSEALG.RS384].indexOf(alg) >= 0) {
     return 'SHA-384';
-  } else if ([COSEALG.ES512, COSEALG.PS512, COSEALG.RS512, COSEALG.EdDSA].indexOf(alg) >= 0) {
+  } else if (
+    [COSEALG.ES512, COSEALG.PS512, COSEALG.RS512, COSEALG.EdDSA].indexOf(alg) >=
+      0
+  ) {
     return 'SHA-512';
   }
 

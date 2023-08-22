@@ -6,9 +6,9 @@ import { browserSupportsWebAuthn } from './browserSupportsWebAuthn';
  *
  * This method will _not_ be able to tell you the name of the platform authenticator.
  */
-export async function platformAuthenticatorIsAvailable(): Promise<boolean> {
+export function platformAuthenticatorIsAvailable(): Promise<boolean> {
   if (!browserSupportsWebAuthn()) {
-    return false;
+    return new Promise((resolve) => resolve(false));
   }
 
   return PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();

@@ -1,20 +1,19 @@
-import fetch from 'cross-fetch';
-
-import { validateCertificatePath } from '../helpers/validateCertificatePath';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM';
-import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString';
+import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
+import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
+import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import type {
   MDSJWTHeader,
   MDSJWTPayload,
-  MetadataStatement,
   MetadataBLOBPayloadEntry,
-} from '../metadata/mdsTypes';
-import { SettingsService } from '../services/settingsService';
-import { getLogger } from '../helpers/logging';
-import { convertPEMToBytes } from '../helpers/convertPEMToBytes';
+  MetadataStatement,
+} from '../metadata/mdsTypes.ts';
+import { SettingsService } from '../services/settingsService.ts';
+import { getLogger } from '../helpers/logging.ts';
+import { convertPEMToBytes } from '../helpers/convertPEMToBytes.ts';
+import { fetch } from '../helpers/fetch.ts';
 
-import { parseJWT } from '../metadata/parseJWT';
-import { verifyJWT } from '../metadata/verifyJWT';
+import { parseJWT } from '../metadata/parseJWT.ts';
+import { verifyJWT } from '../metadata/verifyJWT.ts';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -82,7 +81,7 @@ export class BaseMetadataService {
     if (statements?.length) {
       let statementsAdded = 0;
 
-      statements.forEach(statement => {
+      statements.forEach((statement) => {
         // Only cache statements that are for FIDO2-compatible authenticators
         if (statement.aaguid) {
           this.statementCache[statement.aaguid] = {
@@ -124,7 +123,9 @@ export class BaseMetadataService {
       // Calculate the difference to get the total number of new statements we successfully added
       const newCacheCount = Object.keys(this.statementCache).length;
       const cacheDiff = newCacheCount - currentCacheCount;
-      log(`Cached ${cacheDiff} statements from ${numServers} metadata server(s)`);
+      log(
+        `Cached ${cacheDiff} statements from ${numServers} metadata server(s)`,
+      );
     }
 
     if (verificationMode) {
@@ -140,7 +141,9 @@ export class BaseMetadataService {
    * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
    * BLOB download.
    */
-  async getStatement(aaguid: string | Uint8Array): Promise<MetadataStatement | undefined> {
+  async getStatement(
+    aaguid: string | Uint8Array,
+  ): Promise<MetadataStatement | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
       return;
     }
@@ -218,19 +221,25 @@ export class BaseMetadataService {
     if (payload.no <= no) {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
       // number of the last BLOB cached locally."
-      throw new Error(`Latest BLOB no. "${payload.no}" is not greater than previous ${no}`);
+      throw new Error(
+        `Latest BLOB no. "${payload.no}" is not greater than previous ${no}`,
+      );
     }
 
     const headerCertsPEM = header.x5c.map(convertCertBufferToPEM);
     try {
       // Validate the certificate chain
-      const rootCerts = SettingsService.getRootCertificates({ identifier: 'mds' });
+      const rootCerts = SettingsService.getRootCertificates({
+        identifier: 'mds',
+      });
       await validateCertificatePath(headerCertsPEM, rootCerts);
     } catch (error) {
       const _error: Error = error as Error;
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
-      throw new Error(`BLOB certificate path could not be validated: ${_error.message}`);
+      throw new Error(
+        `BLOB certificate path could not be validated: ${_error.message}`,
+      );
     }
 
     // Verify the BLOB JWT signature
@@ -269,9 +278,11 @@ export class BaseMetadataService {
   /**
    * A helper method to pause execution until the service is ready
    */
-  private async pauseUntilReady(): Promise<void> {
+  private pauseUntilReady(): Promise<void> {
     if (this.state === SERVICE_STATE.READY) {
-      return;
+      return new Promise((resolve) => {
+        resolve();
+      });
     }
 
     // State isn't ready, so set up polling
@@ -281,10 +292,12 @@ export class BaseMetadataService {
       let iterations = totalTimeoutMS / intervalMS;
 
       // Check service state every `intervalMS` milliseconds
-      const intervalID: NodeJS.Timeout = globalThis.setInterval(() => {
+      const intervalID = globalThis.setInterval(() => {
         if (iterations < 1) {
           clearInterval(intervalID);
-          reject(`State did not become ready in ${totalTimeoutMS / 1000} seconds`);
+          reject(
+            `State did not become ready in ${totalTimeoutMS / 1000} seconds`,
+          );
         } else if (this.state === SERVICE_STATE.READY) {
           clearInterval(intervalID);
           resolve();

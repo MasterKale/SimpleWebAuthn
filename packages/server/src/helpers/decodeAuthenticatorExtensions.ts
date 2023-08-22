@@ -1,4 +1,4 @@
-import { isoCBOR } from './iso';
+import { isoCBOR } from './iso/index.ts';
 
 /**
  * Convert authenticator extension data buffer to a proper object
@@ -43,7 +43,9 @@ export type UVMAuthenticatorOutput = {
  * `Object.entries()`. This method will recursively make sure that all Maps are converted into
  * basic objects.
  */
-function convertMapToObjectDeep(input: Map<string, unknown>): { [key: string]: unknown } {
+function convertMapToObjectDeep(
+  input: Map<string, unknown>,
+): { [key: string]: unknown } {
   const mapped: { [key: string]: unknown } = {};
 
   for (const [key, value] of input) {

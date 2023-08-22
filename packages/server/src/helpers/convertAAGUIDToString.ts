@@ -1,4 +1,4 @@
-import { isoUint8Array } from './iso';
+import { isoUint8Array } from './iso/index.ts';
 
 /**
  * Convert the aaguid buffer in authData into a UUID string

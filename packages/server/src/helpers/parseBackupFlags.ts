@@ -1,4 +1,4 @@
-import { CredentialDeviceType } from '@simplewebauthn/typescript-types';
+import type { CredentialDeviceType } from '../deps.ts';
 
 /**
  * Make sense of Bits 3 and 4 in authenticator indicating:
@@ -28,7 +28,7 @@ export function parseBackupFlags({ be, bs }: { be: boolean; bs: boolean }): {
   return { credentialDeviceType, credentialBackedUp };
 }
 
-class InvalidBackupFlags extends Error {
+export class InvalidBackupFlags extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'InvalidBackupFlags';

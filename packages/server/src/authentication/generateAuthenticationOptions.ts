@@ -1,12 +1,11 @@
 import type {
   AuthenticationExtensionsClientInputs,
-  PublicKeyCredentialRequestOptionsJSON,
   PublicKeyCredentialDescriptorFuture,
+  PublicKeyCredentialRequestOptionsJSON,
   UserVerificationRequirement,
-} from '@simplewebauthn/typescript-types';
-
-import { isoBase64URL, isoUint8Array } from '../helpers/iso';
-import { generateChallenge } from '../helpers/generateChallenge';
+} from '../deps.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+import { generateChallenge } from '../helpers/generateChallenge.ts';
 
 export type GenerateAuthenticationOptionsOpts = {
   allowCredentials?: PublicKeyCredentialDescriptorFuture[];
@@ -30,12 +29,12 @@ export type GenerateAuthenticationOptionsOpts = {
  * @param extensions Additional plugins the authenticator or browser should use during authentication
  * @param rpID Valid domain name (after `https://`)
  */
-export function generateAuthenticationOptions(
+export async function generateAuthenticationOptions(
   options: GenerateAuthenticationOptionsOpts = {},
-): PublicKeyCredentialRequestOptionsJSON {
+): Promise<PublicKeyCredentialRequestOptionsJSON> {
   const {
     allowCredentials,
-    challenge = generateChallenge(),
+    challenge = await generateChallenge(),
     timeout = 60000,
     userVerification = 'preferred',
     extensions,
@@ -52,7 +51,7 @@ export function generateAuthenticationOptions(
 
   return {
     challenge: isoBase64URL.fromBuffer(_challenge),
-    allowCredentials: allowCredentials?.map(cred => ({
+    allowCredentials: allowCredentials?.map((cred) => ({
       ...cred,
       id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),

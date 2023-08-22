@@ -1,66 +1,19 @@
 {
   "name": "@simplewebauthn/server",
-  "version": "7.4.0",
-  "description": "SimpleWebAuthn for Servers",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": "./dist/index.js",
-    "./helpers": "./dist/helpers/index.js"
-  },
-  "typesVersions": {
-    "*": {
-      "./dist/index.d.ts": [
-        "./dist/index.d.ts"
-      ],
-      "helpers": [
-        "./dist/helpers/index.d.ts"
-      ]
-    }
-  },
-  "author": "Matthew Miller <matthew@millerti.me>",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
-    "directory": "packages/server"
-  },
-  "homepage": "https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/server#readme",
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
+  "version": "8.0.0-alpha.0",
+  "description": "Lerna/npm wrapper around Deno for @simplewebauthn/server",
   "scripts": {
-    "build": "rimraf dist && tsc",
-    "build:lerna-debug": "rimraf dist && tsc > output.txt; cat output.txt; rm output.txt",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "npm test -- --coverage",
-    "prepublish": "npm run build"
+    "build": "deno task build",
+    "build:lerna-debug": "deno task build > output.txt; cat output.txt; rm output.txt",
+    "test": "deno test -A src/",
+    "test:watch": "deno test -A --watch src/"
   },
-  "keywords": [
-    "typescript",
-    "webauthn",
-    "passkeys",
-    "fido",
-    "node"
-  ],
-  "dependencies": {
-    "@hexagon/base64": "^1.1.25",
-    "@peculiar/asn1-android": "^2.3.3",
-    "@peculiar/asn1-ecc": "^2.3.4",
-    "@peculiar/asn1-rsa": "^2.3.4",
-    "@peculiar/asn1-schema": "^2.3.3",
-    "@peculiar/asn1-x509": "^2.3.4",
-    "@simplewebauthn/iso-webcrypto": "^7.4.0",
-    "@simplewebauthn/typescript-types": "^7.4.0",
-    "@types/debug": "^4.1.7",
-    "@types/node": "^18.11.9",
-    "cbor-x": "^1.4.1",
-    "cross-fetch": "^3.1.5",
-    "debug": "^4.3.2"
+  "lerna": {
+    "command": {
+      "publish": {
+        "directory": "./npm"
+      }
+    }
   },
   "gitHead": "ba039fdd5fdff87f78d3bd246e9bea5f7aa39ccb"
 }

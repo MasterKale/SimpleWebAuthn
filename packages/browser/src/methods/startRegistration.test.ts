@@ -52,8 +52,8 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
 
 beforeEach(() => {
   // Stub out a response so the method won't throw
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
-    return new Promise(resolve => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
+    return new Promise((resolve) => {
       resolve({ response: {}, getClientExtensionResults: () => ({}) });
     });
   });
@@ -61,7 +61,7 @@ beforeEach(() => {
   mockSupportsWebauthn.mockReturnValue(true);
 
   // Reset the abort service so we get an accurate call count
-  // @ts-ignore
+  // @ts-ignore: Ignore the fact that `controller` is private
   webauthnAbortService.controller = undefined;
 });
 
@@ -77,8 +77,12 @@ test('should convert options before passing to navigator.credentials.create(...)
   const credId = argsPublicKey.excludeCredentials[0].id;
 
   // Make sure challenge and user.id are converted to Buffers
-  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(new Uint8Array([102, 105, 122, 122]));
-  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(new Uint8Array([53, 54, 55, 56]));
+  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(
+    new Uint8Array([102, 105, 122, 122]),
+  );
+  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(
+    new Uint8Array([53, 54, 55, 56]),
+  );
 
   // Confirm construction of excludeCredentials array
   expect(credId instanceof ArrayBuffer).toEqual(true);
@@ -88,25 +92,27 @@ test('should convert options before passing to navigator.credentials.create(...)
 });
 
 test('should return base64url-encoded response values', async () => {
-  mockNavigatorCreate.mockImplementation((): Promise<RegistrationCredential> => {
-    return new Promise(resolve => {
-      resolve({
-        id: 'foobar',
-        rawId: utf8StringToBuffer('foobar'),
-        response: {
-          attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
-          clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
-          getTransports: () => [],
-          getAuthenticatorData: () => new Uint8Array(),
-          getPublicKey: () => null,
-          getPublicKeyAlgorithm: () => -999,
-        },
-        getClientExtensionResults: () => ({}),
-        type: 'public-key',
-        authenticatorAttachment: '',
+  mockNavigatorCreate.mockImplementation(
+    (): Promise<RegistrationCredential> => {
+      return new Promise((resolve) => {
+        resolve({
+          id: 'foobar',
+          rawId: utf8StringToBuffer('foobar'),
+          response: {
+            attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
+            clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
+            getTransports: () => [],
+            getAuthenticatorData: () => new Uint8Array(),
+            getPublicKey: () => null,
+            getPublicKeyAlgorithm: () => -999,
+          },
+          getClientExtensionResults: () => ({}),
+          type: 'public-key',
+          authenticatorAttachment: '',
+        });
       });
-    });
-  });
+    },
+  );
 
   const response = await startRegistration(goodOpts1);
 
@@ -115,7 +121,7 @@ test('should return base64url-encoded response values', async () => {
   expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWU');
 });
 
-test("should throw error if WebAuthn isn't supported", async () => {
+test('should throw error if WebAuthn isn\'t supported', async () => {
   mockSupportsWebauthn.mockReturnValue(false);
 
   await expect(startRegistration(goodOpts1)).rejects.toThrow(
@@ -125,21 +131,23 @@ test("should throw error if WebAuthn isn't supported", async () => {
 
 test('should throw error if attestation is cancelled for some reason', async () => {
   mockNavigatorCreate.mockImplementation((): Promise<null> => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       resolve(null);
     });
   });
 
-  await expect(startRegistration(goodOpts1)).rejects.toThrow('Registration was not completed');
+  await expect(startRegistration(goodOpts1)).rejects.toThrow(
+    'Registration was not completed',
+  );
 });
 
 test('should send extensions to authenticator if present in options', async () => {
   const extensions: AuthenticationExtensionsClientInputs = {
     credProps: true,
     appid: 'appidHere',
-    // @ts-ignore
+    // @ts-ignore: Send arbitrary extensions
     uvm: true,
-    // @ts-ignore
+    // @ts-ignore: Send arbitrary extensions
     appidExclude: 'appidExcludeHere',
   };
   const optsWithExts: PublicKeyCredentialCreationOptionsJSON = {
@@ -170,8 +178,8 @@ test('should include extension results', async () => {
   };
 
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
-    return new Promise(resolve => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
+    return new Promise((resolve) => {
       resolve({ response: {}, getClientExtensionResults: () => extResults });
     });
   });
@@ -202,7 +210,8 @@ test('should support "cable" transport in excludeCredentials', async () => {
   await startRegistration(opts);
 
   expect(
-    mockNavigatorCreate.mock.calls[0][0].publicKey.excludeCredentials[0].transports[0],
+    mockNavigatorCreate.mock.calls[0][0].publicKey.excludeCredentials[0]
+      .transports[0],
   ).toEqual('cable');
 });
 
@@ -235,11 +244,11 @@ test('should cancel an existing call when executed again', async () => {
 
 test('should return authenticatorAttachment if present', async () => {
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
-    return new Promise(resolve => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
+    return new Promise((resolve) => {
       resolve({
         response: {},
-        getClientExtensionResults: () => { },
+        getClientExtensionResults: () => {},
         authenticatorAttachment: 'cross-platform',
       });
     });
@@ -257,15 +266,15 @@ test('should return convenience values if getters present', async () => {
    * that's already buried in the response.
    */
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
-    return new Promise(resolve => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
+    return new Promise((resolve) => {
       resolve({
         response: {
           getPublicKeyAlgorithm: () => 777,
           getPublicKey: () => new Uint8Array([0, 0, 0, 0]).buffer,
           getAuthenticatorData: () => new Uint8Array([0, 0, 0, 0]).buffer,
         },
-        getClientExtensionResults: () => { },
+        getClientExtensionResults: () => {},
       });
     });
   });
@@ -284,11 +293,11 @@ test('should not return convenience values if getters missing', async () => {
    * that's already buried in the response.
    */
   // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<any> => {
-    return new Promise(resolve => {
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
+    return new Promise((resolve) => {
       resolve({
         response: {},
-        getClientExtensionResults: () => { },
+        getClientExtensionResults: () => {},
       });
     });
   });
@@ -341,7 +350,10 @@ describe('WebAuthnError', () => {
       rejected.toThrow(/discoverable credentials were required/i);
       rejected.toThrow(/no available authenticator supported/i);
       rejected.toHaveProperty('name', 'ConstraintError');
-      rejected.toHaveProperty('code', 'ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT');
+      rejected.toHaveProperty(
+        'code',
+        'ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT',
+      );
       rejected.toHaveProperty('cause', ConstraintError);
     });
 
@@ -360,7 +372,10 @@ describe('WebAuthnError', () => {
       rejected.toThrow(/user verification was required/i);
       rejected.toThrow(/no available authenticator supported/i);
       rejected.toHaveProperty('name', 'ConstraintError');
-      rejected.toHaveProperty('code', 'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT');
+      rejected.toHaveProperty(
+        'code',
+        'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT',
+      );
       rejected.toHaveProperty('cause', ConstraintError);
     });
   });
@@ -376,7 +391,10 @@ describe('WebAuthnError', () => {
       rejected.toThrow(/authenticator/i);
       rejected.toThrow(/previously registered/i);
       rejected.toHaveProperty('name', 'InvalidStateError');
-      rejected.toHaveProperty('code', 'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED');
+      rejected.toHaveProperty(
+        'code',
+        'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED',
+      );
       rejected.toHaveProperty('cause', InvalidStateError);
     });
   });
@@ -389,7 +407,10 @@ describe('WebAuthnError', () => {
        *
        * See https://github.com/MasterKale/SimpleWebAuthn/discussions/350#discussioncomment-4896572
        */
-      const NotAllowedError = generateCustomError('NotAllowedError', 'Operation failed.');
+      const NotAllowedError = generateCustomError(
+        'NotAllowedError',
+        'Operation failed.',
+      );
       mockNavigatorCreate.mockRejectedValueOnce(NotAllowedError);
 
       const rejected = await expect(startRegistration(goodOpts1)).rejects;
@@ -409,7 +430,7 @@ describe('WebAuthnError', () => {
        */
       const NotAllowedError = generateCustomError(
         'NotAllowedError',
-        'WebAuthn is not supported on sites with TLS certificate errors.'
+        'WebAuthn is not supported on sites with TLS certificate errors.',
       );
       mockNavigatorCreate.mockRejectedValueOnce(NotAllowedError);
 
@@ -455,7 +476,10 @@ describe('WebAuthnError', () => {
       rejected.toThrow(/No available authenticator/i);
       rejected.toThrow(/pubKeyCredParams/i);
       rejected.toHaveProperty('name', 'NotSupportedError');
-      rejected.toHaveProperty('code', 'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG');
+      rejected.toHaveProperty(
+        'code',
+        'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG',
+      );
       rejected.toHaveProperty('cause', NotSupportedError);
     });
   });

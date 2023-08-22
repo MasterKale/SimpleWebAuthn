@@ -1,17 +1,18 @@
-import { SettingsService } from '../../services/settingsService';
-import { isoBase64URL } from '../../helpers/iso';
+import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-import { verifyRegistrationResponse } from '../verifyRegistrationResponse';
+import { SettingsService } from '../../services/settingsService.ts';
+import { verifyRegistrationResponse } from '../verifyRegistrationResponse.ts';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
  * and have cert paths that can't be validated with known root certs from Google
  */
-SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
+SettingsService.setRootCertificates({
+  identifier: 'android-key',
+  certificates: [],
+});
 
-test('should verify Android KeyStore response', async () => {
-  const expectedChallenge = '4ab7dfd1-a695-4777-985f-ad2993828e99';
-  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
+Deno.test('should verify Android KeyStore response', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
@@ -26,11 +27,11 @@ test('should verify Android KeyStore response', async () => {
       type: 'public-key',
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge: '4ab7dfd1-a695-4777-985f-ad2993828e99',
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });

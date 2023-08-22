@@ -6,10 +6,9 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
-} from '@simplewebauthn/typescript-types';
-
-import { generateChallenge } from '../helpers/generateChallenge';
-import { isoBase64URL, isoUint8Array } from '../helpers/iso';
+} from '../deps.ts';
+import { generateChallenge } from '../helpers/generateChallenge.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
@@ -95,15 +94,15 @@ const defaultSupportedAlgorithmIDs: COSEAlgorithmIdentifier[] = [-8, -7, -257];
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export function generateRegistrationOptions(
+export async function generateRegistrationOptions(
   options: GenerateRegistrationOptionsOpts,
-): PublicKeyCredentialCreationOptionsJSON {
+): Promise<PublicKeyCredentialCreationOptionsJSON> {
   const {
     rpName,
     rpID,
     userID,
     userName,
-    challenge = generateChallenge(),
+    challenge = await generateChallenge(),
     userDisplayName = userName,
     timeout = 60000,
     attestationType = 'none',
@@ -116,7 +115,7 @@ export function generateRegistrationOptions(
   /**
    * Prepare pubKeyCredParams from the array of algorithm ID's
    */
-  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs.map(id => ({
+  const pubKeyCredParams: PublicKeyCredentialParameters[] = supportedAlgorithmIDs.map((id) => ({
     alg: id,
     type: 'public-key',
   }));
@@ -175,7 +174,7 @@ export function generateRegistrationOptions(
     pubKeyCredParams,
     timeout,
     attestation: attestationType,
-    excludeCredentials: excludeCredentials.map(cred => ({
+    excludeCredentials: excludeCredentials.map((cred) => ({
       ...cred,
       id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
     })),

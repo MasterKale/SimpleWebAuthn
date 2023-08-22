@@ -1,24 +1,23 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import fs from 'fs';
 import express from 'express';
 import fetch from 'node-fetch';
 
 import {
-  generateRegistrationOptions,
-  verifyRegistrationResponse,
   generateAuthenticationOptions,
-  verifyAuthenticationResponse,
+  generateRegistrationOptions,
   MetadataService,
   MetadataStatement,
   SettingsService,
+  verifyAuthenticationResponse,
+  verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
 import {
-  RegistrationResponseJSON,
   AuthenticationResponseJSON,
+  RegistrationResponseJSON,
 } from '@simplewebauthn/typescript-types';
 
-import { rpID, expectedOrigin } from './index';
+import { expectedOrigin, rpID } from './index';
 import { LoggedInUser } from './example-server';
 
 interface LoggedInFIDOUser extends LoggedInUser {
@@ -46,7 +45,10 @@ try {
   const conformanceMetadataFilenames = fs.readdirSync(conformanceMetadataPath);
   for (const statementPath of conformanceMetadataFilenames) {
     if (statementPath.endsWith('.json')) {
-      const contents = fs.readFileSync(`${conformanceMetadataPath}/${statementPath}`, 'utf-8');
+      const contents = fs.readFileSync(
+        `${conformanceMetadataPath}/${statementPath}`,
+        'utf-8',
+      );
       statements.push(JSON.parse(contents));
     }
   }
@@ -64,8 +66,8 @@ fetch('https://mds3.fido.tools/getEndpoints', {
   body: JSON.stringify({ endpoint: `${expectedOrigin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
 })
-  .then(resp => resp.json())
-  .then(json => {
+  .then((resp) => resp.json())
+  .then((json) => {
     const mdsServers: string[] = json.result;
 
     return MetadataService.initialize({
@@ -99,14 +101,32 @@ const inMemoryUserDeviceDB: { [username: string]: LoggedInFIDOUser } = {
 // A cheap way of remembering who's "logged in" between the request for options and the response
 let loggedInUsername: string | undefined = undefined;
 
-const supportedAlgorithmIDs = [-7, -8, -35, -36, -37, -38, -39, -257, -258, -259, -65535];
+const supportedAlgorithmIDs = [
+  -7,
+  -8,
+  -35,
+  -36,
+  -37,
+  -38,
+  -39,
+  -257,
+  -258,
+  -259,
+  -65535,
+];
 
 /**
  * [FIDO2] Server Tests > MakeCredential Request
  */
 fidoConformanceRouter.post('/attestation/options', (req, res) => {
   const { body } = req;
-  const { username, displayName, authenticatorSelection, attestation, extensions } = body;
+  const {
+    username,
+    displayName,
+    authenticatorSelection,
+    attestation,
+    extensions,
+  } = body;
 
   loggedInUsername = username;
 
@@ -133,7 +153,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
     attestationType: attestation,
     authenticatorSelection,
     extensions,
-    excludeCredentials: devices.map(dev => ({
+    excludeCredentials: devices.map((dev) => ({
       id: dev.credentialID,
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
@@ -183,7 +203,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   if (verified && registrationInfo) {
     const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-    const existingDevice = user.devices.find(device => device.credentialID === credentialID);
+    const existingDevice = user.devices.find((device) => device.credentialID === credentialID);
 
     if (!existingDevice) {
       /**
@@ -219,7 +239,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
   const opts = generateAuthenticationOptions({
     extensions,
     userVerification,
-    allowCredentials: devices.map(dev => ({
+    allowCredentials: devices.map((dev) => ({
       id: dev.credentialID,
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
@@ -253,7 +273,9 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   }
 
   const credIDBuffer = isoBase64URL.toBuffer(id);
-  const existingDevice = user.devices.find(device => isoUint8Array.areEqual(device.credentialID, credIDBuffer));
+  const existingDevice = user.devices.find((device) =>
+    isoUint8Array.areEqual(device.credentialID, credIDBuffer)
+  );
 
   if (!existingDevice) {
     const msg = `Could not find device matching ${id}`;
@@ -330,8 +352,17 @@ X2S5Ht8+e+EQnezLJBJXtnkRWY+Zt491wgt/AwSs5PHHMv5QgjELOuMxQBc=
 `;
 
 // Set above root cert for use by MetadataService
-SettingsService.setRootCertificates({ identifier: 'mds', certificates: [MDS3ROOT] });
+SettingsService.setRootCertificates({
+  identifier: 'mds',
+  certificates: [MDS3ROOT],
+});
 // Reset preset root certificates
 SettingsService.setRootCertificates({ identifier: 'apple', certificates: [] });
-SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
-SettingsService.setRootCertificates({ identifier: 'android-safetynet', certificates: [] });
+SettingsService.setRootCertificates({
+  identifier: 'android-key',
+  certificates: [],
+});
+SettingsService.setRootCertificates({
+  identifier: 'android-safetynet',
+  certificates: [],
+});

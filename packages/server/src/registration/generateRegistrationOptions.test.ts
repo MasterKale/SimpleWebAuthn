@@ -1,8 +1,11 @@
-jest.mock('../helpers/generateChallenge');
+import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts';
 
-import { generateRegistrationOptions } from './generateRegistrationOptions';
+import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
+import { _generateChallengeInternals } from '../helpers/generateChallenge.ts';
+import { isoUint8Array } from '../helpers/iso/index.ts';
 
-test('should generate credential request options suitable for sending via JSON', () => {
+Deno.test('should generate credential request options suitable for sending via JSON', async () => {
   const rpName = 'SimpleWebAuthn';
   const rpID = 'not.real';
   const challenge = 'totallyrandomvalue';
@@ -11,7 +14,7 @@ test('should generate credential request options suitable for sending via JSON',
   const timeout = 1;
   const attestationType = 'indirect';
 
-  const options = generateRegistrationOptions({
+  const options = await generateRegistrationOptions({
     rpName,
     rpID,
     challenge,
@@ -21,39 +24,42 @@ test('should generate credential request options suitable for sending via JSON',
     attestationType,
   });
 
-  expect(options).toEqual({
-    // Challenge, base64url-encoded
-    challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
-    rp: {
-      name: rpName,
-      id: rpID,
+  assertEquals(
+    options,
+    {
+      // Challenge, base64url-encoded
+      challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
+      rp: {
+        name: rpName,
+        id: rpID,
+      },
+      user: {
+        id: userID,
+        name: userName,
+        displayName: userName,
+      },
+      pubKeyCredParams: [
+        { alg: -8, type: 'public-key' },
+        { alg: -7, type: 'public-key' },
+        { alg: -257, type: 'public-key' },
+      ],
+      timeout,
+      attestation: attestationType,
+      excludeCredentials: [],
+      authenticatorSelection: {
+        requireResidentKey: false,
+        residentKey: 'preferred',
+        userVerification: 'preferred',
+      },
+      extensions: {
+        credProps: true,
+      },
     },
-    user: {
-      id: userID,
-      name: userName,
-      displayName: userName,
-    },
-    pubKeyCredParams: [
-      { alg: -8, type: 'public-key' },
-      { alg: -7, type: 'public-key' },
-      { alg: -257, type: 'public-key' },
-    ],
-    timeout,
-    attestation: attestationType,
-    excludeCredentials: [],
-    authenticatorSelection: {
-      requireResidentKey: false,
-      residentKey: 'preferred',
-      userVerification: 'preferred',
-    },
-    extensions: {
-      credProps: true,
-    }
-  });
+  );
 });
 
-test('should map excluded credential IDs if specified', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should map excluded credential IDs if specified', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -61,24 +67,27 @@ test('should map excluded credential IDs if specified', () => {
     userName: 'usernameHere',
     excludeCredentials: [
       {
-        id: Buffer.from('someIDhere', 'ascii'),
+        id: isoUint8Array.fromASCIIString('someIDhere'),
         type: 'public-key',
         transports: ['usb', 'ble', 'nfc', 'internal'],
       },
     ],
   });
 
-  expect(options.excludeCredentials).toEqual([
-    {
-      id: 'c29tZUlEaGVyZQ',
-      type: 'public-key',
-      transports: ['usb', 'ble', 'nfc', 'internal'],
-    },
-  ]);
+  assertEquals(
+    options.excludeCredentials,
+    [
+      {
+        id: 'c29tZUlEaGVyZQ',
+        type: 'public-key',
+        transports: ['usb', 'ble', 'nfc', 'internal'],
+      },
+    ],
+  );
 });
 
-test('defaults to 60 seconds if no timeout is specified', () => {
-  const options = generateRegistrationOptions({
+Deno.test('defaults to 60 seconds if no timeout is specified', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -86,11 +95,11 @@ test('defaults to 60 seconds if no timeout is specified', () => {
     userName: 'usernameHere',
   });
 
-  expect(options.timeout).toEqual(60000);
+  assertEquals(options.timeout, 60000);
 });
 
-test('defaults to none attestation if no attestation type is specified', () => {
-  const options = generateRegistrationOptions({
+Deno.test('defaults to none attestation if no attestation type is specified', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -98,11 +107,11 @@ test('defaults to none attestation if no attestation type is specified', () => {
     userName: 'usernameHere',
   });
 
-  expect(options.attestation).toEqual('none');
+  assertEquals(options.attestation, 'none');
 });
 
-test('should set authenticatorSelection if specified', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should set authenticatorSelection if specified', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -115,15 +124,18 @@ test('should set authenticatorSelection if specified', () => {
     },
   });
 
-  expect(options.authenticatorSelection).toEqual({
-    authenticatorAttachment: 'cross-platform',
-    requireResidentKey: false,
-    userVerification: 'preferred',
-  });
+  assertEquals(
+    options.authenticatorSelection,
+    {
+      authenticatorAttachment: 'cross-platform',
+      requireResidentKey: false,
+      userVerification: 'preferred',
+    },
+  );
 });
 
-test('should set extensions if specified', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should set extensions if specified', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -132,22 +144,22 @@ test('should set extensions if specified', () => {
     extensions: { appid: 'simplewebauthn' },
   });
 
-  expect(options.extensions?.appid).toEqual('simplewebauthn');
+  assertEquals(options.extensions?.appid, 'simplewebauthn');
 });
 
-test('should include credProps if extensions are not provided', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should include credProps if extensions are not provided', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     userID: '1234',
     userName: 'usernameHere',
   });
 
-  expect(options.extensions?.credProps).toEqual(true);
+  assertEquals(options.extensions?.credProps, true);
 });
 
-test('should include credProps if extensions are provided', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should include credProps if extensions are provided', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     userID: '1234',
@@ -155,11 +167,19 @@ test('should include credProps if extensions are provided', () => {
     extensions: { appid: 'simplewebauthn' },
   });
 
-  expect(options.extensions?.credProps).toEqual(true);
+  assertEquals(options.extensions?.credProps, true);
 });
 
-test('should generate a challenge if one is not provided', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should generate a challenge if one is not provided', async () => {
+  const mockGenerateChallenge = stub(
+    _generateChallengeInternals,
+    'stubThis',
+    returnsNext([
+      new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
+    ]),
+  );
+
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -167,11 +187,13 @@ test('should generate a challenge if one is not provided', () => {
   });
 
   // base64url-encoded 16-byte buffer from mocked `generateChallenge()`
-  expect(options.challenge).toEqual('AQIDBAUGBwgJCgsMDQ4PEA');
+  assertEquals(options.challenge, 'AQIDBAUGBwgJCgsMDQ4PEA');
+
+  mockGenerateChallenge.restore();
 });
 
-test('should use custom supported algorithm IDs as-is when provided', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should use custom supported algorithm IDs as-is when provided', async () => {
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -179,15 +201,18 @@ test('should use custom supported algorithm IDs as-is when provided', () => {
     supportedAlgorithmIDs: [-7, -8, -65535],
   });
 
-  expect(options.pubKeyCredParams).toEqual([
-    { alg: -7, type: 'public-key' },
-    { alg: -8, type: 'public-key' },
-    { alg: -65535, type: 'public-key' },
-  ]);
+  assertEquals(
+    options.pubKeyCredParams,
+    [
+      { alg: -7, type: 'public-key' },
+      { alg: -8, type: 'public-key' },
+      { alg: -65535, type: 'public-key' },
+    ],
+  );
 });
 
-test('should require resident key if residentKey option is absent but requireResidentKey is set to true', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should require resident key if residentKey option is absent but requireResidentKey is set to true', async () => {
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -197,12 +222,12 @@ test('should require resident key if residentKey option is absent but requireRes
     },
   });
 
-  expect(options.authenticatorSelection?.requireResidentKey).toEqual(true);
-  expect(options.authenticatorSelection?.residentKey).toEqual('required');
+  assertEquals(options.authenticatorSelection?.requireResidentKey, true);
+  assertEquals(options.authenticatorSelection?.residentKey, 'required');
 });
 
-test('should discourage resident key if residentKey option is absent but requireResidentKey is set to false', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should discourage resident key if residentKey option is absent but requireResidentKey is set to false', async () => {
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -212,24 +237,24 @@ test('should discourage resident key if residentKey option is absent but require
     },
   });
 
-  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
-  expect(options.authenticatorSelection?.residentKey).toBeUndefined();
+  assertEquals(options.authenticatorSelection?.requireResidentKey, false);
+  assertEquals(options.authenticatorSelection?.residentKey, undefined);
 });
 
-test('should prefer resident key if both residentKey and requireResidentKey options are absent', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should prefer resident key if both residentKey and requireResidentKey options are absent', async () => {
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
     userName: 'usernameHere',
   });
 
-  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
-  expect(options.authenticatorSelection?.residentKey).toEqual('preferred');
+  assertEquals(options.authenticatorSelection?.requireResidentKey, false);
+  assertEquals(options.authenticatorSelection?.residentKey, 'preferred');
 });
 
-test('should set requireResidentKey to true if residentKey if set to required', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should set requireResidentKey to true if residentKey if set to required', async () => {
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -239,12 +264,12 @@ test('should set requireResidentKey to true if residentKey if set to required', 
     },
   });
 
-  expect(options.authenticatorSelection?.requireResidentKey).toEqual(true);
-  expect(options.authenticatorSelection?.residentKey).toEqual('required');
+  assertEquals(options.authenticatorSelection?.requireResidentKey, true);
+  assertEquals(options.authenticatorSelection?.residentKey, 'required');
 });
 
-test('should set requireResidentKey to false if residentKey if set to preferred', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should set requireResidentKey to false if residentKey if set to preferred', async () => {
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -254,12 +279,12 @@ test('should set requireResidentKey to false if residentKey if set to preferred'
     },
   });
 
-  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
-  expect(options.authenticatorSelection?.residentKey).toEqual('preferred');
+  assertEquals(options.authenticatorSelection?.requireResidentKey, false);
+  assertEquals(options.authenticatorSelection?.residentKey, 'preferred');
 });
 
-test('should set requireResidentKey to false if residentKey if set to discouraged', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should set requireResidentKey to false if residentKey if set to discouraged', async () => {
+  const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
     userID: '1234',
@@ -269,12 +294,12 @@ test('should set requireResidentKey to false if residentKey if set to discourage
     },
   });
 
-  expect(options.authenticatorSelection?.requireResidentKey).toEqual(false);
-  expect(options.authenticatorSelection?.residentKey).toEqual('discouraged');
+  assertEquals(options.authenticatorSelection?.requireResidentKey, false);
+  assertEquals(options.authenticatorSelection?.residentKey, 'discouraged');
 });
 
-test('should prefer Ed25519 in pubKeyCredParams', () => {
-  const options = generateRegistrationOptions({
+Deno.test('should prefer Ed25519 in pubKeyCredParams', async () => {
+  const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
@@ -282,5 +307,5 @@ test('should prefer Ed25519 in pubKeyCredParams', () => {
     userName: 'usernameHere',
   });
 
-  expect(options.pubKeyCredParams[0].alg).toEqual(-8);
+  assertEquals(options.pubKeyCredParams[0].alg, -8);
 });

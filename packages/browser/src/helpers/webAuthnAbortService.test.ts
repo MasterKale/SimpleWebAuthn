@@ -13,7 +13,7 @@ test('should call abort() with AbortError on existing controller when creating a
 
   // Spy on the existing instance of AbortController
   const abortSpy = jest.fn();
-  // @ts-ignore
+  // @ts-ignore: Ignore the fact that `controller` is private
   webauthnAbortService.controller.abort = abortSpy;
 
   // Generate a new signal, which should call `abort()` on the existing controller

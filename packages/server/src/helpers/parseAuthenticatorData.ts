@@ -1,14 +1,16 @@
 import {
-  decodeAuthenticatorExtensions,
   AuthenticationExtensionsAuthenticatorOutputs,
-} from './decodeAuthenticatorExtensions';
-import { isoCBOR, isoUint8Array } from './iso';
-import { COSEPublicKey } from './cose';
+  decodeAuthenticatorExtensions,
+} from './decodeAuthenticatorExtensions.ts';
+import { isoCBOR, isoUint8Array } from './iso/index.ts';
+import { COSEPublicKey } from './cose.ts';
 
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
-export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticatorData {
+export function parseAuthenticatorData(
+  authData: Uint8Array,
+): ParsedAuthenticatorData {
   if (authData.byteLength < 37) {
     throw new Error(
       `Authenticator data was ${authData.byteLength} bytes, expected at least 37 bytes`,
@@ -18,9 +20,9 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
   let pointer = 0;
   const dataView = isoUint8Array.toDataView(authData);
 
-  const rpIdHash = authData.slice(pointer, (pointer += 32));
+  const rpIdHash = authData.slice(pointer, pointer += 32);
 
-  const flagsBuf = authData.slice(pointer, (pointer += 1));
+  const flagsBuf = authData.slice(pointer, pointer += 1);
   const flagsInt = flagsBuf[0];
 
   // Bit positions can be referenced here:
@@ -44,15 +46,17 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
   let credentialPublicKey: Uint8Array | undefined = undefined;
 
   if (flags.at) {
-    aaguid = authData.slice(pointer, (pointer += 16));
+    aaguid = authData.slice(pointer, pointer += 16);
 
     const credIDLen = dataView.getUint16(pointer);
     pointer += 2;
 
-    credentialID = authData.slice(pointer, (pointer += credIDLen));
+    credentialID = authData.slice(pointer, pointer += credIDLen);
 
     // Decode the next CBOR item in the buffer, then re-encode it back to a Buffer
-    const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(authData.slice(pointer));
+    const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(
+      authData.slice(pointer),
+    );
     const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
 
     credentialPublicKey = firstEncoded;
@@ -74,7 +78,7 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
     throw new Error('Leftover bytes detected while parsing authenticator data');
   }
 
-  return {
+  return _parseAuthenticatorDataInternals.stubThis({
     rpIdHash,
     flagsBuf,
     flags,
@@ -85,7 +89,7 @@ export function parseAuthenticatorData(authData: Uint8Array): ParsedAuthenticato
     credentialPublicKey,
     extensionsData,
     extensionsDataBuffer,
-  };
+  });
 }
 
 export type ParsedAuthenticatorData = {
@@ -107,4 +111,9 @@ export type ParsedAuthenticatorData = {
   credentialPublicKey?: Uint8Array;
   extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
   extensionsDataBuffer?: Uint8Array;
+};
+
+// Make it possible to stub the return value during testing
+export const _parseAuthenticatorDataInternals = {
+  stubThis: (value: ParsedAuthenticatorData) => value,
 };

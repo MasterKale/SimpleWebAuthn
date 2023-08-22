@@ -10,13 +10,19 @@ test('should return true when browser supports WebAuthn', () => {
 });
 
 test('should return false when browser does not support WebAuthn', () => {
-  delete (window as any).PublicKeyCredential;
+  // This looks weird but it appeases the linter so it's _fiiiine_
+  delete (window as { PublicKeyCredential: unknown }).PublicKeyCredential;
   expect(browserSupportsWebAuthn()).toBe(false);
 });
 
 test('should return false when window is undefined', () => {
   // Make window undefined as it is in node environments.
-  const windowSpy = jest.spyOn<any, 'window'>(global, 'window', 'get');
+  const windowSpy = jest.spyOn<typeof globalThis, 'window'>(
+    global,
+    'window',
+    'get',
+  );
+  // @ts-ignore: Intentionally making window unavailable
   windowSpy.mockImplementation(() => undefined);
 
   expect(window).toBe(undefined);

@@ -1,9 +1,8 @@
-import { isoBase64URL } from '../../../helpers/iso';
-import { verifyRegistrationResponse } from '../../verifyRegistrationResponse';
+import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-test('should verify TPM response', async () => {
-  const expectedChallenge = 'a4de0d36-057d-4e9d-831a-2c578fa89170';
-  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
+import { verifyRegistrationResponse } from '../../verifyRegistrationResponse.ts';
+
+Deno.test('should verify TPM response', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'SErwRhxIzjPowcnM3e-D-u89EQXLUe1NYewpshd7Mc0',
@@ -18,24 +17,21 @@ test('should verify TPM response', async () => {
       type: 'public-key',
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge: 'a4de0d36-057d-4e9d-831a-2c578fa89170',
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
 
-test('should verify SHA1 TPM response', async () => {
+Deno.test('should verify SHA1 TPM response', async () => {
   /**
    * Generated on real hardware on 03/03/2020
    *
    * Thanks to https://github.com/abergs/fido2-net-lib/blob/master/Test/TestFiles/attestationTPMSHA1Response.json
    */
-  const expectedChallenge =
-    '9JyUfJkg8PqoKZuD7FHzOE9dbyculC9urGTpGqBnEwnhKmni4rGRXxm3-ZBHK8x6riJQqIpC8qEa-T0qIFTKTQ';
-  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
     response: {
       rawId: 'UJDoUJoGiDQF_EEZ3G_z9Lfq16_KFaXtMTjwTUrrRlc',
@@ -50,24 +46,22 @@ test('should verify SHA1 TPM response', async () => {
       type: 'public-key',
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge:
+      '9JyUfJkg8PqoKZuD7FHzOE9dbyculC9urGTpGqBnEwnhKmni4rGRXxm3-ZBHK8x6riJQqIpC8qEa-T0qIFTKTQ',
     expectedOrigin: 'https://localhost:44329',
     expectedRPID: 'localhost',
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
 
-test('should verify SHA256 TPM response', async () => {
+Deno.test('should verify SHA256 TPM response', async () => {
   /**
    * Generated on real hardware on 03/03/2020
    *
    * Thanks to https://github.com/abergs/fido2-net-lib/blob/master/Test/TestFiles/attestationTPMSHA256Response.json
    */
-  const expectedChallenge =
-    'gHrAk4pNe2VlB0HLeKclI2P6QEa83PuGeijTHMtpbhY9KlybyhlwF_VzRe7yhabXagWuY6rkDWfvvhNqgh2o7A';
-  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
     response: {
       rawId: 'h9XMhkVePN1Prq9Ks_VfwIsVZvt-jmSRTEnevTc-KB8',
@@ -82,16 +76,17 @@ test('should verify SHA256 TPM response', async () => {
       type: 'public-key',
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge:
+      'gHrAk4pNe2VlB0HLeKclI2P6QEa83PuGeijTHMtpbhY9KlybyhlwF_VzRe7yhabXagWuY6rkDWfvvhNqgh2o7A',
     expectedOrigin: 'https://localhost:44329',
     expectedRPID: 'localhost',
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
 
-test('should verify TPM response with spec-compliant tcgAtTpm SAN structure', async () => {
+Deno.test('should verify TPM response with spec-compliant tcgAtTpm SAN structure', async () => {
   /**
    * Name [
    *   RelativeDistinguishedName [
@@ -105,8 +100,6 @@ test('should verify TPM response with spec-compliant tcgAtTpm SAN structure', as
    *   ]
    * ]
    */
-  const expectedChallenge = 'VfmZXKDxqdoXFMHXO3SE2Q2b8u5Ki64OL_XICELcGKg';
-  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'LVwzXx0fStkvsos_jdl9DTd6O3-6be8Ua4tcdXc5XeM',
@@ -121,15 +114,15 @@ test('should verify TPM response with spec-compliant tcgAtTpm SAN structure', as
       type: 'public-key',
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge: 'VfmZXKDxqdoXFMHXO3SE2Q2b8u5Ki64OL_XICELcGKg',
     expectedOrigin: 'https://dev.netpassport.io',
     expectedRPID: 'netpassport.io',
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
 
-test('should verify TPM response with non-spec-compliant tcgAtTpm SAN structure', async () => {
+Deno.test('should verify TPM response with non-spec-compliant tcgAtTpm SAN structure', async () => {
   /**
    * Name [
    *   RelativeDistinguishedName [
@@ -139,8 +132,6 @@ test('should verify TPM response with non-spec-compliant tcgAtTpm SAN structure'
    *   ]
    * ]
    */
-  const expectedChallenge = '4STWgmXrgJxzigqe6nFuIg';
-  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'X7TPi7o8WfiIz1bP0Vciz1xRvSMyiitgOR1sUqY724s',
@@ -155,17 +146,15 @@ test('should verify TPM response with non-spec-compliant tcgAtTpm SAN structure'
       type: 'public-key',
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge: '4STWgmXrgJxzigqe6nFuIg',
     expectedOrigin: 'https://localhost:44329',
     expectedRPID: 'localhost',
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });
 
-test('should verify TPM response with ECC public area type', async () => {
-  const expectedChallenge = 'uzn9u0Tx-LBdtGgERsbkHRBjiUt5i2rvm2BBTZrWqEo';
-  jest.spyOn(isoBase64URL, 'fromString').mockReturnValueOnce(expectedChallenge);
+Deno.test('should verify TPM response with ECC public area type', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'hsS2ywFz_LWf9-lC35vC9uJTVD3ZCVdweZvESUbjXnQ',
@@ -180,10 +169,10 @@ test('should verify TPM response with ECC public area type', async () => {
       },
       clientExtensionResults: {},
     },
-    expectedChallenge,
+    expectedChallenge: 'uzn9u0Tx-LBdtGgERsbkHRBjiUt5i2rvm2BBTZrWqEo',
     expectedOrigin: 'https://webauthn.io',
     expectedRPID: 'webauthn.io',
   });
 
-  expect(verification.verified).toEqual(true);
+  assertEquals(verification.verified, true);
 });

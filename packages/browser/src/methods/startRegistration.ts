@@ -1,8 +1,8 @@
 import {
+  AuthenticatorTransportFuture,
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
   RegistrationResponseJSON,
-  AuthenticatorTransportFuture,
 } from '@simplewebauthn/typescript-types';
 
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
@@ -81,7 +81,9 @@ export async function startRegistration(
   // L3 says this is required, but browser and webview support are still not guaranteed.
   let responseAuthenticatorData: string | undefined;
   if (typeof response.getAuthenticatorData === 'function') {
-    responseAuthenticatorData = bufferToBase64URLString(response.getAuthenticatorData());
+    responseAuthenticatorData = bufferToBase64URLString(
+      response.getAuthenticatorData(),
+    );
   }
 
   return {
@@ -97,6 +99,8 @@ export async function startRegistration(
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
-    authenticatorAttachment: toAuthenticatorAttachment(credential.authenticatorAttachment),
+    authenticatorAttachment: toAuthenticatorAttachment(
+      credential.authenticatorAttachment,
+    ),
   };
 }

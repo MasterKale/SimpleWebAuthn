@@ -1,5 +1,5 @@
-import { toHash } from './toHash';
-import { isoUint8Array } from './iso';
+import { toHash } from './toHash.ts';
+import { isoUint8Array } from './iso/index.ts';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Returns the unhashed RP ID
@@ -13,15 +13,17 @@ export async function matchExpectedRPID(
 ): Promise<string> {
   try {
     const matchedRPID = await Promise.any<string>(
-      expectedRPIDs.map(expected => {
+      expectedRPIDs.map((expected) => {
         return new Promise((resolve, reject) => {
-          toHash(isoUint8Array.fromASCIIString(expected)).then(expectedRPIDHash => {
-            if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
-              resolve(expected);
-            } else {
-              reject();
-            }
-          });
+          toHash(isoUint8Array.fromASCIIString(expected)).then(
+            (expectedRPIDHash) => {
+              if (isoUint8Array.areEqual(rpIDHash, expectedRPIDHash)) {
+                resolve(expected);
+              } else {
+                reject();
+              }
+            },
+          );
         });
       }),
     );

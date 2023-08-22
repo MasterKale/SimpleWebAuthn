@@ -1,4 +1,4 @@
-import { Base64URLString } from '@simplewebauthn/typescript-types';
+import type { Base64URLString } from '../deps.ts';
 
 /**
  * Metadata Service structures
@@ -222,19 +222,35 @@ const AlgSign = [
  * ALG_KEY
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#public-key-representation-formats
  */
-export type AlgKey = 'ecc_x962_raw' | 'ecc_x962_der' | 'rsa_2048_raw' | 'rsa_2048_der' | 'cose';
+export type AlgKey =
+  | 'ecc_x962_raw'
+  | 'ecc_x962_der'
+  | 'rsa_2048_raw'
+  | 'rsa_2048_der'
+  | 'cose';
 
 /**
  * ATTESTATION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#authenticator-attestation-types
  */
-export type Attestation = 'basic_full' | 'basic_surrogate' | 'ecdaa' | 'attca' | 'anonca' | 'none';
+export type Attestation =
+  | 'basic_full'
+  | 'basic_surrogate'
+  | 'ecdaa'
+  | 'attca'
+  | 'anonca'
+  | 'none';
 
 /**
  * KEY_PROTECTION
  * https://fidoalliance.org/specs/common-specs/fido-registry-v2.2-ps-20220523.html#key-protection-types
  */
-export type KeyProtection = 'software' | 'hardware' | 'tee' | 'secure_element' | 'remote_handle';
+export type KeyProtection =
+  | 'software'
+  | 'hardware'
+  | 'tee'
+  | 'secure_element'
+  | 'remote_handle';
 
 /**
  * MATCHER_PROTECTION

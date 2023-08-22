@@ -1,41 +1,45 @@
-import { AsnParser } from '@peculiar/asn1-schema';
 import {
+  AsnParser,
   Certificate,
-  id_ce_subjectAltName,
-  SubjectAlternativeName,
-  id_ce_extKeyUsage,
   ExtendedKeyUsage,
+  id_ce_extKeyUsage,
+  id_ce_subjectAltName,
   Name,
-} from '@peculiar/asn1-x509';
-
-import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse';
-
-import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey';
+  SubjectAlternativeName,
+} from '../../../deps.ts';
+import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse.ts';
+import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey.ts';
 import {
+  COSEALG,
   COSEKEYS,
   isCOSEAlg,
-  isCOSEPublicKeyRSA,
   isCOSEPublicKeyEC2,
-  COSEALG,
-} from '../../../helpers/cose';
-import { toHash } from '../../../helpers/toHash';
-import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../../../helpers/validateCertificatePath';
-import { getCertificateInfo } from '../../../helpers/getCertificateInfo';
-import { verifySignature } from '../../../helpers/verifySignature';
-import { isoUint8Array } from '../../../helpers/iso';
-import { MetadataService } from '../../../services/metadataService';
-import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata';
+  isCOSEPublicKeyRSA,
+} from '../../../helpers/cose.ts';
+import { toHash } from '../../../helpers/toHash.ts';
+import { convertCertBufferToPEM } from '../../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../../helpers/validateCertificatePath.ts';
+import { getCertificateInfo } from '../../../helpers/getCertificateInfo.ts';
+import { verifySignature } from '../../../helpers/verifySignature.ts';
+import { isoUint8Array } from '../../../helpers/iso/index.ts';
+import { MetadataService } from '../../../services/metadataService.ts';
+import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata.ts';
 
-import { TPM_MANUFACTURERS, TPM_ECC_CURVE_COSE_CRV_MAP } from './constants';
-import { parseCertInfo } from './parseCertInfo';
-import { parsePubArea } from './parsePubArea';
+import { TPM_ECC_CURVE_COSE_CRV_MAP, TPM_MANUFACTURERS } from './constants.ts';
+import { parseCertInfo } from './parseCertInfo.ts';
+import { parsePubArea } from './parsePubArea.ts';
 
 export async function verifyAttestationTPM(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
-  const { aaguid, attStmt, authData, credentialPublicKey, clientDataHash, rootCertificates } =
-    options;
+  const {
+    aaguid,
+    attStmt,
+    authData,
+    credentialPublicKey,
+    clientDataHash,
+    rootCertificates,
+  } = options;
   const ver = attStmt.get('ver');
   const sig = attStmt.get('sig');
   const alg = attStmt.get('alg');
@@ -51,7 +55,9 @@ export async function verifyAttestationTPM(
   }
 
   if (!sig) {
-    throw new Error('No attestation signature provided in attestation statement (TPM)');
+    throw new Error(
+      'No attestation signature provided in attestation statement (TPM)',
+    );
   }
 
   if (!alg) {
@@ -63,7 +69,9 @@ export async function verifyAttestationTPM(
   }
 
   if (!x5c) {
-    throw new Error('No attestation certificate provided in attestation statement (TPM)');
+    throw new Error(
+      'No attestation certificate provided in attestation statement (TPM)',
+    );
   }
 
   if (!pubArea) {
@@ -84,9 +92,11 @@ export async function verifyAttestationTPM(
   if (pubType === 'TPM_ALG_RSA') {
     if (!isCOSEPublicKeyRSA(cosePublicKey)) {
       throw new Error(
-        `Credential public key with kty ${cosePublicKey.get(
-          COSEKEYS.kty,
-        )} did not match ${pubType}`,
+        `Credential public key with kty ${
+          cosePublicKey.get(
+            COSEKEYS.kty,
+          )
+        } did not match ${pubType}`,
       );
     }
 
@@ -101,11 +111,15 @@ export async function verifyAttestationTPM(
     }
 
     if (!isoUint8Array.areEqual(unique, n)) {
-      throw new Error('PubArea unique is not same as credentialPublicKey (TPM|RSA)');
+      throw new Error(
+        'PubArea unique is not same as credentialPublicKey (TPM|RSA)',
+      );
     }
 
     if (!parameters.rsa) {
-      throw new Error(`Parsed pubArea type is RSA, but missing parameters.rsa (TPM|RSA)`);
+      throw new Error(
+        `Parsed pubArea type is RSA, but missing parameters.rsa (TPM|RSA)`,
+      );
     }
 
     const eBuffer = e as Uint8Array;
@@ -116,14 +130,18 @@ export async function verifyAttestationTPM(
     const eSum = eBuffer[0] + (eBuffer[1] << 8) + (eBuffer[2] << 16);
 
     if (pubAreaExponent !== eSum) {
-      throw new Error(`Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`);
+      throw new Error(
+        `Unexpected public key exp ${eSum}, expected ${pubAreaExponent} (TPM|RSA)`,
+      );
     }
   } else if (pubType === 'TPM_ALG_ECC') {
     if (!isCOSEPublicKeyEC2(cosePublicKey)) {
       throw new Error(
-        `Credential public key with kty ${cosePublicKey.get(
-          COSEKEYS.kty,
-        )} did not match ${pubType}`,
+        `Credential public key with kty ${
+          cosePublicKey.get(
+            COSEKEYS.kty,
+          )
+        } did not match ${pubType}`,
       );
     }
 
@@ -142,11 +160,15 @@ export async function verifyAttestationTPM(
     }
 
     if (!isoUint8Array.areEqual(unique, isoUint8Array.concat([x, y]))) {
-      throw new Error('PubArea unique is not same as public key x and y (TPM|ECC)');
+      throw new Error(
+        'PubArea unique is not same as public key x and y (TPM|ECC)',
+      );
     }
 
     if (!parameters.ecc) {
-      throw new Error(`Parsed pubArea type is ECC, but missing parameters.ecc (TPM|ECC)`);
+      throw new Error(
+        `Parsed pubArea type is ECC, but missing parameters.ecc (TPM|ECC)`,
+      );
     }
 
     const pubAreaCurveID = parameters.ecc.curveID;
@@ -164,18 +186,28 @@ export async function verifyAttestationTPM(
   const { magic, type: certType, attested, extraData } = parsedCertInfo;
 
   if (magic !== 0xff544347) {
-    throw new Error(`Unexpected magic value "${magic}", expected "0xff544347" (TPM)`);
+    throw new Error(
+      `Unexpected magic value "${magic}", expected "0xff544347" (TPM)`,
+    );
   }
 
   if (certType !== 'TPM_ST_ATTEST_CERTIFY') {
-    throw new Error(`Unexpected type "${certType}", expected "TPM_ST_ATTEST_CERTIFY" (TPM)`);
+    throw new Error(
+      `Unexpected type "${certType}", expected "TPM_ST_ATTEST_CERTIFY" (TPM)`,
+    );
   }
 
   // Hash pubArea to create pubAreaHash using the nameAlg in attested
-  const pubAreaHash = await toHash(pubArea, attestedNameAlgToCOSEAlg(attested.nameAlg));
+  const pubAreaHash = await toHash(
+    pubArea,
+    attestedNameAlgToCOSEAlg(attested.nameAlg),
+  );
 
   // Concatenate attested.nameAlg and pubAreaHash to create attestedName.
-  const attestedName = isoUint8Array.concat([attested.nameAlgBuffer, pubAreaHash]);
+  const attestedName = isoUint8Array.concat([
+    attested.nameAlgBuffer,
+    pubAreaHash,
+  ]);
 
   // Check that certInfo.attested.name is equals to attestedName.
   if (!isoUint8Array.areEqual(attested.name, attestedName)) {
@@ -190,7 +222,9 @@ export async function verifyAttestationTPM(
 
   // Check that certInfo.extraData is equals to attToBeSignedHash.
   if (!isoUint8Array.areEqual(extraData, attToBeSignedHash)) {
-    throw new Error('CertInfo extra data did not equal hashed attestation (TPM)');
+    throw new Error(
+      'CertInfo extra data did not equal hashed attestation (TPM)',
+    );
   }
 
   /**
@@ -221,13 +255,17 @@ export async function verifyAttestationTPM(
   // Check that certificate is currently valid
   let now = new Date();
   if (notBefore > now) {
-    throw new Error(`Certificate not good before "${notBefore.toString()}" (TPM)`);
+    throw new Error(
+      `Certificate not good before "${notBefore.toString()}" (TPM)`,
+    );
   }
 
   // Check that certificate has not expired
   now = new Date();
   if (notAfter < now) {
-    throw new Error(`Certificate not good after "${notAfter.toString()}" (TPM)`);
+    throw new Error(
+      `Certificate not good after "${notAfter.toString()}" (TPM)`,
+    );
   }
 
   /**
@@ -241,9 +279,12 @@ export async function verifyAttestationTPM(
 
   let subjectAltNamePresent: SubjectAlternativeName | undefined;
   let extKeyUsage: ExtendedKeyUsage | undefined;
-  parsedCert.tbsCertificate.extensions.forEach(ext => {
+  parsedCert.tbsCertificate.extensions.forEach((ext) => {
     if (ext.extnID === id_ce_subjectAltName) {
-      subjectAltNamePresent = AsnParser.parse(ext.extnValue, SubjectAlternativeName);
+      subjectAltNamePresent = AsnParser.parse(
+        ext.extnValue,
+        SubjectAlternativeName,
+      );
     } else if (ext.extnID === id_ce_extKeyUsage) {
       extKeyUsage = AsnParser.parse(ext.extnValue, ExtendedKeyUsage);
     }
@@ -251,13 +292,17 @@ export async function verifyAttestationTPM(
 
   // Check that certificate contains subjectAltName (2.5.29.17) extension,
   if (!subjectAltNamePresent) {
-    throw new Error('Certificate did not contain subjectAltName extension (TPM)');
+    throw new Error(
+      'Certificate did not contain subjectAltName extension (TPM)',
+    );
   }
 
   // TPM-specific values are buried within `directoryName`, so first make sure there are values
   // there.
   if (!subjectAltNamePresent[0].directoryName?.[0].length) {
-    throw new Error('Certificate subjectAltName extension directoryName was empty (TPM)');
+    throw new Error(
+      'Certificate subjectAltName extension directoryName was empty (TPM)',
+    );
   }
 
   const { tcgAtTpmManufacturer, tcgAtTpmModel, tcgAtTpmVersion } = getTcgAtTpmValues(
@@ -265,22 +310,30 @@ export async function verifyAttestationTPM(
   );
 
   if (!tcgAtTpmManufacturer || !tcgAtTpmModel || !tcgAtTpmVersion) {
-    throw new Error('Certificate contained incomplete subjectAltName data (TPM)');
+    throw new Error(
+      'Certificate contained incomplete subjectAltName data (TPM)',
+    );
   }
 
   if (!extKeyUsage) {
-    throw new Error('Certificate did not contain ExtendedKeyUsage extension (TPM)');
+    throw new Error(
+      'Certificate did not contain ExtendedKeyUsage extension (TPM)',
+    );
   }
 
   // Check that tcpaTpmManufacturer (2.23.133.2.1) field is set to a valid manufacturer ID.
   if (!TPM_MANUFACTURERS[tcgAtTpmManufacturer]) {
-    throw new Error(`Could not match TPM manufacturer "${tcgAtTpmManufacturer}" (TPM)`);
+    throw new Error(
+      `Could not match TPM manufacturer "${tcgAtTpmManufacturer}" (TPM)`,
+    );
   }
 
   // Check that certificate contains extKeyUsage (2.5.29.37) extension and it must contain
   // tcg-kp-AIKCertificate (2.23.133.8.3) OID.
   if (extKeyUsage[0] !== '2.23.133.8.3') {
-    throw new Error(`Unexpected extKeyUsage "${extKeyUsage[0]}", expected "2.23.133.8.3" (TPM)`);
+    throw new Error(
+      `Unexpected extKeyUsage "${extKeyUsage[0]}", expected "2.23.133.8.3" (TPM)`,
+    );
   }
 
   // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
@@ -303,7 +356,10 @@ export async function verifyAttestationTPM(
   } else {
     try {
       // Try validating the certificate path using the root certificates set via SettingsService
-      await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
+      await validateCertificatePath(
+        x5c.map(convertCertBufferToPEM),
+        rootCertificates,
+      );
     } catch (err) {
       const _err = err as Error;
       throw new Error(`${_err.message} (TPM)`);
@@ -364,8 +420,8 @@ function getTcgAtTpmValues(root: Name): {
    *
    * Both structures have been seen in the wild and need to be supported
    */
-  root.forEach(relName => {
-    relName.forEach(attr => {
+  root.forEach((relName) => {
+    relName.forEach((attr) => {
       if (attr.type === oidManufacturer) {
         tcgAtTpmManufacturer = attr.value.toString();
       } else if (attr.type === oidModel) {

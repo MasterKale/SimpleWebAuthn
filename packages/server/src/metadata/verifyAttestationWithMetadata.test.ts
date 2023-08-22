@@ -1,8 +1,10 @@
-import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata';
-import { MetadataStatement } from '../metadata/mdsTypes';
-import { isoBase64URL } from '../helpers/iso';
+import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-test('should verify attestation with metadata (android-safetynet)', async () => {
+import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata.ts';
+import { MetadataStatement } from '../metadata/mdsTypes.ts';
+import { isoBase64URL } from '../helpers/iso/index.ts';
+
+Deno.test('should verify attestation with metadata (android-safetynet)', async () => {
   const metadataStatementJSONSafetyNet: MetadataStatement = {
     legalHeader: 'https://fidoalliance.org/metadata/metadata-statement-legal-header/',
     aaguid: 'b93fd961-f2e6-462f-b122-82002247de78',
@@ -29,7 +31,8 @@ test('should verify attestation with metadata (android-safetynet)', async () => 
     attestationRootCertificates: [
       'MIIDdTCCAl2gAwIBAgILBAAAAAABFUtaw5QwDQYJKoZIhvcNAQEFBQAwVzELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEdsb2JhbFNpZ24gbnYtc2ExEDAOBgNVBAsTB1Jvb3QgQ0ExGzAZBgNVBAMTEkdsb2JhbFNpZ24gUm9vdCBDQTAeFw05ODA5MDExMjAwMDBaFw0yODAxMjgxMjAwMDBaMFcxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMRAwDgYDVQQLEwdSb290IENBMRswGQYDVQQDExJHbG9iYWxTaWduIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDaDuaZjc6j40+Kfvvxi4Mla+pIH/EqsLmVEQS98GPR4mdmzxzdzxtIK+6NiY6arymAZavpxy0Sy6scTHAHoT0KMM0VjU/43dSMUBUc71DuxC73/OlS8pF94G3VNTCOXkNz8kHp1Wrjsok6Vjk4bwY8iGlbKk3Fp1S4bInMm/k8yuX9ifUSPJJ4ltbcdG6TRGHRjcdGsnUOhugZitVtbNV4FpWi6cgKOOvyJBNPc1STE4U6G7weNLWLBYy5d4ux2x8gkasJU26Qzns3dLlwR5EiUWMWea6xrkEmCMgZK9FGqkjWZCrXgzT/LCrBbBlDSgeF59N89iFo7+ryUp9/k5DPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRge2YaRQ2XyolQL30EzTSo//z9SzANBgkqhkiG9w0BAQUFAAOCAQEA1nPnfE920I2/7LqivjTFKDK1fPxsnCwrvQmeU79rXqoRSLblCKOzyj1hTdNGCbM+w6DjY1Ub8rrvrTnhQ7k4o+YviiY776BQVvnGCv04zcQLcFGUl5gE38NflNUVyRRBnMRddWQVDf9VMOyGj/8N7yy5Y0b2qvzfvGn9LhJIZJrglfCm7ymPAbEVtQwdpf5pLGkkeB6zpxxxYu7KyJesF12KwvhHhm4qxFYxldBniYUr+WymXUadDKqC5JlR3XC321Y9YeRq4VzW9v493kHMB65jUr9TU/Qr6cf9tveCX4XSQRjbgbMEHMUfpIBvFSDJ3gyICh3WZlXi/EjJKSZp4A==',
     ],
-    icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB7klEQVR4AaWPP2sUQRiHn5mdvexd/plEcvlDCi1E/EMabUWI9jaKWPoV/A7BQhAbG7t8CCUIKQQLuwhCUBsLBSUmGkLudm9n5nWHzMAego3P8Oy9s8vvfd+jzctPz2Ya+Zdbu48mG0ma8Eh8/bF3yWGGwPvV81d7+9/2lpy3Mrty7jswPPz8Yb20lQJ2iain2w9ok02aLURWstxuiHgknnrEK3GERg9poZ7s3CUxl/dvVfrntmRag9BuICJgrXfHnRvAWyJaDxXB+ezCWqX3t6e6i/ri/E1AkdBoLi/cZrL5pqeHb2yvu9RIUKfiWH95IVmmV6eucK1/j8JMIwRo6jNcX77P2vQ6ZEZ7OXreSFA93rnD3Mx6r7YfTxQKGkN4WP8eW7+bz4Z3eHEE9FFZAJXuliXVyUEfif9ZHINW+BQ5fSc+3oTjztTZRkx4LEhtfh1avBMSIkBrA+JvOAohm1AFgJGRpbOoXS/X1KXgHZE4X1Ssxpt18iYImGJiRFWWKCXkBdiR4L0QUEKamIKxhoQZm6fAdMDVjT7cQwBEYh3DSsl4A+trQTwJbUCsT5P+CodTZtYDmNJYcrEDQSChIMsVzoVQ2kLFMCCQFW4AoDbfbRDI7fIi5aAL41jtVNiQiPUjmUBOgAMCm683/ss/TaVXtx4qKMoAAAAASUVORK5CYII=',
+    icon:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB7klEQVR4AaWPP2sUQRiHn5mdvexd/plEcvlDCi1E/EMabUWI9jaKWPoV/A7BQhAbG7t8CCUIKQQLuwhCUBsLBSUmGkLudm9n5nWHzMAego3P8Oy9s8vvfd+jzctPz2Ya+Zdbu48mG0ma8Eh8/bF3yWGGwPvV81d7+9/2lpy3Mrty7jswPPz8Yb20lQJ2iain2w9ok02aLURWstxuiHgknnrEK3GERg9poZ7s3CUxl/dvVfrntmRag9BuICJgrXfHnRvAWyJaDxXB+ezCWqX3t6e6i/ri/E1AkdBoLi/cZrL5pqeHb2yvu9RIUKfiWH95IVmmV6eucK1/j8JMIwRo6jNcX77P2vQ6ZEZ7OXreSFA93rnD3Mx6r7YfTxQKGkN4WP8eW7+bz4Z3eHEE9FFZAJXuliXVyUEfif9ZHINW+BQ5fSc+3oTjztTZRkx4LEhtfh1avBMSIkBrA+JvOAohm1AFgJGRpbOoXS/X1KXgHZE4X1Ssxpt18iYImGJiRFWWKCXkBdiR4L0QUEKamIKxhoQZm6fAdMDVjT7cQwBEYh3DSsl4A+trQTwJbUCsT5P+CodTZtYDmNJYcrEDQSChIMsVzoVQ2kLFMCCQFW4AoDbfbRDI7fIi5aAL41jtVNiQiPUjmUBOgAMCm683/ss/TaVXtx4qKMoAAAAASUVORK5CYII=',
     authenticatorGetInfo: {
       versions: ['FIDO_2_0'],
       aaguid: 'b93fd961f2e6462fb12282002247de78',
@@ -52,10 +55,10 @@ test('should verify attestation with metadata (android-safetynet)', async () => 
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });
 
-test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator algorithm in metadata', async () => {
+Deno.test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator algorithm in metadata', async () => {
   const metadataStatement: MetadataStatement = {
     legalHeader: 'https://fidoalliance.org/metadata/metadata-statement-legal-header/',
     aaguid: '08987058-cadc-4b81-b6e1-30de50dcbe96',
@@ -81,7 +84,8 @@ test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator alg
     attestationRootCertificates: [
       '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',
     ],
-    icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAACkUlEQVR42uyai3GDMAyGQyegGzACnaCMkBHoBhkhnSAj0A2SDaAT0E6QbEA3cOXW6XEpBtnImMv9utOllxjF/qKHLTdRSm0gdnkAAgACIAACIAACIAACIAgAARAAARAAARAAARBEAFCSJINKkpLuSTtSZbQz76W25zhKkpFWPbtaz6Q75vPuoluuPmqxlZK2yi76s9RznjlpN2K7CrFWaUAHNS0HT0Atw3YpDSjxbdoPuaziG3uk579cvIdeWsbQD7L7NAYoWpKmLy8chueO5reB7KKKrQnQJdDYn9AJZHc5QBT7enINY2hjxrqItsvJWSdxFxKuYlOlWJmE6zPPcsJuN7WFiF7me5DOAws4OyZyG6TOsr/KQziDaJm/mcy2V1V0+T0JeXxqqlrWC9mGGy3O6wwFaI0SdR+EMg9AEAACIAByqViZb+/prgFdN6qb306j3lTWs0BJ76Qjw0ktO+3ad60PQhMrfM9YwqK7lUPe4j+/OR40cDaqJeJ+xo80JsWih1WTBAcb8ysKrb+TfowQKy3v55wbBkk49FJbQusqr4snadL9hEtXC3nO1G1HG6UfxIj5oDnJlHPOVVAerWGmvYQxwc70hiTh7Bidy3/3ZFE6isxf8epNhUCl4n5ftYqWKzMP3IIquaFnquXO0sZ1yn/RWq69SuK6GdPXORfSz4HPnk1bNXO0+UZze5HqKIodNYwnHVVcOUivNcStxj4CGFYhWAWgXgmuF4JzdMhn6wDUm1DpmFyVY7IvQqeTRdod2v2F8lNn/gcpW+rUsOi9mAmFwlSo3Pw9JQ3p+8bhgnAMkPM613BxOBQqc2FEB4SmPQSAAAiAAAiAAAiAAAiAIAAEQAAEQAAEQPco3wIMADOXgFhOTghuAAAAAElFTkSuQmCC',
+    icon:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAACkUlEQVR42uyai3GDMAyGQyegGzACnaCMkBHoBhkhnSAj0A2SDaAT0E6QbEA3cOXW6XEpBtnImMv9utOllxjF/qKHLTdRSm0gdnkAAgACIAACIAACIAACIAgAARAAARAAARAAARBEAFCSJINKkpLuSTtSZbQz76W25zhKkpFWPbtaz6Q75vPuoluuPmqxlZK2yi76s9RznjlpN2K7CrFWaUAHNS0HT0Atw3YpDSjxbdoPuaziG3uk579cvIdeWsbQD7L7NAYoWpKmLy8chueO5reB7KKKrQnQJdDYn9AJZHc5QBT7enINY2hjxrqItsvJWSdxFxKuYlOlWJmE6zPPcsJuN7WFiF7me5DOAws4OyZyG6TOsr/KQziDaJm/mcy2V1V0+T0JeXxqqlrWC9mGGy3O6wwFaI0SdR+EMg9AEAACIAByqViZb+/prgFdN6qb306j3lTWs0BJ76Qjw0ktO+3ad60PQhMrfM9YwqK7lUPe4j+/OR40cDaqJeJ+xo80JsWih1WTBAcb8ysKrb+TfowQKy3v55wbBkk49FJbQusqr4snadL9hEtXC3nO1G1HG6UfxIj5oDnJlHPOVVAerWGmvYQxwc70hiTh7Bidy3/3ZFE6isxf8epNhUCl4n5ftYqWKzMP3IIquaFnquXO0sZ1yn/RWq69SuK6GdPXORfSz4HPnk1bNXO0+UZze5HqKIodNYwnHVVcOUivNcStxj4CGFYhWAWgXgmuF4JzdMhn6wDUm1DpmFyVY7IvQqeTRdod2v2F8lNn/gcpW+rUsOi9mAmFwlSo3Pw9JQ3p+8bhgnAMkPM613BxOBQqc2FEB4SmPQSAAAiAAAiAAAiAAAiAIAAEQAAEQAAEQPco3wIMADOXgFhOTghuAAAAAElFTkSuQmCC',
     authenticatorGetInfo: {
       versions: ['FIDO_2_0'],
       aaguid: '08987058cadc4b81b6e130de50dcbe96',
@@ -103,10 +107,10 @@ test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator alg
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });
 
-test('should not validate certificate path when authenticator is self-referencing its attestation statement certificates', async () => {
+Deno.test('should not validate certificate path when authenticator is self-referencing its attestation statement certificates', async () => {
   const metadataStatement: MetadataStatement = {
     legalHeader: 'https://fidoalliance.org/metadata/metadata-statement-legal-header/',
     description:
@@ -126,9 +130,15 @@ test('should not validate certificate path when authenticator is self-referencin
     userVerificationDetails: [
       [{ userVerificationMethod: 'none' }],
       [{ userVerificationMethod: 'presence_internal' }],
-      [{ userVerificationMethod: 'passcode_external', caDesc: { base: 10, minLength: 4 } }],
+      [{
+        userVerificationMethod: 'passcode_external',
+        caDesc: { base: 10, minLength: 4 },
+      }],
       [
-        { userVerificationMethod: 'passcode_external', caDesc: { base: 10, minLength: 4 } },
+        {
+          userVerificationMethod: 'passcode_external',
+          caDesc: { base: 10, minLength: 4 },
+        },
         { userVerificationMethod: 'presence_internal' },
       ],
     ],
@@ -165,10 +175,10 @@ test('should not validate certificate path when authenticator is self-referencin
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });
 
-test('should verify idmelon attestation with updated root certificate', async () => {
+Deno.test('should verify idmelon attestation with updated root certificate', async () => {
   /**
    * See https://github.com/MasterKale/SimpleWebAuthn/issues/302 for more context, basically
    * IDmelon's root cert in FIDO MDS was missing an extension. I worked with IDmelon to generate a
@@ -207,7 +217,8 @@ test('should verify idmelon attestation with updated root certificate', async ()
     attestationRootCertificates: [
       'MIIByzCCAXGgAwIBAgIJANmMNK6jVpuuMAoGCCqGSM49BAMCMEExJDAiBgNVBAoMG1ZhbmNvc3lzIERhdGEgU2VjdXJpdHkgSW5jLjEZMBcGA1UEAwwQVmFuY29zeXMgUm9vdCBDQTAgFw0yMjEyMTQxODQxMDlaGA8yMDcyMTIwMTE4NDEwOVowQTEkMCIGA1UECgwbVmFuY29zeXMgRGF0YSBTZWN1cml0eSBJbmMuMRkwFwYDVQQDDBBWYW5jb3N5cyBSb290IENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEalYgEopnKScAm+d9f1XpGB3zbkZCD3hZEKuxTclpBYlj4ypNRg0gMSa7geBgd6nck50YaVhdy75uIc2wbWX8t6NQME4wHQYDVR0OBBYEFOxyf0cDs8Yl+VnWSZ1uYJAKkFeVMB8GA1UdIwQYMBaAFOxyf0cDs8Yl+VnWSZ1uYJAKkFeVMAwGA1UdEwQFMAMBAf8wCgYIKoZIzj0EAwIDSAAwRQIhAO2XuiRDXxy/UkWhsuZQYNUXeOj08AeTWADAqXvcA30hAiBi2cdGd61PNwHDTYjXPenPcD8S0rFTDncNWfs3E/WDXA==',
     ],
-    icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUtmc3y+fyWzOZis9rK5fI6n9B8v+Cw2ezl8vlHptNVrNbX7Paj0ulvud293++JxuP///89HRvpAAAAEXRSTlP/////////////////////ACWtmWIAAABsSURBVHgBxdPBCoAwDIPh/yDise//tIIQCZo6RNGdtuWDstFSg/UOgMiADQBJ6J4iCwS4BgzBuEQHCoFa+mdM+qijsDMVhBfdoRFaAL4nAe6AeghODYPnsaNyLuAqg5AHwO9AYu5BmqEPhncFmecvM5KKQHMAAAAASUVORK5CYII=',
+    icon:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUtmc3y+fyWzOZis9rK5fI6n9B8v+Cw2ezl8vlHptNVrNbX7Paj0ulvud293++JxuP///89HRvpAAAAEXRSTlP/////////////////////ACWtmWIAAABsSURBVHgBxdPBCoAwDIPh/yDise//tIIQCZo6RNGdtuWDstFSg/UOgMiADQBJ6J4iCwS4BgzBuEQHCoFa+mdM+qijsDMVhBfdoRFaAL4nAe6AeghODYPnsaNyLuAqg5AHwO9AYu5BmqEPhncFmecvM5KKQHMAAAAASUVORK5CYII=',
     authenticatorGetInfo: {
       versions: ['FIDO_2_0'],
       extensions: ['hmac-secret'],
@@ -229,5 +240,5 @@ test('should verify idmelon attestation with updated root certificate', async ()
     x5c,
   });
 
-  expect(verified).toEqual(true);
+  assertEquals(verified, true);
 });

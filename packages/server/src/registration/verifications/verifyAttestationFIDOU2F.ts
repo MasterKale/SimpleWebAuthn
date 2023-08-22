@@ -1,11 +1,11 @@
-import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 
-import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS';
-import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { verifySignature } from '../../helpers/verifySignature';
-import { isoUint8Array } from '../../helpers/iso';
-import { COSEALG } from '../../helpers/cose';
+import { convertCOSEtoPKCS } from '../../helpers/convertCOSEtoPKCS.ts';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { COSEALG } from '../../helpers/cose.ts';
 
 /**
  * Verify an attestation response with fmt 'fido-u2f'
@@ -38,11 +38,15 @@ export async function verifyAttestationFIDOU2F(
   const x5c = attStmt.get('x5c');
 
   if (!x5c) {
-    throw new Error('No attestation certificate provided in attestation statement (FIDOU2F)');
+    throw new Error(
+      'No attestation certificate provided in attestation statement (FIDOU2F)',
+    );
   }
 
   if (!sig) {
-    throw new Error('No attestation signature provided in attestation statement (FIDOU2F)');
+    throw new Error(
+      'No attestation signature provided in attestation statement (FIDOU2F)',
+    );
   }
 
   // FIDO spec says that aaguid _must_ equal 0x00 here to be legit
@@ -53,7 +57,10 @@ export async function verifyAttestationFIDOU2F(
 
   try {
     // Try validating the certificate path using the root certificates set via SettingsService
-    await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
+    await validateCertificatePath(
+      x5c.map(convertCertBufferToPEM),
+      rootCertificates,
+    );
   } catch (err) {
     const _err = err as Error;
     throw new Error(`${_err.message} (FIDOU2F)`);

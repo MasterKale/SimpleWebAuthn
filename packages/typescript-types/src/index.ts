@@ -4,25 +4,45 @@
  */
 
 import type {
-  AuthenticatorAssertionResponse,
-  AuthenticatorAttestationResponse,
-  PublicKeyCredential,
-  PublicKeyCredentialDescriptor,
+  AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
+  AuthenticatorAssertionResponse,
+  AuthenticatorAttachment,
+  AuthenticatorAttestationResponse,
+  AuthenticatorSelectionCriteria,
+  COSEAlgorithmIdentifier,
+  PublicKeyCredential,
+  PublicKeyCredentialCreationOptions,
+  PublicKeyCredentialDescriptor,
+  PublicKeyCredentialParameters,
+  PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRpEntity,
   PublicKeyCredentialType,
-  PublicKeyCredentialParameters,
-  AuthenticatorSelectionCriteria,
-  AttestationConveyancePreference,
   UserVerificationRequirement,
-  AuthenticatorAttachment,
-  PublicKeyCredentialCreationOptions,
-  PublicKeyCredentialRequestOptions,
-  COSEAlgorithmIdentifier,
-} from './dom';
+} from './dom.ts';
 
-export * from './dom';
+export type {
+  AttestationConveyancePreference,
+  AuthenticationExtensionsClientInputs,
+  AuthenticationExtensionsClientOutputs,
+  AuthenticatorAssertionResponse,
+  AuthenticatorAttachment,
+  AuthenticatorAttestationResponse,
+  AuthenticatorSelectionCriteria,
+  AuthenticatorTransport,
+  COSEAlgorithmIdentifier,
+  Crypto,
+  PublicKeyCredential,
+  PublicKeyCredentialCreationOptions,
+  PublicKeyCredentialDescriptor,
+  PublicKeyCredentialParameters,
+  PublicKeyCredentialRequestOptions,
+  PublicKeyCredentialRpEntity,
+  PublicKeyCredentialType,
+  PublicKeyCredentialUserEntity,
+  UserVerificationRequirement,
+} from './dom.ts';
 
 /**
  * A variant of PublicKeyCredentialCreationOptions suitable for JSON transmission to the browser to
@@ -187,14 +207,13 @@ export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAtt
  * know about it (sometime after 4.6.3)
  */
 export type AuthenticatorTransportFuture =
-  'ble'
+  | 'ble'
   | 'cable'
   | 'hybrid'
   | 'internal'
   | 'nfc'
   | 'smart-card'
-  | 'usb'
-  ;
+  | 'usb';
 
 /**
  * A super class of TypeScript's `PublicKeyCredentialDescriptor` that knows about the latest
@@ -206,10 +225,10 @@ export interface PublicKeyCredentialDescriptorFuture
   transports?: AuthenticatorTransportFuture[];
 }
 
-/**
- *
- */
-export type PublicKeyCredentialJSON = RegistrationResponseJSON | AuthenticationResponseJSON;
+/** */
+export type PublicKeyCredentialJSON =
+  | RegistrationResponseJSON
+  | AuthenticationResponseJSON;
 
 /**
  * A super class of TypeScript's `PublicKeyCredential` that knows about upcoming WebAuthn features

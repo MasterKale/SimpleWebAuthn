@@ -1,12 +1,16 @@
-import { isoCBOR } from './iso';
+import { isoCBOR } from './iso/index.ts';
 
 /**
  * Convert an AttestationObject buffer to a proper object
  *
  * @param base64AttestationObject Attestation Object buffer
  */
-export function decodeAttestationObject(attestationObject: Uint8Array): AttestationObject {
-  return isoCBOR.decodeFirst<AttestationObject>(attestationObject);
+export function decodeAttestationObject(
+  attestationObject: Uint8Array,
+): AttestationObject {
+  return _decodeAttestationObjectInternals.stubThis(
+    isoCBOR.decodeFirst<AttestationObject>(attestationObject),
+  );
 }
 
 export type AttestationFormat =
@@ -38,4 +42,9 @@ export type AttestationStatement = {
   get(key: 'pubArea'): Uint8Array | undefined;
   // `Map` properties
   readonly size: number;
+};
+
+// Make it possible to stub the return value during testing
+export const _decodeAttestationObjectInternals = {
+  stubThis: (value: AttestationObject) => value,
 };

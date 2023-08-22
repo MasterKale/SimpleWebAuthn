@@ -57,7 +57,8 @@ export function identifyAuthenticationError({
     // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 1)
     // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 12)
     return new WebAuthnError({
-      message: 'The authenticator was unable to process the specified options, or could not create a new assertion signature',
+      message:
+        'The authenticator was unable to process the specified options, or could not create a new assertion signature',
       code: 'ERROR_AUTHENTICATOR_GENERAL_ERROR',
       cause: error,
     });

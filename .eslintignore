@@ -1,7 +1,0 @@
-node_modules/
-dist/
-coverage/
-*.test.ts
-*.config.js
-setupTests.ts
-tsconfig.json

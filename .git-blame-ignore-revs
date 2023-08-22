@@ -1,0 +1,15 @@
+######################
+# Deno formatting runs
+######################
+# "Use single-quotes and increase line width"
+a59634a1a9b0393622fb121fbe229132c01a2624
+# "Run `deno fmt` on everything"
+549e08dbed9736b63d827649aaf422958f989609
+# "Format browser"
+dfb32f4891f6c955c25b2f305fa702cdaf8c5a5e
+# "Format README.md"
+34a0c49714b2974e409495bd0dba59ccc7003ae1
+# "Run `deno fmt` on example project"
+872893e3c4930c293cd8b701395429e24088ce1e
+# "Run `ddi fmt` over src/"
+070f73b8de107111b4a34001254a981548f677f7

@@ -1,4 +1,4 @@
-import { COSEALG } from './cose';
+import { COSEALG } from './cose.ts';
 
 /**
  * Map X.509 signature algorithm OIDs to COSE algorithm IDs
@@ -6,7 +6,9 @@ import { COSEALG } from './cose';
  * - EC2 OIDs: https://oidref.com/1.2.840.10045.4.3
  * - RSA OIDs: https://oidref.com/1.2.840.113549.1.1
  */
-export function mapX509SignatureAlgToCOSEAlg(signatureAlgorithm: string): COSEALG {
+export function mapX509SignatureAlgToCOSEAlg(
+  signatureAlgorithm: string,
+): COSEALG {
   let alg: COSEALG;
 
   if (signatureAlgorithm === '1.2.840.10045.4.3.2') {

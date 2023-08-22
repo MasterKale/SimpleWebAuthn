@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { AsnSerializer } from '@peculiar/asn1-schema';
-
-import { isCertRevoked } from './isCertRevoked';
-import { verifySignature } from './verifySignature';
-import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
-import { getCertificateInfo } from './getCertificateInfo';
-import { convertPEMToBytes } from './convertPEMToBytes';
+import { AsnSerializer } from '../deps.ts';
+import { isCertRevoked } from './isCertRevoked.ts';
+import { verifySignature } from './verifySignature.ts';
+import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
+import { getCertificateInfo } from './getCertificateInfo.ts';
+import { convertPEMToBytes } from './convertPEMToBytes.ts';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -48,7 +46,9 @@ export async function validateCertificatePath(
   if (invalidSubjectAndIssuerError) {
     throw new InvalidSubjectAndIssuer();
   } else if (certificateNotYetValidOrExpiredErrorMessage) {
-    throw new CertificateNotYetValidOrExpired(certificateNotYetValidOrExpiredErrorMessage);
+    throw new CertificateNotYetValidOrExpired(
+      certificateNotYetValidOrExpiredErrorMessage,
+    );
   }
 
   return true;

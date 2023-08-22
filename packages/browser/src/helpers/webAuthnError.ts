@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 /**
  * A custom Error used to return a more nuanced error detailing _why_ one of the eight documented
  * errors in the spec was raised after calling `navigator.credentials.create()` or
@@ -25,24 +24,20 @@ export class WebAuthnError extends Error {
     cause,
     name,
   }: {
-    message: string,
-    code: WebAuthnErrorCode,
-    cause: Error,
-    name?: string,
+    message: string;
+    code: WebAuthnErrorCode;
+    cause: Error;
+    name?: string;
   }) {
-    /**
-     * `cause` is supported in evergreen browsers, but not IE10, so this ts-ignore is to
-     * help Rollup complete the ES5 build.
-     */
-    // @ts-ignore
-    super(message, { cause })
+    // @ts-ignore: help Rollup understand that `cause` is okay to set
+    super(message, { cause });
     this.name = name ?? cause.name;
     this.code = code;
   }
 }
 
 export type WebAuthnErrorCode =
-  'ERROR_CEREMONY_ABORTED'
+  | 'ERROR_CEREMONY_ABORTED'
   | 'ERROR_INVALID_DOMAIN'
   | 'ERROR_INVALID_RP_ID'
   | 'ERROR_INVALID_USER_ID_LENGTH'
@@ -52,5 +47,4 @@ export type WebAuthnErrorCode =
   | 'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT'
   | 'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED'
   | 'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG'
-  | 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY'
-  ;
+  | 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY';

@@ -1,5 +1,27 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "deno.path": "/opt/homebrew/bin/deno",
+  "deno.enablePaths": [
+    "./packages/server",
+    "./packages/typescript-types"
+  ],
+  "editor.rulers": [
+    100
+  ],
+  "editor.defaultFormatter": "denoland.vscode-deno",
+  // Required for formatOnSave to work, see https://github.com/denoland/vscode_deno/issues/789
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "gitlens.advanced.blame.customArguments": [
+    "--ignore-revs-file",
+    ".git-blame-ignore-revs"
+  ]
 }

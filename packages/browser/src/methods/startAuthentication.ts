@@ -1,7 +1,7 @@
 import {
-  PublicKeyCredentialRequestOptionsJSON,
   AuthenticationCredential,
   AuthenticationResponseJSON,
+  PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/typescript-types';
 
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
@@ -33,7 +33,9 @@ export async function startAuthentication(
   // of public key
   let allowCredentials;
   if (requestOptionsJSON.allowCredentials?.length !== 0) {
-    allowCredentials = requestOptionsJSON.allowCredentials?.map(toPublicKeyCredentialDescriptor);
+    allowCredentials = requestOptionsJSON.allowCredentials?.map(
+      toPublicKeyCredentialDescriptor,
+    );
   }
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
@@ -56,11 +58,15 @@ export async function startAuthentication(
     }
 
     // Check for an <input> with "webauthn" in its `autocomplete` attribute
-    const eligibleInputs = document.querySelectorAll("input[autocomplete*='webauthn']");
+    const eligibleInputs = document.querySelectorAll(
+      'input[autocomplete*=\'webauthn\']',
+    );
 
     // WebAuthn autofill requires at least one valid input
     if (eligibleInputs.length < 1) {
-      throw Error('No <input> with `"webauthn"` in its `autocomplete` attribute was detected');
+      throw Error(
+        'No <input> with `"webauthn"` in its `autocomplete` attribute was detected',
+      );
     }
 
     // `CredentialMediationRequirement` doesn't know about "conditional" yet as of
@@ -106,6 +112,8 @@ export async function startAuthentication(
     },
     type,
     clientExtensionResults: credential.getClientExtensionResults(),
-    authenticatorAttachment: toAuthenticatorAttachment(credential.authenticatorAttachment),
+    authenticatorAttachment: toAuthenticatorAttachment(
+      credential.authenticatorAttachment,
+    ),
   };
 }

@@ -1,13 +1,13 @@
-import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse';
+import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 
-import { isCOSEAlg } from '../../helpers/cose';
-import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM';
-import { validateCertificatePath } from '../../helpers/validateCertificatePath';
-import { getCertificateInfo } from '../../helpers/getCertificateInfo';
-import { verifySignature } from '../../helpers/verifySignature';
-import { isoUint8Array } from '../../helpers/iso';
-import { MetadataService } from '../../services/metadataService';
-import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata';
+import { isCOSEAlg } from '../../helpers/cose.ts';
+import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
+import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
+import { getCertificateInfo } from '../../helpers/getCertificateInfo.ts';
+import { verifySignature } from '../../helpers/verifySignature.ts';
+import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { MetadataService } from '../../services/metadataService.ts';
+import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata.ts';
 
 /**
  * Verify an attestation response with fmt 'packed'
@@ -15,15 +15,23 @@ import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationW
 export async function verifyAttestationPacked(
   options: AttestationFormatVerifierOpts,
 ): Promise<boolean> {
-  const { attStmt, clientDataHash, authData, credentialPublicKey, aaguid, rootCertificates } =
-    options;
+  const {
+    attStmt,
+    clientDataHash,
+    authData,
+    credentialPublicKey,
+    aaguid,
+    rootCertificates,
+  } = options;
 
   const sig = attStmt.get('sig');
   const x5c = attStmt.get('x5c');
   const alg = attStmt.get('alg');
 
   if (!sig) {
-    throw new Error('No attestation signature provided in attestation statement (Packed)');
+    throw new Error(
+      'No attestation signature provided in attestation statement (Packed)',
+    );
   }
 
   if (!alg) {
@@ -31,7 +39,9 @@ export async function verifyAttestationPacked(
   }
 
   if (!isCOSEAlg(alg)) {
-    throw new Error(`Attestation statement contained invalid alg ${alg} (Packed)`);
+    throw new Error(
+      `Attestation statement contained invalid alg ${alg} (Packed)`,
+    );
   }
 
   const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
@@ -46,7 +56,9 @@ export async function verifyAttestationPacked(
     const { OU, CN, O, C } = subject;
 
     if (OU !== 'Authenticator Attestation') {
-      throw new Error('Certificate OU was not "Authenticator Attestation" (Packed|Full)');
+      throw new Error(
+        'Certificate OU was not "Authenticator Attestation" (Packed|Full)',
+      );
     }
 
     if (!CN) {
@@ -58,25 +70,35 @@ export async function verifyAttestationPacked(
     }
 
     if (!C || C.length !== 2) {
-      throw new Error('Certificate C was not two-character ISO 3166 code (Packed|Full)');
+      throw new Error(
+        'Certificate C was not two-character ISO 3166 code (Packed|Full)',
+      );
     }
 
     if (basicConstraintsCA) {
-      throw new Error('Certificate basic constraints CA was not `false` (Packed|Full)');
+      throw new Error(
+        'Certificate basic constraints CA was not `false` (Packed|Full)',
+      );
     }
 
     if (version !== 2) {
-      throw new Error('Certificate version was not `3` (ASN.1 value of 2) (Packed|Full)');
+      throw new Error(
+        'Certificate version was not `3` (ASN.1 value of 2) (Packed|Full)',
+      );
     }
 
     let now = new Date();
     if (notBefore > now) {
-      throw new Error(`Certificate not good before "${notBefore.toString()}" (Packed|Full)`);
+      throw new Error(
+        `Certificate not good before "${notBefore.toString()}" (Packed|Full)`,
+      );
     }
 
     now = new Date();
     if (notAfter < now) {
-      throw new Error(`Certificate not good after "${notAfter.toString()}" (Packed|Full)`);
+      throw new Error(
+        `Certificate not good after "${notAfter.toString()}" (Packed|Full)`,
+      );
     }
 
     // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
@@ -88,7 +110,9 @@ export async function verifyAttestationPacked(
       // The presence of x5c means this is a full attestation. Check to see if attestationTypes
       // includes packed attestations.
       if (statement.attestationTypes.indexOf('basic_full') < 0) {
-        throw new Error('Metadata does not indicate support for full attestations (Packed|Full)');
+        throw new Error(
+          'Metadata does not indicate support for full attestations (Packed|Full)',
+        );
       }
 
       try {
@@ -105,7 +129,10 @@ export async function verifyAttestationPacked(
     } else {
       try {
         // Try validating the certificate path using the root certificates set via SettingsService
-        await validateCertificatePath(x5c.map(convertCertBufferToPEM), rootCertificates);
+        await validateCertificatePath(
+          x5c.map(convertCertBufferToPEM),
+          rootCertificates,
+        );
       } catch (err) {
         const _err = err as Error;
         throw new Error(`${_err.message} (Packed|Full)`);

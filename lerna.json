@@ -1,18 +1,19 @@
 {
-  "version": "7.4.0",
-  "npmClient": "npm",
-  "useNx": true,
+  "version": "8.0.0-alpha.0",
+  "npmClient": "pnpm",
   "command": {
     "publish": {
       "ignoreChanges": [
         "*.config.js",
-        ".eslintrc.js",
-        ".prettierignore",
-        ".gitignore",
-        ".eslintignore"
+        ".gitignore"
       ],
       "message": "chore(release): publish %s"
     }
   },
-  "packages": ["packages/*"]
+  "packages": [
+    "packages/browser",
+    "packages/server",
+    "packages/typescript-types"
+  ],
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }

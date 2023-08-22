@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import * as cborx from 'cbor-x';
+import { cborx } from '../../deps.ts';
 
 /**
  * This encoder should keep CBOR data the same length when data is re-encoded
@@ -11,7 +10,10 @@ import * as cborx from 'cbor-x';
  * So long as these requirements are maintained, then CBOR sequences can be encoded and decoded
  * freely while maintaining their lengths for the most accurate pointer movement across them.
  */
-const encoder = new cborx.Encoder({ mapsAsObjects: false, tagUint8Array: false });
+const encoder = new cborx.Encoder({
+  mapsAsObjects: false,
+  tagUint8Array: false,
+});
 
 /**
  * Decode and return the first item in a sequence of CBOR-encoded values
@@ -21,7 +23,9 @@ const encoder = new cborx.Encoder({ mapsAsObjects: false, tagUint8Array: false }
  * `false`
  */
 export function decodeFirst<Type>(input: Uint8Array): Type {
-  const decoded = encoder.decodeMultiple(input) as undefined | Type[];
+  // Make a copy so we don't mutate the original
+  const _input = new Uint8Array(input);
+  const decoded = encoder.decodeMultiple(_input) as undefined | Type[];
 
   if (decoded === undefined) {
     throw new Error('CBOR input data was empty');
@@ -41,6 +45,6 @@ export function decodeFirst<Type>(input: Uint8Array): Type {
 /**
  * Encode data to CBOR
  */
-export function encode(input: any): Uint8Array {
+export function encode(input: unknown): Uint8Array {
   return encoder.encode(input);
 }

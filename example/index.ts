@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /**
  * An example Express server showing off a simple integration of @simplewebauthn/server.
  *
@@ -17,27 +16,27 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import {
-  // Registration
-  generateRegistrationOptions,
-  verifyRegistrationResponse,
   // Authentication
   generateAuthenticationOptions,
+  // Registration
+  generateRegistrationOptions,
   verifyAuthenticationResponse,
+  verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
 import type {
-  GenerateRegistrationOptionsOpts,
   GenerateAuthenticationOptionsOpts,
-  VerifyRegistrationResponseOpts,
-  VerifyAuthenticationResponseOpts,
-  VerifiedRegistrationResponse,
+  GenerateRegistrationOptionsOpts,
   VerifiedAuthenticationResponse,
+  VerifiedRegistrationResponse,
+  VerifyAuthenticationResponseOpts,
+  VerifyRegistrationResponseOpts,
 } from '@simplewebauthn/server';
 
 import type {
-  RegistrationResponseJSON,
   AuthenticationResponseJSON,
   AuthenticatorDevice,
+  RegistrationResponseJSON,
 } from '@simplewebauthn/typescript-types';
 
 import { LoggedInUser } from './example-server';
@@ -75,9 +74,11 @@ app.use(
  * interact with the Rely Party (a.k.a. "RP", a.k.a. "this server").
  */
 if (ENABLE_CONFORMANCE === 'true') {
-  import('./fido-conformance').then(({ fidoRouteSuffix, fidoConformanceRouter }) => {
-    app.use(fidoRouteSuffix, fidoConformanceRouter);
-  });
+  import('./fido-conformance').then(
+    ({ fidoRouteSuffix, fidoConformanceRouter }) => {
+      app.use(fidoRouteSuffix, fidoConformanceRouter);
+    },
+  );
 }
 
 /**
@@ -135,7 +136,7 @@ app.get('/generate-registration-options', (req, res) => {
      * the browser if it's asked to perform registration when one of these ID's already resides
      * on it.
      */
-    excludeCredentials: devices.map(dev => ({
+    excludeCredentials: devices.map((dev) => ({
       id: dev.credentialID,
       type: 'public-key',
       transports: dev.transports,
@@ -188,7 +189,9 @@ app.post('/verify-registration', async (req, res) => {
   if (verified && registrationInfo) {
     const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-    const existingDevice = user.devices.find(device => isoUint8Array.areEqual(device.credentialID, credentialID));
+    const existingDevice = user.devices.find((device) =>
+      isoUint8Array.areEqual(device.credentialID, credentialID)
+    );
 
     if (!existingDevice) {
       /**
@@ -218,7 +221,7 @@ app.get('/generate-authentication-options', (req, res) => {
 
   const opts: GenerateAuthenticationOptionsOpts = {
     timeout: 60000,
-    allowCredentials: user.devices.map(dev => ({
+    allowCredentials: user.devices.map((dev) => ({
       id: dev.credentialID,
       type: 'public-key',
       transports: dev.transports,
@@ -256,7 +259,9 @@ app.post('/verify-authentication', async (req, res) => {
   }
 
   if (!dbAuthenticator) {
-    return res.status(400).send({ error: 'Authenticator is not registered with this site' });
+    return res.status(400).send({
+      error: 'Authenticator is not registered with this site',
+    });
   }
 
   let verification: VerifiedAuthenticationResponse;

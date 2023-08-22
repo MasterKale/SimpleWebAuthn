@@ -1,11 +1,12 @@
-import type { Base64URLString } from '@simplewebauthn/typescript-types';
-
-import { isoBase64URL } from './iso';
+import type { Base64URLString } from '../deps.ts';
+import { isoBase64URL } from './iso/index.ts';
 
 /**
  * Convert buffer to an OpenSSL-compatible PEM text format.
  */
-export function convertCertBufferToPEM(certBuffer: Uint8Array | Base64URLString): string {
+export function convertCertBufferToPEM(
+  certBuffer: Uint8Array | Base64URLString,
+): string {
   let b64cert: string;
 
   /**

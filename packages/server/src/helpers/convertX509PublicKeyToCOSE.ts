@@ -1,19 +1,25 @@
-import { AsnParser } from '@peculiar/asn1-schema';
-import { Certificate } from '@peculiar/asn1-x509';
-import { ECParameters, id_ecPublicKey, id_secp256r1, id_secp384r1 } from '@peculiar/asn1-ecc';
-import { RSAPublicKey } from '@peculiar/asn1-rsa';
-
 import {
-  COSEPublicKey,
-  COSEKTY,
+  AsnParser,
+  Certificate,
+  ECParameters,
+  id_ecPublicKey,
+  id_secp256r1,
+  id_secp384r1,
+  RSAPublicKey,
+} from '../deps.ts';
+import {
   COSECRV,
   COSEKEYS,
+  COSEKTY,
+  COSEPublicKey,
   COSEPublicKeyEC2,
   COSEPublicKeyRSA,
-} from './cose';
-import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg';
+} from './cose.ts';
+import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 
-export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPublicKey {
+export function convertX509PublicKeyToCOSE(
+  x509Certificate: Uint8Array,
+): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();
 
   /**
@@ -48,10 +54,14 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
     } else if (namedCurve === id_secp384r1) {
       crv = COSECRV.P384;
     } else {
-      throw new Error(`Certificate public key contained unexpected namedCurve ${namedCurve} (EC2)`);
+      throw new Error(
+        `Certificate public key contained unexpected namedCurve ${namedCurve} (EC2)`,
+      );
     }
 
-    const subjectPublicKey = new Uint8Array(subjectPublicKeyInfo.subjectPublicKey);
+    const subjectPublicKey = new Uint8Array(
+      subjectPublicKeyInfo.subjectPublicKey,
+    );
 
     let x: Uint8Array;
     let y: Uint8Array;
@@ -59,15 +69,20 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
       // Public key is in "uncompressed form", so we can split the remaining bytes in half
       let pointer = 1;
       const halfLength = (subjectPublicKey.length - 1) / 2;
-      x = subjectPublicKey.slice(pointer, (pointer += halfLength));
+      x = subjectPublicKey.slice(pointer, pointer += halfLength);
       y = subjectPublicKey.slice(pointer);
     } else {
-      throw new Error('TODO: Figure out how to handle public keys in "compressed form"');
+      throw new Error(
+        'TODO: Figure out how to handle public keys in "compressed form"',
+      );
     }
 
     const coseEC2PubKey: COSEPublicKeyEC2 = new Map();
     coseEC2PubKey.set(COSEKEYS.kty, COSEKTY.EC2);
-    coseEC2PubKey.set(COSEKEYS.alg, mapX509SignatureAlgToCOSEAlg(signatureAlgorithm));
+    coseEC2PubKey.set(
+      COSEKEYS.alg,
+      mapX509SignatureAlgToCOSEAlg(signatureAlgorithm),
+    );
     coseEC2PubKey.set(COSEKEYS.crv, crv);
     coseEC2PubKey.set(COSEKEYS.x, x);
     coseEC2PubKey.set(COSEKEYS.y, y);
@@ -77,11 +92,17 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
     /**
      * RSA public key
      */
-    const rsaPublicKey = AsnParser.parse(subjectPublicKeyInfo.subjectPublicKey, RSAPublicKey);
+    const rsaPublicKey = AsnParser.parse(
+      subjectPublicKeyInfo.subjectPublicKey,
+      RSAPublicKey,
+    );
 
     const coseRSAPubKey: COSEPublicKeyRSA = new Map();
     coseRSAPubKey.set(COSEKEYS.kty, COSEKTY.RSA);
-    coseRSAPubKey.set(COSEKEYS.alg, mapX509SignatureAlgToCOSEAlg(signatureAlgorithm));
+    coseRSAPubKey.set(
+      COSEKEYS.alg,
+      mapX509SignatureAlgToCOSEAlg(signatureAlgorithm),
+    );
     coseRSAPubKey.set(COSEKEYS.n, new Uint8Array(rsaPublicKey.modulus));
     coseRSAPubKey.set(COSEKEYS.e, new Uint8Array(rsaPublicKey.publicExponent));
 

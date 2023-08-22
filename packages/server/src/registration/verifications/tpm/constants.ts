@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+// deno-lint-ignore-file no-dupe-keys
 /**
  * A whole lotta domain knowledge is captured here, with hazy connections to source
  * documents. Good places to start searching for more info on these values are the

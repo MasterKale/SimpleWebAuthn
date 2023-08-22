@@ -1,9 +1,8 @@
-import WebCrypto from '@simplewebauthn/iso-webcrypto';
-
-import { COSEPublicKeyOKP, COSEKEYS, isCOSEAlg, COSECRV } from '../../cose';
-import { isoBase64URL } from '../../index';
-import { SubtleCryptoCrv } from './structs';
-import { importKey } from './importKey';
+import { COSECRV, COSEKEYS, COSEPublicKeyOKP, isCOSEAlg } from '../../cose.ts';
+import { isoBase64URL } from '../../index.ts';
+import { SubtleCryptoCrv } from './structs.ts';
+import { importKey } from './importKey.ts';
+import { getWebCrypto } from './getWebCrypto.ts';
 
 export async function verifyOKP(opts: {
   cosePublicKey: COSEPublicKeyOKP;
@@ -11,6 +10,8 @@ export async function verifyOKP(opts: {
   data: Uint8Array;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data } = opts;
+
+  const WebCrypto = await getWebCrypto();
 
   const alg = cosePublicKey.get(COSEKEYS.alg);
   const crv = cosePublicKey.get(COSEKEYS.crv);

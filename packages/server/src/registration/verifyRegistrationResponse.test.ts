@@ -1,47 +1,40 @@
-import { RegistrationResponseJSON } from '@simplewebauthn/typescript-types';
+import {
+  assert,
+  assertEquals,
+  assertFalse,
+  assertRejects,
+} from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts';
 
-import { verifyRegistrationResponse } from './verifyRegistrationResponse';
-
-import * as esmDecodeAttestationObject from '../helpers/decodeAttestationObject';
-import * as esmDecodeClientDataJSON from '../helpers/decodeClientDataJSON';
-import * as esmParseAuthenticatorData from '../helpers/parseAuthenticatorData';
-import * as esmDecodeCredentialPublicKey from '../helpers/decodeCredentialPublicKey';
-import { toHash } from '../helpers/toHash';
-import { isoBase64URL, isoUint8Array } from '../helpers/iso';
-import { COSEPublicKey, COSEKEYS } from '../helpers/cose';
-import { SettingsService } from '../services/settingsService';
-
-import * as esmVerifyAttestationFIDOU2F from './verifications/verifyAttestationFIDOU2F';
+import { RegistrationResponseJSON } from '../deps.ts';
+import { verifyRegistrationResponse } from './verifyRegistrationResponse.ts';
+import {
+  _decodeAttestationObjectInternals,
+  decodeAttestationObject,
+} from '../helpers/decodeAttestationObject.ts';
+import { _decodeClientDataJSONInternals } from '../helpers/decodeClientDataJSON.ts';
+import {
+  _parseAuthenticatorDataInternals,
+  parseAuthenticatorData,
+} from '../helpers/parseAuthenticatorData.ts';
+import { _decodeCredentialPublicKeyInternals } from '../helpers/decodeCredentialPublicKey.ts';
+import { _verifySignatureInternals } from '../helpers/verifySignature.ts';
+import { toHash } from '../helpers/toHash.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+import { COSEKEYS } from '../helpers/cose.ts';
+import { SettingsService } from '../services/settingsService.ts';
+import { assertObjectMatch } from 'https://deno.land/std@0.198.0/assert/assert_object_match.ts';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
  * and have cert paths that can't be validated with known root certs from Google
  */
-SettingsService.setRootCertificates({ identifier: 'android-key', certificates: [] });
-
-let mockDecodeAttestation: jest.SpyInstance<esmDecodeAttestationObject.AttestationObject>;
-let mockDecodeClientData: jest.SpyInstance;
-let mockParseAuthData: jest.SpyInstance;
-let mockDecodePubKey: jest.SpyInstance<COSEPublicKey>;
-let mockVerifyFIDOU2F: jest.SpyInstance;
-
-beforeEach(() => {
-  mockDecodeAttestation = jest.spyOn(esmDecodeAttestationObject, 'decodeAttestationObject');
-  mockDecodeClientData = jest.spyOn(esmDecodeClientDataJSON, 'decodeClientDataJSON');
-  mockParseAuthData = jest.spyOn(esmParseAuthenticatorData, 'parseAuthenticatorData');
-  mockDecodePubKey = jest.spyOn(esmDecodeCredentialPublicKey, 'decodeCredentialPublicKey');
-  mockVerifyFIDOU2F = jest.spyOn(esmVerifyAttestationFIDOU2F, 'verifyAttestationFIDOU2F');
+SettingsService.setRootCertificates({
+  identifier: 'android-key',
+  certificates: [],
 });
 
-afterEach(() => {
-  mockDecodeAttestation.mockRestore();
-  mockDecodeClientData.mockRestore();
-  mockParseAuthData.mockRestore();
-  mockDecodePubKey.mockRestore();
-  mockVerifyFIDOU2F.mockRestore();
-});
-
-test('should verify FIDO U2F attestation', async () => {
+Deno.test('should verify FIDO U2F attestation', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationFIDOU2F,
     expectedChallenge: attestationFIDOU2FChallenge,
@@ -50,30 +43,33 @@ test('should verify FIDO U2F attestation', async () => {
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('fido-u2f');
-  expect(verification.registrationInfo?.counter).toEqual(0);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'fido-u2f');
+  assertEquals(verification.registrationInfo?.counter, 0);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
-    isoBase64URL.toBuffer(
-      'VHzbxaYaJu2P8m1Y2iHn2gRNHrgK0iYbn9E978L3Qi7Q-chFeicIHwYCRophz5lth2nCgEVKcgWirxlgidgbUQ',
-    ),
+  assertEquals(
+    verification.registrationInfo?.aaguid,
+    '00000000-0000-0000-0000-000000000000',
   );
-  expect(verification.registrationInfo?.aaguid).toEqual('00000000-0000-0000-0000-000000000000');
-  expect(verification.registrationInfo?.credentialType).toEqual('public-key');
-  expect(verification.registrationInfo?.userVerified).toEqual(false);
-  expect(verification.registrationInfo?.attestationObject).toEqual(
+  assertEquals(verification.registrationInfo?.credentialType, 'public-key');
+  assertEquals(verification.registrationInfo?.userVerified, false);
+  assertEquals(
+    verification.registrationInfo?.attestationObject,
     isoBase64URL.toBuffer(attestationFIDOU2F.response.attestationObject),
   );
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
-  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
+  assertEquals(
+    verification.registrationInfo?.origin,
+    'https://dev.dontneeda.pw',
+  );
+  assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
 });
 
-test('should verify Packed (EC2) attestation', async () => {
+Deno.test('should verify Packed (EC2) attestation', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationPacked,
     expectedChallenge: attestationPackedChallenge,
@@ -81,15 +77,17 @@ test('should verify Packed (EC2) attestation', async () => {
     expectedRPID: 'dev.dontneeda.pw',
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('packed');
-  expect(verification.registrationInfo?.counter).toEqual(1589874425);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'packed');
+  assertEquals(verification.registrationInfo?.counter, 1589874425);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIEoxVVqK-oIGmqoDEyO4KjmMx5R2HeMM4LQQXh8sE01PIlggtzuuoMN5fWnAIuuXdlfshOGu1k3ApBUtDJ8eKiuo_6c',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
+  assertEquals(
+    verification.registrationInfo?.credentialID,
     isoBase64URL.toBuffer(
       'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
         'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
@@ -97,7 +95,7 @@ test('should verify Packed (EC2) attestation', async () => {
   );
 });
 
-test('should verify Packed (X5C) attestation', async () => {
+Deno.test('should verify Packed (X5C) attestation', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationPackedX5C,
     expectedChallenge: attestationPackedX5CChallenge,
@@ -106,22 +104,24 @@ test('should verify Packed (X5C) attestation', async () => {
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('packed');
-  expect(verification.registrationInfo?.counter).toEqual(28);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'packed');
+  assertEquals(verification.registrationInfo?.counter, 28);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIGwlsYCNyRb4AD9cyTw6cH5VS-uzflmmO1UldGGe9eIaIlggvadzKD8p6wKLjgYfxRxldjCMGRV0YyM13osWbKIPrF8',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
+  assertEquals(
+    verification.registrationInfo?.credentialID,
     isoBase64URL.toBuffer(
       '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
     ),
   );
 });
 
-test('should verify None attestation', async () => {
+Deno.test('should verify None attestation', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
@@ -129,23 +129,28 @@ test('should verify None attestation', async () => {
     expectedRPID: 'dev.dontneeda.pw',
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('none');
-  expect(verification.registrationInfo?.counter).toEqual(0);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'none');
+  assertEquals(verification.registrationInfo?.counter, 0);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
+  assertEquals(
+    verification.registrationInfo?.credentialID,
     isoBase64URL.toBuffer(
       'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
     ),
   );
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
+  assertEquals(
+    verification.registrationInfo?.origin,
+    'https://dev.dontneeda.pw',
+  );
 });
 
-test('should verify None attestation w/RSA public key', async () => {
+Deno.test('should verify None attestation w/RSA public key', async () => {
   const expectedChallenge = 'pYZ3VX2yb8dS9yplNxJChiXhPGBk8gZzTAyJ2iU5x1k';
   const verification = await verifyRegistrationResponse({
     response: {
@@ -166,194 +171,299 @@ test('should verify None attestation w/RSA public key', async () => {
     expectedRPID: 'dev.dontneeda.pw',
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('none');
-  expect(verification.registrationInfo?.counter).toEqual(0);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'none');
+  assertEquals(verification.registrationInfo?.counter, 0);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQDxfpXrj0ba_AH30JJ_-W7BHSOPugOD8aEDdNBKc1gjB9AmV3FPl2aL0fwiOMKtM_byI24qXb2FzcyjC7HUVkHRtzkAQnahXckI4wY_01koaY6iwXuIE3Ya0Zjs2iZyz6u4G_abGnWdObqa_kHxc3CHR7Xy5MDkAkKyX6TqU0tgHZcEhDd_Lb5ONJDwg4wvKlZBtZYElfMuZ6lonoRZ7qR_81rGkDZyFaxp6RlyvzEbo4ijeIaHQylqCz-oFm03ifZMOfRHYuF4uTjJDRH-g4BW1f3rdi7DTHk1hJnIw1IyL_VFIQ9NifkAguYjNCySCUNpYli2eMrPhAu5dYJFFjINIUMBAAE',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
+  assertEquals(
+    verification.registrationInfo?.credentialID,
     isoBase64URL.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
   );
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
-  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
+  assertEquals(
+    verification.registrationInfo?.origin,
+    'https://dev.dontneeda.pw',
+  );
+  assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
 });
 
-test('should throw when response challenge is not expected value', async () => {
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: 'shouldhavebeenthisvalue',
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/registration response challenge/i);
+Deno.test('should throw when response challenge is not expected value', async () => {
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: 'shouldhavebeenthisvalue',
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'registration response challenge',
+  );
 });
 
-test('should throw when response origin is not expected value', async () => {
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://different.address',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/registration response origin/i);
+Deno.test('should throw when response origin is not expected value', async () => {
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://different.address',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'registration response origin',
+  );
 });
 
-test('should throw when attestation type is not webauthn.create', async () => {
+Deno.test('should throw when attestation type is not webauthn.create', async () => {
   const origin = 'https://dev.dontneeda.pw';
   const challenge = attestationNoneChallenge;
 
-  // @ts-ignore 2345
-  mockDecodeClientData.mockReturnValue({
-    origin,
-    type: 'webauthn.badtype',
-    challenge: attestationNoneChallenge,
-  });
+  const mockDecodeClientData = stub(
+    _decodeClientDataJSONInternals,
+    'stubThis',
+    returnsNext([
+      {
+        origin,
+        type: 'webauthn.badtype',
+        challenge: attestationNoneChallenge,
+      },
+    ]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: challenge,
-      expectedOrigin: origin,
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/registration response type/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: challenge,
+        expectedOrigin: origin,
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'registration response type',
+  );
+
+  mockDecodeClientData.restore();
 });
 
-test('should throw if an unexpected attestation format is specified', async () => {
-  const realAtteObj = esmDecodeAttestationObject.decodeAttestationObject(
+Deno.test('should throw if an unexpected attestation format is specified', async () => {
+  const realAtteObj = decodeAttestationObject(
     isoBase64URL.toBuffer(attestationNone.response.attestationObject),
   );
   // Mangle the fmt
   (realAtteObj as Map<unknown, unknown>).set('fmt', 'fizzbuzz');
 
-  mockDecodeAttestation.mockReturnValue(realAtteObj);
+  const mockDecodeAttestation = stub(
+    _decodeAttestationObjectInternals,
+    'stubThis',
+    returnsNext([realAtteObj]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/unsupported attestation format/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'Unsupported Attestation Format',
+  );
+
+  mockDecodeAttestation.restore();
 });
 
-test('should throw error if assertion RP ID is unexpected value', async () => {
-  const authData = esmDecodeAttestationObject
-    .decodeAttestationObject(isoBase64URL.toBuffer(attestationNone.response.attestationObject))
-    .get('authData');
-  const actualAuthData = esmParseAuthenticatorData.parseAuthenticatorData(authData);
+Deno.test('should throw error if assertion RP ID is unexpected value', async () => {
+  const authData = decodeAttestationObject(
+    isoBase64URL.toBuffer(attestationNone.response.attestationObject),
+  ).get('authData');
+  const actualAuthData = parseAuthenticatorData(authData);
 
-  mockParseAuthData.mockReturnValue({
-    ...actualAuthData,
-    rpIdHash: await toHash(Buffer.from('bad.url', 'ascii')),
-  });
+  const mockParseAuthData = stub(
+    _parseAuthenticatorDataInternals,
+    'stubThis',
+    returnsNext([
+      {
+        ...actualAuthData,
+        rpIdHash: await toHash(isoUint8Array.fromASCIIString('bad.url')),
+      },
+    ]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/rp id/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'RP ID',
+  );
+
+  mockParseAuthData.restore();
 });
 
-test('should throw error if user was not present', async () => {
-  mockParseAuthData.mockReturnValue({
-    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
-    flags: {
-      up: false,
-    },
-  });
+Deno.test('should throw error if user was not present', async () => {
+  const mockParseAuthData = stub(
+    _parseAuthenticatorDataInternals,
+    'stubThis',
+    // @ts-ignore: Only return the values that matter
+    returnsNext([
+      {
+        rpIdHash: await toHash(
+          isoUint8Array.fromASCIIString('dev.dontneeda.pw'),
+        ),
+        flags: {
+          up: false,
+        },
+      },
+    ]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/not present/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'not present',
+  );
+
+  mockParseAuthData.restore();
 });
 
-test('should throw if the authenticator does not give back credential ID', async () => {
-  mockParseAuthData.mockReturnValue({
-    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
-    flags: {
-      up: true,
-    },
-    credentialID: undefined,
-  });
+Deno.test('should throw if the authenticator does not give back credential ID', async () => {
+  const mockParseAuthData = stub(
+    _parseAuthenticatorDataInternals,
+    'stubThis',
+    // @ts-ignore: Only return the values that matter
+    returnsNext([
+      {
+        rpIdHash: await toHash(
+          isoUint8Array.fromASCIIString('dev.dontneeda.pw'),
+        ),
+        flags: {
+          up: true,
+        },
+        credentialID: undefined,
+      },
+    ]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-      requireUserVerification: false,
-    }),
-  ).rejects.toThrow(/credential id/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+        requireUserVerification: false,
+      }),
+    Error,
+    'credential ID',
+  );
+
+  mockParseAuthData.restore();
 });
 
-test('should throw if the authenticator does not give back credential public key', async () => {
-  mockParseAuthData.mockReturnValue({
-    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
-    flags: {
-      up: true,
-    },
-    credentialID: 'aaa',
-    credentialPublicKey: undefined,
-  });
+Deno.test('should throw if the authenticator does not give back credential public key', async () => {
+  const mockParseAuthData = stub(
+    _parseAuthenticatorDataInternals,
+    'stubThis',
+    // @ts-ignore: Only return the values that matter
+    returnsNext([
+      {
+        rpIdHash: await toHash(
+          isoUint8Array.fromASCIIString('dev.dontneeda.pw'),
+        ),
+        flags: {
+          up: true,
+        },
+        credentialID: 'aaa',
+        credentialPublicKey: undefined,
+      },
+    ]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-      requireUserVerification: false,
-    }),
-  ).rejects.toThrow(/public key/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+        requireUserVerification: false,
+      }),
+    Error,
+    'public key',
+  );
+
+  mockParseAuthData.restore();
 });
 
-test('should throw error if no alg is specified in public key', async () => {
+Deno.test('should throw error if no alg is specified in public key', async () => {
   const pubKey = new Map();
-  mockDecodePubKey.mockReturnValue(pubKey);
+  const mockDecodePubKey = stub(
+    _decodeCredentialPublicKeyInternals,
+    'stubThis',
+    returnsNext([pubKey]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/missing numeric alg/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'missing numeric alg',
+  );
+
+  mockDecodePubKey.restore();
 });
 
-test('should throw error if unsupported alg is used', async () => {
+Deno.test('should throw error if unsupported alg is used', async () => {
   const pubKey = new Map();
   pubKey.set(COSEKEYS.alg, -999);
-  mockDecodePubKey.mockReturnValue(pubKey);
+  const mockDecodePubKey = stub(
+    _decodeCredentialPublicKeyInternals,
+    'stubThis',
+    returnsNext([pubKey]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/unexpected public key/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'Unexpected public key',
+  );
+
+  mockDecodePubKey.restore();
 });
 
-test('should not include authenticator info if not verified', async () => {
-  mockVerifyFIDOU2F.mockReturnValue(false);
+Deno.test('should not include authenticator info if not verified', async () => {
+  const mockVerifySignature = stub(
+    _verifySignatureInternals,
+    'stubThis',
+    returnsNext([new Promise((resolve) => resolve(false))]),
+  );
 
   const verification = await verifyRegistrationResponse({
     response: attestationFIDOU2F,
@@ -363,31 +473,43 @@ test('should not include authenticator info if not verified', async () => {
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toBe(false);
-  expect(verification.registrationInfo).toBeUndefined();
+  assertFalse(verification.verified);
+  assertEquals(verification.registrationInfo, undefined);
+
+  mockVerifySignature.restore();
 });
 
-test('should throw an error if user verification is required but user was not verified', async () => {
-  mockParseAuthData.mockReturnValue({
-    rpIdHash: await toHash(Buffer.from('dev.dontneeda.pw', 'ascii')),
-    flags: {
-      up: true,
-      uv: false,
-    },
-  });
+Deno.test('should throw an error if user verification is required but user was not verified', async () => {
+  const mockParseAuthData = stub(
+    _parseAuthenticatorDataInternals,
+    'stubThis',
+    // @ts-ignore: Only return the values that matter
+    returnsNext([{
+      rpIdHash: await toHash(isoUint8Array.fromASCIIString('dev.dontneeda.pw')),
+      flags: {
+        up: true,
+        uv: false,
+      },
+    }]),
+  );
 
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationFIDOU2F,
-      expectedChallenge: attestationFIDOU2FChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-      requireUserVerification: true,
-    }),
-  ).rejects.toThrow(/user could not be verified/i);
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationFIDOU2F,
+        expectedChallenge: attestationFIDOU2FChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+        requireUserVerification: true,
+      }),
+    Error,
+    'user could not be verified',
+  );
+
+  mockParseAuthData.restore();
 });
 
-test('should validate TPM RSA response (SHA256)', async () => {
+Deno.test('should validate TPM RSA response (SHA256)', async () => {
   const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
   const verification = await verifyRegistrationResponse({
     response: {
@@ -409,22 +531,27 @@ test('should validate TPM RSA response (SHA256)', async () => {
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('tpm');
-  expect(verification.registrationInfo?.counter).toEqual(30);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'tpm');
+  assertEquals(verification.registrationInfo?.counter, 30);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQCtxzw59Wsl8xWP97wPTu2TSDlushwshL8GedHAHO1R62m3nNy21hCLJlQabfLepRUQ_v9mq3PCmV81tBSqtRGU5_YlK0R2yeu756SnT39c6hKC3PBPt_xdjL_ccz4H_73DunfB63QZOtdeAsswV7WPLqMARofuM-LQ_LHnNguCypDcxhADuUqQtogfwZsknTVIPxzGcfqnQ7ERF9D9AOWIQ8YjOsTi_B2zS8SOySKIFUGwwYcPG7DiCE-QJcI-fpydRDnEq6UxbkYgB7XK4BlmPKlwuXkBDX9egl_Ma4B7W2WJvYbKevu6Z8Kc5y-OITpNVDYKbBK3qKyh4yIUpB1NIUMBAAE',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
+  assertEquals(
+    verification.registrationInfo?.credentialID,
     isoBase64URL.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
   );
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
-  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
+  assertEquals(
+    verification.registrationInfo?.origin,
+    'https://dev.dontneeda.pw',
+  );
+  assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
 });
 
-test('should validate TPM RSA response (SHA1)', async () => {
+Deno.test('should validate TPM RSA response (SHA1)', async () => {
   const expectedChallenge = 'f4e8d87b-d363-47cc-ab4d-1a84647bf245';
   const verification = await verifyRegistrationResponse({
     response: {
@@ -446,22 +573,27 @@ test('should validate TPM RSA response (SHA1)', async () => {
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('tpm');
-  expect(verification.registrationInfo?.counter).toEqual(97);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'tpm');
+  assertEquals(verification.registrationInfo?.counter, 97);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pAEDAzn__iBZAQCzl_wD24PZ5z-po2FrwoQVdd13got_CkL8p4B_NvJBC5OwAYKDilii_wj-0CA8ManbpSInx9Tdnz6t91OhudwUT0-W_BHSLK_MqFcjZWrR5LYVmVpz1EgH3DrOTra4AlogEq2D2CYktPrPe7joE-oT3vAYXK8vzQDLRyaxI_Z1qS4KLlLCdajW8PGpw1YRjMDw6s69GZU8mXkgNPMCUh1TZ1bnCvJTO9fnmLjDjqdQGRU4bWo8tFjCL8g1-2WD_2n0-twt6n-Uox5VnR1dQJG4awMlanBCkGGpOb3WBDQ8K10YJJ2evPhJKGJahBvu2Dxmq6pLCAXCv0ma3EHj-PmDIUMBAAE',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
+  assertEquals(
+    verification.registrationInfo?.credentialID,
     isoBase64URL.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
   );
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
-  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
+  assertEquals(
+    verification.registrationInfo?.origin,
+    'https://dev.dontneeda.pw',
+  );
+  assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
 });
 
-test('should validate Android-Key response', async () => {
+Deno.test('should validate Android-Key response', async () => {
   const expectedChallenge = '14e0d1b6-9c36-4849-aeec-ea64676449ef';
   const verification = await verifyRegistrationResponse({
     response: {
@@ -483,22 +615,27 @@ test('should validate Android-Key response', async () => {
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toEqual(true);
-  expect(verification.registrationInfo?.fmt).toEqual('android-key');
-  expect(verification.registrationInfo?.counter).toEqual(108);
-  expect(verification.registrationInfo?.credentialPublicKey).toEqual(
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.fmt, 'android-key');
+  assertEquals(verification.registrationInfo?.counter, 108);
+  assertEquals(
+    verification.registrationInfo?.credentialPublicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239oIlgg6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
     ),
   );
-  expect(verification.registrationInfo?.credentialID).toEqual(
+  assertEquals(
+    verification.registrationInfo?.credentialID,
     isoBase64URL.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
   );
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
-  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
+  assertEquals(
+    verification.registrationInfo?.origin,
+    'https://dev.dontneeda.pw',
+  );
+  assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
 });
 
-test('should support multiple possible origins', async () => {
+Deno.test('should support multiple possible origins', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
@@ -506,12 +643,15 @@ test('should support multiple possible origins', async () => {
     expectedRPID: 'dev.dontneeda.pw',
   });
 
-  expect(verification.verified).toBe(true);
-  expect(verification.registrationInfo?.origin).toEqual('https://dev.dontneeda.pw');
-  expect(verification.registrationInfo?.rpID).toEqual('dev.dontneeda.pw');
+  assert(verification.verified);
+  assertEquals(
+    verification.registrationInfo?.origin,
+    'https://dev.dontneeda.pw',
+  );
+  assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
 });
 
-test('should not set RPID in registrationInfo when not expected', async () => {
+Deno.test('should not set RPID in registrationInfo when not expected', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
@@ -519,22 +659,25 @@ test('should not set RPID in registrationInfo when not expected', async () => {
     expectedRPID: undefined,
   });
 
-  expect(verification.verified).toBe(true);
-  expect(verification.registrationInfo?.rpID).toBeUndefined();
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.rpID, undefined);
 });
 
-test('should throw an error if origin not in list of expected origins', async () => {
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: ['https://different.address'],
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/unexpected registration response origin/i);
+Deno.test('should throw an error if origin not in list of expected origins', async () => {
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: ['https://different.address'],
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'Unexpected registration response origin',
+  );
 });
 
-test('should support multiple possible RP IDs', async () => {
+Deno.test('should support multiple possible RP IDs', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
@@ -542,24 +685,28 @@ test('should support multiple possible RP IDs', async () => {
     expectedRPID: ['dev.dontneeda.pw', 'simplewebauthn.dev'],
   });
 
-  expect(verification.verified).toBe(true);
+  assert(verification.verified);
 });
 
-test('should throw an error if RP ID not in list of possible RP IDs', async () => {
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: attestationNoneChallenge,
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: ['simplewebauthn.dev'],
-    }),
-  ).rejects.toThrow(/unexpected rp id/i);
+Deno.test('should throw an error if RP ID not in list of possible RP IDs', async () => {
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: ['simplewebauthn.dev'],
+      }),
+    Error,
+    'Unexpected RP ID',
+  );
 });
 
-test('should pass verification if custom challenge verifier returns true', async () => {
+Deno.test('should pass verification if custom challenge verifier returns true', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
-      id: 'AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA',
+      id:
+        'AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA',
       rawId:
         'AUywDsPYEOoucI3-o-jB1J6Kt6QAxLMa1WwFKj1bNi4pAakWAsZX-pJ4gAeDmocL7SXnl8vzUfLkfrOGIVmds1RhjU1DYIWlxcGhAA',
       response: {
@@ -573,30 +720,37 @@ test('should pass verification if custom challenge verifier returns true', async
       clientExtensionResults: {},
     },
     expectedChallenge: (challenge: string) => {
-      const parsedChallenge: { actualChallenge: string; arbitraryData: string } = JSON.parse(
+      const parsedChallenge: {
+        actualChallenge: string;
+        arbitraryData: string;
+      } = JSON.parse(
         isoBase64URL.toString(challenge),
       );
-      return parsedChallenge.actualChallenge === 'xRsYdCQv5WZOqmxReiZl6C9q5SfrZne4lNSr9QVtPig';
+      return parsedChallenge.actualChallenge ===
+        'xRsYdCQv5WZOqmxReiZl6C9q5SfrZne4lNSr9QVtPig';
     },
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
   });
 
-  expect(verification.verified).toBe(true);
+  assert(verification.verified);
 });
 
-test('should fail verification if custom challenge verifier returns false', async () => {
-  await expect(
-    verifyRegistrationResponse({
-      response: attestationNone,
-      expectedChallenge: (challenge: string) => challenge === 'thisWillneverMatch',
-      expectedOrigin: 'https://dev.dontneeda.pw',
-      expectedRPID: 'dev.dontneeda.pw',
-    }),
-  ).rejects.toThrow(/custom challenge verifier returned false/i);
+Deno.test('should fail verification if custom challenge verifier returns false', async () => {
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: (challenge: string) => challenge === 'thisWillneverMatch',
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+      }),
+    Error,
+    'Custom challenge verifier returned false',
+  );
 });
 
-test('should return credential backup info', async () => {
+Deno.test('should return credential backup info', async () => {
   const verification = await verifyRegistrationResponse({
     response: attestationNone,
     expectedChallenge: attestationNoneChallenge,
@@ -604,11 +758,14 @@ test('should return credential backup info', async () => {
     expectedRPID: 'dev.dontneeda.pw',
   });
 
-  expect(verification.registrationInfo?.credentialDeviceType).toEqual('singleDevice');
-  expect(verification.registrationInfo?.credentialBackedUp).toEqual(false);
+  assertEquals(
+    verification.registrationInfo?.credentialDeviceType,
+    'singleDevice',
+  );
+  assertEquals(verification.registrationInfo?.credentialBackedUp, false);
 });
 
-test('should return authenticator extension output', async () => {
+Deno.test('should return authenticator extension output', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'E_Pko4wN1BXE23S0ftN3eQ',
@@ -631,22 +788,25 @@ test('should return authenticator extension output', async () => {
     expectedRPID: 'try-webauthn.appspot.com',
   });
 
-  expect(verification.registrationInfo?.authenticatorExtensionResults).toMatchObject({
-    devicePubKey: {
-      dpk: isoUint8Array.fromHex(
-        'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
-      ),
-      sig: isoUint8Array.fromHex(
-        '3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E',
-      ),
-      nonce: isoUint8Array.fromHex(''),
-      scope: isoUint8Array.fromHex('00'),
-      aaguid: isoUint8Array.fromHex('00000000000000000000000000000000'),
+  assertObjectMatch(
+    verification.registrationInfo!.authenticatorExtensionResults!,
+    {
+      devicePubKey: {
+        dpk: isoUint8Array.fromHex(
+          'A5010203262001215820991AABED9DE4271A9EDEAD8806F9DC96D6DCCD0C476253A5510489EC8379BE5B225820A0973CFDEDBB79E27FEF4EE7481673FB3312504DDCA5434CFD23431D6AD29EDA',
+        ),
+        sig: isoUint8Array.fromHex(
+          '3045022100EFB38074BD15B8C82CF09F87FBC6FB3C7169EA4F1806B7E90937374302345B7A02202B7113040731A0E727D338D48542863CE65880AA79E5EA740AC8CCD94347988E',
+        ),
+        nonce: isoUint8Array.fromHex(''),
+        scope: isoUint8Array.fromHex('00'),
+        aaguid: isoUint8Array.fromHex('00000000000000000000000000000000'),
+      },
     },
-  });
+  );
 });
 
-test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert public key', async () => {
+Deno.test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert public key', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: '7wQcUWO9gG6mi2IktoZUogs8opnghY01DPYwaerMZms',
@@ -667,10 +827,10 @@ test('should verify FIDO U2F attestation that specifies SHA-1 in its leaf cert p
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toBe(true);
+  assert(verification.verified);
 });
 
-test('should verify Packed attestation with RSA-PSS SHA-256 public key', async () => {
+Deno.test('should verify Packed attestation with RSA-PSS SHA-256 public key', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'n_dmFmW9UL7678vS4A3XSQLXvxWjefEkYVzEB5cNc_Q',
@@ -691,10 +851,10 @@ test('should verify Packed attestation with RSA-PSS SHA-256 public key', async (
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toBe(true);
+  assert(verification.verified);
 });
 
-test('should verify Packed attestation with RSA-PSS SHA-384 public key', async () => {
+Deno.test('should verify Packed attestation with RSA-PSS SHA-384 public key', async () => {
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'BCwirFmTkTdTUjVqn_uSy-UOSK-iMBgzpfFunE-Hnb0',
@@ -715,7 +875,7 @@ test('should verify Packed attestation with RSA-PSS SHA-384 public key', async (
     requireUserVerification: false,
   });
 
-  expect(verification.verified).toBe(true);
+  assert(verification.verified);
 });
 
 /**
@@ -735,21 +895,21 @@ const attestationFIDOU2F: RegistrationResponseJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const attestationFIDOU2FChallenge = isoBase64URL.fromString('totallyUniqueValueEveryAttestation');
+const attestationFIDOU2FChallenge = isoBase64URL.fromString(
+  'totallyUniqueValueEveryAttestation',
+);
 
 const attestationPacked: RegistrationResponseJSON = {
   id: 'bbb',
   rawId: 'bbb',
   response: {
-    attestationObject:
-      'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
+    attestationObject: 'o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIhANvrPZMUFrl_rvlgR' +
       'qz6lCPlF6B4y885FYUCCrhrzAYXAiAb4dQKXbP3IimsTTadkwXQlrRVdxzlbmPXt847-Oh6r2hhdXRoRGF0YVjhP' +
       'dxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KBFXsOO-a3OAAI1vMYKZIsLJfHwVQMAXQGE4WNXLCDWOCa2x' +
       '8hpqk5dZy_xdc4wBd4UgCJ4M_JAHI7oJgDDVb8WUcKqRB_mzRxwCL9vdTl-ZKPXg3_-Zrt1Adgb7EnK9ivqaTOKM' +
       'DqRrKsIObWYJaqpsSJtUKUBAgMmIAEhWCBKMVVaivqCBpqqAxMjuCo5jMeUdh3jDOC0EF4fLBNNTyJYILc7rqDDe' +
       'X1pwCLrl3ZX7IThrtZNwKQVLQyfHiorqP-n',
-    clientDataJSON:
-      'eyJjaGFsbGVuZ2UiOiJjelpRU1dKQ2JsQlFibkpIVGxOQ2VFNWtkRVJ5VkRkVmNsWlpT' +
+    clientDataJSON: 'eyJjaGFsbGVuZ2UiOiJjelpRU1dKQ2JsQlFibkpIVGxOQ2VFNWtkRVJ5VkRkVmNsWlpT' +
       'a3M1U0UwIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3IiwidHlwZSI6IndlYmF1dGhuLmNyZWF0' +
       'ZSJ9',
     transports: [],
@@ -757,15 +917,16 @@ const attestationPacked: RegistrationResponseJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationPackedChallenge = isoBase64URL.fromString('s6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM');
+const attestationPackedChallenge = isoBase64URL.fromString(
+  's6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM',
+);
 
 const attestationPackedX5C: RegistrationResponseJSON = {
   // TODO: Grab these from another iPhone attestation
   id: 'aaa',
   rawId: 'aaa',
   response: {
-    attestationObject:
-      'o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAIMt_hGMtdgpIVIwMOeKK' +
+    attestationObject: 'o2NmbXRmcGFja2VkZ2F0dFN0bXSjY2FsZyZjc2lnWEcwRQIhAIMt_hGMtdgpIVIwMOeKK' +
       'w0IkUUFkXSY8arKh3Q0c5QQAiB9Sv9JavAEmppeH_XkZjB7TFM3jfxsgl97iIkvuJOUImN4NWOBWQLBMIICvTCCAaWgA' +
       'wIBAgIEKudiYzANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwM' +
       'DYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowbjELMAkGA1UEBhMCU0UxEjAQBgNVBAoMCVl1Ymljb' +
@@ -781,27 +942,26 @@ const attestationPackedX5C: RegistrationResponseJSON = {
       'wBA4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56TlqUBA' +
       'gMmIAEhWCBsJbGAjckW-AA_XMk8OnB-VUvrs35ZpjtVJXRhnvXiGiJYIL2ncyg_KesCi44GH8UcZXYwjBkVdGMjNd6LF' +
       'myiD6xf',
-    clientDataJSON:
-      'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhG' +
+    clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiZEc5MFlXeHNlVlZ1YVhG' +
       'MVpWWmhiSFZsUlhabGNubFVhVzFsIiwib3JpZ2luIjoiaHR0cHM6Ly9kZXYuZG9udG5lZWRhLnB3In0=',
     transports: [],
   },
   type: 'public-key',
   clientExtensionResults: {},
 };
-const attestationPackedX5CChallenge = isoBase64URL.fromString('totallyUniqueValueEveryTime');
+const attestationPackedX5CChallenge = isoBase64URL.fromString(
+  'totallyUniqueValueEveryTime',
+);
 
 const attestationNone: RegistrationResponseJSON = {
   id: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   rawId: 'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   response: {
-    attestationObject:
-      'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjFPdxHEOnAiLIp26idVjIguzn3I' +
+    attestationObject: 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjFPdxHEOnAiLIp26idVjIguzn3I' +
       'pr_RlsKZWsa-5qK-KBFAAAAAAAAAAAAAAAAAAAAAAAAAAAAQQHSlyRHIdWleVqO24-6ix7JFWODqDWo_arvEz3Se' +
       '5EgIFHkcVjZ4F5XDSBreIHsWRilRnKmaaqlqK3V2_4XtYs2pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENs' +
       'MH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
-    clientDataJSON:
-      'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYUVWalkxQlhkWHBw' +
+    clientDataJSON: 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiYUVWalkxQlhkWHBw' +
       'VURBd1NEQndOV2Q0YURKZmRUVmZVRU0wVG1WWloyUSIsIm9yaWdpbiI6Imh0dHBzOlwvXC9kZXYuZG9udG5lZWRh' +
       'LnB3IiwiYW5kcm9pZFBhY2thZ2VOYW1lIjoib3JnLm1vemlsbGEuZmlyZWZveCJ9',
     transports: [],
@@ -809,4 +969,6 @@ const attestationNone: RegistrationResponseJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const attestationNoneChallenge = isoBase64URL.fromString('hEccPWuziP00H0p5gxh2_u5_PC4NeYgd');
+const attestationNoneChallenge = isoBase64URL.fromString(
+  'hEccPWuziP00H0p5gxh2_u5_PC4NeYgd',
+);

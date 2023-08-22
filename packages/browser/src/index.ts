@@ -9,11 +9,11 @@ import { platformAuthenticatorIsAvailable } from './helpers/platformAuthenticato
 import { browserSupportsWebAuthnAutofill } from './helpers/browserSupportsWebAuthnAutofill';
 
 export {
-  startRegistration,
-  startAuthentication,
   browserSupportsWebAuthn,
   browserSupportsWebAuthnAutofill,
   platformAuthenticatorIsAvailable,
+  startAuthentication,
+  startRegistration,
 };
 
 export type { WebAuthnErrorCode } from './helpers/webAuthnError';

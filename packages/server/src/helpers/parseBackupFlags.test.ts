@@ -1,34 +1,33 @@
-import { parseBackupFlags } from './parseBackupFlags';
+import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-test('should return single-device cred, not backed up', () => {
+import { InvalidBackupFlags, parseBackupFlags } from './parseBackupFlags.ts';
+import { assertThrows } from 'https://deno.land/std@0.198.0/assert/assert_throws.ts';
+
+Deno.test('should return single-device cred, not backed up', () => {
   const parsed = parseBackupFlags({ be: false, bs: false });
 
-  expect(parsed.credentialDeviceType).toEqual('singleDevice');
-  expect(parsed.credentialBackedUp).toEqual(false);
+  assertEquals(parsed.credentialDeviceType, 'singleDevice');
+  assertEquals(parsed.credentialBackedUp, false);
 });
 
-test('should throw on single-device cred, backed up', () => {
-  expect.assertions(2);
-
-  try {
-    parseBackupFlags({ be: false, bs: true });
-  } catch (err) {
-    const _err: Error = err as Error;
-    expect(_err.message).toContain('impossible');
-    expect(_err.name).toEqual('InvalidBackupFlags');
-  }
+Deno.test('should throw on single-device cred, backed up', () => {
+  assertThrows(
+    () => parseBackupFlags({ be: false, bs: true }),
+    InvalidBackupFlags,
+    'impossible',
+  );
 });
 
-test('should return multi-device cred, not backed up', () => {
+Deno.test('should return multi-device cred, not backed up', () => {
   const parsed = parseBackupFlags({ be: true, bs: false });
 
-  expect(parsed.credentialDeviceType).toEqual('multiDevice');
-  expect(parsed.credentialBackedUp).toEqual(false);
+  assertEquals(parsed.credentialDeviceType, 'multiDevice');
+  assertEquals(parsed.credentialBackedUp, false);
 });
 
-test('should return multi-device cred, backed up', () => {
+Deno.test('should return multi-device cred, backed up', () => {
   const parsed = parseBackupFlags({ be: true, bs: true });
 
-  expect(parsed.credentialDeviceType).toEqual('multiDevice');
-  expect(parsed.credentialBackedUp).toEqual(true);
+  assertEquals(parsed.credentialDeviceType, 'multiDevice');
+  assertEquals(parsed.credentialBackedUp, true);
 });
