@@ -4,8 +4,7 @@
   "description": "Lerna/npm wrapper around Deno for @simplewebauthn/typescript-types",
   "scripts": {
     "build": "npm run extract-dom-types && deno task build",
-    "extract-dom-types": "ts-node extract-dom-types.ts",
-    "prepublish": "npm run build"
+    "extract-dom-types": "ts-node extract-dom-types.ts"
   },
   "lerna": {
     "command": {
