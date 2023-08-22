@@ -57,28 +57,29 @@ close to all it takes to get up and running with WebAuthn.
 
 Install the following before proceeding:
 
-- **Node.js 18**
+- **Node.js 18.x**
 - **Deno 1.36.x**
+- **pnpm 8.6.x**
 
 After pulling down the code, set up dependencies:
 
 ```sh
-$> npm install
+$> pnpm install
 ```
 
 To run unit tests for all workspace packages, use the `test` series of scripts:
 
 ```sh
 # Run All tests
-$> npm run test
+$> pnpm run test
 # Run an individual package's tests
-$> npm run test:browser
-$> npm run test:server
+$> pnpm run test:browser
+$> pnpm run test:server
 ```
 
 Tests can be run in watch mode with the `dev` series of scripts:
 
 ```sh
-$> npm run dev:browser
-$> npm run dev:server
+$> pnpm run dev:browser
+$> pnpm run dev:server
 ```
