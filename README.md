@@ -37,7 +37,8 @@ npm install @simplewebauthn/server
 npm install @simplewebauthn/typescript-types
 ```
 
-The following packages are available for import into **Deno v1.33.x** projects from **deno.land/x**:
+The **server** and **typescript-types** packages are also available for import into **Deno v1.33.x**
+projects from **deno.land/x**:
 
 ```ts
 import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
