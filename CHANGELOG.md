@@ -1,25 +1,50 @@
 # Changelog
 
-## v8.0.0-alpha.0
+## v8.0.0 - Around the (ESM) World
 
-**Packages:**
+This major release marks the completion of a long journey that started with the release of v7.0.0:
+SimpleWebAuthn is now available for use in non-Node projects! 🎉
 
-- @simplewebauthn/browser@8.0.0-alpha.0
-- @simplewebauthn/server@8.0.0-alpha.0
-- @simplewebauthn/typescript-types@8.0.0-alpha.0
+SimpleWebAuthn debuted in mid-2020 as a combination of libraries aiming to make WebAuthn simpler to
+use across browsers and "NodeJS + CommonJS" applications. Since then NodeJS has evolved to gain ESM
+support, and additional JavaScript and TypeScript runtimes have debuted that offer ESM-centric,
+TypeScript-first alternatives while also implementing Web APIs to offer a more consistent and
+capable execution environment for developers.
 
-**Changes:**
+I've wanted to make this project available to developers using these Node alternatives to help them
+get past some of WebAuthn's rough spots. Today I'm happy to announce that this goal has been
+achieved! 😌
 
-- TODO **[server] [typescript-types]** SimpleWebAuthn can now be used in runtimes other than Node.
-  Deno is now also a first-class runtime and will eventually be available at
-  https://deno.land/x/simplewebauthn (after I formally release this update.)
+See the **Changes** below for more information, as well as additional information on breaking
+changes made in this release.
+
+### Packages
+
+- @simplewebauthn/browser@8.0.0
+- @simplewebauthn/server@8.0.0
+- @simplewebauthn/typescript-types@8.0.0
+
+### Changes
+
+- **[server] [typescript-types]** SimpleWebAuthn can now also be used in runtimes other than Node.
+  Deno is now a first-class runtime for this project alongside Node.
+  - The following list of runtimes are officially supported:
+    - (Existing) NodeJS using CommonJS
+    - (Existing) NodeJS using ECMAScript Modules (ESM)
+    - (New) Deno @ https://deno.land/x/simplewebauthn
+  - The following list of runtimes are periodically tested but unofficially supported:
+    - (New) CloudFlare Workers
+    - (New) Bun
+- **[browser]** Version sync
 
 ### Breaking Changes
 
-- TODO [server] `generateRegistrationOptions()` and `generateAuthenticationOptions()` are now
-  asynchronous methods. Refactor the calls to handle the `Promise` that's now returned in whatever
-  way is appropriate for your project.
-- TODO (it's an alpha release, I'll finalize the changelog when I formally release this.)
+- **[server]** `generateRegistrationOptions()` and `generateAuthenticationOptions()` are now
+  asynchronous methods. Refactor calls to these methods to handle the `Promise` that's now returned
+  in whatever way is appropriate for your project.
+- **[server]** `generateChallenge()` (in `@simplewebauthn/server/helpers`) is now an asynchronous
+  method. Refactor calls to this method to handle the `Promise` that's now returned in whatever way
+  is appropriate for your project.
 
 ## v7.4.0
 
