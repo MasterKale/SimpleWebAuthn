@@ -42,7 +42,7 @@ projects from **deno.land/x**:
 
 ```ts
 import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
-import {...} from 'https://deno.land/x/simplewebauthn/deno/typescript-types.ts';
+import type {...} from 'https://deno.land/x/simplewebauthn/deno/typescript-types.ts';
 ```
 
 ## Example
