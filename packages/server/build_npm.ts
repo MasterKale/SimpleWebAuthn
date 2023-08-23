@@ -1,9 +1,7 @@
-import { build, BuildOptions, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
+import { build, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
 
-const outDir = {
-  publish: './npm',
-  test: './npm-test',
-} as const;
+const outDir = './npm';
+
 const lernaPackageJSON: { version: string } = JSON.parse(
   Deno.readTextFileSync('./package.json'),
 );
@@ -11,50 +9,19 @@ const typesPackageJSON: { version: string } = JSON.parse(
   Deno.readTextFileSync('../typescript-types/npm/package.json'),
 );
 
-// Clear both build directories
-await Promise.all([
-  await emptyDir(outDir.publish),
-  await emptyDir(outDir.test),
-]);
+await emptyDir(outDir);
 
-/**
- * Maintain a separate build just for testing, as we need to shim crypto only
- * when test_runner.js runs to test the ESM and CJS output. The test environment
- * currently lacks `globalThis.crypto` and so shimming it is the only way to
- * get the tests to successfully execute. But we don't want the shim in the
- * build we post up to NPM so that the runtime's native Crypto can be used.
- *
- * See https://github.com/denoland/dnt/issues/181
- */
-console.log('Building for testing...');
 await build({
-  entryPoints: getEntryPoints(),
-  outDir: outDir.test,
+  entryPoints: [
+    { name: '.', path: './src/index.ts' },
+    { name: './helpers', path: './src/helpers/index.ts' },
+  ],
+  outDir,
   shims: {
     deno: {
       test: 'dev',
     },
-    crypto: true,
   },
-  test: true,
-  // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
-  typeCheck: false,
-  package: {
-    name: 'for-testing-only',
-    version: '0.0.0',
-  },
-  // Map from Deno package to NPM package for Node build
-  mappings: getMappings(),
-  // TypeScript tsconfig.json config
-  compilerOptions: getCompilerOptions(),
-});
-
-console.log('Building for publishing...');
-await build({
-  entryPoints: getEntryPoints(),
-  outDir: outDir.publish,
-  shims: {},
-  test: false,
   // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
   typeCheck: false,
   // package.json values
@@ -98,26 +65,7 @@ await build({
     },
   },
   // Map from Deno package to NPM package for Node build
-  mappings: getMappings(),
-  // TypeScript tsconfig.json config
-  compilerOptions: getCompilerOptions(),
-});
-
-Deno.copyFileSync('LICENSE.md', `${outDir.publish}/LICENSE.md`);
-Deno.copyFileSync('README.md', `${outDir.publish}/README.md`);
-
-/**
- * Settings we can reuse across the two build configs
- */
-function getEntryPoints(): BuildOptions['entryPoints'] {
-  return [
-    { name: '.', path: './src/index.ts' },
-    { name: './helpers', path: './src/helpers/index.ts' },
-  ];
-}
-
-function getMappings(): BuildOptions['mappings'] {
-  return {
+  mappings: {
     'https://deno.land/x/b64@1.1.27/src/base64.js': {
       name: '@hexagon/base64',
       version: '^1.1.27',
@@ -163,11 +111,12 @@ function getMappings(): BuildOptions['mappings'] {
       name: '@simplewebauthn/typescript-types',
       version: `^${typesPackageJSON.version}`,
     },
-  };
-}
-
-function getCompilerOptions(): BuildOptions['compilerOptions'] {
-  return {
+  },
+  // TypeScript tsconfig.json config
+  compilerOptions: {
     lib: ['ES2021'],
-  };
-}
+  },
+});
+
+Deno.copyFileSync('LICENSE.md', `${outDir}/LICENSE.md`);
+Deno.copyFileSync('README.md', `${outDir}/README.md`);
