@@ -1,5 +1,17 @@
 # Changelog
 
+## v8.0.1
+
+### Packages
+
+- @simplewebauthn/server@8.0.1
+
+### Changes
+
+- **[server]** Node projects with `"type": "module"` in their **package.json** will no longer error
+  out when trying to use methods that leverage the Crypto APIs
+  ([#428](https://github.com/MasterKale/SimpleWebAuthn/pull/428))
+
 ## v8.0.0 - Around the (ESM) World
 
 This major release marks the completion of a long journey that started with the release of v7.0.0:
@@ -27,7 +39,8 @@ changes made in this release.
 ### Changes
 
 - **[server] [typescript-types]** SimpleWebAuthn can now also be used in runtimes other than Node.
-  Deno is now a first-class runtime for this project alongside Node.
+  Deno is now a first-class runtime for this project alongside Node
+  ([#425](https://github.com/MasterKale/SimpleWebAuthn/pull/425))
   - The following list of runtimes are officially supported:
     - (Existing) NodeJS using CommonJS
     - (Existing) NodeJS using ECMAScript Modules (ESM)
