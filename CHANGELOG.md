@@ -1,5 +1,16 @@
 # Changelog
 
+## v8.0.2
+
+### Packages
+
+- @simplewebauthn/browser@8.0.2
+
+### Changes
+
+- **[browser]** The NPM package now targets ES2021 for support in older browsers like Safari 13.1
+  ([#429](https://github.com/MasterKale/SimpleWebAuthn/pull/429))
+
 ## v8.0.1
 
 ### Packages
