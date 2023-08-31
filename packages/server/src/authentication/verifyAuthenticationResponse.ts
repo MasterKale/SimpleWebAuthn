@@ -15,7 +15,7 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
 export type VerifyAuthenticationResponseOpts = {
   response: AuthenticationResponseJSON;
-  expectedChallenge: string | ((challenge: string) => boolean);
+  expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
   authenticator: AuthenticatorDevice;
@@ -94,7 +94,7 @@ export async function verifyAuthenticationResponse(
 
   // Ensure the device provided the challenge we gave it
   if (typeof expectedChallenge === 'function') {
-    if (!expectedChallenge(challenge)) {
+    if (!(await expectedChallenge(challenge))) {
       throw new Error(
         `Custom challenge verifier returned false for registration response challenge "${challenge}"`,
       );

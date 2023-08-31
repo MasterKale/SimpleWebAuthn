@@ -394,6 +394,82 @@ Deno.test('should fail verification if custom challenge verifier returns false',
   );
 });
 
+Deno.test('should pass verification if custom challenge verifier returns a Promise that resolves with true', async () => {
+  const verification = await verifyAuthenticationResponse({
+    response: {
+      id:
+        'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
+      rawId:
+        'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
+      response: {
+        authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFYftypQ',
+        clientDataJSON:
+          'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiZXlKaFkzUjFZV3hEYUdGc2JHVnVaMlVpT2lKTE0xRjRUMnB1VmtwTWFVZHNibFpGY0RWMllUVlJTbVZOVmxkT1psODNVRmxuZFhSbllrRjBRVlZCSWl3aVlYSmlhWFJ5WVhKNVJHRjBZU0k2SW5OcFoyNU5aVkJzWldGelpTSjkiLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0OjgwMDAiLCJjcm9zc09yaWdpbiI6ZmFsc2V9',
+        signature:
+          'MEUCIByFAVGfkoKPEzynp-37BX_HOXSaC6-58-ELjB7BG9opAiEAyD_1mN9YAPrphcwpzK3ym2Xx8EjAapgQ326mKgQ1pW0',
+        userHandle: 'internalUserId',
+      },
+      type: 'public-key',
+      clientExtensionResults: {},
+    },
+    expectedChallenge: (challenge: string) => {
+      const parsedChallenge: {
+        actualChallenge: string;
+        arbitraryData: string;
+      } = JSON.parse(
+        isoBase64URL.toString(challenge),
+      );
+      return Promise.resolve(
+        parsedChallenge.actualChallenge ===
+          'K3QxOjnVJLiGlnVEp5va5QJeMVWNf_7PYgutgbAtAUA',
+      );
+    },
+    expectedOrigin: 'http://localhost:8000',
+    expectedRPID: 'localhost',
+    authenticator: {
+      credentialID: isoBase64URL.toBuffer(
+        'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
+      ),
+      credentialPublicKey: isoBase64URL.toBuffer(
+        'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
+      ),
+      counter: 0,
+    },
+  });
+
+  assert(verification.verified);
+});
+
+Deno.test('should fail verification if custom challenge verifier returns a Promise that resolves with false', async () => {
+  await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: assertionResponse,
+        expectedChallenge: (challenge) => Promise.resolve(challenge === 'willNeverMatch'),
+        expectedOrigin: assertionOrigin,
+        expectedRPID: 'dev.dontneeda.pw',
+        authenticator: authenticator,
+      }),
+    Error,
+    'Custom challenge verifier returned false',
+  );
+});
+
+Deno.test('should fail verification if custom challenge verifier returns a Promise that rejects', async () => {
+  await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: assertionResponse,
+        expectedChallenge: () => Promise.reject(new Error('rejected')),
+        expectedOrigin: assertionOrigin,
+        expectedRPID: 'dev.dontneeda.pw',
+        authenticator: authenticator,
+      }),
+    Error,
+    'rejected',
+  );
+});
+
 Deno.test('should return authenticator extension output', async () => {
   const verification = await verifyAuthenticationResponse({
     response: {
