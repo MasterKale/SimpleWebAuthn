@@ -42,3 +42,7 @@ pnpm run build:browser && (cd packages/browser; pnpm publish)
 ```
 pnpm run build:server && (cd packages/server/npm; pnpm publish)
 ```
+
+### Step 5: Push up `HEAD` to `origin`
+
+Don't forget to push up the latest changes to `origin` when everything's been published!
