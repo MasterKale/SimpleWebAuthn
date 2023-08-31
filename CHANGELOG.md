@@ -4,7 +4,7 @@
 
 ### Packages
 
-- @simplewebauthn/browser@8.1.0
+- @simplewebauthn/server@8.1.0
 
 ### Changes
 
