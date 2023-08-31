@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf ./packages/**/node_modules && rm -rf ./packages/**/dist && rm -rf ./packages/**/npm",
-    "get-it-onto-npm": "pnpm install && rm -f ./packages/**/package-lock.json && lerna publish",
     "lint": "deno lint packages/**/src/**/*.ts example/**/*.ts",
     "test": "pnpm run test:browser; pnpm run test:server",
     "test:browser": "lerna run test --scope=@simplewebauthn/browser",
