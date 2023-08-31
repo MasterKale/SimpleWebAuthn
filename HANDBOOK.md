@@ -7,7 +7,7 @@ Notes for myself that I don't want cluttering up the README
 ### Step 1: Determine which packages need to be published
 
 ```
-npx lerna version --no-push
+pnpm run update-version
 ```
 
 What packages need to be published?
