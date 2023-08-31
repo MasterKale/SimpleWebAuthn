@@ -1,5 +1,17 @@
 # Changelog
 
+## v8.1.0
+
+### Packages
+
+- @simplewebauthn/browser@8.1.0
+
+### Changes
+
+- **[server]** The `expectedChallenge` argument for `verifyRegistrationResponse()` and
+  `verifyAuthenticationResponse()` methods now also accept asynchronous methods
+  ([#432](https://github.com/MasterKale/SimpleWebAuthn/pull/432))
+
 ## v8.0.2
 
 ### Packages
