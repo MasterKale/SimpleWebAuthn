@@ -1,5 +1,16 @@
 # Changelog
 
+## v8.1.1
+
+### Packages
+
+- @simplewebauthn/server@8.1.1
+
+### Changes
+
+- **[server]** Debug logger output from `MetadataService` has been disabled
+  ([#434](https://github.com/MasterKale/SimpleWebAuthn/pull/434))
+
 ## v8.1.0
 
 ### Packages
