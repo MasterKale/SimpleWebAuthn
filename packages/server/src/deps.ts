@@ -26,10 +26,6 @@ export { default as base64 } from 'https://deno.land/x/b64@1.1.27/src/base64.js'
 // cross-fetch
 export { fetch as crossFetch } from 'https://esm.sh/cross-fetch@4.0.0';
 
-// debug
-export { default as debug } from 'https://esm.sh/debug@4.3.4';
-export type { Debugger } from 'https://esm.sh/@types/debug@4.1.8';
-
 // @peculiar libraries
 export { AsnParser, AsnSerializer } from 'https://esm.sh/@peculiar/asn1-schema@2.3.6';
 export {

@@ -1,6 +1,6 @@
-import { debug, Debugger } from '../deps.ts';
+// import { debug, Debugger } from '../deps.ts';
 
-const defaultLogger = debug('SimpleWebAuthn');
+// const defaultLogger = debug('SimpleWebAuthn');
 
 /**
  * Generate an instance of a `debug` logger that extends off of the "simplewebauthn" namespace for
@@ -16,6 +16,7 @@ const defaultLogger = debug('SimpleWebAuthn');
  * log('hello'); // simplewebauthn:mds hello +0ms
  * ```
  */
-export function getLogger(name: string): Debugger {
-  return defaultLogger.extend(name);
+export function getLogger(_name: string): (message: string, ..._rest: unknown[]) => void {
+  // This is a noop for now while I search for a better debug logger technique
+  return (_message, ..._rest) => {};
 }

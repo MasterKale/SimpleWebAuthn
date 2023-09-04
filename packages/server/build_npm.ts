@@ -74,14 +74,6 @@ await build({
       name: 'cbor-x',
       version: '^1.5.2',
     },
-    'https://esm.sh/debug@4.3.4': {
-      name: 'debug',
-      version: '^4.3.4',
-    },
-    'https://esm.sh/@types/debug@4.1.8': {
-      name: '@types/debug',
-      version: '^4.1.8',
-    },
     'https://esm.sh/cross-fetch@4.0.0': {
       name: 'cross-fetch',
       version: '^4.0.0',
