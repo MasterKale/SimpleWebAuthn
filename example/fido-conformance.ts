@@ -118,7 +118,7 @@ const supportedAlgorithmIDs = [
 /**
  * [FIDO2] Server Tests > MakeCredential Request
  */
-fidoConformanceRouter.post('/attestation/options', (req, res) => {
+fidoConformanceRouter.post('/attestation/options', async (req, res) => {
   const { body } = req;
   const {
     username,
@@ -144,7 +144,7 @@ fidoConformanceRouter.post('/attestation/options', (req, res) => {
 
   const { devices } = user;
 
-  const opts = generateRegistrationOptions({
+  const opts = await generateRegistrationOptions({
     rpName,
     rpID,
     userID: username,
@@ -226,7 +226,7 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
 /**
  * [FIDO2] Server Tests > GetAuthentication Request
  */
-fidoConformanceRouter.post('/assertion/options', (req, res) => {
+fidoConformanceRouter.post('/assertion/options', async (req, res) => {
   const { body } = req;
   const { username, userVerification, extensions } = body;
 
@@ -236,7 +236,7 @@ fidoConformanceRouter.post('/assertion/options', (req, res) => {
 
   const { devices } = user;
 
-  const opts = generateAuthenticationOptions({
+  const opts = await generateAuthenticationOptions({
     extensions,
     userVerification,
     allowCredentials: devices.map((dev) => ({

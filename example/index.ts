@@ -112,7 +112,7 @@ const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
 /**
  * Registration (a.k.a. "Registration")
  */
-app.get('/generate-registration-options', (req, res) => {
+app.get('/generate-registration-options', async (req, res) => {
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
   const {
@@ -150,7 +150,7 @@ app.get('/generate-registration-options', (req, res) => {
     supportedAlgorithmIDs: [-7, -257],
   };
 
-  const options = generateRegistrationOptions(opts);
+  const options = await generateRegistrationOptions(opts);
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
@@ -215,7 +215,7 @@ app.post('/verify-registration', async (req, res) => {
 /**
  * Login (a.k.a. "Authentication")
  */
-app.get('/generate-authentication-options', (req, res) => {
+app.get('/generate-authentication-options', async (req, res) => {
   // You need to know the user by this point
   const user = inMemoryUserDeviceDB[loggedInUserId];
 
@@ -230,7 +230,7 @@ app.get('/generate-authentication-options', (req, res) => {
     rpID,
   };
 
-  const options = generateAuthenticationOptions(opts);
+  const options = await generateAuthenticationOptions(opts);
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
