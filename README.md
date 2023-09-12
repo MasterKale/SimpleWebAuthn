@@ -64,7 +64,7 @@ Install the following before proceeding:
 After pulling down the code, set up dependencies:
 
 ```sh
-$> pnpm install
+$> pnpm run bootstrap-monorepo
 ```
 
 To run unit tests for all workspace packages, use the `test` series of scripts:
