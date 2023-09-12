@@ -36,6 +36,7 @@ export type VerifyAuthenticationResponseOpts = {
  * `generateAuthenticationOptions()`
  * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
+ * @param expectedType (Optional) The response type expected ('webauthn.get')
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
