@@ -95,11 +95,11 @@ export async function verifyRegistrationResponse(
   if (Array.isArray(expectedType)) {
     if (!expectedType.includes(type)) {
       const joinedExpectedType = expectedType.join(', ');
-      throw new Error(`Unexpected authentication response type "${type}", expected one of: ${joinedExpectedType}`);
+      throw new Error(`Unexpected registration response type "${type}", expected one of: ${joinedExpectedType}`);
     }
   } else if (expectedType) {
     if (type !== expectedType) {
-      throw new Error(`Unexpected authentication response type "${type}", expected "${expectedType}"`);
+      throw new Error(`Unexpected registration response type "${type}", expected "${expectedType}"`);
     }
   } else if (type !== 'webauthn.create') {
     throw new Error(`Unexpected registration response type: ${type}`);
