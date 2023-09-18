@@ -67,23 +67,29 @@ export async function startRegistration(
   // L3 says this is required, but browser and webview support are still not guaranteed.
   let responsePublicKeyAlgorithm: number | undefined = undefined;
   if (typeof response.getPublicKeyAlgorithm === 'function') {
-    responsePublicKeyAlgorithm = response.getPublicKeyAlgorithm();
+    try {
+      responsePublicKeyAlgorithm = response.getPublicKeyAlgorithm();
+    } catch (err) {}
   }
-
+  
   let responsePublicKey: string | undefined = undefined;
   if (typeof response.getPublicKey === 'function') {
-    const _publicKey = response.getPublicKey();
-    if (_publicKey !== null) {
-      responsePublicKey = bufferToBase64URLString(_publicKey);
-    }
+    try {
+      const _publicKey = response.getPublicKey();
+      if (_publicKey !== null) {
+        responsePublicKey = bufferToBase64URLString(_publicKey);
+      }
+    } catch (err) {}
   }
 
   // L3 says this is required, but browser and webview support are still not guaranteed.
   let responseAuthenticatorData: string | undefined;
   if (typeof response.getAuthenticatorData === 'function') {
-    responseAuthenticatorData = bufferToBase64URLString(
-      response.getAuthenticatorData(),
-    );
+    try {
+      responseAuthenticatorData = bufferToBase64URLString(
+        response.getAuthenticatorData(),
+      );
+    } catch (err) {}
   }
 
   return {
