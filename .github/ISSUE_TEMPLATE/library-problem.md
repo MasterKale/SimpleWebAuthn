@@ -30,7 +30,7 @@ assignees: ''
 
 - **OS:** (e.g. macOS 13.2)
 - **Browser:** (e.g. Chrome 110)
-- **Authenticator:** (e.g. YubiKey 5, iPhone 12 @ iOS 16.3)
+- **Authenticator:** (e.g. YubiKey 5, iPhone 12 @ iOS 16.3, 1Password browser extension 2.15.1)
 
 ### SimpleWebAuthn Libraries
 
