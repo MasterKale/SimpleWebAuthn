@@ -57,6 +57,10 @@ export function parseAuthenticatorData(
      * Firefox 117 incorrectly CBOR-encodes authData when EdDSA (-8) is used for the public key.
      * A CBOR "Map of 3 items" (0xa3) should be "Map of 4 items" (0xa4), and if we manually adjust
      * the single byte there's a good chance the authData can be correctly parsed.
+     *
+     * This browser release also incorrectly uses the string labels "OKP" and "Ed25519" instead of
+     * their integer representations for kty and crv respectively. That's why the COSE public key
+     * in the hex below looks so odd.
      */
     // Bytes decode to `{ 1: "OKP", 3: -8, -1: "Ed25519" }` (it's missing key -2 a.k.a. COSEKEYS.x)
     const badEdDSACBOR = isoUint8Array.fromHex('a301634f4b500327206745643235353139');
@@ -70,6 +74,7 @@ export function parseAuthenticatorData(
     const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(
       authData.slice(pointer),
     );
+    console.log(isoUint8Array.toHex(isoCBOR.encode(firstDecoded)));
     const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
 
     credentialPublicKey = firstEncoded;

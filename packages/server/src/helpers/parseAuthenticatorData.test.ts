@@ -67,8 +67,9 @@ Deno.test('should parse extension data', () => {
 
 Deno.test('should parse malformed authenticator data from Firefox 117', () => {
   /**
-   * Firefox 117 seems to be incorrectly serializing authenticator data. See the following issues
-   * for more context (I've dealt with this issue before, over in the py_webauthn project):
+   * Firefox 117 is incorrectly serializing authenticator data, and using string values for kty and
+   * crv at the same time. See the following issues for more context (I've dealt with this issue
+   * before, over in the py_webauthn project):
    *
    * - https://github.com/duo-labs/py_webauthn/issues/175
    * - https://github.com/mozilla/authenticator-rs/pull/292
