@@ -74,7 +74,6 @@ export function parseAuthenticatorData(
     const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(
       authData.slice(pointer),
     );
-    console.log(isoUint8Array.toHex(isoCBOR.encode(firstDecoded)));
     const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
 
     credentialPublicKey = firstEncoded;
