@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "bootstrap-monorepo": "pnpm install --ignore-workspace && pnpm run build:types && pnpm run build:server && pnpm install",
+    "bootstrap-monorepo": "./bootstrap.sh",
     "clean": "rm -rf ./packages/**/node_modules && rm -rf ./packages/**/dist && rm -rf ./packages/**/npm",
     "lint": "deno lint packages/**/src/**/*.ts example/**/*.ts",
     "test": "pnpm run test:browser; pnpm run test:server",
