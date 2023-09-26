@@ -5,7 +5,6 @@ import {
   RegistrationResponseJSON,
 } from '@simplewebauthn/typescript-types';
 
-import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
@@ -32,7 +31,7 @@ export async function startRegistration(
     challenge: base64URLStringToBuffer(creationOptionsJSON.challenge),
     user: {
       ...creationOptionsJSON.user,
-      id: utf8StringToBuffer(creationOptionsJSON.user.id),
+      id: base64URLStringToBuffer(creationOptionsJSON.user.id),
     },
     excludeCredentials: creationOptionsJSON.excludeCredentials?.map(
       toPublicKeyCredentialDescriptor,
