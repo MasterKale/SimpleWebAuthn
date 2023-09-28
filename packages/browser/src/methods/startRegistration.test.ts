@@ -309,6 +309,61 @@ test('should not return convenience values if getters missing', async () => {
   expect(response.response.authenticatorData).toBeUndefined();
 });
 
+test('should survive browser extensions that intercept WebAuthn and incorrectly implement public key value getters', async () => {
+  /**
+   * 1Password browser extension v2.15.1 (the one that introduced passkeys support) seemed to have
+   * implemented the following methods on AuthenticatorAttestationResponse...
+   *
+   * - getPublicKeyAlgorithm()
+   * - getPublicKey()
+   * - getAuthenticatorData()
+   *
+   * ...But when you attempt to call them as methods they'll error out with `TypeError`'s:
+   *
+   * Safari:
+   * > TypeError: Can only call AuthenticatorAttestationResponse.getPublicKeyAlgorithm on instances
+   * > of AuthenticatorAttestationResponse
+   *
+   * Chrome:
+   * > TypeError: Illegal invocation
+   *
+   * Firefox:
+   * > N/A (it handled it fine for some reason)
+   *
+   * Make sure `startRegistration()` can survive this scenario.
+   *
+   * See https://github.com/MasterKale/SimpleWebAuthn/issues/438 for more context.
+   */
+
+  // Mock extension return values from the browser extension intercepting WebAuthn
+  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
+    return new Promise((resolve) => {
+      resolve({
+        response: {
+          getPublicKeyAlgorithm: () => {
+            throw new Error('I throw for some reason');
+          },
+          getPublicKey: () => {
+            throw new Error('I also throw for some reason');
+          },
+          getAuthenticatorData: () => {
+            throw new Error('I throw for some reason too');
+          },
+        },
+        getClientExtensionResults: () => {},
+      });
+    });
+  });
+
+  await expect(startRegistration(goodOpts1)).resolves;
+
+  const response = await startRegistration(goodOpts1);
+
+  expect(response.response.publicKeyAlgorithm).toBeUndefined();
+  expect(response.response.publicKey).toBeUndefined();
+  expect(response.response.authenticatorData).toBeUndefined();
+});
+
 describe('WebAuthnError', () => {
   describe('AbortError', () => {
     const AbortError = generateCustomError('AbortError');
