@@ -70,7 +70,7 @@ export async function startRegistration(
     try {
       responsePublicKeyAlgorithm = response.getPublicKeyAlgorithm();
     } catch (error) {
-      // pass
+      warnOnBrokenImplementation('getPublicKeyAlgorithm()', error as Error);
     }
   }
 
@@ -82,7 +82,7 @@ export async function startRegistration(
         responsePublicKey = bufferToBase64URLString(_publicKey);
       }
     } catch (error) {
-      // pass
+      warnOnBrokenImplementation('getPublicKey()', error as Error);
     }
   }
 
@@ -94,7 +94,7 @@ export async function startRegistration(
         response.getAuthenticatorData(),
       );
     } catch (error) {
-      // pass
+      warnOnBrokenImplementation('getAuthenticatorData()', error as Error);
     }
   }
 
@@ -115,4 +115,15 @@ export async function startRegistration(
       credential.authenticatorAttachment,
     ),
   };
+}
+
+/**
+ * Visibly warn when we detect an issue related to a passkey provider intercepting WebAuthn API
+ * calls
+ */
+function warnOnBrokenImplementation(methodName: string, cause: Error): void {
+  console.warn(
+    `The browser extension that intercepted this WebAuthn API call incorrectly implemented ${methodName}. You should report this error to them.\n`,
+    cause,
+  );
 }
