@@ -12,8 +12,12 @@ test('should export method `browserSupportsWebAuthn`', () => {
   expect(index.browserSupportsWebAuthn).toBeDefined();
 });
 
+test('should export method `browserSupportsWebAuthnAutofill`', () => {
+  expect(index.browserSupportsWebAuthnAutofill).toBeDefined();
+});
+
 test('should export method `platformAuthenticatorIsAvailable`', () => {
-  expect(index.browserSupportsWebAuthn).toBeDefined();
+  expect(index.platformAuthenticatorIsAvailable).toBeDefined();
 });
 
 test('should export method `base64URLStringToBuffer`', () => {
