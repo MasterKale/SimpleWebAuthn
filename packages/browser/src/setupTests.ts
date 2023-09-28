@@ -2,6 +2,7 @@
 // jest.spyOn(console, 'log').mockImplementation();
 // jest.spyOn(console, 'debug').mockImplementation();
 // jest.spyOn(console, 'error').mockImplementation();
+jest.spyOn(console, 'warn').mockImplementation();
 
 /**
  * JSDom doesn't seem to support `credentials`, so let's define them here so we can mock their
