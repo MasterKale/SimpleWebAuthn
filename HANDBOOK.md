@@ -22,13 +22,13 @@ What packages need to be published?
 ### Step 2: Need to publish `typescript-types`?
 
 ```
-pnpm run build:types && (cd packages/typescript-types/npm; pnpm publish)
+pnpm run publish:types
 ```
 
 ### Step 3: Need to publish `browser`?
 
 ```
-pnpm run build:browser && (cd packages/browser; pnpm publish)
+pnpm run publish:browser
 ```
 
 ### Step 4: Need to publish `server`?
@@ -40,7 +40,7 @@ pnpm run build:browser && (cd packages/browser; pnpm publish)
      unavailable.
 
 ```
-pnpm run build:server && (cd packages/server/npm; pnpm publish)
+pnpm run publish:server
 ```
 
 ### Step 5: Push up `HEAD` to `origin`
