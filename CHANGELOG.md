@@ -1,5 +1,17 @@
 # Changelog
 
+## v8.2.1
+
+### Packages
+
+- @simplewebauthn/browser@8.2.1
+
+### Changes
+
+- **[browser]** `startRegistration()` will visibly warn in the browser console when a WebAuthn API
+  method call errors out in a way that is likely due to a browser extension intercepting the API
+  ([#447](https://github.com/MasterKale/SimpleWebAuthn/pull/447))
+
 ## v8.2.0
 
 ### Packages
