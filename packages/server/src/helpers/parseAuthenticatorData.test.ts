@@ -2,7 +2,7 @@ import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
 import { parseAuthenticatorData } from './parseAuthenticatorData.ts';
 import { AuthenticationExtensionsAuthenticatorOutputs } from './decodeAuthenticatorExtensions.ts';
-import { isoBase64URL } from './iso/index.ts';
+import { isoBase64URL, isoUint8Array } from './iso/index.ts';
 
 // Grabbed this from a Conformance test, contains attestation data
 const authDataWithAT = isoBase64URL.toBuffer(
@@ -63,4 +63,22 @@ Deno.test('should parse extension data', () => {
         'This is an example extension! If you read this message, you probably successfully passing conformance tests. Good job!',
     } as AuthenticationExtensionsAuthenticatorOutputs,
   );
+});
+
+Deno.test('should parse malformed authenticator data from Firefox 117', () => {
+  /**
+   * Firefox 117 is incorrectly serializing authenticator data, and using string values for kty and
+   * crv at the same time. See the following issues for more context (I've dealt with this issue
+   * before, over in the py_webauthn project):
+   *
+   * - https://github.com/duo-labs/py_webauthn/issues/175
+   * - https://github.com/mozilla/authenticator-rs/pull/292
+   */
+  const authDataBadKty =
+    'b40499b0271a68957267de4ec40056a74c8758c6582e1e01fcf357d73101e7ba450000000400000000000000000000000000000000008072d3a1a3fa7cf32f44367df847585ff0850c7bd62c338ab45be1fda6fdb79982f96c20efc0bb6ed9347e8c1e77690e67b225b485a098f6f46fde3f2a85acd0177a04d6bb5c7566fb89881dfe48ea7abc361f7acaf86a5966adef557930fa5c045c636f50cf938e508a81b845134eb2988dc3af0ab6f98cfc615532684b4a6363a301634f4b50032720674564323535313921982018d51858187318e6188918eb18ab187e18fd18fd185d184b08184b187318e818e118f818c71518ff18f5183a18fd18a3186b185f1109183e183b14';
+
+  const parsed = parseAuthenticatorData(isoUint8Array.fromHex(authDataBadKty));
+
+  // If we can assert this then it means we could parse the bad auth data above
+  assertEquals(parsed.flags.at, true);
 });
