@@ -15,3 +15,11 @@ test('should export method `browserSupportsWebAuthn`', () => {
 test('should export method `platformAuthenticatorIsAvailable`', () => {
   expect(index.browserSupportsWebAuthn).toBeDefined();
 });
+
+test('should export method `base64URLStringToBuffer`', () => {
+  expect(index.base64URLStringToBuffer).toBeDefined();
+});
+
+test('should export method `bufferToBase64URLString`', () => {
+  expect(index.bufferToBase64URLString).toBeDefined();
+});
