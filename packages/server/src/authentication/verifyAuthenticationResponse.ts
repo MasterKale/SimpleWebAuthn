@@ -18,6 +18,7 @@ export type VerifyAuthenticationResponseOpts = {
   expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
+  expectedType?: string | string[];
   authenticator: AuthenticatorDevice;
   requireUserVerification?: boolean;
   advancedFIDOConfig?: {
@@ -35,6 +36,7 @@ export type VerifyAuthenticationResponseOpts = {
  * `generateAuthenticationOptions()`
  * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
+ * @param expectedType (Optional) The response type expected ('webauthn.get')
  * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
@@ -52,6 +54,7 @@ export async function verifyAuthenticationResponse(
     expectedChallenge,
     expectedOrigin,
     expectedRPID,
+    expectedType,
     authenticator,
     requireUserVerification = true,
     advancedFIDOConfig,
@@ -88,7 +91,16 @@ export async function verifyAuthenticationResponse(
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an authentication
-  if (type !== 'webauthn.get') {
+  if (Array.isArray(expectedType)) {
+    if (!expectedType.includes(type)) {
+      const joinedExpectedType = expectedType.join(', ');
+      throw new Error(`Unexpected authentication response type "${type}", expected one of: ${joinedExpectedType}`);
+    }
+  } else if (expectedType) {
+    if (type !== expectedType) {
+      throw new Error(`Unexpected authentication response type "${type}", expected "${expectedType}"`);
+    }
+  } else if (type !== 'webauthn.get') {
     throw new Error(`Unexpected authentication response type: ${type}`);
   }
 

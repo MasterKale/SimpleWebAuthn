@@ -335,6 +335,40 @@ Deno.test('should throw an error if RP ID not in list of possible RP IDs', async
   );
 });
 
+Deno.test('should throw an error if type not the expected type', async () => {
+  await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: assertionResponse,
+        expectedChallenge: assertionChallenge,
+        expectedOrigin: assertionOrigin,
+        // assertionResponse contains webauthn.get, this should produce an error
+        expectedType: 'payment.get',
+        expectedRPID: 'localhost',
+        authenticator: authenticator,
+      }),
+    Error,
+    'Unexpected authentication response type',
+  );
+});
+
+Deno.test('should throw an error if type not in list of expected types', async () => {
+  await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: assertionResponse,
+        expectedChallenge: assertionChallenge,
+        expectedOrigin: assertionOrigin,
+        // assertionResponse contains webauthn.get, this should produce an error
+        expectedType: ['payment.get', 'something.get'],
+        expectedRPID: 'localhost',
+        authenticator: authenticator,
+      }),
+    Error,
+    'Unexpected authentication response type',
+  );
+});
+
 Deno.test('should pass verification if custom challenge verifier returns true', async () => {
   const verification = await verifyAuthenticationResponse({
     response: {

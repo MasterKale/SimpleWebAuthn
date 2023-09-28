@@ -219,6 +219,36 @@ Deno.test('should throw when response origin is not expected value', async () =>
   );
 });
 
+Deno.test('should throw when response type is not expected value', async () => {
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+        expectedType: 'something.get'
+      }),
+    Error,
+   'registration response type',
+  );
+});
+
+Deno.test('should throw when response type is not in list of expected types', async () => {
+  await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: attestationNone,
+        expectedChallenge: attestationNoneChallenge,
+        expectedOrigin: 'https://dev.dontneeda.pw',
+        expectedRPID: 'dev.dontneeda.pw',
+        expectedType: ['something.create', 'something.else.create']
+      }),
+    Error,
+    'registration response type',
+  );
+});
+
 Deno.test('should throw when attestation type is not webauthn.create', async () => {
   const origin = 'https://dev.dontneeda.pw';
   const challenge = attestationNoneChallenge;
@@ -246,6 +276,34 @@ Deno.test('should throw when attestation type is not webauthn.create', async () 
     Error,
     'registration response type',
   );
+
+  mockDecodeClientData.restore();
+});
+
+Deno.test('should validate when attestation type is not webauthn.create and expected type provided', async () => {
+  const origin = 'https://dev.dontneeda.pw';
+  const challenge = attestationNoneChallenge;
+
+  const mockDecodeClientData = stub(
+    _decodeClientDataJSONInternals,
+    'stubThis',
+    returnsNext([
+      {
+        origin,
+        type: 'webauthn.goodtype',
+        challenge: attestationNoneChallenge,
+      },
+    ]),
+  );
+
+  const verification = await verifyRegistrationResponse({
+    response: attestationNone,
+    expectedChallenge: challenge,
+    expectedOrigin: origin,
+    expectedRPID: 'dev.dontneeda.pw',
+    expectedType: 'webauthn.goodtype'
+  });
+  assert(verification.verified);
 
   mockDecodeClientData.restore();
 });

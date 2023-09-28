@@ -33,6 +33,7 @@ export type VerifyRegistrationResponseOpts = {
   expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];
+  expectedType?: string | string[];
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
@@ -47,6 +48,7 @@ export type VerifyRegistrationResponseOpts = {
  * `generateRegistrationOptions()`
  * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
+ * @param expectedType (Optional) The response type expected ('webauthn.create')
  * @param requireUserVerification (Optional) Enforce user verification by the authenticator
  * (via PIN, fingerprint, etc...)
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
@@ -60,6 +62,7 @@ export async function verifyRegistrationResponse(
     expectedChallenge,
     expectedOrigin,
     expectedRPID,
+    expectedType,
     requireUserVerification = true,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
@@ -89,7 +92,16 @@ export async function verifyRegistrationResponse(
   const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an registration
-  if (type !== 'webauthn.create') {
+  if (Array.isArray(expectedType)) {
+    if (!expectedType.includes(type)) {
+      const joinedExpectedType = expectedType.join(', ');
+      throw new Error(`Unexpected registration response type "${type}", expected one of: ${joinedExpectedType}`);
+    }
+  } else if (expectedType) {
+    if (type !== expectedType) {
+      throw new Error(`Unexpected registration response type "${type}", expected "${expectedType}"`);
+    }
+  } else if (type !== 'webauthn.create') {
     throw new Error(`Unexpected registration response type: ${type}`);
   }
 
