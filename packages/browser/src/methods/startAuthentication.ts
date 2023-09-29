@@ -11,7 +11,7 @@ import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyAuthenticationError } from '../helpers/identifyAuthenticationError';
-import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { WebauthnAbortService } from '../helpers/webAuthnAbortService';
 import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
 /**
@@ -79,7 +79,7 @@ export async function startAuthentication(
   // Finalize options
   options.publicKey = publicKey;
   // Set up the ability to cancel this request if the user attempts another
-  options.signal = webauthnAbortService.createNewAbortSignal();
+  options.signal = WebauthnAbortService.createNewAbortSignal();
 
   // Wait for the user to complete assertion
   let credential;

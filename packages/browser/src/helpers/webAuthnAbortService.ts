@@ -2,7 +2,7 @@
  * A way to cancel an existing WebAuthn request, for example to cancel a
  * WebAuthn autofill authentication request for a manual authentication attempt.
  */
-class WebAuthnAbortService {
+class BaseWebAuthnAbortService {
   private controller: AbortController | undefined;
 
   /**
@@ -26,4 +26,4 @@ class WebAuthnAbortService {
   }
 }
 
-export const webauthnAbortService = new WebAuthnAbortService();
+export const WebauthnAbortService = new BaseWebAuthnAbortService();
