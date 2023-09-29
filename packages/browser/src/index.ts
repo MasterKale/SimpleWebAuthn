@@ -9,6 +9,7 @@ import { platformAuthenticatorIsAvailable } from './helpers/platformAuthenticato
 import { browserSupportsWebAuthnAutofill } from './helpers/browserSupportsWebAuthnAutofill';
 import { base64URLStringToBuffer } from './helpers/base64URLStringToBuffer';
 import { bufferToBase64URLString } from './helpers/bufferToBase64URLString';
+import { WebauthnAbortService } from './helpers/webAuthnAbortService';
 
 export {
   base64URLStringToBuffer,
@@ -18,6 +19,7 @@ export {
   platformAuthenticatorIsAvailable,
   startAuthentication,
   startRegistration,
+  WebauthnAbortService,
 };
 
 export type { WebAuthnErrorCode } from './helpers/webAuthnError';
