@@ -21,6 +21,21 @@ class BaseWebAuthnAbortService {
     this.controller = newController;
     return newController.signal;
   }
+
+  /**
+   * Manually cancel any active WebAuthn registration or authentication attempt.
+   */
+  cancelCeremony() {
+    if (this.controller) {
+      const abortError = new Error(
+        'Manually cancelling existing WebAuthn API call',
+      );
+      abortError.name = 'AbortError';
+      this.controller.abort(abortError);
+
+      this.controller = undefined;
+    }
+  }
 }
 
 /**
