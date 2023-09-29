@@ -1,23 +1,23 @@
-import { WebauthnAbortService } from './webAuthnAbortService';
+import { WebAuthnAbortService } from './webAuthnAbortService';
 
 test('should create a new abort signal every time', () => {
-  const signal1 = WebauthnAbortService.createNewAbortSignal();
-  const signal2 = WebauthnAbortService.createNewAbortSignal();
+  const signal1 = WebAuthnAbortService.createNewAbortSignal();
+  const signal2 = WebAuthnAbortService.createNewAbortSignal();
 
   expect(signal2).not.toBe(signal1);
 });
 
 test('should call abort() with AbortError on existing controller when creating a new signal', () => {
   // Populate `.controller`
-  WebauthnAbortService.createNewAbortSignal();
+  WebAuthnAbortService.createNewAbortSignal();
 
   // Spy on the existing instance of AbortController
   const abortSpy = jest.fn();
   // @ts-ignore: Ignore the fact that `controller` is private
-  WebauthnAbortService.controller.abort = abortSpy;
+  WebAuthnAbortService.controller.abort = abortSpy;
 
   // Generate a new signal, which should call `abort()` on the existing controller
-  WebauthnAbortService.createNewAbortSignal();
+  WebAuthnAbortService.createNewAbortSignal();
   expect(abortSpy).toHaveBeenCalledTimes(1);
 
   // Make sure we raise an AbortError so it can be detected correctly
@@ -28,15 +28,15 @@ test('should call abort() with AbortError on existing controller when creating a
 
 test('should cancel active WebAuthn ceremony when manually cancelled', () => {
   // Populate `.controller`
-  WebauthnAbortService.createNewAbortSignal();
+  WebAuthnAbortService.createNewAbortSignal();
 
   // Spy on the existing instance of AbortController
   const abortSpy = jest.fn();
   // @ts-ignore: Ignore the fact that `controller` is private
-  WebauthnAbortService.controller.abort = abortSpy;
+  WebAuthnAbortService.controller.abort = abortSpy;
 
   // Cancel the in-flight ceremony, which should call `abort()` on the existing controller
-  WebauthnAbortService.cancelCeremony();
+  WebAuthnAbortService.cancelCeremony();
   expect(abortSpy).toHaveBeenCalledTimes(1);
 
   // Make sure we raise an AbortError so it can be detected correctly
@@ -46,5 +46,5 @@ test('should cancel active WebAuthn ceremony when manually cancelled', () => {
 
   // Ensure that we don't set up a new AbortController because it's unnecessary to do so
   // @ts-ignore: Ignore the fact that `controller` is private
-  expect(WebauthnAbortService.controller).toBeUndefined();
+  expect(WebAuthnAbortService.controller).toBeUndefined();
 });

@@ -11,7 +11,7 @@ import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
 import { identifyRegistrationError } from '../helpers/identifyRegistrationError';
-import { WebauthnAbortService } from '../helpers/webAuthnAbortService';
+import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
 import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
 /**
@@ -42,7 +42,7 @@ export async function startRegistration(
   // Finalize options
   const options: CredentialCreationOptions = { publicKey };
   // Set up the ability to cancel this request if the user attempts another
-  options.signal = WebauthnAbortService.createNewAbortSignal();
+  options.signal = WebAuthnAbortService.createNewAbortSignal();
 
   // Wait for the user to complete attestation
   let credential;

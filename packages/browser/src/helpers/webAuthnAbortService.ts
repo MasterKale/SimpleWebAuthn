@@ -45,4 +45,4 @@ class BaseWebAuthnAbortService {
  * developers building projects that use client-side routing to better control the behavior of
  * their UX in response to router navigation events.
  */
-export const WebauthnAbortService = new BaseWebAuthnAbortService();
+export const WebAuthnAbortService = new BaseWebAuthnAbortService();
