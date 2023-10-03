@@ -9,8 +9,8 @@
         "isDefault": true
       },
       "problemMatcher": [],
-      "label": "npm: build:server",
-      "detail": "lerna bootstrap --scope=@simplewebauthn/server"
+      "label": "pnpm: build:server",
+      "detail": "pnpm run build:server"
     },
     {
       "type": "npm",
@@ -20,8 +20,8 @@
         "isDefault": true
       },
       "problemMatcher": [],
-      "label": "npm: build:browser",
-      "detail": "lerna bootstrap --scope=@simplewebauthn/browser"
+      "label": "pnpm: build:browser",
+      "detail": "pnpm run build:browser"
     }
   ]
 }
