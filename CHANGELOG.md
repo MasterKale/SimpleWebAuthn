@@ -1,5 +1,17 @@
 # Changelog
 
+## v8.3.1
+
+### Packages
+
+- @simplewebauthn/browser@8.3.1
+
+### Changes
+
+- **[browser]** Calling `startAuthentication(..., true)` to set up conditional UI will now require
+  the `"webauthn"` value in an input's `autocomplete="..."` be either the only value or the last
+  value ([#451](https://github.com/MasterKale/SimpleWebAuthn/pull/451))
+
 ## v8.3.0
 
 ### Packages
