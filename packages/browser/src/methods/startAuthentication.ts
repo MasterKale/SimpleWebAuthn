@@ -65,7 +65,7 @@ export async function startAuthentication(
     // WebAuthn autofill requires at least one valid input
     if (eligibleInputs.length < 1) {
       throw Error(
-        'No <input> with `"webauthn"` as the only or last value in its `autocomplete` attribute was detected',
+        'No <input> with "webauthn" as the only or last value in its `autocomplete` attribute was detected',
       );
     }
 
