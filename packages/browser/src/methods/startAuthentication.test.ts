@@ -297,6 +297,22 @@ test('should set up autofill a.k.a. Conditional UI', async () => {
     .toEqual(0);
 });
 
+test('should set up conditional UI if "webauthn" is the only autocomplete token', async () => {
+  /**
+   * According to WHATWG "webauthn" can be the only token in the autocomplete attribute:
+   * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill-detail-tokens
+   */
+  document.body.innerHTML = `
+    <form>
+      <label for="username">Username</label>
+      <input type="text" name="username" autocomplete="webauthn" />
+      <button type="submit">Submit</button>
+    </form>
+  `;
+
+  await expect(startAuthentication(goodOpts1, true)).resolves;
+});
+
 test('should throw error if autofill not supported', async () => {
   mockSupportsAutofill.mockResolvedValue(false);
 
@@ -311,6 +327,25 @@ test('should throw error if no acceptable <input> is found', async () => {
     <form>
       <label for="username">Username</label>
       <input type="text" name="username" autocomplete="username" />
+      <button type="submit">Submit</button>
+    </form>
+  `;
+
+  const rejected = await expect(startAuthentication(goodOpts1, true)).rejects;
+  rejected.toThrow(Error);
+  rejected.toThrow(/no <input>/i);
+});
+
+test('should throw error if "webauthn" is not final autocomplete token', async () => {
+  /**
+   * According to WHATWG "webauthn" must be the final token in the autocomplete attribute when
+   * multiple tokens are present:
+   * https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill-detail-tokens
+   */
+  document.body.innerHTML = `
+    <form>
+      <label for="username">Username</label>
+      <input type="text" name="username" autocomplete="webauthn username" />
       <button type="submit">Submit</button>
     </form>
   `;
