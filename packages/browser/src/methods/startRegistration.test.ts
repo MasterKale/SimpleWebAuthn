@@ -8,7 +8,7 @@ import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/webAuthnError';
-import { webauthnAbortService } from '../helpers/webAuthnAbortService';
+import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
 
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 
@@ -61,8 +61,7 @@ beforeEach(() => {
   mockSupportsWebauthn.mockReturnValue(true);
 
   // Reset the abort service so we get an accurate call count
-  // @ts-ignore: Ignore the fact that `controller` is private
-  webauthnAbortService.controller = undefined;
+  WebAuthnAbortService.cancelCeremony();
 });
 
 afterEach(() => {

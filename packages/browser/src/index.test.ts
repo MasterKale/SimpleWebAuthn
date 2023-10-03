@@ -27,3 +27,7 @@ test('should export method `base64URLStringToBuffer`', () => {
 test('should export method `bufferToBase64URLString`', () => {
   expect(index.bufferToBase64URLString).toBeDefined();
 });
+
+test('should export singleton `WebAuthnAbortService`', () => {
+  expect(index.WebAuthnAbortService).toBeDefined();
+});
