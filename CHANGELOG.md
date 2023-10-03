@@ -1,5 +1,19 @@
 # Changelog
 
+## v8.3.0
+
+### Packages
+
+- @simplewebauthn/browser@8.3.0
+
+### Changes
+
+- **[browser]** The `WebAuthnAbortService` singleton can now be imported, with a `cancelCeremony()`
+  method that can be called to manually cancel any active WebAuthn ceremonies. This can be used by
+  developers building projects that use client-side routing to better control the behavior of their
+  UX in response to router navigation events.
+  ([#449](https://github.com/MasterKale/SimpleWebAuthn/pull/449))
+
 ## v8.2.1
 
 ### Packages
