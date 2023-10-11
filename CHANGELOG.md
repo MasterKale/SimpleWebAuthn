@@ -1,5 +1,17 @@
 # Changelog
 
+## v8.3.2
+
+### Packages
+
+- @simplewebauthn/server@8.3.2
+
+### Changes
+
+- **[server]** The cbor-x dependency is now used without pulling in the Node-specific `stream` API
+  for better Web API environment compatibility
+  ([#455](https://github.com/MasterKale/SimpleWebAuthn/pull/455), with thanks to @Maronato)
+
 ## v8.3.1
 
 ### Packages
