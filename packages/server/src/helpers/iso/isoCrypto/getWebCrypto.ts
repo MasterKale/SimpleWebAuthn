@@ -11,29 +11,31 @@ export async function getWebCrypto(): Promise<Crypto> {
     return webCrypto;
   }
 
+  /**
+   * Naively attempt to access Crypto as a global object, which popular alternative run-times
+   * support.
+   */
+  // @ts-ignore: ...right here.
+  let _crypto: Crypto = globalThis.crypto;
+
   try {
     /**
      * Naively attempt a Node import...
      */
     // @ts-ignore: We'll handle any errors...
     // dnt-shim-ignore
-    const _crypto = await import('node:crypto');
-    webCrypto = _crypto.webcrypto as Crypto;
-  } catch (_err) {
-    /**
-     * Naively attempt to access Crypto as a global object, which popular alternative run-times
-     * support.
-     */
-    // @ts-ignore: ...right here.
-    const _crypto: Crypto = globalThis.crypto;
-
-    if (!_crypto) {
-      // We tried to access it both in Node and globally, so bail out
-      throw new MissingWebCrypto();
+    const nodeCrypto = await import('node:crypto');
+    if (nodeCrypto.webcrypto) {
+      _crypto = nodeCrypto.webcrypto as Crypto;
     }
+  } catch {}
 
-    webCrypto = _crypto;
+  if (!_crypto) {
+    // We tried to access it both in Node and globally, so bail out
+    throw new MissingWebCrypto();
   }
+  
+  webCrypto = _crypto;
 
   return webCrypto;
 }
