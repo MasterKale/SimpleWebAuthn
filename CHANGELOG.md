@@ -60,13 +60,15 @@
 ### Changes
 
 - **[browser]** `startRegistration()` will no longer error out on registration responses generated
-  by the 1Password browser extension ([#443](https://github.com/MasterKale/SimpleWebAuthn/pull/443))
+  by the 1Password browser extension ([#443](https://github.com/MasterKale/SimpleWebAuthn/pull/443),
+  with thanks to @unix)
 - **[browser]** Helper methods `base64URLStringToBuffer()` and `bufferToBase64URLString()` are now
   exported from `@simplewebauthn/browser`
   ([#444](https://github.com/MasterKale/SimpleWebAuthn/pull/444))
 - **[server]** `verifyRegistrationResponse()` and `verifyAuthenticationResponse()` now accept a new
   `expectedType` argument that can be used to, for example, verify Secure Payment Confirmation
-  responses ([#436](https://github.com/MasterKale/SimpleWebAuthn/pull/436))
+  responses ([#436](https://github.com/MasterKale/SimpleWebAuthn/pull/436), with thanks to
+  @fabiancook)
 - **[server]** Responses containing malformed authenticator data returned from Firefox 117 will no
   longer raise an error ([#441](https://github.com/MasterKale/SimpleWebAuthn/pull/441))
 
@@ -91,7 +93,7 @@
 
 - **[server]** The `expectedChallenge` argument for `verifyRegistrationResponse()` and
   `verifyAuthenticationResponse()` methods now also accept asynchronous methods
-  ([#432](https://github.com/MasterKale/SimpleWebAuthn/pull/432))
+  ([#432](https://github.com/MasterKale/SimpleWebAuthn/pull/432), with thanks to @jordanbtucker)
 
 ## v8.0.2
 
