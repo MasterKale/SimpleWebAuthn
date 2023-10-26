@@ -65,8 +65,10 @@ export function parseAuthenticatorData(
     // Bytes decode to `{ 1: "OKP", 3: -8, -1: "Ed25519" }` (it's missing key -2 a.k.a. COSEKEYS.x)
     const badEdDSACBOR = isoUint8Array.fromHex('a301634f4b500327206745643235353139');
     const bytesAtCurrentPosition = authData.slice(pointer, pointer + badEdDSACBOR.byteLength);
+    let foundBadCBOR = false;
     if (isoUint8Array.areEqual(badEdDSACBOR, bytesAtCurrentPosition)) {
       // Change the bad CBOR 0xa3 to 0xa4 so that the credential public key can be recognized
+      foundBadCBOR = true;
       authData[pointer] = 0xa4;
     }
 
@@ -75,6 +77,12 @@ export function parseAuthenticatorData(
       authData.slice(pointer),
     );
     const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
+
+    if (foundBadCBOR) {
+      // Restore the bit we changed so that `authData` is the same as it came in and won't break
+      // signature verification.
+      authData[pointer] = 0xa3;
+    }
 
     credentialPublicKey = firstEncoded;
     pointer += firstEncoded.byteLength;
