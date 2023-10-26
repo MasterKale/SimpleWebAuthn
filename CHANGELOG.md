@@ -1,5 +1,22 @@
 # Changelog
 
+## v8.3.3
+
+### Packages
+
+- @simplewebauthn/browser@8.3.3
+- @simplewebauthn/server@8.3.3
+- @simplewebauthn/typescript-types@8.3.3
+
+### Changes
+
+- **[server, types]** `deno vendor` will no longer error out because **typescript-types/src/dom.ts**
+  is missing ([#466](https://github.com/MasterKale/SimpleWebAuthn/pull/466))
+- **[server]** Authenticator data will now be preserved after bad CBOR encoding is detected and
+  temporarily fixed when handling security key responses from Firefox
+  ([#465](https://github.com/MasterKale/SimpleWebAuthn/pull/465))
+- **[browser]** Version sync due to changes in **typescript-types**
+
 ## v8.3.2
 
 ### Packages
