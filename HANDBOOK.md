@@ -4,6 +4,16 @@ Notes for myself that I don't want cluttering up the README
 
 ## Deployment Process
 
+### Step 0: Things you might have missed
+
+#### Did you update the version of `"typescript"` in the monorepo's root **package.json** file?
+
+Run this first to update **packages/typescript-types/dom.ts** then commit the changes:
+
+```
+(cd packages/typescript-types; pnpm run extract-dom-types)
+```
+
 ### Step 1: Determine which packages need to be published
 
 ```
