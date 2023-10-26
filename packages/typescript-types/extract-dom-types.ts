@@ -87,9 +87,12 @@ const outputSourceFile = project.createSourceFile(`src/dom.ts`, undefined, {
   overwrite: true,
 });
 outputSourceFile.addStatements([
-  `// Generated from typescript@${version} ${domSourcePath}`,
-  `// To regenerate, run the following command from the project root:`,
-  `// npx lerna --scope=@simplewebauthn/typescript-types exec -- npm run extract-dom-types`,
+  `/**`,
+  ` * Generated from typescript@${version} ${domSourcePath}`,
+  ` * To regenerate, run the following command from the project root:`,
+  ` * npx lerna --scope=@simplewebauthn/typescript-types exec -- npm run extract-dom-types`,
+  ` */`,
+  `// BEGIN CODEGEN`,
 ]);
 const resolvedStructures = Array.from(resolvedNodes).map((node) => node.getStructure());
 outputSourceFile.addInterfaces(
