@@ -11,37 +11,50 @@ export async function getWebCrypto(): Promise<Crypto> {
     return webCrypto;
   }
 
-  try {
-    /**
-     * Naively attempt a Node import...
-     */
-    // @ts-ignore: We'll handle any errors...
-    // dnt-shim-ignore
-    const _crypto = await import('node:crypto');
-    webCrypto = _crypto.webcrypto as Crypto;
-  } catch (_err) {
-    /**
-     * Naively attempt to access Crypto as a global object, which popular alternative run-times
-     * support.
-     */
-    // @ts-ignore: ...right here.
-    const _crypto: Crypto = globalThis.crypto;
+  /**
+   * Naively attempt to access Crypto as a global object, which popular alternative run-times
+   * support.
+   */
+  const _crypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
 
-    if (!_crypto) {
-      // We tried to access it both in Node and globally, so bail out
-      throw new MissingWebCrypto();
-    }
-
+  if (_crypto) {
     webCrypto = _crypto;
+    return webCrypto;
   }
 
-  return webCrypto;
+  try {
+    /**
+     * `globalThis.crypto` isn't available, so attempt a Node import...
+     */
+    const _crypto = await _getWebCryptoInternals.stubThisImportNodeCrypto();
+
+    if (_crypto.webcrypto) {
+      webCrypto = _crypto.webcrypto as Crypto;
+      return webCrypto;
+    }
+  } catch (_err) {
+    // pass
+  }
+
+  // We tried to access it both in Node and globally, so bail out
+  throw new MissingWebCrypto();
 }
 
-class MissingWebCrypto extends Error {
+export class MissingWebCrypto extends Error {
   constructor() {
     const message = 'An instance of the Crypto API could not be located';
     super(message);
     this.name = 'MissingWebCrypto';
   }
 }
+
+// Make it possible to stub return values during testing
+export const _getWebCryptoInternals = {
+  // dnt-shim-ignore
+  stubThisImportNodeCrypto: () => import('node:crypto'),
+  stubThisGlobalThisCrypto: () => globalThis.crypto,
+  // Make it possible to reset the `webCrypto` at the top of the file
+  setCachedCrypto: (newCrypto: Crypto | undefined) => {
+    webCrypto = newCrypto;
+  },
+};
