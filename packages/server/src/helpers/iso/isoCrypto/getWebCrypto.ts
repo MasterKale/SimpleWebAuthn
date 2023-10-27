@@ -15,7 +15,7 @@ export async function getWebCrypto(): Promise<Crypto> {
    * Naively attempt to access Crypto as a global object, which popular alternative run-times
    * support.
    */
-  const _crypto = globalThis.crypto;
+  const _crypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
 
   if (_crypto) {
     webCrypto = _crypto;
@@ -40,7 +40,7 @@ export async function getWebCrypto(): Promise<Crypto> {
   throw new MissingWebCrypto();
 }
 
-class MissingWebCrypto extends Error {
+export class MissingWebCrypto extends Error {
   constructor() {
     const message = 'An instance of the Crypto API could not be located';
     super(message);
@@ -52,4 +52,9 @@ class MissingWebCrypto extends Error {
 export const _getWebCryptoInternals = {
   // dnt-shim-ignore
   stubThisImportNodeCrypto: () => import('node:crypto'),
+  stubThisGlobalThisCrypto: () => globalThis.crypto,
+  // Make it possible to reset the `webCrypto` at the top of the file
+  setCachedCrypto: (newCrypto: Crypto | undefined) => {
+    webCrypto = newCrypto;
+  },
 };

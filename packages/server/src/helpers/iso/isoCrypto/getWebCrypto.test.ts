@@ -1,75 +1,137 @@
-import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertEquals, assertRejects } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts';
 
-import { _getWebCryptoInternals, getWebCrypto } from './getWebCrypto.ts';
+import { _getWebCryptoInternals, getWebCrypto, MissingWebCrypto } from './getWebCrypto.ts';
 
-Deno.test('Should return globalThis.crypto when present', async () => {
-  // Back up globalThis.crypto
-  const originalCrypto = globalThis.crypto;
-
-  // Overwrite globalThis.crypto
-  const newCrypto = {};
-  Object.defineProperty(globalThis, 'crypto', { value: newCrypto, writable: true });
+Deno.test('should return globalThis.crypto when present', async () => {
+  // Pretend globalThis.crypto exists
+  const newGlobalThisCrypto = {};
+  const mockGlobalThisCrypto = stub(
+    _getWebCryptoInternals,
+    'stubThisGlobalThisCrypto',
+    // @ts-ignore: globalThis.crypto
+    returnsNext([newGlobalThisCrypto]),
+  );
 
   const returnedCrypto = await getWebCrypto();
 
-  assertEquals(returnedCrypto, newCrypto);
+  assertEquals(returnedCrypto, newGlobalThisCrypto);
 
-  // Restore globalThis.crypto
-  Object.defineProperty(globalThis, 'crypto', { value: originalCrypto, writable: true });
+  mockGlobalThisCrypto.restore();
 });
 
-Deno.test('Should return node:crypto.webcrypto when globalThis.crypto is missing', async () => {
-  // Mock out just enough of the 'node:crypto' module
-  const fakeNodeCrypto = { webcrypto: {} };
-  const mockDecodeClientData = stub(
+Deno.test('should return node:crypto.webcrypto when globalThis.crypto is missing', async () => {
+  // Pretend globalThis.crypto doesn't exist
+  const mockGlobalThisCrypto = stub(
     _getWebCryptoInternals,
-    'stubThisImportNodeCrypto',
-    // @ts-ignore: Pretending to return something from Node
-    returnsNext([fakeNodeCrypto]),
+    'stubThisGlobalThisCrypto',
+    // @ts-ignore: globalThis.crypto
+    returnsNext([undefined]),
   );
 
-  // Back up globalThis.crypto
-  const originalCrypto = globalThis.crypto;
-
-  // Overwrite globalThis.crypto
-  const newCrypto = undefined;
-  Object.defineProperty(globalThis, 'crypto', { value: newCrypto, writable: true });
+  // Mock out just enough of the 'node:crypto' module
+  const fakeNodeCrypto = { webcrypto: {} };
+  const mockImportNodeCrypto = stub(
+    _getWebCryptoInternals,
+    'stubThisImportNodeCrypto',
+    // @ts-ignore: node:crypto
+    returnsNext([fakeNodeCrypto]),
+  );
 
   const returnedCrypto = await getWebCrypto();
 
   assertEquals(returnedCrypto, fakeNodeCrypto.webcrypto);
 
-  // Restore globalThis.crypto
-  Object.defineProperty(globalThis, 'crypto', { value: originalCrypto, writable: true });
-  mockDecodeClientData.restore();
+  mockGlobalThisCrypto.restore();
+  mockImportNodeCrypto.restore();
 });
 
 Deno.test(
-  'Should return globalThis.crypto when present, while node:crypto is present but missing webcrypto',
+  'should return globalThis.crypto when present, while node:crypto.webcrypto is present',
   async () => {
+    // Pretend globalThis.crypto exists
+    const fakeGlobalThisCrypto = {};
+    const mockGlobalThisCrypto = stub(
+      _getWebCryptoInternals,
+      'stubThisGlobalThisCrypto',
+      // @ts-ignore: globalThis.crypto
+      returnsNext([fakeGlobalThisCrypto]),
+    );
+
     // Mock out just enough of the 'node:crypto' module, but like we're in Node v14
-    const fakeNodeCrypto = { webcrypto: undefined };
-    const mockDecodeClientData = stub(
+    const fakeNodeCrypto = { webcrypto: {} };
+    const mockImportNodeCrypto = stub(
       _getWebCryptoInternals,
       'stubThisImportNodeCrypto',
-      // @ts-ignore: Pretending to return something from Node
+      // @ts-ignore: node:crypto
       returnsNext([fakeNodeCrypto]),
     );
 
-    // Back up globalThis.crypto
-    const originalCrypto = globalThis.crypto;
+    const returnedCrypto = await getWebCrypto();
 
-    // Overwrite globalThis.crypto
-    const fakeGlobalCrypto = {};
-    Object.defineProperty(globalThis, 'crypto', { value: fakeGlobalCrypto, writable: true });
+    assertEquals(returnedCrypto, fakeGlobalThisCrypto);
+
+    mockGlobalThisCrypto.restore();
+    mockImportNodeCrypto.restore();
+  },
+);
+
+Deno.test(
+  'should return globalThis.crypto when present, while node:crypto is present but missing webcrypto',
+  async () => {
+    // Pretend globalThis.crypto exists
+    const fakeGlobalThisCrypto = {};
+    const mockGlobalThisCrypto = stub(
+      _getWebCryptoInternals,
+      'stubThisGlobalThisCrypto',
+      // @ts-ignore: globalThis.crypto
+      returnsNext([fakeGlobalThisCrypto]),
+    );
+
+    // Mock out just enough of the 'node:crypto' module, but like we're in Node v14
+    const fakeNodeCrypto = { webcrypto: undefined };
+    const mockImportNodeCrypto = stub(
+      _getWebCryptoInternals,
+      'stubThisImportNodeCrypto',
+      // @ts-ignore: node:crypto
+      returnsNext([fakeNodeCrypto]),
+    );
 
     const returnedCrypto = await getWebCrypto();
 
-    assertEquals(returnedCrypto, fakeGlobalCrypto);
+    assertEquals(returnedCrypto, fakeGlobalThisCrypto);
 
-    // Restore globalThis.crypto
-    Object.defineProperty(globalThis, 'crypto', { value: originalCrypto, writable: true });
-    mockDecodeClientData.restore();
+    mockGlobalThisCrypto.restore();
+    mockImportNodeCrypto.restore();
   },
 );
+
+Deno.test('should raise MissingWebCrypto error when nothing is available', async () => {
+  // Clear whatever version of crypto might have been set
+  _getWebCryptoInternals.setCachedCrypto(undefined);
+
+  // Pretend globalThis.crypto doesn't exist
+  const mockGlobalThisCrypto = stub(
+    _getWebCryptoInternals,
+    'stubThisGlobalThisCrypto',
+    // @ts-ignore: globalThis.crypto
+    returnsNext([undefined]),
+  );
+
+  // Pretend node:crypto doesn't exist
+  const mockImportNodeCrypto = stub(
+    _getWebCryptoInternals,
+    'stubThisImportNodeCrypto',
+    // @ts-ignore: node:crypto
+    returnsNext([undefined]),
+  );
+
+  await assertRejects(
+    () => getWebCrypto(),
+    MissingWebCrypto,
+    'Crypto API could not be located',
+  );
+
+  mockGlobalThisCrypto.restore();
+  mockImportNodeCrypto.restore();
+});
