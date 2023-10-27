@@ -16,6 +16,9 @@ Run this first to update **packages/typescript-types/dom.ts** then commit the ch
 
 ### Step 1: Determine which packages need to be published
 
+Run this command, **but cancel out the first time!** Use it to determine which packages need entries
+in CHANGELOG.md!
+
 ```
 pnpm run update-version
 ```
@@ -28,6 +31,9 @@ What packages need to be published?
    - [ ] browser
 1.
    - [ ] server
+
+Add entries to CHANGELOG.md, then re-run the command but go all the way through with it so that the
+latest changes have an entry in the CHANGELOG that gets bundled with the release.
 
 ### Step 2: Need to publish `typescript-types`?
 
