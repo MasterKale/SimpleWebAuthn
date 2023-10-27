@@ -29,7 +29,6 @@ export async function getWebCrypto(): Promise<Crypto> {
     const _crypto = await _getWebCryptoInternals.stubThisImportNodeCrypto();
 
     if (_crypto.webcrypto) {
-      console.log('node:crypto.webcrypto');
       webCrypto = _crypto.webcrypto as Crypto;
       return webCrypto;
     }
