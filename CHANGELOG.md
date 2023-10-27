@@ -1,5 +1,19 @@
 # Changelog
 
+## v8.3.4
+
+### Packages
+
+- @simplewebauthn/browser@.3.4
+- @simplewebauthn/server@.3.4
+- @simplewebauthn/typescript-types@.3.4
+
+### Changes
+
+- **[server]** The library will now try to use `globalThis.crypto` first before trying to import
+  Node's `node:crypto` as a fallback ([#468](https://github.com/MasterKale/SimpleWebAuthn/pull/468))
+- **[browser, types]** Version sync
+
 ## v8.3.3
 
 ### Packages
