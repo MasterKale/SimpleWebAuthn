@@ -4,6 +4,9 @@ import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts
 import { _getWebCryptoInternals, getWebCrypto, MissingWebCrypto } from './getWebCrypto.ts';
 
 Deno.test('should return globalThis.crypto when present', async () => {
+  // Clear whatever version of crypto might have been set
+  _getWebCryptoInternals.setCachedCrypto(undefined);
+
   // Pretend globalThis.crypto exists
   const newGlobalThisCrypto = {};
   const mockGlobalThisCrypto = stub(
@@ -21,6 +24,9 @@ Deno.test('should return globalThis.crypto when present', async () => {
 });
 
 Deno.test('should return node:crypto.webcrypto when globalThis.crypto is missing', async () => {
+  // Clear whatever version of crypto might have been set
+  _getWebCryptoInternals.setCachedCrypto(undefined);
+
   // Pretend globalThis.crypto doesn't exist
   const mockGlobalThisCrypto = stub(
     _getWebCryptoInternals,
@@ -49,6 +55,9 @@ Deno.test('should return node:crypto.webcrypto when globalThis.crypto is missing
 Deno.test(
   'should return globalThis.crypto when present, while node:crypto.webcrypto is present',
   async () => {
+    // Clear whatever version of crypto might have been set
+    _getWebCryptoInternals.setCachedCrypto(undefined);
+
     // Pretend globalThis.crypto exists
     const fakeGlobalThisCrypto = {};
     const mockGlobalThisCrypto = stub(
@@ -79,6 +88,9 @@ Deno.test(
 Deno.test(
   'should return globalThis.crypto when present, while node:crypto is present but missing webcrypto',
   async () => {
+    // Clear whatever version of crypto might have been set
+    _getWebCryptoInternals.setCachedCrypto(undefined);
+
     // Pretend globalThis.crypto exists
     const fakeGlobalThisCrypto = {};
     const mockGlobalThisCrypto = stub(
