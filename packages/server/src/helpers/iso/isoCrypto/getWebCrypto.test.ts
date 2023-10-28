@@ -41,7 +41,7 @@ Deno.test('should return node:crypto.webcrypto when globalThis.crypto is missing
     _getWebCryptoInternals,
     'stubThisImportNodeCrypto',
     // @ts-ignore: node:crypto
-    returnsNext([fakeNodeCrypto]),
+    returnsNext([Promise.resolve(fakeNodeCrypto)]),
   );
 
   const returnedCrypto = await getWebCrypto();
@@ -73,7 +73,7 @@ Deno.test(
       _getWebCryptoInternals,
       'stubThisImportNodeCrypto',
       // @ts-ignore: node:crypto
-      returnsNext([fakeNodeCrypto]),
+      returnsNext([Promise.resolve(fakeNodeCrypto)]),
     );
 
     const returnedCrypto = await getWebCrypto();
@@ -106,7 +106,7 @@ Deno.test(
       _getWebCryptoInternals,
       'stubThisImportNodeCrypto',
       // @ts-ignore: node:crypto
-      returnsNext([fakeNodeCrypto]),
+      returnsNext([Promise.resolve(fakeNodeCrypto)]),
     );
 
     const returnedCrypto = await getWebCrypto();
@@ -135,7 +135,7 @@ Deno.test('should raise MissingWebCrypto error when nothing is available', async
     _getWebCryptoInternals,
     'stubThisImportNodeCrypto',
     // @ts-ignore: node:crypto
-    returnsNext([undefined]),
+    returnsNext([Promise.resolve({ webcrypto: undefined })]),
   );
 
   await assertRejects(

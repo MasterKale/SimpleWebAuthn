@@ -15,25 +15,21 @@ export async function getWebCrypto(): Promise<Crypto> {
    * Naively attempt to access Crypto as a global object, which popular alternative run-times
    * support.
    */
-  const _crypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
+  const _globalThisCrypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
 
-  if (_crypto) {
-    webCrypto = _crypto;
+  if (_globalThisCrypto) {
+    webCrypto = _globalThisCrypto;
     return webCrypto;
   }
 
-  try {
-    /**
-     * `globalThis.crypto` isn't available, so attempt a Node import...
-     */
-    const _crypto = await _getWebCryptoInternals.stubThisImportNodeCrypto();
+  /**
+   * `globalThis.crypto` isn't available, so attempt a Node import...
+   */
+  const _nodeCrypto = await _getWebCryptoInternals.stubThisImportNodeCrypto();
 
-    if (_crypto.webcrypto) {
-      webCrypto = _crypto.webcrypto as Crypto;
-      return webCrypto;
-    }
-  } catch (_err) {
-    // pass
+  if (_nodeCrypto?.webcrypto) {
+    webCrypto = _nodeCrypto.webcrypto as Crypto;
+    return webCrypto;
   }
 
   // We tried to access it both in Node and globally, so bail out
@@ -50,8 +46,21 @@ export class MissingWebCrypto extends Error {
 
 // Make it possible to stub return values during testing
 export const _getWebCryptoInternals = {
-  // dnt-shim-ignore
-  stubThisImportNodeCrypto: () => import('node:crypto'),
+  stubThisImportNodeCrypto: async () => {
+    try {
+      // dnt-shim-ignore
+      const _nodeCrypto = await import('node:crypto');
+      return _nodeCrypto;
+    } catch (_err) {
+      /**
+       * Intentionally declaring webcrypto as undefined because we're assuming the Node import
+       * failed due to either:
+       * - `import()` isn't supported
+       * - `node:crypto` is unavailable.
+       */
+      return { webcrypto: undefined };
+    }
+  },
   stubThisGlobalThisCrypto: () => globalThis.crypto,
   // Make it possible to reset the `webCrypto` at the top of the file
   setCachedCrypto: (newCrypto: Crypto | undefined) => {
