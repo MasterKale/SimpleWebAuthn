@@ -18,7 +18,6 @@ export async function getWebCrypto(): Promise<Crypto> {
   const _globalThisCrypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
 
   if (_globalThisCrypto) {
-    console.log('globalThis.crypto');
     webCrypto = _globalThisCrypto;
     return webCrypto;
   }
@@ -29,7 +28,6 @@ export async function getWebCrypto(): Promise<Crypto> {
   const _nodeCrypto = await _getWebCryptoInternals.stubThisImportNodeCrypto();
 
   if (_nodeCrypto?.webcrypto) {
-    console.log('node:crypto');
     webCrypto = _nodeCrypto.webcrypto as Crypto;
     return webCrypto;
   }
