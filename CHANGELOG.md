@@ -1,5 +1,16 @@
 # Changelog
 
+## v8.3.5
+
+### Packages
+
+- @simplewebauthn/server@8.3.5
+
+### Changes
+
+- **[server]** Use of the Web Crypto API in edge runtimes has been improved
+  ([#472](https://github.com/MasterKale/SimpleWebAuthn/pull/472))
+
 ## v8.3.4
 
 ### Packages
