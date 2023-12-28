@@ -79,25 +79,25 @@ await build({
       name: 'cross-fetch',
       version: '^4.0.0',
     },
-    'https://esm.sh/@peculiar/asn1-schema@2.3.6': {
+    'https://esm.sh/@peculiar/asn1-schema@2.3.8': {
       name: '@peculiar/asn1-schema',
-      version: '^2.3.6',
+      version: '^2.3.8',
     },
-    'https://esm.sh/@peculiar/asn1-x509@2.3.6': {
+    'https://esm.sh/@peculiar/asn1-x509@2.3.8': {
       name: '@peculiar/asn1-x509',
-      version: '^2.3.6',
+      version: '^2.3.8',
     },
-    'https://esm.sh/@peculiar/asn1-ecc@2.3.6': {
+    'https://esm.sh/@peculiar/asn1-ecc@2.3.8': {
       name: '@peculiar/asn1-ecc',
-      version: '^2.3.6',
+      version: '^2.3.8',
     },
-    'https://esm.sh/@peculiar/asn1-rsa@2.3.6': {
+    'https://esm.sh/@peculiar/asn1-rsa@2.3.8': {
       name: '@peculiar/asn1-rsa',
-      version: '^2.3.6',
+      version: '^2.3.8',
     },
-    'https://esm.sh/@peculiar/asn1-android@2.3.6': {
+    'https://esm.sh/@peculiar/asn1-android@2.3.10': {
       name: '@peculiar/asn1-android',
-      version: '^2.3.6',
+      version: '^2.3.10',
     },
     // Mapping for '../../typescript-types/src/index.ts' in deps.ts
     '../typescript-types/src/index.ts': {
