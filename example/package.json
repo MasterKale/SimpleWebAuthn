@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@simplewebauthn/server": "8.1.1",
+    "@simplewebauthn/server": "8.3.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.3",
