@@ -27,7 +27,7 @@ export { default as base64 } from 'https://deno.land/x/b64@1.1.27/src/base64.js'
 export { fetch as crossFetch } from 'https://esm.sh/cross-fetch@4.0.0';
 
 // @peculiar libraries
-export { AsnParser, AsnSerializer } from 'https://esm.sh/@peculiar/asn1-schema@2.3.6';
+export { AsnParser, AsnSerializer } from 'https://esm.sh/@peculiar/asn1-schema@2.3.8';
 export {
   AuthorityKeyIdentifier,
   BasicConstraints,
@@ -44,13 +44,13 @@ export {
   Name,
   SubjectAlternativeName,
   SubjectKeyIdentifier,
-} from 'https://esm.sh/@peculiar/asn1-x509@2.3.6';
+} from 'https://esm.sh/@peculiar/asn1-x509@2.3.8';
 export {
   ECDSASigValue,
   ECParameters,
   id_ecPublicKey,
   id_secp256r1,
   id_secp384r1,
-} from 'https://esm.sh/@peculiar/asn1-ecc@2.3.6';
-export { RSAPublicKey } from 'https://esm.sh/@peculiar/asn1-rsa@2.3.6';
-export { id_ce_keyDescription, KeyDescription } from 'https://esm.sh/@peculiar/asn1-android@2.3.6';
+} from 'https://esm.sh/@peculiar/asn1-ecc@2.3.8';
+export { RSAPublicKey } from 'https://esm.sh/@peculiar/asn1-rsa@2.3.8';
+export { id_ce_keyDescription, KeyDescription } from 'https://esm.sh/@peculiar/asn1-android@2.3.10';
