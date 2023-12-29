@@ -143,6 +143,7 @@ app.get('/generate-registration-options', async (req, res) => {
     })),
     authenticatorSelection: {
       residentKey: 'discouraged',
+      userVerification: 'preferred',
     },
     /**
      * Support the two most common algorithms: ES256, and RS256
@@ -175,7 +176,7 @@ app.post('/verify-registration', async (req, res) => {
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
-      requireUserVerification: true,
+      requireUserVerification: false,
     };
     verification = await verifyRegistrationResponse(opts);
   } catch (error) {
