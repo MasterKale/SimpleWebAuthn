@@ -1,5 +1,16 @@
 # Changelog
 
+## v8.3.6
+
+### Packages
+
+- @simplewebauthn/server@8.3.6
+
+### Changes
+
+- **[server]** Updated dependencies to fix an issue with ASN.1 parsing when calling
+  `verifyAuthenticationResponse()` ([#499](https://github.com/MasterKale/SimpleWebAuthn/pull/499))
+
 ## v8.3.5
 
 ### Packages
