@@ -23,31 +23,24 @@ in CHANGELOG.md!
 pnpm run update-version
 ```
 
-What packages need to be published?
+### Step 2: Update CHANGELOG.md
 
-1.
-   - [ ] typescript-types
-1.
-   - [ ] browser
-1.
-   - [ ] server
+Add entries to CHANGELOG.md, then re-run the command above **but go all the way through with it this
+time** so that the latest changes have an entry in the CHANGELOG that gets bundled with the release.
 
-Add entries to CHANGELOG.md, then re-run the command but go all the way through with it so that the
-latest changes have an entry in the CHANGELOG that gets bundled with the release.
-
-### Step 2: Need to publish `typescript-types`?
+### Step 3: Need to publish `typescript-types`?
 
 ```
 pnpm run publish:types
 ```
 
-### Step 3: Need to publish `browser`?
+### Step 4: Need to publish `browser`?
 
 ```
 pnpm run publish:browser
 ```
 
-### Step 4: Need to publish `server`?
+### Step 5: Need to publish `server`?
 
 1.
    - [ ] Make sure the correct version of `typescript-types` is on NPM
@@ -59,6 +52,6 @@ pnpm run publish:browser
 pnpm run publish:server
 ```
 
-### Step 5: Push up `HEAD` to `origin`
+### Step 6: Push up `HEAD` to `origin`
 
 Don't forget to push up the latest changes to `origin` when everything's been published!
