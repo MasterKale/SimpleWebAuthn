@@ -227,7 +227,7 @@ app.get('/generate-authentication-options', async (req, res) => {
       type: 'public-key',
       transports: dev.transports,
     })),
-    userVerification: 'required',
+    userVerification: 'preferred',
     rpID,
   };
 
@@ -273,7 +273,7 @@ app.post('/verify-authentication', async (req, res) => {
       expectedOrigin,
       expectedRPID: rpID,
       authenticator: dbAuthenticator,
-      requireUserVerification: true,
+      requireUserVerification: false,
     };
     verification = await verifyAuthenticationResponse(opts);
   } catch (error) {
