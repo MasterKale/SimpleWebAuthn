@@ -144,7 +144,7 @@ app.get('/generate-registration-options', async (req, res) => {
     authenticatorSelection: {
       residentKey: 'discouraged',
       /**
-       * Wondering why user verification isn't required here? See here:
+       * Wondering why user verification isn't required? See here:
        *
        * https://passkeys.dev/docs/use-cases/bootstrapping/#a-note-about-user-verification
        */
@@ -233,7 +233,7 @@ app.get('/generate-authentication-options', async (req, res) => {
       transports: dev.transports,
     })),
     /**
-     * Wondering why user verification isn't required here? See here:
+     * Wondering why user verification isn't required? See here:
      *
      * https://passkeys.dev/docs/use-cases/bootstrapping/#a-note-about-user-verification
      */
