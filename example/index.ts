@@ -143,6 +143,11 @@ app.get('/generate-registration-options', async (req, res) => {
     })),
     authenticatorSelection: {
       residentKey: 'discouraged',
+      /**
+       * Wondering why user verification isn't required here? See here:
+       *
+       * https://passkeys.dev/docs/use-cases/bootstrapping/#a-note-about-user-verification
+       */
       userVerification: 'preferred',
     },
     /**
@@ -227,6 +232,11 @@ app.get('/generate-authentication-options', async (req, res) => {
       type: 'public-key',
       transports: dev.transports,
     })),
+    /**
+     * Wondering why user verification isn't required here? See here:
+     *
+     * https://passkeys.dev/docs/use-cases/bootstrapping/#a-note-about-user-verification
+     */
     userVerification: 'preferred',
     rpID,
   };
