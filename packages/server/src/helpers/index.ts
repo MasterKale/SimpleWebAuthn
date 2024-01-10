@@ -42,7 +42,7 @@ import type {
 } from './decodeAttestationObject.ts';
 import type { CertificateInfo } from './getCertificateInfo.ts';
 import type { ClientDataJSON } from './decodeClientDataJSON.ts';
-import type { COSEPublicKey } from './cose.ts';
+import type { COSEPublicKey, COSEPublicKeyEC2, COSEPublicKeyOKP, COSEPublicKeyRSA } from './cose.ts';
 import type { ParsedAuthenticatorData } from './parseAuthenticatorData.ts';
 
 export type {
@@ -52,5 +52,8 @@ export type {
   CertificateInfo,
   ClientDataJSON,
   COSEPublicKey,
+  COSEPublicKeyEC2,
+  COSEPublicKeyOKP,
+  COSEPublicKeyRSA,
   ParsedAuthenticatorData,
 };
