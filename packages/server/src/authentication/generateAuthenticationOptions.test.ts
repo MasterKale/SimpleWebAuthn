@@ -132,6 +132,17 @@ Deno.test('should generate a challenge if one is not provided', async () => {
   assert(isoBase64URL.isBase64url(options.challenge));
 });
 
+Deno.test('should treat string challenges as UTF-8 strings', async () => {
+  const options = await generateAuthenticationOptions({
+    challenge: 'こんにちは',
+  });
+
+  assertEquals(
+    options.challenge,
+    '44GT44KT44Gr44Gh44Gv',
+  );
+});
+
 Deno.test('should set rpId if specified', async () => {
   const rpID = 'simplewebauthn.dev';
 
