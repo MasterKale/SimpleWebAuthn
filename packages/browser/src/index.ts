@@ -10,6 +10,7 @@ import { browserSupportsWebAuthnAutofill } from './helpers/browserSupportsWebAut
 import { base64URLStringToBuffer } from './helpers/base64URLStringToBuffer';
 import { bufferToBase64URLString } from './helpers/bufferToBase64URLString';
 import { WebAuthnAbortService } from './helpers/webAuthnAbortService';
+import { WebAuthnError } from './helpers/webAuthnError';
 
 export {
   base64URLStringToBuffer,
@@ -20,6 +21,7 @@ export {
   startAuthentication,
   startRegistration,
   WebAuthnAbortService,
+  WebAuthnError,
 };
 
 export type { WebAuthnErrorCode } from './helpers/webAuthnError';
