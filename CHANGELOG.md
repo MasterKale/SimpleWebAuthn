@@ -1,5 +1,26 @@
 # Changelog
 
+## v8.3.7
+
+### Packages
+
+- @simplewebauthn/browser@8.3.7
+- @simplewebauthn/server@8.3.7
+
+### Changes
+
+- **[browser]** The `WebAuthnError` class can now be imported from `@simplewebauthn/browser` for
+  simpler error detection and handling when calling `startRegistration()` and
+  `startAuthentication()` ([#505](https://github.com/MasterKale/SimpleWebAuthn/pull/505), with
+  thanks to @zoontek)
+- **[server]** The `COSEPublicKeyEC2`, `COSEPublicKeyOKP`, and `COSEPublicKeyRSA` types can now be
+  imported from `@simplwebauthn/server/helpers` to help type possible return values from
+  `decodeCredentialPublicKey()` ([#504](https://github.com/MasterKale/SimpleWebAuthn/pull/504), with
+  thanks to @mmv08)
+- **[server]** Custom challenge strings passed to `generateRegistrationOptions()` will now be
+  treated as UTF-8 strings to align with the existing behavior of `generateAuthenticationOptions()`
+  ([#507](https://github.com/MasterKale/SimpleWebAuthn/pull/507))
+
 ## v8.3.6
 
 ### Packages
