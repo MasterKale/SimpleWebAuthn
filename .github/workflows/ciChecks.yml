@@ -29,14 +29,16 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - run: node -v
+    - name: Confirm installed Node version
+      run: node -v
 
     # Install Deno
     - name: Setup Deno ${{ matrix.deno-version }}
       uses: maximousblk/setup-deno@v2
       with:
         deno-version: ${{ matrix.deno-version }}
-    - run: deno -V
+    - name: Confirm installed Deno version
+      run: deno -V
 
     # Install pnpm w/cache for quicker installs
     # https://github.com/pnpm/action-setup#use-cache-to-reduce-installation-time
@@ -61,9 +63,10 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
-    # Build and test dnt packages
-    - run: npm run build:types   # browser tests will need this to be built
-    - run: npm run build:server  # dnt will test everything in Node too
-
-    # Test packages
-    - run: npm run test:browser
+    # Build and test packages
+    - name: Build & test @simplewebauthn/typescript-types
+      run: npm run build:types   # browser tests will need this to be built
+    - name: Build & test @simplewebauthn/server
+      run: npm run build:server  # dnt will test everything in Node too
+    - name: Test @simplewebauthn/browser
+      run: npm run test:browser
