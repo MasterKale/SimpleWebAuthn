@@ -192,6 +192,21 @@ Deno.test('should generate a challenge if one is not provided', async () => {
   mockGenerateChallenge.restore();
 });
 
+Deno.test('should treat string challenges as UTF-8 strings', async () => {
+  const options = await generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userID: '1234',
+    userName: 'usernameHere',
+    challenge: 'こんにちは',
+  });
+
+  assertEquals(
+    options.challenge,
+    '44GT44KT44Gr44Gh44Gv',
+  );
+});
+
 Deno.test('should use custom supported algorithm IDs as-is when provided', async () => {
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
