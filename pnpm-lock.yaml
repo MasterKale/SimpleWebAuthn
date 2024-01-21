@@ -98,7 +98,7 @@ importers:
         version: 2.3.8
       '@simplewebauthn/typescript-types':
         specifier: ^8.3.4
-        version: link:../../typescript-types/npm
+        version: 8.3.4
       cbor-x:
         specifier: ^1.5.2
         version: 1.5.4
@@ -1377,6 +1377,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@simplewebauthn/typescript-types@8.3.4:
+    resolution: {integrity: sha512-38xtca0OqfRVNloKBrFB5LEM6PN5vzFbJG6rAutPVrtGHFYxPdiV3btYWq0eAZAZmP+dqFPYJxJWeJrGfmYHng==}
+    dev: false
 
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
