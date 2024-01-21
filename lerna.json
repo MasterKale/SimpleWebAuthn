@@ -13,7 +13,7 @@
   "packages": [
     "packages/browser",
     "packages/server",
-    "packages/typescript-types"
+    "packages/types"
   ],
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }

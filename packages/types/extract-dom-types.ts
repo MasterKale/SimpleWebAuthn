@@ -90,7 +90,7 @@ outputSourceFile.addStatements([
   `/**`,
   ` * Generated from typescript@${version} ${domSourcePath}`,
   ` * To regenerate, run the following command from the project root:`,
-  ` * npx lerna --scope=@simplewebauthn/typescript-types exec -- npm run extract-dom-types`,
+  ` * npx lerna --scope=@simplewebauthn/types exec -- npm run extract-dom-types`,
   ` */`,
   `// BEGIN CODEGEN`,
 ]);

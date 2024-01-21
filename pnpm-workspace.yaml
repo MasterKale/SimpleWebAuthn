@@ -1,4 +1,4 @@
 packages:
   - "packages/browser"
   - "packages/server/npm"
-  - "packages/typescript-types/npm"
+  - "packages/types/npm"

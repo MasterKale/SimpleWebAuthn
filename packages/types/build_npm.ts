@@ -18,7 +18,7 @@ await build({
   test: false,
   // package.json values
   package: {
-    name: '@simplewebauthn/typescript-types',
+    name: '@simplewebauthn/types',
     version: lernaPackageJSON.version,
     description: 'TypeScript types used by the @simplewebauthn series of libraries',
     license: 'MIT',
@@ -26,10 +26,9 @@ await build({
     repository: {
       type: 'git',
       url: 'git+https://github.com/MasterKale/SimpleWebAuthn.git',
-      directory: 'packages/typescript-types',
+      directory: 'packages/types',
     },
-    homepage:
-      'https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types#readme',
+    homepage: 'https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/types#readme',
     publishConfig: {
       access: 'public',
     },
