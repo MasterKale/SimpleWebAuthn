@@ -2,7 +2,7 @@ import {
   AuthenticationCredential,
   AuthenticationResponseJSON,
   PublicKeyCredentialRequestOptionsJSON,
-} from '@simplewebauthn/typescript-types';
+} from '@simplewebauthn/types';
 
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';

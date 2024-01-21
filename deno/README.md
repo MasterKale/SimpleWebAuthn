@@ -5,8 +5,8 @@ importing SimpleWebAuthn from https://deno.land/x/simplewebauthn.
 
 ## Installation
 
-For example, to import the **server** or **typescript-types** packages into your Deno project, add
-the following to your **deps.ts** file:
+For example, to import the **server** or **types** packages into your Deno project, add the
+following to your **deps.ts** file:
 
 ```ts
 import {
@@ -15,5 +15,5 @@ import {
 
 import {
   // ...
-} from 'https://deno.land/x/simplewebauthn/deno/typescript-types.ts';
+} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```

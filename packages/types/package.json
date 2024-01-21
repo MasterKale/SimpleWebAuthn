@@ -1,7 +1,7 @@
 {
-  "name": "@simplewebauthn/typescript-types",
+  "name": "@simplewebauthn/types",
   "version": "8.3.4",
-  "description": "Lerna/npm wrapper around Deno for @simplewebauthn/typescript-types",
+  "description": "Lerna/npm wrapper around Deno for @simplewebauthn/types",
   "scripts": {
     "build": "deno task build",
     "extract-dom-types": "ts-node extract-dom-types.ts"

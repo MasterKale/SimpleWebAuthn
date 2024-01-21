@@ -1,7 +1,7 @@
 /**
  * Generated from typescript@5.1.6 typescript/lib/lib.dom.d.ts
  * To regenerate, run the following command from the project root:
- * npx lerna --scope=@simplewebauthn/typescript-types exec -- npm run extract-dom-types
+ * npx lerna --scope=@simplewebauthn/types exec -- npm run extract-dom-types
  */
 // BEGIN CODEGEN
 /**

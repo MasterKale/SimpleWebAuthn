@@ -1,4 +1,4 @@
-import { AuthenticatorAttachment } from '@simplewebauthn/typescript-types';
+import { AuthenticatorAttachment } from '@simplewebauthn/types';
 
 const attachments: AuthenticatorAttachment[] = ['cross-platform', 'platform'];
 

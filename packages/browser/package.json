@@ -31,7 +31,7 @@
     "umd"
   ],
   "dependencies": {
-    "@simplewebauthn/typescript-types": "workspace:^"
+    "@simplewebauthn/types": "workspace:^"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",

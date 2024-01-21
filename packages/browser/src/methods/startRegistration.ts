@@ -3,7 +3,7 @@ import {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
   RegistrationResponseJSON,
-} from '@simplewebauthn/typescript-types';
+} from '@simplewebauthn/types';
 
 import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';

@@ -6,7 +6,7 @@ const lernaPackageJSON: { version: string } = JSON.parse(
   Deno.readTextFileSync('./package.json'),
 );
 const typesPackageJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('../typescript-types/npm/package.json'),
+  Deno.readTextFileSync('../types/npm/package.json'),
 );
 
 await emptyDir(outDir);
@@ -99,10 +99,13 @@ await build({
       name: '@peculiar/asn1-android',
       version: '^2.3.10',
     },
-    // Mapping for '../../typescript-types/src/index.ts' in deps.ts
-    '../typescript-types/src/index.ts': {
+    // Mapping for '../../types/src/index.ts' in deps.ts
+    '../types/src/index.ts': {
+      // TODO: Update this to point to @simplewebauthn/types after publishing it to NPM
       name: '@simplewebauthn/typescript-types',
-      version: `^${typesPackageJSON.version}`,
+      version: '^8.3.4',
+      // name: '@simplewebauthn/types',
+      // version: `^${typesPackageJSON.version}`,
     },
   },
   // TypeScript tsconfig.json config

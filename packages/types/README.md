@@ -1,7 +1,7 @@
-# @simplewebauthn/typescript-types <!-- omit in toc -->
+# @simplewebauthn/types <!-- omit in toc -->
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
-[![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/typescript-types?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/typescript-types)
+[![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/types?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/types)
 
 TypeScript typings for **@simplewebauthn/server** and **@simplewebauthn/browser**
 
@@ -16,7 +16,7 @@ TypeScript typings for **@simplewebauthn/server** and **@simplewebauthn/browser*
 This package is available on **npm**:
 
 ```sh
-npm install @simplewebauthn/typescript-types
+npm install @simplewebauthn/types
 ```
 
 ### Deno v1.33.x or higher
@@ -24,5 +24,5 @@ npm install @simplewebauthn/typescript-types
 It is also available for import into Deno projects from **deno.land/x**:
 
 ```ts
-import {...} from 'https://deno.land/x/simplewebauthn/deno/typescript-types.ts';
+import {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```

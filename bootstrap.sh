@@ -1,6 +1,6 @@
 # Install root dependencies without trying to link workspace packages
 pnpm install --ignore-workspace
-# Built typescript-types so server can build
+# Build types so server can build
 pnpm run build:types --skip-nx-cache
 # If we can't run tests on a fresh pull then it might mean we need to refresh the Deno lock file
 pnpm run test:server --skip-nx-cache
