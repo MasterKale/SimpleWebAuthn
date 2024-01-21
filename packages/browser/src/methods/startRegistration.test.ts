@@ -3,7 +3,7 @@ import {
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
-} from '@simplewebauthn/typescript-types';
+} from '@simplewebauthn/types';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';

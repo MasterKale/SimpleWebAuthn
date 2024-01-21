@@ -3,7 +3,7 @@ import {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialRequestOptionsJSON,
-} from '@simplewebauthn/typescript-types';
+} from '@simplewebauthn/types';
 
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';

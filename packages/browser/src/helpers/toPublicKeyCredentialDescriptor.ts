@@ -1,4 +1,4 @@
-import type { PublicKeyCredentialDescriptorJSON } from '@simplewebauthn/typescript-types';
+import type { PublicKeyCredentialDescriptorJSON } from '@simplewebauthn/types';
 
 import { base64URLStringToBuffer } from './base64URLStringToBuffer';
 
