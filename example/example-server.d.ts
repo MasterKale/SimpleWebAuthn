@@ -1,4 +1,4 @@
-import type { AuthenticatorDevice } from '@simplewebauthn/typescript-types';
+import type { AuthenticatorDevice } from '@simplewebauthn/types';
 
 /**
  * You'll need a database to store a few things:

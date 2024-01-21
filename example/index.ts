@@ -37,7 +37,7 @@ import type {
   AuthenticationResponseJSON,
   AuthenticatorDevice,
   RegistrationResponseJSON,
-} from '@simplewebauthn/typescript-types';
+} from '@simplewebauthn/types';
 
 import { LoggedInUser } from './example-server';
 

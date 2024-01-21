@@ -12,10 +12,7 @@ import {
   verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
-import {
-  AuthenticationResponseJSON,
-  RegistrationResponseJSON,
-} from '@simplewebauthn/typescript-types';
+import { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/types';
 
 import { expectedOrigin, rpID } from './index';
 import { LoggedInUser } from './example-server';
