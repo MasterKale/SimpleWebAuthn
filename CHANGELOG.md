@@ -1,5 +1,40 @@
 # Changelog
 
+## v9.0.0 - The one in which 11 characters were saved
+
+### Packages
+
+- @simplewebauthn/browser@9.0.0
+- @simplewebauthn/server@9.0.0
+- @simplewebauthn/types@9.0.0
+
+### Changes
+
+- **[types]** The `@simplewebauthn/typescript-types` package has been renamed to
+  `@simplewebauthn/types` ([#508](https://github.com/MasterKale/SimpleWebAuthn/pull/508))
+
+### Breaking Changes
+
+- Any reference to `@simplwebauthn/typescript-types` will need to be replaced with the new package
+  name `@simplewebauthn/types`:
+
+**Before:**
+
+```ts
+import { ... } from '@simplwebauthn/typescript-types';
+```
+
+**After:**
+
+```sh
+$> npm uninstall @simplewebauthn/typescript-types
+$> npm install -D @simplewebauthn/types
+```
+
+```ts
+import { ... } from '@simplwebauthn/types';
+```
+
 ## v8.3.7
 
 ### Packages
