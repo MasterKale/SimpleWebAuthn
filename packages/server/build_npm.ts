@@ -101,8 +101,11 @@ await build({
     },
     // Mapping for '../../types/src/index.ts' in deps.ts
     '../types/src/index.ts': {
-      name: '@simplewebauthn/types',
-      version: `^${typesPackageJSON.version}`,
+      // TODO: Update this to point to @simplewebauthn/types after publishing it to NPM
+      name: '@simplewebauthn/typescript-types',
+      version: '^8.3.4',
+      // name: '@simplewebauthn/types',
+      // version: `^${typesPackageJSON.version}`,
     },
   },
   // TypeScript tsconfig.json config
