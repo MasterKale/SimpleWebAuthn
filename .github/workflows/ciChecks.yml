@@ -64,7 +64,7 @@ jobs:
       run: pnpm install
 
     # Build and test packages
-    - name: Build & test @simplewebauthn/typescript-types
+    - name: Build & test @simplewebauthn/types
       run: npm run build:types   # browser tests will need this to be built
     - name: Build & test @simplewebauthn/server
       run: npm run build:server  # dnt will test everything in Node too

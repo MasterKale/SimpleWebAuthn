@@ -8,10 +8,10 @@ Notes for myself that I don't want cluttering up the README
 
 #### Did you update the version of `"typescript"` in the monorepo's root **package.json** file?
 
-Run this first to update **packages/typescript-types/dom.ts** then commit the changes:
+Run this first to update **packages/types/dom.ts** then commit the changes:
 
 ```
-(cd packages/typescript-types; pnpm run extract-dom-types)
+(cd packages/types; pnpm run extract-dom-types)
 ```
 
 ### Step 1: Determine which packages need to be published
@@ -28,7 +28,7 @@ pnpm run update-version
 Add entries to CHANGELOG.md, then re-run the command above **but go all the way through with it this
 time** so that the latest changes have an entry in the CHANGELOG that gets bundled with the release.
 
-### Step 3: Need to publish `typescript-types`?
+### Step 3: Need to publish `types`?
 
 ```
 pnpm run publish:types
@@ -43,10 +43,9 @@ pnpm run publish:browser
 ### Step 5: Need to publish `server`?
 
 1.
-   - [ ] Make sure the correct version of `typescript-types` is on NPM
+   - [ ] Make sure the correct version of `types` is on NPM
    - The `npm install` step that dnt performs while building the project pulls from NPM. The build
-     will fail if the version of `typescript-types` specified in `mappings` in **build_npm.ts** is
-     unavailable.
+     will fail if the version of `types` specified in `mappings` in **build_npm.ts** is unavailable.
 
 ```
 pnpm run publish:server

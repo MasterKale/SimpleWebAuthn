@@ -7,7 +7,7 @@
   "deno.path": "/opt/homebrew/bin/deno",
   "deno.enablePaths": [
     "./packages/server",
-    "./packages/typescript-types"
+    "./packages/types"
   ],
   "editor.rulers": [
     100

@@ -18,7 +18,7 @@ incorporate WebAuthn into a website. The following packages are maintained here:
 
 An additional package is also included that contains shared TypeScript definitions:
 
-- [@simplewebauthn/typescript-types](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/typescript-types/)
+- [@simplewebauthn/types](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/types/)
 
 See these packages' READMEs for more specific implementation information.
 
@@ -35,15 +35,15 @@ These packages are all available on **npm** for use in **Node LTS 16.x** project
 ```sh
 npm install @simplewebauthn/browser
 npm install @simplewebauthn/server
-npm install @simplewebauthn/typescript-types
+npm install @simplewebauthn/types
 ```
 
-The **server** and **typescript-types** packages are also available for import into **Deno v1.33.x**
-projects from **deno.land/x**:
+The **server** and **types** packages are also available for import into **Deno v1.33.x** projects
+from **deno.land/x**:
 
 ```ts
 import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
-import type {...} from 'https://deno.land/x/simplewebauthn/deno/typescript-types.ts';
+import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```
 
 ## Example
