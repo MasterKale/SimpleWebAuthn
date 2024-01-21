@@ -6,7 +6,7 @@ const lernaPackageJSON: { version: string } = JSON.parse(
   Deno.readTextFileSync('./package.json'),
 );
 const typesPackageJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('../typescript-types/npm/package.json'),
+  Deno.readTextFileSync('../types/npm/package.json'),
 );
 
 await emptyDir(outDir);
@@ -99,9 +99,9 @@ await build({
       name: '@peculiar/asn1-android',
       version: '^2.3.10',
     },
-    // Mapping for '../../typescript-types/src/index.ts' in deps.ts
-    '../typescript-types/src/index.ts': {
-      name: '@simplewebauthn/typescript-types',
+    // Mapping for '../../types/src/index.ts' in deps.ts
+    '../types/src/index.ts': {
+      name: '@simplewebauthn/types',
       version: `^${typesPackageJSON.version}`,
     },
   },

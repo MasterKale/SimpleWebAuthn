@@ -1,4 +1,4 @@
-// @simplewebauthn/typescript-types
+// @simplewebauthn/types
 export type {
   AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
@@ -15,7 +15,7 @@ export type {
   PublicKeyCredentialRequestOptionsJSON,
   RegistrationResponseJSON,
   UserVerificationRequirement,
-} from '../../typescript-types/src/index.ts';
+} from '../../types/src/index.ts';
 
 // cbor (a.k.a. cbor-x in Node land)
 export * as cborx from 'https://deno.land/x/cbor@v1.5.2/encode.js';
