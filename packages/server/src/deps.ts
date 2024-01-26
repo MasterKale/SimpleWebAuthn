@@ -18,7 +18,7 @@ export type {
 } from '../../types/src/index.ts';
 
 // cbor (a.k.a. cbor-x in Node land)
-export * as cborx from 'https://deno.land/x/cbor@v1.5.2/encode.js';
+export * as cborx from 'https://deno.land/x/cbor@v1.5.2/index.js';
 
 // b64 (a.k.a. @hexagon/base64 in Node land)
 export { default as base64 } from 'https://deno.land/x/b64@1.1.27/src/base64.js';

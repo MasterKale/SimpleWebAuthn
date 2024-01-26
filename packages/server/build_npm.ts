@@ -70,9 +70,9 @@ await build({
       name: '@hexagon/base64',
       version: '^1.1.27',
     },
-    'https://deno.land/x/cbor@v1.5.2/encode.js': {
+    'https://deno.land/x/cbor@v1.5.2/index.js': {
       name: 'cbor-x',
-      subPath: 'encode',
+      subPath: 'index-no-eval',
       version: '^1.5.2',
     },
     'https://esm.sh/cross-fetch@4.0.0': {
