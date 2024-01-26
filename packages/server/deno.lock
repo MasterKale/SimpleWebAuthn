@@ -98,6 +98,7 @@
     "https://deno.land/x/b64@1.1.27/src/base64.js": "9e10b98e4203d030bc913913a2e4683b4842aff337bc9ec2643a28dfe04b5fc4",
     "https://deno.land/x/cbor@v1.5.2/decode.js": "ab5518450c1cc3d8e3be7a772de8008d2a4f92626630eed6fabd66a25f565526",
     "https://deno.land/x/cbor@v1.5.2/encode.js": "80da1bb1c2936bba0b53e7e0945d73c5a55ed62ea659cf3d785514310b4e3d37",
+    "https://deno.land/x/cbor@v1.5.2/index.js": "cc8678819d77aa34b6fa9293658d85d5e53e53eaf555f85b0f98a8a18dbfaa12",
     "https://deno.land/x/code_block_writer@12.0.0/mod.ts": "2c3448060e47c9d08604c8f40dee34343f553f33edcdfebbf648442be33205e5",
     "https://deno.land/x/code_block_writer@12.0.0/utils/string_utils.ts": "60cb4ec8bd335bf241ef785ccec51e809d576ff8e8d29da43d2273b69ce2a6ff",
     "https://deno.land/x/deno_cache@0.4.1/auth_tokens.ts": "5fee7e9155e78cedf3f6ff3efacffdb76ac1a76c86978658d9066d4fb0f7326e",
