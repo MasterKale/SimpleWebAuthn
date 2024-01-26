@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/browser",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "description": "SimpleWebAuthn for Browsers",
   "main": "dist/bundle/index.js",
   "unpkg": "dist/bundle/index.umd.min.js",
