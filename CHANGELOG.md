@@ -1,5 +1,20 @@
 # Changelog
 
+## v9.0.1
+
+### Packages
+
+- @simplewebauthn/browser@9.0.1
+- @simplewebauthn/server@9.0.1
+- @simplewebauthn/types@9.0.1
+
+### Changes
+
+- **[server]** Fixed an issue with use with CBOR handling in runtime environments that restrict use
+  of `eval()` ([#511](https://github.com/MasterKale/SimpleWebAuthn/pull/511), with thanks to
+  @Maronato)
+- **[browser, types]** Monorepo version sync
+
 ## v9.0.0 - The one in which 11 characters were saved
 
 ### Packages
