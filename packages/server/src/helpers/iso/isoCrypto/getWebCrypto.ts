@@ -49,6 +49,10 @@ export const _getWebCryptoInternals = {
   stubThisImportNodeCrypto: async () => {
     try {
       // dnt-shim-ignore
+      /**
+       * The `webpackIgnore` here is to help support Next.js' Edge runtime.
+       * See https://github.com/MasterKale/SimpleWebAuthn/issues/517 for more info.
+       */
       const _nodeCrypto = await import(/* webpackIgnore: true */ 'node:crypto');
       return _nodeCrypto;
     } catch (_err) {
