@@ -49,7 +49,7 @@ export const _getWebCryptoInternals = {
   stubThisImportNodeCrypto: async () => {
     try {
       // dnt-shim-ignore
-      const _nodeCrypto = await import('node:crypto');
+      const _nodeCrypto = await import(/* webpackIgnore: true */ 'node:crypto');
       return _nodeCrypto;
     } catch (_err) {
       /**
