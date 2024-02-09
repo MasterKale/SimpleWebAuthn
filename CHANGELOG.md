@@ -1,5 +1,16 @@
 # Changelog
 
+## v9.0.2
+
+### Packages
+
+- @simplewebauthn/server@9.0.2
+
+### Changes
+
+- **[server]** Improved support for Next.js Edge runtime
+  ([#518](https://github.com/MasterKale/SimpleWebAuthn/pull/518), with thanks to @balazsorban44)
+
 ## v9.0.1
 
 ### Packages
