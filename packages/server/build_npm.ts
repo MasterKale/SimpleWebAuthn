@@ -70,11 +70,6 @@ await build({
       name: '@hexagon/base64',
       version: '^1.1.27',
     },
-    'https://deno.land/x/cbor@v1.5.2/index.js': {
-      name: 'cbor-x',
-      subPath: 'index-no-eval',
-      version: '^1.5.2',
-    },
     'https://esm.sh/cross-fetch@4.0.0': {
       name: 'cross-fetch',
       version: '^4.0.0',
@@ -98,6 +93,10 @@ await build({
     'https://esm.sh/@peculiar/asn1-android@2.3.10': {
       name: '@peculiar/asn1-android',
       version: '^2.3.10',
+    },
+    'https://deno.land/x/tiny_cbor@0.2.2/index.ts': {
+      name: '@levischuck/tiny-cbor',
+      version: '^0.2.2',
     },
     // Mapping for '../../types/src/index.ts' in deps.ts
     '../types/src/index.ts': {
