@@ -1,5 +1,18 @@
 # Changelog
 
+## v9.0.3
+
+### Packages
+
+- @simplewebauthn/server@9.0.3
+
+### Changes
+
+- **[server]** Fixed
+  `"Cannot find module 'cbor-x/index-no-eval' or its corresponding type declarations"` build errors
+  when transpiling TypeScript projects using **@simplewebauthn/server**
+  ([#521](https://github.com/MasterKale/SimpleWebAuthn/pull/521))
+
 ## v9.0.2
 
 ### Packages
