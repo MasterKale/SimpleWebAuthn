@@ -76,7 +76,17 @@ export function parseAuthenticatorData(
     const firstDecoded = isoCBOR.decodeFirst<COSEPublicKey>(
       authData.slice(pointer),
     );
-    const firstEncoded = Uint8Array.from(isoCBOR.encode(firstDecoded));
+    const firstEncoded = Uint8Array.from(
+      /**
+       * Casting to `Map` via `as unknown` here because TS doesn't make it possible to define Maps
+       * with discrete keys and properties with known types per pair, and CBOR libs typically parse
+       * CBOR Major Type 5 to `Map` because you can have numbers for keys. A `COSEPublicKey` can be
+       * generalized as "a Map with numbers for keys and either numbers or bytes for values" though.
+       * If this presumption falls apart then other parts of verification later on will fail so we
+       * should be safe doing this here.
+       */
+      isoCBOR.encode(firstDecoded as unknown as Map<number, number | Uint8Array>),
+    );
 
     if (foundBadCBOR) {
       // Restore the bit we changed so that `authData` is the same as it came in and won't break
@@ -92,7 +102,12 @@ export function parseAuthenticatorData(
   let extensionsDataBuffer: Uint8Array | undefined = undefined;
 
   if (flags.ed) {
-    const firstDecoded = isoCBOR.decodeFirst(authData.slice(pointer));
+    /**
+     * Typing here feels a little sloppy but we're immediately CBOR-encoding this back to bytes to
+     * more diligently parse via `decodeAuthenticatorExtensions()` so :shrug:
+     */
+    type AuthenticatorExtensionData = Map<string, Uint8Array>;
+    const firstDecoded = isoCBOR.decodeFirst<AuthenticatorExtensionData>(authData.slice(pointer));
     extensionsDataBuffer = Uint8Array.from(isoCBOR.encode(firstDecoded));
     extensionsData = decodeAuthenticatorExtensions(extensionsDataBuffer);
     pointer += extensionsDataBuffer.byteLength;
