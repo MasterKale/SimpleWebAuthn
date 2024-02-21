@@ -53,7 +53,7 @@ export async function generateAuthenticationOptions(
     challenge: isoBase64URL.fromBuffer(_challenge),
     allowCredentials: allowCredentials?.map((cred) => ({
       ...cred,
-      id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
+      id: typeof(cred.id) !== 'string' ? isoBase64URL.fromBuffer(cred.id as Uint8Array) : cred.id,
     })),
     timeout,
     userVerification,
