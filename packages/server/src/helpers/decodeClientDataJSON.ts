@@ -1,9 +1,10 @@
 import { isoBase64URL } from './iso/index.ts';
+import type { Base64URLString } from '../deps.ts';
 
 /**
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON
  */
-export function decodeClientDataJSON(data: string): ClientDataJSON {
+export function decodeClientDataJSON(data: Base64URLString): ClientDataJSON {
   const toString = isoBase64URL.toString(data);
   const clientData: ClientDataJSON = JSON.parse(toString);
 
