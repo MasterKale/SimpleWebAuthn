@@ -11,13 +11,11 @@ Deno.test('should generate credential request options suitable for sending via J
   const options = await generateAuthenticationOptions({
     allowCredentials: [
       {
-        id: isoUint8Array.fromASCIIString('1234'),
-        type: 'public-key',
+        id: '1234',
         transports: ['usb', 'nfc'],
       },
       {
-        id: isoUint8Array.fromASCIIString('5678'),
-        type: 'public-key',
+        id: '5678',
         transports: ['internal'],
       },
     ],
@@ -30,12 +28,12 @@ Deno.test('should generate credential request options suitable for sending via J
     challenge: challengeString,
     allowCredentials: [
       {
-        id: 'MTIzNA',
+        id: '1234',
         type: 'public-key',
         transports: ['usb', 'nfc'],
       },
       {
-        id: 'NTY3OA',
+        id: '5678',
         type: 'public-key',
         transports: ['internal'],
       },
@@ -51,8 +49,8 @@ Deno.test('defaults to 60 seconds if no timeout is specified', async () => {
   const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: isoUint8Array.fromASCIIString('1234'), type: 'public-key' },
-      { id: isoUint8Array.fromASCIIString('5678'), type: 'public-key' },
+      { id: '1234' },
+      { id: '5678' },
     ],
   });
 
@@ -63,8 +61,8 @@ Deno.test('should set userVerification to "preferred" if not specified', async (
   const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: isoUint8Array.fromASCIIString('1234'), type: 'public-key' },
-      { id: isoUint8Array.fromASCIIString('5678'), type: 'public-key' },
+      { id: '1234' },
+      { id: '5678' },
     ],
   });
 
@@ -94,8 +92,8 @@ Deno.test('should set userVerification if specified', async () => {
   const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: isoUint8Array.fromASCIIString('1234'), type: 'public-key' },
-      { id: isoUint8Array.fromASCIIString('5678'), type: 'public-key' },
+      { id: '1234' },
+      { id: '5678' },
     ],
     userVerification: 'required',
   });
@@ -107,8 +105,8 @@ Deno.test('should set extensions if specified', async () => {
   const options = await generateAuthenticationOptions({
     challenge: challengeBuffer,
     allowCredentials: [
-      { id: isoUint8Array.fromASCIIString('1234'), type: 'public-key' },
-      { id: isoUint8Array.fromASCIIString('5678'), type: 'public-key' },
+      { id: '1234' },
+      { id: '5678' },
     ],
     extensions: { appid: 'simplewebauthn' },
   });
@@ -117,15 +115,13 @@ Deno.test('should set extensions if specified', async () => {
 });
 
 Deno.test('should generate a challenge if one is not provided', async () => {
-  const opts = {
-    allowCredentials: [
-      { id: isoUint8Array.fromASCIIString('1234'), type: 'public-key' },
-      { id: isoUint8Array.fromASCIIString('5678'), type: 'public-key' },
-    ],
-  };
-
   // @ts-ignore 2345
-  const options = await generateAuthenticationOptions(opts);
+  const options = await generateAuthenticationOptions({
+    allowCredentials: [
+      { id: '1234' },
+      { id: '5678' },
+    ],
+  });
 
   // Assert basic properties of the challenge
   assert(options.challenge.length >= 16);
