@@ -6,6 +6,7 @@
 - [Overview](#overview)
 - [Installation](#installation)
 - [Example](#example)
+- [Contributions](#contributions)
 - [Development](#development)
 
 ## Overview
@@ -52,6 +53,17 @@ For a practical guide to implementing these libraries, take a look at the
 [example project](https://github.com/MasterKale/SimpleWebAuthn/tree/master/example). It includes a
 single-file Express server and a few HTML files that, combined with the packages in this repo, are
 close to all it takes to get up and running with WebAuthn.
+
+## Contributions
+
+The SimpleWebAuthn project is currently open to Pull Requests for bug fixes only.
+[Please submit an Issue beforehand](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose)
+to capture additional context about the problem being solved.
+
+Requests for new features or changes to existing features require time for discussion to synthesize
+solutions from modern needs and historical context.
+[Feel free to create an Issue](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose) for
+these types of requests to start this discussion.
 
 ## Development
 
