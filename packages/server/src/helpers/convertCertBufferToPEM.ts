@@ -13,7 +13,7 @@ export function convertCertBufferToPEM(
    * Get certBuffer to a base64 representation
    */
   if (typeof certBuffer === 'string') {
-    if (isoBase64URL.isBase64url(certBuffer)) {
+    if (isoBase64URL.isBase64URL(certBuffer)) {
       b64cert = isoBase64URL.toBase64(certBuffer);
     } else if (isoBase64URL.isBase64(certBuffer)) {
       b64cert = certBuffer;

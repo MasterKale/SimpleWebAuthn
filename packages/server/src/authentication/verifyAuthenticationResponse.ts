@@ -133,13 +133,13 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  if (!isoBase64URL.isBase64url(assertionResponse.authenticatorData)) {
+  if (!isoBase64URL.isBase64URL(assertionResponse.authenticatorData)) {
     throw new Error(
       'Credential response authenticatorData was not a base64url string',
     );
   }
 
-  if (!isoBase64URL.isBase64url(assertionResponse.signature)) {
+  if (!isoBase64URL.isBase64URL(assertionResponse.signature)) {
     throw new Error('Credential response signature was not a base64url string');
   }
 

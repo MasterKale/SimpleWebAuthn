@@ -129,7 +129,7 @@ Deno.test('should generate a challenge if one is not provided', async () => {
 
   // Assert basic properties of the challenge
   assert(options.challenge.length >= 16);
-  assert(isoBase64URL.isBase64url(options.challenge));
+  assert(isoBase64URL.isBase64URL(options.challenge));
 });
 
 Deno.test('should treat string challenges as UTF-8 strings', async () => {
