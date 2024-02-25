@@ -1,6 +1,7 @@
 import type {
   AuthenticationExtensionsClientInputs,
-  PublicKeyCredentialDescriptorFuture,
+  AuthenticatorTransportFuture,
+  Base64URLString,
   PublicKeyCredentialRequestOptionsJSON,
   UserVerificationRequirement,
 } from '../deps.ts';
@@ -8,7 +9,10 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 
 export type GenerateAuthenticationOptionsOpts = {
-  allowCredentials?: PublicKeyCredentialDescriptorFuture[];
+  allowCredentials?: {
+    id: Base64URLString;
+    transports?: AuthenticatorTransportFuture[];
+  }[];
   challenge?: string | Uint8Array;
   timeout?: number;
   userVerification?: UserVerificationRequirement;
@@ -51,10 +55,17 @@ export async function generateAuthenticationOptions(
 
   return {
     challenge: isoBase64URL.fromBuffer(_challenge),
-    allowCredentials: allowCredentials?.map((cred) => ({
-      ...cred,
-      id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
-    })),
+    allowCredentials: allowCredentials?.map((cred) => {
+      if (!isoBase64URL.isBase64URL(cred.id)) {
+        throw new Error(`excludeCredential id "${cred.id}" is not a valid base64url string`);
+      }
+
+      return {
+        ...cred,
+        id: isoBase64URL.trimPadding(cred.id),
+        type: 'public-key',
+      };
+    }),
     timeout,
     userVerification,
     extensions,

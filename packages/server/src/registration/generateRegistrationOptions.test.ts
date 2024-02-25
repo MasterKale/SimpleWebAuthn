@@ -67,8 +67,7 @@ Deno.test('should map excluded credential IDs if specified', async () => {
     userName: 'usernameHere',
     excludeCredentials: [
       {
-        id: isoUint8Array.fromASCIIString('someIDhere'),
-        type: 'public-key',
+        id: 'someIDhere',
         transports: ['usb', 'ble', 'nfc', 'internal'],
       },
     ],
@@ -78,7 +77,7 @@ Deno.test('should map excluded credential IDs if specified', async () => {
     options.excludeCredentials,
     [
       {
-        id: 'c29tZUlEaGVyZQ',
+        id: 'someIDhere',
         type: 'public-key',
         transports: ['usb', 'ble', 'nfc', 'internal'],
       },

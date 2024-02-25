@@ -1,6 +1,7 @@
 import type {
   AuthenticationResponseJSON,
   AuthenticatorDevice,
+  Base64URLString,
   CredentialDeviceType,
   UserVerificationRequirement,
 } from '../deps.ts';
@@ -94,11 +95,15 @@ export async function verifyAuthenticationResponse(
   if (Array.isArray(expectedType)) {
     if (!expectedType.includes(type)) {
       const joinedExpectedType = expectedType.join(', ');
-      throw new Error(`Unexpected authentication response type "${type}", expected one of: ${joinedExpectedType}`);
+      throw new Error(
+        `Unexpected authentication response type "${type}", expected one of: ${joinedExpectedType}`,
+      );
     }
   } else if (expectedType) {
     if (type !== expectedType) {
-      throw new Error(`Unexpected authentication response type "${type}", expected "${expectedType}"`);
+      throw new Error(
+        `Unexpected authentication response type "${type}", expected "${expectedType}"`,
+      );
     }
   } else if (type !== 'webauthn.get') {
     throw new Error(`Unexpected authentication response type: ${type}`);
@@ -133,13 +138,13 @@ export async function verifyAuthenticationResponse(
     }
   }
 
-  if (!isoBase64URL.isBase64url(assertionResponse.authenticatorData)) {
+  if (!isoBase64URL.isBase64URL(assertionResponse.authenticatorData)) {
     throw new Error(
       'Credential response authenticatorData was not a base64url string',
     );
   }
 
-  if (!isoBase64URL.isBase64url(assertionResponse.signature)) {
+  if (!isoBase64URL.isBase64URL(assertionResponse.signature)) {
     throw new Error('Credential response signature was not a base64url string');
   }
 
@@ -280,7 +285,7 @@ export async function verifyAuthenticationResponse(
 export type VerifiedAuthenticationResponse = {
   verified: boolean;
   authenticationInfo: {
-    credentialID: Uint8Array;
+    credentialID: Base64URLString;
     newCounter: number;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;

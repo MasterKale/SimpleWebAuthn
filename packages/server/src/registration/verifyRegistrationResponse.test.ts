@@ -88,10 +88,7 @@ Deno.test('should verify Packed (EC2) attestation', async () => {
   );
   assertEquals(
     verification.registrationInfo?.credentialID,
-    isoBase64URL.toBuffer(
-      'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3U' +
-        'B2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
-    ),
+    'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3UB2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
   );
 });
 
@@ -115,9 +112,7 @@ Deno.test('should verify Packed (X5C) attestation', async () => {
   );
   assertEquals(
     verification.registrationInfo?.credentialID,
-    isoBase64URL.toBuffer(
-      '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
-    ),
+    '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
   );
 });
 
@@ -140,9 +135,7 @@ Deno.test('should verify None attestation', async () => {
   );
   assertEquals(
     verification.registrationInfo?.credentialID,
-    isoBase64URL.toBuffer(
-      'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
-    ),
+    'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   );
   assertEquals(
     verification.registrationInfo?.origin,
@@ -182,7 +175,7 @@ Deno.test('should verify None attestation w/RSA public key', async () => {
   );
   assertEquals(
     verification.registrationInfo?.credentialID,
-    isoBase64URL.toBuffer('kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo'),
+    'kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo',
   );
   assertEquals(
     verification.registrationInfo?.origin,
@@ -227,10 +220,10 @@ Deno.test('should throw when response type is not expected value', async () => {
         expectedChallenge: attestationNoneChallenge,
         expectedOrigin: 'https://dev.dontneeda.pw',
         expectedRPID: 'dev.dontneeda.pw',
-        expectedType: 'something.get'
+        expectedType: 'something.get',
       }),
     Error,
-   'registration response type',
+    'registration response type',
   );
 });
 
@@ -242,7 +235,7 @@ Deno.test('should throw when response type is not in list of expected types', as
         expectedChallenge: attestationNoneChallenge,
         expectedOrigin: 'https://dev.dontneeda.pw',
         expectedRPID: 'dev.dontneeda.pw',
-        expectedType: ['something.create', 'something.else.create']
+        expectedType: ['something.create', 'something.else.create'],
       }),
     Error,
     'registration response type',
@@ -301,7 +294,7 @@ Deno.test('should validate when attestation type is not webauthn.create and expe
     expectedChallenge: challenge,
     expectedOrigin: origin,
     expectedRPID: 'dev.dontneeda.pw',
-    expectedType: 'webauthn.goodtype'
+    expectedType: 'webauthn.goodtype',
   });
   assert(verification.verified);
 
@@ -600,7 +593,7 @@ Deno.test('should validate TPM RSA response (SHA256)', async () => {
   );
   assertEquals(
     verification.registrationInfo?.credentialID,
-    isoBase64URL.toBuffer('lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM'),
+    'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
   );
   assertEquals(
     verification.registrationInfo?.origin,
@@ -642,7 +635,7 @@ Deno.test('should validate TPM RSA response (SHA1)', async () => {
   );
   assertEquals(
     verification.registrationInfo?.credentialID,
-    isoBase64URL.toBuffer('oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU'),
+    'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
   );
   assertEquals(
     verification.registrationInfo?.origin,
@@ -684,7 +677,7 @@ Deno.test('should validate Android-Key response', async () => {
   );
   assertEquals(
     verification.registrationInfo?.credentialID,
-    isoBase64URL.toBuffer('PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o'),
+    'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
   );
   assertEquals(
     verification.registrationInfo?.origin,

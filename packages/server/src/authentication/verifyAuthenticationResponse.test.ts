@@ -267,9 +267,7 @@ Deno.test('should verify TPM assertion', { ignore: true }, async () => {
     expectedRPID: 'dev.dontneeda.pw',
     authenticator: {
       credentialPublicKey: isoBase64URL.toBuffer('BAEAAQ'),
-      credentialID: isoBase64URL.toBuffer(
-        'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
-      ),
+      credentialID: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
       counter: 0,
     },
   });
@@ -400,9 +398,8 @@ Deno.test('should pass verification if custom challenge verifier returns true', 
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
     authenticator: {
-      credentialID: isoBase64URL.toBuffer(
+      credentialID:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
-      ),
       credentialPublicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
@@ -461,9 +458,8 @@ Deno.test('should pass verification if custom challenge verifier returns a Promi
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
     authenticator: {
-      credentialID: isoBase64URL.toBuffer(
+      credentialID:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
-      ),
       credentialPublicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
@@ -525,9 +521,8 @@ Deno.test('should return authenticator extension output', async () => {
     expectedRPID: 'try-webauthn.appspot.com',
     expectedChallenge: 'iZsVCztrDW7D2U_GHCIlYKLwV2bCsBTRqVQUnJXn9Tk',
     authenticator: {
-      credentialID: isoBase64URL.toBuffer(
+      credentialID:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
-      ),
       credentialPublicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
@@ -611,9 +606,8 @@ const authenticator: AuthenticatorDevice = {
   credentialPublicKey: isoBase64URL.toBuffer(
     'pQECAyYgASFYIIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A1Ilgg8WGeA6hPmnab0HAViUYVRkwTNcN77QBf_RR0dv3lIvQ',
   ),
-  credentialID: isoBase64URL.toBuffer(
+  credentialID:
     'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
-  ),
   counter: 143,
 };
 
@@ -641,8 +635,7 @@ const authenticatorFirstTimeUsed: AuthenticatorDevice = {
   credentialPublicKey: isoBase64URL.toBuffer(
     'pQECAyYgASFYIGmaxR4mBbukc2QhtW2ldhAAd555r-ljlGQN8MbcTnPPIlgg9CyUlE-0AB2fbzZbNgBvJuRa7r6o2jPphOmtyNPR_kY',
   ),
-  credentialID: isoBase64URL.toBuffer(
+  credentialID:
     'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
-  ),
   counter: 0,
 };

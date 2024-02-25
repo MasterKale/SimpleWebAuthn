@@ -22,6 +22,17 @@
       "problemMatcher": [],
       "label": "pnpm: build:browser",
       "detail": "pnpm run build:browser"
+    },
+    {
+      "type": "npm",
+      "script": "build:types",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "label": "pnpm: build:types",
+      "detail": "pnpm run build:types"
     }
   ]
 }

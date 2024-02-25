@@ -2,9 +2,10 @@ import type {
   AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticatorSelectionCriteria,
+  AuthenticatorTransportFuture,
+  Base64URLString,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialDescriptorFuture,
   PublicKeyCredentialParameters,
 } from '../deps.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
@@ -19,7 +20,10 @@ export type GenerateRegistrationOptionsOpts = {
   userDisplayName?: string;
   timeout?: number;
   attestationType?: AttestationConveyancePreference;
-  excludeCredentials?: PublicKeyCredentialDescriptorFuture[];
+  excludeCredentials?: {
+    id: Base64URLString;
+    transports?: AuthenticatorTransportFuture[];
+  }[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
   extensions?: AuthenticationExtensionsClientInputs;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
@@ -174,10 +178,17 @@ export async function generateRegistrationOptions(
     pubKeyCredParams,
     timeout,
     attestation: attestationType,
-    excludeCredentials: excludeCredentials.map((cred) => ({
-      ...cred,
-      id: isoBase64URL.fromBuffer(cred.id as Uint8Array),
-    })),
+    excludeCredentials: excludeCredentials.map((cred) => {
+      if (!isoBase64URL.isBase64URL(cred.id)) {
+        throw new Error(`excludeCredential id "${cred.id}" is not a valid base64url string`);
+      }
+
+      return {
+        ...cred,
+        id: isoBase64URL.trimPadding(cred.id),
+        type: 'public-key',
+      };
+    }),
     authenticatorSelection,
     extensions: {
       ...extensions,

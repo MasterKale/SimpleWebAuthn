@@ -1,4 +1,5 @@
 import { base64 } from '../../deps.ts';
+import type { Base64URLString } from '../../deps.ts';
 
 /**
  * Decode from a Base64URL-encoded string to an ArrayBuffer. Best used when converting a
@@ -63,8 +64,15 @@ export function isBase64(input: string): boolean {
 /**
  * Confirm that the string is encoded into base64url, with support for optional padding
  */
-export function isBase64url(input: string): boolean {
+export function isBase64URL(input: string): boolean {
   // Trim padding characters from the string if present
-  input = input.replace(/=/g, '');
+  input = trimPadding(input);
   return base64.validate(input, true);
+}
+
+/**
+ * Remove optional padding from a base64url-encoded string
+ */
+export function trimPadding(input: Base64URLString): Base64URLString {
+  return input.replace(/=/g, '');
 }
