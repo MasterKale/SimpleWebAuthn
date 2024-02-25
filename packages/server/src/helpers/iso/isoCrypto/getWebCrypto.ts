@@ -6,7 +6,7 @@ let webCrypto: Crypto | undefined = undefined;
  * Try to get an instance of the Crypto API from the current runtime. Should support Node,
  * as well as others, like Deno, that implement Web APIs.
  */
-export async function getWebCrypto(): Promise<Crypto> {
+export function getWebCrypto(): Crypto {
   if (webCrypto) {
     return webCrypto;
   }
@@ -22,17 +22,7 @@ export async function getWebCrypto(): Promise<Crypto> {
     return webCrypto;
   }
 
-  /**
-   * `globalThis.crypto` isn't available, so attempt a Node import...
-   */
-  const _nodeCrypto = await _getWebCryptoInternals.stubThisImportNodeCrypto();
-
-  if (_nodeCrypto?.webcrypto) {
-    webCrypto = _nodeCrypto.webcrypto as Crypto;
-    return webCrypto;
-  }
-
-  // We tried to access it both in Node and globally, so bail out
+  // We couldn't find WebCrypto so bail out
   throw new MissingWebCrypto();
 }
 
@@ -46,25 +36,6 @@ export class MissingWebCrypto extends Error {
 
 // Make it possible to stub return values during testing
 export const _getWebCryptoInternals = {
-  stubThisImportNodeCrypto: async () => {
-    try {
-      // dnt-shim-ignore
-      /**
-       * The `webpackIgnore` here is to help support Next.js' Edge runtime.
-       * See https://github.com/MasterKale/SimpleWebAuthn/issues/517 for more info.
-       */
-      const _nodeCrypto = await import(/* webpackIgnore: true */ 'node:crypto');
-      return _nodeCrypto;
-    } catch (_err) {
-      /**
-       * Intentionally declaring webcrypto as undefined because we're assuming the Node import
-       * failed due to either:
-       * - `import()` isn't supported
-       * - `node:crypto` is unavailable.
-       */
-      return { webcrypto: undefined };
-    }
-  },
   stubThisGlobalThisCrypto: () => globalThis.crypto,
   // Make it possible to reset the `webCrypto` at the top of the file
   setCachedCrypto: (newCrypto: Crypto | undefined) => {
