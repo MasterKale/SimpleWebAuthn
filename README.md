@@ -70,7 +70,7 @@ these types of requests to start this discussion.
 Install the following before proceeding:
 
 - **Node.js 18.x**
-- **Deno 1.36.x**
+- **Deno 1.41.x**
 - **pnpm 8.6.x**
 
 After pulling down the code, set up dependencies:
