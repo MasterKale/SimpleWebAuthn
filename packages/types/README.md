@@ -6,12 +6,12 @@
 TypeScript typings for **@simplewebauthn/server** and **@simplewebauthn/browser**
 
 - [Installation](#installation)
-  - [Node LTS 16.x or higher](#node-lts-16x-or-higher)
+  - [Node LTS 20.x or higher](#node-lts-20x-or-higher)
   - [Deno v1.33.x or higher](#deno-v133x-or-higher)
 
 ## Installation
 
-### Node LTS 16.x or higher
+### Node LTS 20.x or higher
 
 This package is available on **npm**:
 
