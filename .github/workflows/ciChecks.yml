@@ -17,9 +17,7 @@ jobs:
     strategy:
       matrix:
         node-version: [ 16, 18 ]
-        # TODO: Find a better action, this one is limited to v1.33.1
-        # See https://github.com/maximousblk/setup-deno/issues
-        deno-version: [ 'v1.33.1' ]
+        deno-version: [ 'v1.41.0' ]
 
     steps:
     - uses: actions/checkout@v3
@@ -34,7 +32,7 @@ jobs:
 
     # Install Deno
     - name: Setup Deno ${{ matrix.deno-version }}
-      uses: maximousblk/setup-deno@v2
+      uses: denoland/setup-deno@v1
       with:
         deno-version: ${{ matrix.deno-version }}
     - name: Confirm installed Deno version
