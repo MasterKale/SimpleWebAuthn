@@ -16,7 +16,7 @@ export async function verifyRSA(opts: {
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 
-  const WebCrypto = await getWebCrypto();
+  const WebCrypto = getWebCrypto();
 
   const alg = cosePublicKey.get(COSEKEYS.alg);
   const n = cosePublicKey.get(COSEKEYS.n);

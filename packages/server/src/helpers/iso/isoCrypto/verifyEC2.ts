@@ -16,7 +16,7 @@ export async function verifyEC2(opts: {
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 
-  const WebCrypto = await getWebCrypto();
+  const WebCrypto = getWebCrypto();
 
   // Import the public key
   const alg = cosePublicKey.get(COSEKEYS.alg);

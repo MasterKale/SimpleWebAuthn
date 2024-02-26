@@ -12,7 +12,7 @@ export async function digest(
   data: Uint8Array,
   algorithm: COSEALG,
 ): Promise<Uint8Array> {
-  const WebCrypto = await getWebCrypto();
+  const WebCrypto = getWebCrypto();
 
   const subtleAlgorithm = mapCoseAlgToWebCryptoAlg(algorithm);
 

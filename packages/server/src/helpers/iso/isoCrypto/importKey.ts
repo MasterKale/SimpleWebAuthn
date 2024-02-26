@@ -1,10 +1,10 @@
 import { getWebCrypto } from './getWebCrypto.ts';
 
-export async function importKey(opts: {
+export function importKey(opts: {
   keyData: JsonWebKey;
   algorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams;
 }): Promise<CryptoKey> {
-  const WebCrypto = await getWebCrypto();
+  const WebCrypto = getWebCrypto();
 
   const { keyData, algorithm } = opts;
 

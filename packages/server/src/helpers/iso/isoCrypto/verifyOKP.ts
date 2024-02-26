@@ -11,7 +11,7 @@ export async function verifyOKP(opts: {
 }): Promise<boolean> {
   const { cosePublicKey, signature, data } = opts;
 
-  const WebCrypto = await getWebCrypto();
+  const WebCrypto = getWebCrypto();
 
   const alg = cosePublicKey.get(COSEKEYS.alg);
   const crv = cosePublicKey.get(COSEKEYS.crv);
