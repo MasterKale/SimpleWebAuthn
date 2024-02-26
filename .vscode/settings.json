@@ -1,9 +1,6 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
-  // `deno.enable` is superfluous but necessary pre-Deno 1.37 (we're currently using 1.36)
-  // See https://github.com/denoland/deno/issues/20411#issuecomment-1725920550
-  "deno.enable": true,
   "deno.path": "/opt/homebrew/bin/deno",
   "deno.enablePaths": [
     "./packages/server",

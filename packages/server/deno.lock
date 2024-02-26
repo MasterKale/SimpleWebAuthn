@@ -1,5 +1,16 @@
 {
-  "version": "2",
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:@types/node": "npm:@types/node@18.16.19"
+    },
+    "npm": {
+      "@types/node@18.16.19": {
+        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
+        "dependencies": {}
+      }
+    }
+  },
   "remote": {
     "https://deno.land/std@0.140.0/_util/assert.ts": "e94f2eb37cebd7f199952e242c77654e43333c1ac4c5c700e929ea3aa5489f74",
     "https://deno.land/std@0.140.0/_util/os.ts": "3b4c6e27febd119d36a416d7a97bd3b0251b77c88942c8f16ee5953ea13e2e49",
@@ -153,16 +164,5 @@
     "https://esm.sh/v135/pvtsutils@1.3.5/denonext/pvtsutils.mjs": "016782b990e2652a326cf1d8984c2adc4552171da902cc73dc8e12ffdbe3a100",
     "https://esm.sh/v135/pvutils@1.1.3/denonext/pvutils.mjs": "ad156a239ec0f1aa99f123fab44abc292c87d4fd6969d7af264436630457523c",
     "https://esm.sh/v135/tslib@2.6.2/denonext/tslib.mjs": "29782bcd3139f77ec063dc5a9385c0fff4a8d0a23b6765c73d9edeb169a04bf1"
-  },
-  "npm": {
-    "specifiers": {
-      "@types/node": "@types/node@18.16.19"
-    },
-    "packages": {
-      "@types/node@18.16.19": {
-        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
-        "dependencies": {}
-      }
-    }
   }
 }

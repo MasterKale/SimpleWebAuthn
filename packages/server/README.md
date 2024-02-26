@@ -4,14 +4,14 @@
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/server)
 
 - [Installation](#installation)
-  - [Node LTS 16.x or higher](#node-lts-16x-or-higher)
+  - [Node LTS 20.x or higher](#node-lts-20x-or-higher)
   - [Deno v1.33.x or higher](#deno-v133x-or-higher)
 - [Usage](#usage)
 - [Supported Attestation Formats](#supported-attestation-formats)
 
 ## Installation
 
-### Node LTS 16.x or higher
+### Node LTS 20.x or higher
 
 This package is available on **npm** and supports **both CommonJS and
 [ECMAScript modules (ESM)](https://nodejs.org/api/esm.html#enabling)** projects:
