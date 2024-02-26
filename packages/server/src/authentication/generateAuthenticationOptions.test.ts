@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertExists } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+import { isoBase64URL } from '../helpers/iso/index.ts';
 
 import { generateAuthenticationOptions } from './generateAuthenticationOptions.ts';
 

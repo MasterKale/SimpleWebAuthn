@@ -3,7 +3,6 @@ import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts
 
 import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
 import { _generateChallengeInternals } from '../helpers/generateChallenge.ts';
-import { isoUint8Array } from '../helpers/iso/index.ts';
 
 Deno.test('should generate credential request options suitable for sending via JSON', async () => {
   const rpName = 'SimpleWebAuthn';

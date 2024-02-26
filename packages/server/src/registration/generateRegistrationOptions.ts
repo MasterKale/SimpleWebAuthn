@@ -98,15 +98,15 @@ const defaultSupportedAlgorithmIDs: COSEAlgorithmIdentifier[] = [-8, -7, -257];
  * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
  * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
-export async function generateRegistrationOptions(
+export function generateRegistrationOptions(
   options: GenerateRegistrationOptionsOpts,
-): Promise<PublicKeyCredentialCreationOptionsJSON> {
+): PublicKeyCredentialCreationOptionsJSON {
   const {
     rpName,
     rpID,
     userID,
     userName,
-    challenge = await generateChallenge(),
+    challenge = generateChallenge(),
     userDisplayName = userName,
     timeout = 60000,
     attestationType = 'none',

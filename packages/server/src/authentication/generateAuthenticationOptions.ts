@@ -33,12 +33,12 @@ export type GenerateAuthenticationOptionsOpts = {
  * @param extensions Additional plugins the authenticator or browser should use during authentication
  * @param rpID Valid domain name (after `https://`)
  */
-export async function generateAuthenticationOptions(
+export function generateAuthenticationOptions(
   options: GenerateAuthenticationOptionsOpts = {},
-): Promise<PublicKeyCredentialRequestOptionsJSON> {
+): PublicKeyCredentialRequestOptionsJSON {
   const {
     allowCredentials,
-    challenge = await generateChallenge(),
+    challenge = generateChallenge(),
     timeout = 60000,
     userVerification = 'preferred',
     extensions,
