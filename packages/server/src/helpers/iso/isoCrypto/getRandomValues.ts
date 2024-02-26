@@ -5,8 +5,8 @@ import { getWebCrypto } from './getWebCrypto.ts';
  *
  * @returns the same bytes array passed into the method
  */
-export async function getRandomValues(array: Uint8Array): Promise<Uint8Array> {
-  const WebCrypto = await getWebCrypto();
+export function getRandomValues(array: Uint8Array): Uint8Array {
+  const WebCrypto = getWebCrypto();
 
   WebCrypto.getRandomValues(array);
 
