@@ -857,7 +857,7 @@ Deno.test('should fail verification if custom challenge verifier returns a Promi
     () =>
       verifyRegistrationResponse({
         response: attestationNone,
-        expectedChallenge: (challenge: string) => Promise.reject(new Error('rejected')),
+        expectedChallenge: (_: string) => Promise.reject(new Error('rejected')),
         expectedOrigin: 'https://dev.dontneeda.pw',
         expectedRPID: 'dev.dontneeda.pw',
       }),
