@@ -9,7 +9,7 @@ let webCrypto: Crypto | undefined = undefined;
 export function getWebCrypto(): Promise<Crypto> {
   /**
    * Hello there! If you came here wondering why this method is asynchronous when use of
-   * `globalThis.crypto` is not, it's to minimize a bunch of refactor related to make this
+   * `globalThis.crypto` is not, it's to minimize a bunch of refactor related to making this
    * synchronous. For example, `generateRegistrationOptions()` and `generateAuthenticationOptions()`
    * become synchronous if we make this synchronous (since nothing else in that method is async)
    * which represents a breaking API change in this library's core API.
