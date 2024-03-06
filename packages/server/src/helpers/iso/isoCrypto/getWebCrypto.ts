@@ -6,34 +6,38 @@ let webCrypto: Crypto | undefined = undefined;
  * Try to get an instance of the Crypto API from the current runtime. Should support Node,
  * as well as others, like Deno, that implement Web APIs.
  */
-export async function getWebCrypto(): Promise<Crypto> {
-  if (webCrypto) {
-    return webCrypto;
-  }
-
+export function getWebCrypto(): Promise<Crypto> {
   /**
-   * Naively attempt to access Crypto as a global object, which popular alternative run-times
-   * support.
+   * Hello there! If you came here wondering why this method is asynchronous when use of
+   * `globalThis.crypto` is not, it's to minimize a bunch of refactor related to making this
+   * synchronous. For example, `generateRegistrationOptions()` and `generateAuthenticationOptions()`
+   * become synchronous if we make this synchronous (since nothing else in that method is async)
+   * which represents a breaking API change in this library's core API.
+   *
+   * TODO: If it's after February 2025 when you read this then consider whether it still makes sense
+   * to keep this method asynchronous.
    */
-  const _globalThisCrypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
+  const toResolve = new Promise<Crypto>((resolve, reject) => {
+    if (webCrypto) {
+      return resolve(webCrypto);
+    }
 
-  if (_globalThisCrypto) {
-    webCrypto = _globalThisCrypto;
-    return webCrypto;
-  }
+    /**
+     * Naively attempt to access Crypto as a global object, which popular ESM-centric run-times
+     * support (and Node v20+)
+     */
+    const _globalThisCrypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
 
-  /**
-   * `globalThis.crypto` isn't available, so attempt a Node import...
-   */
-  const _nodeCrypto = await _getWebCryptoInternals.stubThisImportNodeCrypto();
+    if (_globalThisCrypto) {
+      webCrypto = _globalThisCrypto;
+      return resolve(webCrypto);
+    }
 
-  if (_nodeCrypto?.webcrypto) {
-    webCrypto = _nodeCrypto.webcrypto as Crypto;
-    return webCrypto;
-  }
+    // We tried to access it both in Node and globally, so bail out
+    return reject(new MissingWebCrypto());
+  });
 
-  // We tried to access it both in Node and globally, so bail out
-  throw new MissingWebCrypto();
+  return toResolve;
 }
 
 export class MissingWebCrypto extends Error {
@@ -46,25 +50,6 @@ export class MissingWebCrypto extends Error {
 
 // Make it possible to stub return values during testing
 export const _getWebCryptoInternals = {
-  stubThisImportNodeCrypto: async () => {
-    try {
-      // dnt-shim-ignore
-      /**
-       * The `webpackIgnore` here is to help support Next.js' Edge runtime.
-       * See https://github.com/MasterKale/SimpleWebAuthn/issues/517 for more info.
-       */
-      const _nodeCrypto = await import(/* webpackIgnore: true */ 'node:crypto');
-      return _nodeCrypto;
-    } catch (_err) {
-      /**
-       * Intentionally declaring webcrypto as undefined because we're assuming the Node import
-       * failed due to either:
-       * - `import()` isn't supported
-       * - `node:crypto` is unavailable.
-       */
-      return { webcrypto: undefined };
-    }
-  },
   stubThisGlobalThisCrypto: () => globalThis.crypto,
   // Make it possible to reset the `webCrypto` at the top of the file
   setCachedCrypto: (newCrypto: Crypto | undefined) => {
