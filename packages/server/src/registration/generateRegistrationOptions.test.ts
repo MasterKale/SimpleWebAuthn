@@ -3,7 +3,6 @@ import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts
 
 import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
 import { _generateChallengeInternals } from '../helpers/generateChallenge.ts';
-import { isoUint8Array } from '../helpers/iso/index.ts';
 
 Deno.test('should generate credential request options suitable for sending via JSON', async () => {
   const rpName = 'SimpleWebAuthn';
@@ -13,6 +12,7 @@ Deno.test('should generate credential request options suitable for sending via J
   const userName = 'usernameHere';
   const timeout = 1;
   const attestationType = 'indirect';
+  const userDisplayName = 'userDisplayName';
 
   const options = await generateRegistrationOptions({
     rpName,
@@ -20,6 +20,7 @@ Deno.test('should generate credential request options suitable for sending via J
     challenge,
     userID,
     userName,
+    userDisplayName,
     timeout,
     attestationType,
   });
@@ -36,7 +37,7 @@ Deno.test('should generate credential request options suitable for sending via J
       user: {
         id: userID,
         name: userName,
-        displayName: userName,
+        displayName: userDisplayName,
       },
       pubKeyCredParams: [
         { alg: -8, type: 'public-key' },
@@ -107,6 +108,18 @@ Deno.test('defaults to none attestation if no attestation type is specified', as
   });
 
   assertEquals(options.attestation, 'none');
+});
+
+Deno.test('defaults to empty string for displayName if no userDisplayName is specified', async () => {
+  const options = await generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userID: '1234',
+    userName: 'usernameHere',
+  });
+
+  assertEquals(options.user.displayName, '');
 });
 
 Deno.test('should set authenticatorSelection if specified', async () => {
