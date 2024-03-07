@@ -107,7 +107,7 @@ export async function generateRegistrationOptions(
     userID,
     userName,
     challenge = await generateChallenge(),
-    userDisplayName = userName,
+    userDisplayName = '',
     timeout = 60000,
     attestationType = 'none',
     excludeCredentials = [],
