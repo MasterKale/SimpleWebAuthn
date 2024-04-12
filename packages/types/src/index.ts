@@ -168,7 +168,7 @@ export interface AuthenticatorAssertionResponseJSON {
   clientDataJSON: Base64URLString;
   authenticatorData: Base64URLString;
   signature: Base64URLString;
-  userHandle?: string;
+  userHandle?: Base64URLString;
 }
 
 /**

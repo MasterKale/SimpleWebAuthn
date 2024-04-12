@@ -41,16 +41,16 @@ export function toBase64(base64urlString: string): string {
 }
 
 /**
- * Encode a string to base64url
+ * Encode a UTF-8 string to base64url
  */
-export function fromString(ascii: string): string {
-  return base64.fromString(ascii, true);
+export function fromUTF8String(utf8String: string): string {
+  return base64.fromString(utf8String, true);
 }
 
 /**
- * Decode a base64url string into its original string
+ * Decode a base64url string into its original UTF-8 string
  */
-export function toString(base64urlString: string): string {
+export function toUTF8String(base64urlString: string): string {
   return base64.toString(base64urlString, true);
 }
 

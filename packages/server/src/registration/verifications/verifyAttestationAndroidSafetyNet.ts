@@ -43,10 +43,10 @@ export async function verifyAttestationAndroidSafetyNet(
   const jwtParts = jwt.split('.');
 
   const HEADER: SafetyNetJWTHeader = JSON.parse(
-    isoBase64URL.toString(jwtParts[0]),
+    isoBase64URL.toUTF8String(jwtParts[0]),
   );
   const PAYLOAD: SafetyNetJWTPayload = JSON.parse(
-    isoBase64URL.toString(jwtParts[1]),
+    isoBase64URL.toUTF8String(jwtParts[1]),
   );
   const SIGNATURE: SafetyNetJWTSignature = jwtParts[2];
 

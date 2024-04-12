@@ -6,7 +6,6 @@ import {
 
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
-import { bufferToUTF8String } from '../helpers/bufferToUTF8String';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
@@ -17,12 +16,11 @@ import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment'
 /**
  * Begin authenticator "login" via WebAuthn assertion
  *
- * @param requestOptionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions()`
- * @param useBrowserAutofill Initialize conditional UI to enable logging in via browser
- * autofill prompts
+ * @param optionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions()`
+ * @param useBrowserAutofill (Optional) Initialize conditional UI to enable logging in via browser autofill prompts. Defaults to `false`.
  */
 export async function startAuthentication(
-  requestOptionsJSON: PublicKeyCredentialRequestOptionsJSON,
+  optionsJSON: PublicKeyCredentialRequestOptionsJSON,
   useBrowserAutofill = false,
 ): Promise<AuthenticationResponseJSON> {
   if (!browserSupportsWebAuthn()) {
@@ -32,16 +30,16 @@ export async function startAuthentication(
   // We need to avoid passing empty array to avoid blocking retrieval
   // of public key
   let allowCredentials;
-  if (requestOptionsJSON.allowCredentials?.length !== 0) {
-    allowCredentials = requestOptionsJSON.allowCredentials?.map(
+  if (optionsJSON.allowCredentials?.length !== 0) {
+    allowCredentials = optionsJSON.allowCredentials?.map(
       toPublicKeyCredentialDescriptor,
     );
   }
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
   const publicKey: PublicKeyCredentialRequestOptions = {
-    ...requestOptionsJSON,
-    challenge: base64URLStringToBuffer(requestOptionsJSON.challenge),
+    ...optionsJSON,
+    challenge: base64URLStringToBuffer(optionsJSON.challenge),
     allowCredentials,
   };
 
@@ -59,7 +57,7 @@ export async function startAuthentication(
 
     // Check for an <input> with "webauthn" in its `autocomplete` attribute
     const eligibleInputs = document.querySelectorAll(
-      'input[autocomplete$=\'webauthn\']',
+      "input[autocomplete$='webauthn']",
     );
 
     // WebAuthn autofill requires at least one valid input
@@ -97,7 +95,7 @@ export async function startAuthentication(
 
   let userHandle = undefined;
   if (response.userHandle) {
-    userHandle = bufferToUTF8String(response.userHandle);
+    userHandle = bufferToBase64URLString(response.userHandle);
   }
 
   // Convert values to base64 to make it easier to send back to the server

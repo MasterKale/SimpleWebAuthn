@@ -390,7 +390,7 @@ Deno.test('should pass verification if custom challenge verifier returns true', 
         actualChallenge: string;
         arbitraryData: string;
       } = JSON.parse(
-        isoBase64URL.toString(challenge),
+        isoBase64URL.toUTF8String(challenge),
       );
       return parsedChallenge.actualChallenge ===
         'K3QxOjnVJLiGlnVEp5va5QJeMVWNf_7PYgutgbAtAUA';
@@ -448,7 +448,7 @@ Deno.test('should pass verification if custom challenge verifier returns a Promi
         actualChallenge: string;
         arbitraryData: string;
       } = JSON.parse(
-        isoBase64URL.toString(challenge),
+        isoBase64URL.toUTF8String(challenge),
       );
       return Promise.resolve(
         parsedChallenge.actualChallenge ===
@@ -597,7 +597,7 @@ const assertionResponse: AuthenticationResponseJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const assertionChallenge = isoBase64URL.fromString(
+const assertionChallenge = isoBase64URL.fromUTF8String(
   'totallyUniqueValueEveryTime',
 );
 const assertionOrigin = 'https://dev.dontneeda.pw';
@@ -627,7 +627,7 @@ const assertionFirstTimeUsedResponse: AuthenticationResponseJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const assertionFirstTimeUsedChallenge = isoBase64URL.fromString(
+const assertionFirstTimeUsedChallenge = isoBase64URL.fromUTF8String(
   'totallyUniqueValueEveryAssertion',
 );
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';

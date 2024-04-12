@@ -6,11 +6,9 @@ import {
 } from '@simplewebauthn/types';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
-import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
+import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
 import { WebAuthnError } from '../helpers/webAuthnError';
 import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
-
-import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 
 import { startRegistration } from './startRegistration';
 
@@ -23,7 +21,7 @@ const mockAttestationObject = 'mockAtte';
 const mockClientDataJSON = 'mockClie';
 
 const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
-  challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
+  challenge: '1T6uHri4OAQ',
   attestation: 'direct',
   pubKeyCredParams: [
     {
@@ -36,7 +34,7 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
     name: 'SimpleWebAuthn',
   },
   user: {
-    id: '5678',
+    id: 'f4pdy3fpA34',
     displayName: 'username',
     name: 'username',
   },
@@ -77,10 +75,10 @@ test('should convert options before passing to navigator.credentials.create(...)
 
   // Make sure challenge and user.id are converted to Buffers
   expect(new Uint8Array(argsPublicKey.challenge)).toEqual(
-    new Uint8Array([102, 105, 122, 122]),
+    new Uint8Array([213, 62, 174, 30, 184, 184, 56, 4]),
   );
   expect(new Uint8Array(argsPublicKey.user.id)).toEqual(
-    new Uint8Array([53, 54, 55, 56]),
+    new Uint8Array([127, 138, 93, 203, 119, 233, 3, 126]),
   );
 
   // Confirm construction of excludeCredentials array
@@ -95,8 +93,8 @@ test('should return base64url-encoded response values', async () => {
     (): Promise<RegistrationCredential> => {
       return new Promise((resolve) => {
         resolve({
-          id: 'foobar',
-          rawId: utf8StringToBuffer('foobar'),
+          id: '6mUg8GzxDxs',
+          rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
           response: {
             attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
             clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
@@ -115,12 +113,12 @@ test('should return base64url-encoded response values', async () => {
 
   const response = await startRegistration(goodOpts1);
 
-  expect(response.rawId).toEqual('Zm9vYmFy');
+  expect(response.rawId).toEqual('6mUg8GzxDxs');
   expect(response.response.attestationObject).toEqual('bW9ja0F0dGU');
   expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWU');
 });
 
-test('should throw error if WebAuthn isn\'t supported', async () => {
+test("should throw error if WebAuthn isn't supported", async () => {
   mockSupportsWebauthn.mockReturnValue(false);
 
   await expect(startRegistration(goodOpts1)).rejects.toThrow(
@@ -216,8 +214,8 @@ test('should support "cable" transport in excludeCredentials', async () => {
 
 test('should return "cable" transport from response', async () => {
   mockNavigatorCreate.mockResolvedValue({
-    id: 'foobar',
-    rawId: utf8StringToBuffer('foobar'),
+    id: '6mUg8GzxDxs',
+    rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
     response: {
       attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
       clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
@@ -589,7 +587,8 @@ describe('WebAuthnError', () => {
         ...goodOpts1,
         user: {
           ...goodOpts1.user,
-          id: Array(65).fill('a').join(''),
+          // A base64url string 100 characters long should decode to ~70 bytes
+          id: Array(100).fill('a').join(''),
         },
       };
 

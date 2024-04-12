@@ -775,7 +775,7 @@ Deno.test('should pass verification if custom challenge verifier returns true', 
         actualChallenge: string;
         arbitraryData: string;
       } = JSON.parse(
-        isoBase64URL.toString(challenge),
+        isoBase64URL.toUTF8String(challenge),
       );
       return parsedChallenge.actualChallenge ===
         'xRsYdCQv5WZOqmxReiZl6C9q5SfrZne4lNSr9QVtPig';
@@ -823,7 +823,7 @@ Deno.test('should pass verification if custom challenge verifier returns a Promi
         actualChallenge: string;
         arbitraryData: string;
       } = JSON.parse(
-        isoBase64URL.toString(challenge),
+        isoBase64URL.toUTF8String(challenge),
       );
       return Promise.resolve(
         parsedChallenge.actualChallenge ===
@@ -1011,7 +1011,7 @@ const attestationFIDOU2F: RegistrationResponseJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const attestationFIDOU2FChallenge = isoBase64URL.fromString(
+const attestationFIDOU2FChallenge = isoBase64URL.fromUTF8String(
   'totallyUniqueValueEveryAttestation',
 );
 
@@ -1033,7 +1033,7 @@ const attestationPacked: RegistrationResponseJSON = {
   clientExtensionResults: {},
   type: 'public-key',
 };
-const attestationPackedChallenge = isoBase64URL.fromString(
+const attestationPackedChallenge = isoBase64URL.fromUTF8String(
   's6PIbBnPPnrGNSBxNdtDrT7UrVYJK9HM',
 );
 
@@ -1065,7 +1065,7 @@ const attestationPackedX5C: RegistrationResponseJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const attestationPackedX5CChallenge = isoBase64URL.fromString(
+const attestationPackedX5CChallenge = isoBase64URL.fromUTF8String(
   'totallyUniqueValueEveryTime',
 );
 
@@ -1085,6 +1085,6 @@ const attestationNone: RegistrationResponseJSON = {
   type: 'public-key',
   clientExtensionResults: {},
 };
-const attestationNoneChallenge = isoBase64URL.fromString(
+const attestationNoneChallenge = isoBase64URL.fromUTF8String(
   'hEccPWuziP00H0p5gxh2_u5_PC4NeYgd',
 );

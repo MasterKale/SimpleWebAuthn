@@ -5,7 +5,6 @@ import {
   RegistrationResponseJSON,
 } from '@simplewebauthn/types';
 
-import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
@@ -17,10 +16,10 @@ import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment'
 /**
  * Begin authenticator "registration" via WebAuthn attestation
  *
- * @param creationOptionsJSON Output from **@simplewebauthn/server**'s `generateRegistrationOptions()`
+ * @param optionsJSON Output from **@simplewebauthn/server**'s `generateRegistrationOptions()`
  */
 export async function startRegistration(
-  creationOptionsJSON: PublicKeyCredentialCreationOptionsJSON,
+  optionsJSON: PublicKeyCredentialCreationOptionsJSON,
 ): Promise<RegistrationResponseJSON> {
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
@@ -28,13 +27,13 @@ export async function startRegistration(
 
   // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
   const publicKey: PublicKeyCredentialCreationOptions = {
-    ...creationOptionsJSON,
-    challenge: base64URLStringToBuffer(creationOptionsJSON.challenge),
+    ...optionsJSON,
+    challenge: base64URLStringToBuffer(optionsJSON.challenge),
     user: {
-      ...creationOptionsJSON.user,
-      id: utf8StringToBuffer(creationOptionsJSON.user.id),
+      ...optionsJSON.user,
+      id: base64URLStringToBuffer(optionsJSON.user.id),
     },
-    excludeCredentials: creationOptionsJSON.excludeCredentials?.map(
+    excludeCredentials: optionsJSON.excludeCredentials?.map(
       toPublicKeyCredentialDescriptor,
     ),
   };
