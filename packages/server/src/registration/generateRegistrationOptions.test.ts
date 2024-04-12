@@ -331,6 +331,6 @@ Deno.test('should raise if string is specified for userID', async () => {
         userID: 'customUserID',
       }),
     Error,
-    'String values for `userID` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids)',
+    'String values for `userID` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids',
   );
 });

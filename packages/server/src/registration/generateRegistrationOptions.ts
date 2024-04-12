@@ -171,7 +171,7 @@ export async function generateRegistrationOptions(
    */
   if (typeof userID === 'string') {
     throw new Error(
-      `String values for \`userID\` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids)`,
+      `String values for \`userID\` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids`,
     );
   }
 
