@@ -105,8 +105,8 @@ export async function generateRegistrationOptions(
   const {
     rpName,
     rpID,
-    userID,
     userName,
+    userID,
     challenge = await generateChallenge(),
     userDisplayName = '',
     timeout = 60000,
@@ -166,10 +166,20 @@ export async function generateRegistrationOptions(
   }
 
   /**
+   * Explicitly disallow use of strings for userID anymore because `isoBase64URL.fromBuffer()` below
+   * will return an empty string if one gets through!
+   */
+  if (typeof userID === 'string') {
+    throw new Error(
+      `String values for \`userID\` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids)`,
+    );
+  }
+
+  /**
    * Generate a user ID if one is not provided
    */
   let _userID = userID;
-  if (_userID === undefined) {
+  if (!_userID) {
     _userID = await generateUserID();
   }
 

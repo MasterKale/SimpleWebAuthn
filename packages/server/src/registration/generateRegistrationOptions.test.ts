@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertEquals, assertRejects } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts';
 
 import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
@@ -318,4 +318,19 @@ Deno.test('should prefer Ed25519 in pubKeyCredParams', async () => {
   });
 
   assertEquals(options.pubKeyCredParams[0].alg, -8);
+});
+
+Deno.test('should raise if string is specified for userID', async () => {
+  await assertRejects(
+    () =>
+      generateRegistrationOptions({
+        rpName: 'SimpleWebAuthn',
+        rpID: 'not.real',
+        userName: 'usernameHere',
+        // @ts-ignore: Pretending a dev missed a refactor between v9 and v10
+        userID: 'customUserID',
+      }),
+    Error,
+    'String values for `userID` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids)',
+  );
 });
