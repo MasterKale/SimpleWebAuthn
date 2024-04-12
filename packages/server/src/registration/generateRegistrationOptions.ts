@@ -9,13 +9,14 @@ import type {
   PublicKeyCredentialParameters,
 } from '../deps.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
+import { generateUserID } from '../helpers/generateUserID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
 export type GenerateRegistrationOptionsOpts = {
   rpName: string;
   rpID: string;
-  userID: string;
   userName: string;
+  userID?: Uint8Array;
   challenge?: string | Uint8Array;
   userDisplayName?: string;
   timeout?: number;
@@ -164,6 +165,14 @@ export async function generateRegistrationOptions(
     _challenge = isoUint8Array.fromUTF8String(_challenge);
   }
 
+  /**
+   * Generate a user ID if one is not provided
+   */
+  let _userID = userID;
+  if (_userID === undefined) {
+    _userID = await generateUserID();
+  }
+
   return {
     challenge: isoBase64URL.fromBuffer(_challenge),
     rp: {
@@ -171,7 +180,7 @@ export async function generateRegistrationOptions(
       id: rpID,
     },
     user: {
-      id: userID,
+      id: isoBase64URL.fromBuffer(_userID),
       name: userName,
       displayName: userDisplayName,
     },
