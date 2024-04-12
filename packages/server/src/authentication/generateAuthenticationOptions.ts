@@ -9,6 +9,7 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 
 export type GenerateAuthenticationOptionsOpts = {
+  rpID: string;
   allowCredentials?: {
     id: Base64URLString;
     transports?: AuthenticatorTransportFuture[];
@@ -17,7 +18,6 @@ export type GenerateAuthenticationOptionsOpts = {
   timeout?: number;
   userVerification?: UserVerificationRequirement;
   extensions?: AuthenticationExtensionsClientInputs;
-  rpID?: string;
 };
 
 /**
@@ -34,7 +34,7 @@ export type GenerateAuthenticationOptionsOpts = {
  * @param rpID Valid domain name (after `https://`)
  */
 export async function generateAuthenticationOptions(
-  options: GenerateAuthenticationOptionsOpts = {},
+  options: GenerateAuthenticationOptionsOpts,
 ): Promise<PublicKeyCredentialRequestOptionsJSON> {
   const {
     allowCredentials,
@@ -54,6 +54,7 @@ export async function generateAuthenticationOptions(
   }
 
   return {
+    rpId: rpID,
     challenge: isoBase64URL.fromBuffer(_challenge),
     allowCredentials: allowCredentials?.map((cred) => {
       if (!isoBase64URL.isBase64URL(cred.id)) {
@@ -69,6 +70,5 @@ export async function generateAuthenticationOptions(
     timeout,
     userVerification,
     extensions,
-    rpId: rpID,
   };
 }
