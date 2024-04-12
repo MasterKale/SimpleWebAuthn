@@ -44,16 +44,13 @@ export type VerifyRegistrationResponseOpts = {
  *
  * **Options:**
  *
- * @param response Response returned by **@simplewebauthn/browser**'s `startAuthentication()`
- * @param expectedChallenge The base64url-encoded `options.challenge` returned by
- * `generateRegistrationOptions()`
- * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
- * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
- * @param expectedType (Optional) The response type expected ('webauthn.create')
- * @param requireUserVerification (Optional) Enforce user verification by the authenticator
- * (via PIN, fingerprint, etc...)
- * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
- * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
+ * @param response - Response returned by **@simplewebauthn/browser**'s `startAuthentication()`
+ * @param expectedChallenge - The base64url-encoded `options.challenge` returned by `generateRegistrationOptions()`
+ * @param expectedOrigin - Website URL (or array of URLs) that the registration should have occurred on
+ * @param expectedRPID - RP ID (or array of IDs) that was specified in the registration options
+ * @param expectedType **(Optional)** - The response type expected ('webauthn.create')
+ * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
+ * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to all supported algorithm IDs
  */
 export async function verifyRegistrationResponse(
   options: VerifyRegistrationResponseOpts,

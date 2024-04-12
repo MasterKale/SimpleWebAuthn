@@ -21,17 +21,16 @@ export type GenerateAuthenticationOptionsOpts = {
 };
 
 /**
- * Prepare a value to pass into navigator.credentials.get(...) for authenticator "login"
+ * Prepare a value to pass into navigator.credentials.get(...) for authenticator authentication
  *
- * @param allowCredentials Authenticators previously registered by the user, if any. If undefined
- * the client will ask the user which credential they want to use
- * @param challenge Random value the authenticator needs to sign and pass back
- * user for authentication
- * @param timeout How long (in ms) the user can take to complete authentication
- * @param userVerification Set to `'discouraged'` when asserting as part of a 2FA flow, otherwise
- * set to `'preferred'` or `'required'` as desired.
- * @param extensions Additional plugins the authenticator or browser should use during authentication
- * @param rpID Valid domain name (after `https://`)
+ * **Options:**
+ *
+ * @param rpID - Valid domain name (after `https://`)
+ * @param allowCredentials **(Optional)** - Authenticators previously registered by the user, if any. If undefined the client will ask the user which credential they want to use
+ * @param challenge **(Optional)** - Random value the authenticator needs to sign and pass back user for authentication. Defaults to generating a random value
+ * @param timeout **(Optional)** - How long (in ms) the user can take to complete authentication. Defaults to `60000`
+ * @param userVerification **(Optional)** - Set to `'discouraged'` when asserting as part of a 2FA flow, otherwise set to `'preferred'` or `'required'` as desired. Defaults to `"preferred"`
+ * @param extensions **(Optional)** - Additional plugins the authenticator or browser should use during authentication
  */
 export async function generateAuthenticationOptions(
   options: GenerateAuthenticationOptionsOpts,
