@@ -1,5 +1,326 @@
 # Changelog
 
+## v10.0.0 - The one that goes up to 20
+
+Thanks for everything, Node 16 and Node 18, but it's time to move on! The headlining change of this
+release is the targeting of Node LTS v20+ as the minimum Node runtime. Additional developer-centric
+quality-of-life changes have also been made in the name of streamlining use of SimpleWebAuthn on
+both the back end and front end.
+
+This release is packed with updates, so buckle up! Refactor advice for breaking changes is, as
+always, offered below.
+
+### Packages
+
+- @simplewebauthn/browser@10.0.0
+- @simplewebauthn/server@10.0.0
+- @simplewebauthn/types@10.0.0
+
+### Changes
+
+- **[server]** The minimum supported Node version has been raised to Node v20
+  ([#531](https://github.com/MasterKale/SimpleWebAuthn/pull/531))
+- **[server]** `user.displayName` now defaults to an empty string if a value is not specified for
+  `userDisplayName` when calling `generateRegistrationOptions()`
+  ([#538](https://github.com/MasterKale/SimpleWebAuthn/pull/538))
+- **[browser]** The `browserSupportsWebAuthnAutofill()` helper will no longer break in environments
+  in which `PublicKeyCredential` is not present
+  ([#557](https://github.com/MasterKale/SimpleWebAuthn/pull/557), with thanks to @clarafitzgerald)
+
+### Breaking Changes
+
+- **[server]** The following breaking changes were made in PR
+  [#529](https://github.com/MasterKale/SimpleWebAuthn/pull/529):
+  - `generateRegistrationOptions()` now expects `Base64URLString` for excluded credential IDs
+  - `generateAuthenticationOptions()` now expects `Base64URLString` for allowed credential IDs
+  - `credentialID` returned from response verification methods is now a `Base64URLString`
+  - `AuthenticatorDevice.credentialID` is now a `Base64URLString`
+  - `isoBase64URL.isBase64url()` is now called `isoBase64URL.isBase64URL()`
+- **[browser, server]** The following breaking changes were made in PR
+  [#552](https://github.com/MasterKale/SimpleWebAuthn/pull/552):
+  - `generateRegistrationOptions()` now accepts an optional `Uint8Array` instead of a `string` for
+    `userID`
+  - `isoBase64URL.toString()` and `isoBase64URL.fromString()` have been renamed
+  - `generateRegistrationOptions()` will now generate random user IDs
+  - `user.id` is now treated like a base64url string in `startRegistration()`
+  - `userHandle` is now treated like a base64url string in `startAuthentication()`
+- **[server]** `rpID` is now a required argument when calling `generateAuthenticationOptions()`
+  ([#555](https://github.com/MasterKale/SimpleWebAuthn/pull/555))
+
+---
+
+#### [server] `generateRegistrationOptions()` now expects `Base64URLString` for excluded credential IDs
+
+The `isoBase64URL` helper can be used to massage `Uint8Array` credential IDs into base64url strings:
+
+**Before**
+
+```ts
+const opts = await generateRegistrationOptions({
+  // ...
+  excludeCredentials: devices.map((dev) => ({
+    id: dev.credentialID, // type: Uint8Array
+    type: 'public-key',
+    transports: dev.transports,
+  })),
+});
+```
+
+**After**
+
+```ts
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
+
+const opts = await generateRegistrationOptions({
+  // ...
+  excludeCredentials: devices.map((dev) => ({
+    id: isoBase64URL.fromBuffer(dev.credentialID), // type: string
+    transports: dev.transports,
+  })),
+});
+```
+
+The `type` argument is no longer needed either.
+
+---
+
+#### [server] `generateAuthenticationOptions()` now expects `Base64URLString` for allowed credential IDs
+
+Similarly, the `isoBase64URL` helper can also be used during auth to massage `Uint8Array` credential
+IDs into base64url strings:
+
+**Before**
+
+```ts
+const opts = await generateAuthenticationOptions({
+  // ...
+  allowCredentials: devices.map((dev) => ({
+    id: dev.credentialID, // type: Uint8Array
+    type: 'public-key',
+    transports: dev.transports,
+  })),
+});
+```
+
+**After**
+
+```ts
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
+
+const opts = await generateAuthenticationOptions({
+  // ...
+  allowCredentials: devices.map((dev) => ({
+    id: isoBase64URL.fromBuffer(dev.credentialID), // type: Base64URLString (a.k.a string)
+    transports: dev.transports,
+  })),
+});
+```
+
+The `type` argument is no longer needed either.
+
+---
+
+#### [server] `credentialID` returned from response verification methods is now a `Base64URLString`
+
+It is no longer necessary to manually stringify `credentialID` out of response verification methods:
+
+**Before**
+
+```ts
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
+
+// Registration
+const { verified, registrationInfo } = await verifyRegistrationResponse({ ... });
+if (verified && registrationInfo) {
+  const { credentialID } = registrationInfo;
+  await storeInDatabase({ credIDString: isoBase64URL.fromBuffer(credentialID), ... });
+}
+
+// Authentication
+const { verified, authenticationInfo } = await verifyAuthenticationResponse({ ... });
+if (verified && authenticationInfo) {
+  const { newCounter, credentialID } = authenticationInfo;
+  dbAuthenticator.counter = authenticationInfo.newCounter;
+  await updateCounterInDatabase({
+    credIDString: isoBase64URL.fromBuffer(credentialID),
+    newCounter,
+  });
+}
+```
+
+**After**
+
+```ts
+// Registration
+const { verified, registrationInfo } = await verifyRegistrationResponse({ ... });
+if (verified && registrationInfo) {
+  const { credentialID } = registrationInfo;
+  await storeInDatabase({ credIDString: credentialID, ... });
+}
+
+// Authentication
+const { verified, authenticationInfo } = await verifyAuthenticationResponse({ ... });
+if (verified && authenticationInfo) {
+  const { newCounter, credentialID } = authenticationInfo;
+  dbAuthenticator.counter = authenticationInfo.newCounter;
+  await updateCounterInDatabase({ credIDString: credentialID, newCounter });
+}
+```
+
+---
+
+#### [server] `AuthenticatorDevice.credentialID` is now a `Base64URLString`
+
+Calls to `verifyAuthenticationResponse()` will need to be updated to encode the credential ID to a
+base64url string:
+
+**Before**
+
+```ts
+const verification = await verifyAuthenticationResponse({
+  // ...
+  authenticator: {
+    // ...
+    credentialID: credIDBytes,
+  },
+});
+```
+
+**After**
+
+```ts
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
+
+const verification = await verifyAuthenticationResponse({
+  // ...
+  authenticator: {
+    // ...
+    credentialID: isoBase64URL.fromBuffer(credIDBytes),
+  },
+});
+```
+
+---
+
+#### [server] `isoBase64URL.isBase64url()` is now called `isoBase64URL.isBase64URL()`
+
+Note the capitalization change from "url" to "URL" in the method name. Update calls to this method
+accordingly.
+
+---
+
+#### [server] `generateRegistrationOptions()` will now generate random user IDs
+
+#### [browser] `user.id` is now treated like a base64url string in `startRegistration()`
+
+#### [browser] `userHandle` is now treated like a base64url string in `startAuthentication()`
+
+A random identifier will now be generated when a value is not provided for the now-optional `userID`
+argument when calling `generateRegistrationOptions()`. This identifier will be **base64url-encoded
+string of 32 random bytes**. RPs that wish to take advantage of this can **simply omit this
+argument**.
+
+Additionally, `startRegistration()` will base64url-decode `user.id` before calling WebAuthn. During
+auth `startAuthentication()` will base64url-encode `userHandle` in the returned credential. This
+should be a transparent change for RP's that simply feed **@simplewebauthn/server** options output
+into the corresponding **@simplewebauthn/browser** methods.
+
+However, RP's that wish to continue generating their own user identifiers will need to take
+additional steps to ensure they get back user IDs in the expected format after authentication.
+
+**Before (SimpleWebAuthn v9)**
+
+```ts
+// @simplewebauthn/server v9.x
+const opts = generateRegistrationOptions({
+  // ...
+  userID: 'randomUserID',
+});
+```
+
+```ts
+// @simplewebauthn/browser v9.x
+const credential = await startAuthentication(...);
+sendToServer(credential);
+```
+
+```ts
+// @simplewebauthn/server v9.x
+const credential = await receiveFromBrowser();
+console.log(
+  credential.response.userhandle, // 'randomUserID'
+);
+```
+
+**After (SimpleWebAuthn v10)**
+
+```ts
+// @simplewebauthn/server v10.x
+import { isoUint8Array } from '@simplewebauthn/server/helpers';
+
+const opts = generateRegistrationOptions({
+  // ...
+  userID: isoUint8Array.fromUTF8String('randomUserID'),
+});
+```
+
+```ts
+// @simplewebauthn/browser v10.x
+const credential = await startAuthentication(...);
+sendToServer(credential);
+```
+
+```ts
+// @simplewebauthn/server v10.x
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
+
+const credential = await receiveFromBrowser();
+console.log(
+  isoBase64URL.toUTF8String(credential.response.userhandle), // 'randomUserID'
+);
+```
+
+---
+
+#### [server] `isoBase64URL.toString()` and `isoBase64URL.fromString()` have been renamed
+
+The method names have been updated to reflect the use of UTF-8 string encoding:
+
+**Before:**
+
+```ts
+const foo = isoBase64URL.toString('...');
+const bar = isoBase64URL.fromString('...');
+```
+
+**After:**
+
+```ts
+const foo = isoBase64URL.toUTF8String('...');
+const bar = isoBase64URL.fromUTF8String('...');
+```
+
+---
+
+#### [server] `rpID` is now a required argument when calling `generateAuthenticationOptions()`
+
+Update calls to this method to specify the same `rpID` as passed into
+`generateRegistrationOptions()`:
+
+**Before**
+
+```ts
+  generateRegistrationOptions({ rpID: 'example.com', ... });
+generateAuthenticationOptions();
+```
+
+**After**
+
+```ts
+  generateRegistrationOptions({ rpID: 'example.com', ... });
+generateAuthenticationOptions({ rpID: 'example.com' });
+```
+
 ## v9.0.3
 
 ### Packages
