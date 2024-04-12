@@ -5,7 +5,7 @@ import type { Base64URLString } from '../deps.ts';
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON
  */
 export function decodeClientDataJSON(data: Base64URLString): ClientDataJSON {
-  const toString = isoBase64URL.toString(data);
+  const toString = isoBase64URL.toUTF8String(data);
   const clientData: ClientDataJSON = JSON.parse(toString);
 
   return _decodeClientDataJSONInternals.stubThis(clientData);
