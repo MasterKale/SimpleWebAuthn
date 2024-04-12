@@ -5,6 +5,7 @@ import { decodeAttestationObject } from './decodeAttestationObject.ts';
 import { decodeClientDataJSON } from './decodeClientDataJSON.ts';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey.ts';
 import { generateChallenge } from './generateChallenge.ts';
+import { generateUserID } from './generateUserID.ts';
 import { getCertificateInfo } from './getCertificateInfo.ts';
 import { isCertRevoked } from './isCertRevoked.ts';
 import { parseAuthenticatorData } from './parseAuthenticatorData.ts';
@@ -23,6 +24,7 @@ export {
   decodeClientDataJSON,
   decodeCredentialPublicKey,
   generateChallenge,
+  generateUserID,
   getCertificateInfo,
   isCertRevoked,
   isoBase64URL,
@@ -42,7 +44,12 @@ import type {
 } from './decodeAttestationObject.ts';
 import type { CertificateInfo } from './getCertificateInfo.ts';
 import type { ClientDataJSON } from './decodeClientDataJSON.ts';
-import type { COSEPublicKey, COSEPublicKeyEC2, COSEPublicKeyOKP, COSEPublicKeyRSA } from './cose.ts';
+import type {
+  COSEPublicKey,
+  COSEPublicKeyEC2,
+  COSEPublicKeyOKP,
+  COSEPublicKeyRSA,
+} from './cose.ts';
 import type { ParsedAuthenticatorData } from './parseAuthenticatorData.ts';
 
 export type {
