@@ -3,12 +3,13 @@ import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts
 
 import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
 import { _generateChallengeInternals } from '../helpers/generateChallenge.ts';
+import { isoBase64URL, isoUint8Array } from '../helpers/index.ts';
 
 Deno.test('should generate credential request options suitable for sending via JSON', async () => {
   const rpName = 'SimpleWebAuthn';
   const rpID = 'not.real';
   const challenge = 'totallyrandomvalue';
-  const userID = '1234';
+  const userID = isoUint8Array.fromUTF8String('1234');
   const userName = 'usernameHere';
   const timeout = 1;
   const attestationType = 'indirect';
@@ -35,7 +36,7 @@ Deno.test('should generate credential request options suitable for sending via J
         id: rpID,
       },
       user: {
-        id: userID,
+        id: isoBase64URL.fromBuffer(userID),
         name: userName,
         displayName: userDisplayName,
       },
@@ -64,7 +65,6 @@ Deno.test('should map excluded credential IDs if specified', async () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
     excludeCredentials: [
       {
@@ -91,7 +91,6 @@ Deno.test('defaults to 60 seconds if no timeout is specified', async () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -103,7 +102,6 @@ Deno.test('defaults to none attestation if no attestation type is specified', as
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -115,7 +113,6 @@ Deno.test('defaults to empty string for displayName if no userDisplayName is spe
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -127,7 +124,6 @@ Deno.test('should set authenticatorSelection if specified', async () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
     authenticatorSelection: {
       authenticatorAttachment: 'cross-platform',
@@ -151,7 +147,6 @@ Deno.test('should set extensions if specified', async () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
     extensions: { appid: 'simplewebauthn' },
   });
@@ -163,7 +158,6 @@ Deno.test('should include credProps if extensions are not provided', async () =>
   const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -174,7 +168,6 @@ Deno.test('should include credProps if extensions are provided', async () => {
   const options = await generateRegistrationOptions({
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
-    userID: '1234',
     userName: 'usernameHere',
     extensions: { appid: 'simplewebauthn' },
   });
@@ -194,7 +187,6 @@ Deno.test('should generate a challenge if one is not provided', async () => {
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -208,7 +200,6 @@ Deno.test('should treat string challenges as UTF-8 strings', async () => {
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     challenge: 'こんにちは',
   });
@@ -223,7 +214,6 @@ Deno.test('should use custom supported algorithm IDs as-is when provided', async
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     supportedAlgorithmIDs: [-7, -8, -65535],
   });
@@ -242,7 +232,6 @@ Deno.test('should require resident key if residentKey option is absent but requi
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     authenticatorSelection: {
       requireResidentKey: true,
@@ -257,7 +246,6 @@ Deno.test('should discourage resident key if residentKey option is absent but re
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     authenticatorSelection: {
       requireResidentKey: false,
@@ -272,7 +260,6 @@ Deno.test('should prefer resident key if both residentKey and requireResidentKey
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
@@ -284,7 +271,6 @@ Deno.test('should set requireResidentKey to true if residentKey if set to requir
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     authenticatorSelection: {
       residentKey: 'required',
@@ -299,7 +285,6 @@ Deno.test('should set requireResidentKey to false if residentKey if set to prefe
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     authenticatorSelection: {
       residentKey: 'preferred',
@@ -314,7 +299,6 @@ Deno.test('should set requireResidentKey to false if residentKey if set to disco
   const options = await generateRegistrationOptions({
     rpID: 'not.real',
     rpName: 'SimpleWebAuthn',
-    userID: '1234',
     userName: 'usernameHere',
     authenticatorSelection: {
       residentKey: 'discouraged',
@@ -330,7 +314,6 @@ Deno.test('should prefer Ed25519 in pubKeyCredParams', async () => {
     rpName: 'SimpleWebAuthn',
     rpID: 'not.real',
     challenge: 'totallyrandomvalue',
-    userID: '1234',
     userName: 'usernameHere',
   });
 
