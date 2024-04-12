@@ -7,7 +7,7 @@ import {
 
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
-import { utf8StringToBuffer } from '../helpers/utf8StringToBuffer';
+import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { WebAuthnError } from '../helpers/webAuthnError';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError';
@@ -25,11 +25,11 @@ const mockSupportsAutofill = browserSupportsWebAuthnAutofill as jest.Mock;
 const mockAuthenticatorData = 'mockAuthenticatorData';
 const mockClientDataJSON = 'mockClientDataJSON';
 const mockSignature = 'mockSignature';
-const mockUserHandle = 'mockUserHandle';
+const mockUserHandle = 'f4pdy3fpA34';
 
 // With ASCII challenge
 const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
+  challenge: '1T6uHri4OAQ',
   allowCredentials: [
     {
       id: 'C0VGlvYFratUdAV1iCw-ULpUW8E-exHPXQChBfyVeJZCMfjMFcwDmOFgoMUz39LoMtCJUBW8WPlLkGT6q8qTCg',
@@ -42,7 +42,7 @@ const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
 
 // With UTF-8 challenge
 const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(utf8StringToBuffer('やれやれだぜ')),
+  challenge: bufferToBase64URLString(new TextEncoder().encode('やれやれだぜ')),
   allowCredentials: [],
   timeout: 1,
 };
@@ -78,7 +78,7 @@ test('should convert options before passing to navigator.credentials.get(...)', 
   const credId = argsPublicKey.allowCredentials[0].id;
 
   expect(new Uint8Array(argsPublicKey.challenge)).toEqual(
-    new Uint8Array([102, 105, 122, 122]),
+    new Uint8Array([213, 62, 174, 30, 184, 184, 56, 4]),
   );
   // Make sure the credential ID is an ArrayBuffer with a length of 64
   expect(credId instanceof ArrayBuffer).toEqual(true);
@@ -87,7 +87,7 @@ test('should convert options before passing to navigator.credentials.get(...)', 
 
 test('should support optional allowCredential', async () => {
   await startAuthentication({
-    challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
+    challenge: '1T6uHri4OAQ',
     timeout: 1,
   });
 
@@ -96,7 +96,7 @@ test('should support optional allowCredential', async () => {
 
 test('should convert allow allowCredential to undefined when empty', async () => {
   await startAuthentication({
-    challenge: bufferToBase64URLString(utf8StringToBuffer('fizz')),
+    challenge: '1T6uHri4OAQ',
     timeout: 1,
     allowCredentials: [],
   });
@@ -113,7 +113,7 @@ test('should return base64url-encoded response values', async () => {
           authenticatorData: Buffer.from(mockAuthenticatorData, 'ascii'),
           clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
           signature: Buffer.from(mockSignature, 'ascii'),
-          userHandle: Buffer.from(mockUserHandle, 'ascii'),
+          userHandle: base64URLStringToBuffer(mockUserHandle),
         },
         getClientExtensionResults: () => ({}),
         type: 'public-key',
@@ -130,10 +130,10 @@ test('should return base64url-encoded response values', async () => {
   );
   expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWVudERhdGFKU09O');
   expect(response.response.signature).toEqual('bW9ja1NpZ25hdHVyZQ');
-  expect(response.response.userHandle).toEqual('mockUserHandle');
+  expect(response.response.userHandle).toEqual('f4pdy3fpA34');
 });
 
-test('should throw error if WebAuthn isn\'t supported', async () => {
+test("should throw error if WebAuthn isn't supported", async () => {
   mockSupportsWebAuthn.mockReturnValue(false);
 
   await expect(startAuthentication(goodOpts1)).rejects.toThrow(

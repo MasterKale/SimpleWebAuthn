@@ -6,7 +6,6 @@ import {
 
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
-import { bufferToUTF8String } from '../helpers/bufferToUTF8String';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
 import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
 import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
@@ -97,7 +96,7 @@ export async function startAuthentication(
 
   let userHandle = undefined;
   if (response.userHandle) {
-    userHandle = bufferToUTF8String(response.userHandle);
+    userHandle = bufferToBase64URLString(response.userHandle);
   }
 
   // Convert values to base64 to make it easier to send back to the server
