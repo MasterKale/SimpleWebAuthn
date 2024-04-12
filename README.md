@@ -56,14 +56,14 @@ close to all it takes to get up and running with WebAuthn.
 
 ## Contributions
 
-The SimpleWebAuthn project is currently open to Pull Requests for bug fixes only.
-[Please submit an Issue beforehand](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose)
-to capture additional context about the problem being solved.
+The SimpleWebAuthn project is not currently open to external contributions.
 
-Requests for new features or changes to existing features require time for discussion to synthesize
-solutions from modern needs and historical context.
-[Feel free to create an Issue](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose) for
-these types of requests to start this discussion.
+Please [submit an Issue](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose) and fill
+out the provided template with as much information as possible if you have found a bug in need of
+fixing.
+
+You can also [submit an Issue](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose) to
+request new features, or to suggest changes to existing features.
 
 ## Development
 
