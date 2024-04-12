@@ -19,8 +19,8 @@ export type VerifyAuthenticationResponseOpts = {
   expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
-  expectedType?: string | string[];
   authenticator: AuthenticatorDevice;
+  expectedType?: string | string[];
   requireUserVerification?: boolean;
   advancedFIDOConfig?: {
     userVerification?: UserVerificationRequirement;
@@ -28,24 +28,19 @@ export type VerifyAuthenticationResponseOpts = {
 };
 
 /**
- * Verify that the user has legitimately completed the login process
+ * Verify that the user has legitimately completed the authentication process
  *
  * **Options:**
  *
- * @param response Response returned by **@simplewebauthn/browser**'s `startAssertion()`
- * @param expectedChallenge The base64url-encoded `options.challenge` returned by
- * `generateAuthenticationOptions()`
- * @param expectedOrigin Website URL (or array of URLs) that the registration should have occurred on
- * @param expectedRPID RP ID (or array of IDs) that was specified in the registration options
- * @param expectedType (Optional) The response type expected ('webauthn.get')
- * @param authenticator An internal {@link AuthenticatorDevice} matching the credential's ID
- * @param requireUserVerification (Optional) Enforce user verification by the authenticator
- * (via PIN, fingerprint, etc...)
- * @param advancedFIDOConfig (Optional) Options for satisfying more stringent FIDO RP feature
- * requirements
- * @param advancedFIDOConfig.userVerification (Optional) Enable alternative rules for evaluating the
- * User Presence and User Verified flags in authenticator data: UV (and UP) flags are optional
- * unless this value is `"required"`
+ * @param response - Response returned by **@simplewebauthn/browser**'s `startAssertion()`
+ * @param expectedChallenge - The base64url-encoded `options.challenge` returned by `generateAuthenticationOptions()`
+ * @param expectedOrigin - Website URL (or array of URLs) that the registration should have occurred on
+ * @param expectedRPID - RP ID (or array of IDs) that was specified in the registration options
+ * @param authenticator - An internal {@link AuthenticatorDevice} matching the credential's ID
+ * @param expectedType **(Optional)** - The response type expected ('webauthn.get')
+ * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
+ * @param advancedFIDOConfig **(Optional)** - Options for satisfying more stringent FIDO RP feature requirements
+ * @param advancedFIDOConfig.userVerification **(Optional)** - Enable alternative rules for evaluating the User Presence and User Verified flags in authenticator data: UV (and UP) flags are optional unless this value is `"required"`
  */
 export async function verifyAuthenticationResponse(
   options: VerifyAuthenticationResponseOpts,

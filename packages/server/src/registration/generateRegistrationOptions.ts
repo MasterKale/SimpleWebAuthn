@@ -79,25 +79,22 @@ const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
 const defaultSupportedAlgorithmIDs: COSEAlgorithmIdentifier[] = [-8, -7, -257];
 
 /**
- * Prepare a value to pass into navigator.credentials.create(...) for authenticator "registration"
+ * Prepare a value to pass into navigator.credentials.create(...) for authenticator registration
  *
  * **Options:**
  *
- * @param rpName User-visible, "friendly" website/service name
- * @param rpID Valid domain name (after `https://`)
- * @param userID User's website-specific unique ID
- * @param userName User's website-specific username (email, etc...)
- * @param challenge Random value the authenticator needs to sign and pass back
- * @param userDisplayName User's actual name
- * @param timeout How long (in ms) the user can take to complete attestation
- * @param attestationType Specific attestation statement
- * @param excludeCredentials Authenticators registered by the user so the user can't register the
- * same credential multiple times
- * @param authenticatorSelection Advanced criteria for restricting the types of authenticators that
- * may be used
- * @param extensions Additional plugins the authenticator or browser should use during attestation
- * @param supportedAlgorithmIDs Array of numeric COSE algorithm identifiers supported for
- * attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms
+ * @param rpName - User-visible, "friendly" website/service name
+ * @param rpID - Valid domain name (after `https://`)
+ * @param userName - User's website-specific username (email, etc...)
+ * @param userID **(Optional)** - User's website-specific unique ID. Defaults to generating a random identifier
+ * @param challenge **(Optional)** - Random value the authenticator needs to sign and pass back. Defaults to generating a random value
+ * @param userDisplayName **(Optional)** - User's actual name. Defaults to `""`
+ * @param timeout **(Optional)** - How long (in ms) the user can take to complete attestation. Defaults to `60000`
+ * @param attestationType **(Optional)** - Specific attestation statement. Defaults to `"none"`
+ * @param excludeCredentials **(Optional)** - Authenticators registered by the user so the user can't register the same credential multiple times. Defaults to `[]`
+ * @param authenticatorSelection **(Optional)** - Advanced criteria for restricting the types of authenticators that may be used. Defaults to `{ residentKey: 'preferred', userVerification: 'preferred' }`
+ * @param extensions **(Optional)** - Additional plugins the authenticator or browser should use during attestation
+ * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to `[-8, -7, -257]`
  */
 export async function generateRegistrationOptions(
   options: GenerateRegistrationOptionsOpts,
