@@ -23,7 +23,6 @@ import {
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from '@simplewebauthn/server';
-import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
 import type {
   GenerateAuthenticationOptionsOpts,
   GenerateRegistrationOptionsOpts,
@@ -126,7 +125,6 @@ app.get('/generate-registration-options', async (req, res) => {
   const opts: GenerateRegistrationOptionsOpts = {
     rpName: 'SimpleWebAuthn Example',
     rpID,
-    userID: loggedInUserId,
     userName: username,
     timeout: 60000,
     attestationType: 'none',
@@ -195,9 +193,7 @@ app.post('/verify-registration', async (req, res) => {
   if (verified && registrationInfo) {
     const { credentialPublicKey, credentialID, counter } = registrationInfo;
 
-    const existingDevice = user.devices.find((device) =>
-      isoUint8Array.areEqual(device.credentialID, credentialID)
-    );
+    const existingDevice = user.devices.find((device) => device.credentialID === credentialID);
 
     if (!existingDevice) {
       /**
@@ -260,10 +256,9 @@ app.post('/verify-authentication', async (req, res) => {
   const expectedChallenge = req.session.currentChallenge;
 
   let dbAuthenticator;
-  const bodyCredIDBuffer = isoBase64URL.toBuffer(body.rawId);
   // "Query the DB" here for an authenticator matching `credentialID`
   for (const dev of user.devices) {
-    if (isoUint8Array.areEqual(dev.credentialID, bodyCredIDBuffer)) {
+    if (dev.credentialID === body.id) {
       dbAuthenticator = dev;
       break;
     }

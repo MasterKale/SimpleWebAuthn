@@ -11,7 +11,6 @@ import {
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from '@simplewebauthn/server';
-import { isoBase64URL, isoUint8Array } from '@simplewebauthn/server/helpers';
 import { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/types';
 
 import { expectedOrigin, rpID } from './index';
@@ -234,6 +233,7 @@ fidoConformanceRouter.post('/assertion/options', async (req, res) => {
   const { devices } = user;
 
   const opts = await generateAuthenticationOptions({
+    rpID,
     extensions,
     userVerification,
     allowCredentials: devices.map((dev) => ({
@@ -269,10 +269,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
     return res.status(400).send({ errorMessage: msg });
   }
 
-  const credIDBuffer = isoBase64URL.toBuffer(id);
-  const existingDevice = user.devices.find((device) =>
-    isoUint8Array.areEqual(device.credentialID, credIDBuffer)
-  );
+  const existingDevice = user.devices.find((device) => device.credentialID === id);
 
   if (!existingDevice) {
     const msg = `Could not find device matching ${id}`;
