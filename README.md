@@ -69,7 +69,7 @@ request new features, or to suggest changes to existing features.
 
 Install the following before proceeding:
 
-- **Node.js 18.x**
+- **Node.js 20.x**
 - **Deno 1.41.x**
 - **pnpm 8.6.x**
 
