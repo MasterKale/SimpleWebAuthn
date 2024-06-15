@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logged In</title>
+  <script>
+    fetch('/generate-registration-options')
+    .then(resp => resp.json())
+    .then(opts => {
+      console.log('Registration Options', opts);
+
+      const conditionalCreateOpts = {
+        mediation: 'conditional',
+        publicKey: {
+          ...opts,
+          challenge: new Uint8Array([0,0,0,0,0,0]),
+          user: { ...opts.user, id: new Uint8Array([0,0,0,0,0,0])},
+          authenticatorSelection: {
+            ...opts.authenticatorSelection,
+            userVerification: 'discouraged',
+            residentKey: 'required',
+            requireResidentKey: true,
+          }
+        },
+      };
+
+      console.log('Conditional Create Opts', conditionalCreateOpts)
+
+      return navigator.credentials.create(conditionalCreateOpts);
+    })
+    .then(console.log)
+    .catch(err => { console.error('Error with conditional create', err); });
+  </script>
+</head>
+<body>
+  <h1>Logged In</h1>
+</body>
+</html>

@@ -7,6 +7,7 @@
 import https from 'https';
 import http from 'http';
 import fs from 'fs';
+import path from 'node:path';
 
 import express from 'express';
 import session from 'express-session';
@@ -298,6 +299,14 @@ app.post('/verify-authentication', async (req, res) => {
 
   res.send({ verified });
 });
+
+app.get('/welcome', (_, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'loggedIn.html'));
+});
+
+app.post('/successful-password-auth', (_, res) => {
+  res.redirect('/welcome');
+})
 
 if (ENABLE_HTTPS) {
   const host = '0.0.0.0';

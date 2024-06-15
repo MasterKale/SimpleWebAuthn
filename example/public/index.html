@@ -4,84 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.es5.umd.min.js"></script>
-    <script>
-      const { startAuthentication } = SimpleWebAuthnBrowser;
-      /**
-       * Conditional UI test
-       *
-       * 1. Start Chrome Canary 105+ with the requisite Conditional UI flag:
-       *
-       * open -a /Applications/Google\ Chrome\ Canary.app --args --enable-features=WebAuthenticationConditionalUI
-       *
-       * 2. Create an entry in chrome://settings/passwords (temporary requirement) e.g.:
-       *
-       *   - Site: https://example.simplewebauthn.dev/
-       *   - Username: user@example.simplewebauthn.dev
-       *   - Password: whatever
-       *
-       * 3. Register a credential
-       *
-       * 4. Reload the page
-       *
-       * 5. Interact with the username field above the Authenticate button
-       *
-       * Notes:
-       *
-       * I'm currently trying to get to calling WebAuthn as fast as I can here, there's a
-       * Chrome race condition with autofill that sometimes prevents a credential from appearing.
-       *
-       * See: https://bugs.chromium.org/p/chromium/issues/detail?id=1322967&q=component%3ABlink%3EWebAuthentication&can=2
-       *
-       * I've been assured this race condition is temporary, at which point we'll probably be able
-       * to include this just before </body> as we'd typically do. And at that point we can
-       * probably use async/await as well for more sane-looking code.
-       */
-      fetch('/generate-authentication-options')
-        .then(resp => resp.json())
-        .then(opts => {
-          console.log('Authentication Options (Autofill)', opts);
-          startAuthentication(opts, true)
-            .then(async asseResp => {
-              // We can assume the DOM has loaded by now because it had to for the user to be able
-              // to interact with an input to choose a credential from the autofill
-              const elemSuccess = document.querySelector('#authSuccess');
-              const elemError = document.querySelector('#authError');
-              const elemDebug = document.querySelector('#authDebug');
-
-              printDebug(
-                elemDebug,
-                'Authentication Response (Autofill)',
-                JSON.stringify(asseResp, null, 2),
-              );
-
-              const verificationResp = await fetch('/verify-authentication', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(asseResp),
-              });
-
-              const verificationJSON = await verificationResp.json();
-              printDebug(
-                elemDebug,
-                'Server Response (Autofill)',
-                JSON.stringify(verificationJSON, null, 2),
-              );
-
-              if (verificationJSON && verificationJSON.verified) {
-                elemSuccess.innerHTML = `User authenticated!`;
-              } else {
-                elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(
-                  verificationJSON,
-                )}</pre>`;
-              }
-            })
-            .catch(err => {
-              console.error('(Autofill)', err);
-            });
-        });
-    </script>
     <link rel="stylesheet" href="./styles.css" />
     <title>SimpleWebAuthn Example Site</title>
   </head>
@@ -90,20 +12,20 @@
       <h1>SimpleWebAuthn Example Site</h1>
 
       <div class="controls">
-        <section id="registration">
+        <!-- <section id="registration">
           <button id="btnRegBegin">
             <strong>🚪&nbsp;Register</strong>
           </button>
           <p id="regSuccess" class="success"></p>
           <p id="regError" class="error"></p>
-          <details open>
+          <details>
             <summary>Console</summary>
             <textarea id="regDebug" spellcheck="false"></textarea>
           </details>
-        </section>
+        </section> -->
 
         <section id="authentication">
-          <form onsubmit="stopSubmit(event)">
+          <form action="/successful-password-auth" method="post">
             <section id="inputUsername">
               <label for="username">Username</label>
               <input type="text" name="username" autocomplete="username webauthn" autofocus />
@@ -118,7 +40,7 @@
           </form>
           <p id="authSuccess" class="success"></p>
           <p id="authError" class="error"></p>
-          <details open>
+          <details>
             <summary>Console</summary>
             <textarea id="authDebug" spellcheck="false"></textarea>
           </details>
@@ -158,57 +80,57 @@
         /**
          * Registration
          */
-        document.querySelector('#btnRegBegin').addEventListener('click', async () => {
-          const elemSuccess = document.querySelector('#regSuccess');
-          const elemError = document.querySelector('#regError');
-          const elemDebug = document.querySelector('#regDebug');
+        // document.querySelector('#btnRegBegin').addEventListener('click', async () => {
+        //   const elemSuccess = document.querySelector('#regSuccess');
+        //   const elemError = document.querySelector('#regError');
+        //   const elemDebug = document.querySelector('#regDebug');
 
-          // Reset success/error messages
-          elemSuccess.innerHTML = '';
-          elemError.innerHTML = '';
-          elemDebug.innerHTML = '';
+        //   // Reset success/error messages
+        //   elemSuccess.innerHTML = '';
+        //   elemError.innerHTML = '';
+        //   elemDebug.innerHTML = '';
 
-          const resp = await fetch('/generate-registration-options');
+        //   const resp = await fetch('/generate-registration-options');
 
-          let attResp;
-          try {
-            const opts = await resp.json();
+        //   let attResp;
+        //   try {
+        //     const opts = await resp.json();
 
-            printDebug(elemDebug, 'Registration Options', JSON.stringify(opts, null, 2));
+        //     printDebug(elemDebug, 'Registration Options', JSON.stringify(opts, null, 2));
 
-            hideAuthForm();
+        //     hideAuthForm();
 
-            attResp = await startRegistration(opts);
-            printDebug(elemDebug, 'Registration Response', JSON.stringify(attResp, null, 2));
-          } catch (error) {
-            if (error.name === 'InvalidStateError') {
-              elemError.innerText = 'Error: Authenticator was probably already registered by user';
-            } else {
-              elemError.innerText = error;
-            }
+        //     attResp = await startRegistration(opts);
+        //     printDebug(elemDebug, 'Registration Response', JSON.stringify(attResp, null, 2));
+        //   } catch (error) {
+        //     if (error.name === 'InvalidStateError') {
+        //       elemError.innerText = 'Error: Authenticator was probably already registered by user';
+        //     } else {
+        //       elemError.innerText = error;
+        //     }
 
-            throw error;
-          }
+        //     throw error;
+        //   }
 
-          const verificationResp = await fetch('/verify-registration', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(attResp),
-          });
+        //   const verificationResp = await fetch('/verify-registration', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(attResp),
+        //   });
 
-          const verificationJSON = await verificationResp.json();
-          printDebug(elemDebug, 'Server Response', JSON.stringify(verificationJSON, null, 2));
+        //   const verificationJSON = await verificationResp.json();
+        //   printDebug(elemDebug, 'Server Response', JSON.stringify(verificationJSON, null, 2));
 
-          if (verificationJSON && verificationJSON.verified) {
-            elemSuccess.innerHTML = `Authenticator registered!`;
-          } else {
-            elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(
-              verificationJSON,
-            )}</pre>`;
-          }
-        });
+        //   if (verificationJSON && verificationJSON.verified) {
+        //     elemSuccess.innerHTML = `Authenticator registered!`;
+        //   } else {
+        //     elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(
+        //       verificationJSON,
+        //     )}</pre>`;
+        //   }
+        // });
 
         /**
          * Authentication
@@ -223,40 +145,26 @@
           elemError.innerHTML = '';
           elemDebug.innerHTML = '';
 
-          const resp = await fetch('/generate-authentication-options');
+          // const resp = await fetch('/generate-authentication-options');
 
-          let asseResp;
-          try {
-            const opts = await resp.json();
-            printDebug(elemDebug, 'Authentication Options', JSON.stringify(opts, null, 2));
+          // let asseResp;
+          // try {
+          //   const opts = await resp.json();
+          //   printDebug(elemDebug, 'Authentication Options', JSON.stringify(opts, null, 2));
 
-            hideAuthForm();
+          //   hideAuthForm();
 
-            asseResp = await startAuthentication(opts);
-            printDebug(elemDebug, 'Authentication Response', JSON.stringify(asseResp, null, 2));
-          } catch (error) {
-            elemError.innerText = error;
-            throw new Error(error);
-          }
+          //   asseResp = await startAuthentication(opts);
+          //   printDebug(elemDebug, 'Authentication Response', JSON.stringify(asseResp, null, 2));
+          // } catch (error) {
+          //   elemError.innerText = error;
+          //   throw new Error(error);
+          // }
 
-          const verificationResp = await fetch('/verify-authentication', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(asseResp),
-          });
-
-          const verificationJSON = await verificationResp.json();
-          printDebug(elemDebug, 'Server Response', JSON.stringify(verificationJSON, null, 2));
-
-          if (verificationJSON && verificationJSON.verified) {
-            elemSuccess.innerHTML = `User authenticated!`;
-          } else {
-            elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(
-              verificationJSON,
-            )}</pre>`;
-          }
+          // await fetch('/successful-password-auth', {
+          //   method: 'POST',
+          //   redirect: 'follow',
+          // });
         });
       }
     </script>
