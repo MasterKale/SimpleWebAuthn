@@ -45,5 +45,6 @@ declare module 'express-session' {
      * defaults to 60000ms)
      */
     currentChallenge?: string;
+    loggedIn?: boolean;
   }
 }
