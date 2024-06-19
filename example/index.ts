@@ -300,11 +300,17 @@ app.post('/verify-authentication', async (req, res) => {
   res.send({ verified });
 });
 
-app.get('/welcome', (_, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'loggedIn.html'));
+app.get('/', (req, res) => {
+  res.cookie('loggedIn', '', { maxAge: -1 });
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-app.post('/successful-password-auth', (_, res) => {
+app.get('/welcome', (req, res) => {
+  res.cookie('loggedIn', 'true', { maxAge: 10000000 });
+  res.sendFile(path.join(__dirname, 'views', 'loggedIn.html'));
+});
+
+app.post('/successful-password-auth', (req, res) => {
   res.redirect('/welcome');
 })
 
