@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logged In</title>
+  </head>
+  <body>
+    <h1>Logged In</h1>
+    <script>
+      const conditionalCreateOpts = {
+        mediation: "conditional",
+        publicKey: {
+          rp: { name: "SimpleWebAuthn Example" },
+          challenge: new Uint8Array(16).fill(0),
+          user: {
+            id: new Uint8Array(16).fill(0),
+            name: "UsernameHere",
+            displayName: "UsernameHere",
+          },
+          pubKeyCredParams: [
+          { alg: -7, type: "public-key" },
+          { alg: -257, type: "public-key" },
+        ],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform",
+            userVerification: "required",
+          },
+        },
+      };
+
+      console.log("Conditional Create Opts", conditionalCreateOpts);
+
+      navigator.credentials
+        .create(conditionalCreateOpts)
+        .then(console.log)
+        .catch(console.error);
+    </script>
+  </body>
+</html>
