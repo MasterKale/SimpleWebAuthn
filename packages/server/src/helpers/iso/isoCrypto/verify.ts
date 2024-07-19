@@ -26,7 +26,7 @@ export function verify(opts: {
   if (isCOSEPublicKeyEC2(cosePublicKey)) {
     const crv = cosePublicKey.get(COSEKEYS.crv);
     if (!isCOSECrv(crv)) {
-      throw new Error("unknown COSE curve");
+      throw new Error(`unknown COSE curve ${crv}`);
     }
     const unwrappedSignature = unwrapEC2Signature(signature, crv);
     return verifyEC2({

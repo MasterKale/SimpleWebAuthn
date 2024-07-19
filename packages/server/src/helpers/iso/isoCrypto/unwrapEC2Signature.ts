@@ -56,7 +56,7 @@ function toNormalizedBytes(i: ArrayBuffer, n: number): Uint8Array {
   const normalizedBytes = new Uint8Array(n);
   if (iBytes.length <= n) {
     normalizedBytes.set(iBytes, n - iBytes.length);
-  } else if (iBytes.length === n + 1 && iBytes[0] === 0) {
+  } else if (iBytes.length === n + 1 && iBytes[0] === 0 && (iBytes[1] & 0x80) === 0x80) {
     normalizedBytes.set(iBytes.slice(1));
   } else {
     throw new Error("invalid signature component length");
