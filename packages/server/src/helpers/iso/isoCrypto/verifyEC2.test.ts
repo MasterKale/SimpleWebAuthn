@@ -23,7 +23,7 @@ Deno.test(
 
     const data = isoBase64URL.toBuffer('Bt81jmu3ieajF4w1at8HmieVOTDymHd7xJguJCUsL-Q');
     const signature = isoBase64URL.toBuffer(
-      'MEQCH1h_F7TPTMVh_kwb_ssjD0_2U77bbXazz2ux-P6khLQCIQCutHs9eCBkCIMP3yA9mmNRKEfFd-REmhGY2GbHozaC7w'
+      'MEQCH1h_F7TPTMVh_kwb_ssjD0_2U77bbXazz2ux-P6khLQCIQCutHs9eCBkCIMP3yA9mmNRKEfFd-REmhGY2GbHozaC7w',
     );
 
     const verified = await verifyEC2({
@@ -54,7 +54,7 @@ Deno.test(
 
     const data = isoBase64URL.toBuffer('D7mI8UwWXv4rpfSQUNqtUXAhZEPbRLugmWclPpJ9m7c');
     const signature = isoBase64URL.toBuffer(
-      'MGMCL3lZ2Rjxo5WcmTCdWyB6jTE9PVuduOR_AsJu956J9S_mFNbHP_-MbyWem4dfb5iqAjABJhTRltNl5Y0O4XC7YLNsYKq2WxYQ1HFOMGsr6oNkUPsX3UAr2zeeWL_Tp1VgHeM'
+      'MGMCL3lZ2Rjxo5WcmTCdWyB6jTE9PVuduOR_AsJu956J9S_mFNbHP_-MbyWem4dfb5iqAjABJhTRltNl5Y0O4XC7YLNsYKq2WxYQ1HFOMGsr6oNkUPsX3UAr2zeeWL_Tp1VgHeM',
     );
 
     const verified = await verifyEC2({
@@ -79,16 +79,20 @@ Deno.test({
     cosePublicKey.set(COSEKEYS.crv, COSECRV.P521);
     cosePublicKey.set(
       COSEKEYS.x,
-      isoBase64URL.toBuffer('AaLbnrCvCuQivbknRW50FjdqPQv4NRF9tHsN4QuVQ3sw8uSspd33o-NTBfjg5JzX9rnpbkKDigb6NugmrVjzNMNK'),
+      isoBase64URL.toBuffer(
+        'AaLbnrCvCuQivbknRW50FjdqPQv4NRF9tHsN4QuVQ3sw8uSspd33o-NTBfjg5JzX9rnpbkKDigb6NugmrVjzNMNK',
+      ),
     );
     cosePublicKey.set(
       COSEKEYS.y,
-      isoBase64URL.toBuffer('AE64axa8L8PkLX5Td0GaX79cLOW9E2-8-ObhL9XT_ih-1XxbGQcA5VhL1gI0xIQq5zYAxgZYey6PmbbqgtcUPRVt'),
+      isoBase64URL.toBuffer(
+        'AE64axa8L8PkLX5Td0GaX79cLOW9E2-8-ObhL9XT_ih-1XxbGQcA5VhL1gI0xIQq5zYAxgZYey6PmbbqgtcUPRVt',
+      ),
     );
 
     const data = isoBase64URL.toBuffer('5p0h9RZTjLoBlnL2nY5pqOnhGy4q60NzbjDe2rVDR7o');
     const signature = isoBase64URL.toBuffer(
-      'MIGHAkFRpbGknlgpETORypMprGBXMkJMfuqgJupy3NcgCOaJJdj3Voz74kV2pjPqkLNpuO9FqVtXeEsUw-jYsBHcMqHZhwJCAQ88uFDJS5g81XVBcLMIgf6ro-F-5jgRAmHx3CRVNGdk81MYbFJhT3hd2w9RdhT8qBG0zzRBXYAcHrKo0qJwQZot'
+      'MIGHAkFRpbGknlgpETORypMprGBXMkJMfuqgJupy3NcgCOaJJdj3Voz74kV2pjPqkLNpuO9FqVtXeEsUw-jYsBHcMqHZhwJCAQ88uFDJS5g81XVBcLMIgf6ro-F-5jgRAmHx3CRVNGdk81MYbFJhT3hd2w9RdhT8qBG0zzRBXYAcHrKo0qJwQZot',
     );
 
     const verified = await verifyEC2({

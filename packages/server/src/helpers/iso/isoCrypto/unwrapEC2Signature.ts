@@ -33,14 +33,14 @@ export function unwrapEC2Signature(signature: Uint8Array, crv: COSECRV): Uint8Ar
  */
 function getSignatureComponentLength(crv: COSECRV): number {
   switch (crv) {
-  case COSECRV.P256:
-    return 32;
-  case COSECRV.P384:
-    return 48;
-  case COSECRV.P521:
-    return 66;
-  default:
-    throw new Error(`Unexpected COSE crv value of ${crv} (EC2)`);
+    case COSECRV.P256:
+      return 32;
+    case COSECRV.P384:
+      return 48;
+    case COSECRV.P521:
+      return 66;
+    default:
+      throw new Error(`Unexpected COSE crv value of ${crv} (EC2)`);
   }
 }
 
@@ -69,7 +69,9 @@ function toNormalizedBytes(bytes: Uint8Array, componentLength: number): Uint8Arr
     // needs to be removed for compatibility with the SubtleCrypto Web Crypto API.
     normalizedBytes = bytes.subarray(1);
   } else {
-    throw new Error(`invalid signature component length ${bytes.length} (expected ${componentLength})`);
+    throw new Error(
+      `invalid signature component length ${bytes.length} (expected ${componentLength})`,
+    );
   }
 
   return normalizedBytes;
