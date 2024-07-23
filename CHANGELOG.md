@@ -1,5 +1,17 @@
 # Changelog
 
+## v10.0.1
+
+### Packages
+
+- @simplewebauthn/server@10.0.1
+
+### Changes
+
+- **[server]** `isoCrypto.verify()` now has better support for signature verification with ECC
+  public keys using P-256, P-385, and P-521 curves
+  ([#594](https://github.com/MasterKale/SimpleWebAuthn/pull/594), with thanks to @nlordell)
+
 ## v10.0.0 - The one that goes up to 20
 
 Thanks for everything, Node 16 and Node 18, but it's time to move on! The headlining change of this
