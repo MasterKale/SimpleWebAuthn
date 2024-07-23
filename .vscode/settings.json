@@ -6,6 +6,7 @@
     "./packages/server",
     "./packages/types"
   ],
+  "deno.config": "./deno.jsonc",
   "editor.rulers": [
     100
   ],
