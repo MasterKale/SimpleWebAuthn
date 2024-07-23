@@ -2,6 +2,7 @@ import {
   COSEALG,
   COSEKEYS,
   COSEPublicKey,
+  isCOSECrv,
   isCOSEPublicKeyEC2,
   isCOSEPublicKeyOKP,
   isCOSEPublicKeyRSA,
@@ -23,7 +24,11 @@ export function verify(opts: {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
 
   if (isCOSEPublicKeyEC2(cosePublicKey)) {
-    const unwrappedSignature = unwrapEC2Signature(signature);
+    const crv = cosePublicKey.get(COSEKEYS.crv);
+    if (!isCOSECrv(crv)) {
+      throw new Error(`unknown COSE curve ${crv}`);
+    }
+    const unwrappedSignature = unwrapEC2Signature(signature, crv);
     return verifyEC2({
       cosePublicKey,
       signature: unwrappedSignature,
