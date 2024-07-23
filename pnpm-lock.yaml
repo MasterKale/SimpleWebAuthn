@@ -100,7 +100,7 @@ importers:
         specifier: ^2.3.8
         version: 2.3.8
       '@simplewebauthn/types':
-        specifier: ^9.0.1
+        specifier: ^10.0.0
         version: link:../../types/npm
       cross-fetch:
         specifier: ^4.0.0
