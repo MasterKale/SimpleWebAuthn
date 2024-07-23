@@ -70,7 +70,7 @@ function toNormalizedBytes(bytes: Uint8Array, componentLength: number): Uint8Arr
     normalizedBytes = bytes.subarray(1);
   } else {
     throw new Error(
-      `invalid signature component length ${bytes.length} (expected ${componentLength})`,
+      `Invalid signature component length ${bytes.length}, expected ${componentLength}`,
     );
   }
 
