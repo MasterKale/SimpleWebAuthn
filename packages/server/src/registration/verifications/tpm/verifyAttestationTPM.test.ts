@@ -1,4 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { FakeTime } from 'https://deno.land/std@0.198.0/testing/time.ts';
 
 import { verifyRegistrationResponse } from '../../verifyRegistrationResponse.ts';
 
@@ -132,6 +133,10 @@ Deno.test('should verify TPM response with non-spec-compliant tcgAtTpm SAN struc
    *   ]
    * ]
    */
+  // notBefore: 2022-01-12T22:15:18.000Z
+  // notAfter:  2024-08-02T17:51:55.000Z
+  const mockDate = new FakeTime(new Date('2023-06-30T12:00:00.000Z'));
+
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'X7TPi7o8WfiIz1bP0Vciz1xRvSMyiitgOR1sUqY724s',
@@ -152,6 +157,8 @@ Deno.test('should verify TPM response with non-spec-compliant tcgAtTpm SAN struc
   });
 
   assertEquals(verification.verified, true);
+
+  mockDate.restore();
 });
 
 Deno.test('should verify TPM response with ECC public area type', async () => {
