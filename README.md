@@ -47,6 +47,16 @@ import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
 import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```
 
+## Sponsors
+
+Thank you very much to those below who sponsor my work. Your contributions help keep the open-source dream alive 🙇
+
+Interested in sponsoring this project? See here for more info: https://github.com/sponsors/MasterKale
+
+### Platinum Sponsor
+
+![Okta_Wordmark_Black_S_270](https://github.com/user-attachments/assets/b412ae6e-bda8-4558-aaf5-92e31fab4c22)
+
 ## Example
 
 For a practical guide to implementing these libraries, take a look at the
