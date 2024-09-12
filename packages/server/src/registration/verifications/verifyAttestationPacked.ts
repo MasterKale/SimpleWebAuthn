@@ -6,6 +6,7 @@ import { validateCertificatePath } from '../../helpers/validateCertificatePath.t
 import { getCertificateInfo } from '../../helpers/getCertificateInfo.ts';
 import { verifySignature } from '../../helpers/verifySignature.ts';
 import { isoUint8Array } from '../../helpers/iso/index.ts';
+import { validateExtFIDOGenCEAAGUID } from '../../helpers/validateExtFIDOGenCEAAGUID.ts';
 import { MetadataService } from '../../services/metadataService.ts';
 import { verifyAttestationWithMetadata } from '../../metadata/verifyAttestationWithMetadata.ts';
 
@@ -49,9 +50,14 @@ export async function verifyAttestationPacked(
   let verified = false;
 
   if (x5c) {
-    const { subject, basicConstraintsCA, version, notBefore, notAfter } = getCertificateInfo(
-      x5c[0],
-    );
+    const {
+      subject,
+      basicConstraintsCA,
+      version,
+      notBefore,
+      notAfter,
+      parsedCertificate,
+    } = getCertificateInfo(x5c[0]);
 
     const { OU, CN, O, C } = subject;
 
@@ -101,8 +107,16 @@ export async function verifyAttestationPacked(
       );
     }
 
-    // TODO: If certificate contains id-fido-gen-ce-aaguid(1.3.6.1.4.1.45724.1.1.4) extension, check
-    // that it’s value is set to the same AAGUID as in authData.
+    // Validate attestation statement AAGUID against leaf cert AAGUID
+    try {
+      await validateExtFIDOGenCEAAGUID(
+        parsedCertificate.tbsCertificate.extensions,
+        aaguid,
+      );
+    } catch (err) {
+      const _err = err as Error;
+      throw new Error(`${_err.message} (Packed|Full)`);
+    }
 
     // If available, validate attestation alg and x5c with info in the metadata statement
     const statement = await MetadataService.getStatement(aaguid);
