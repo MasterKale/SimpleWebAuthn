@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertEquals, assertRejects } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 import { FakeTime } from 'https://deno.land/std@0.198.0/testing/time.ts';
 
 import { verifyRegistrationResponse } from '../../verifyRegistrationResponse.ts';
@@ -183,3 +183,75 @@ Deno.test('should verify TPM response with ECC public area type', async () => {
 
   assertEquals(verification.verified, true);
 });
+
+Deno.test(
+  'should succeed if id-fido-gen-ce-aaguid extension is present and matches AAGUID in auth data',
+  async () => {
+    const verification = await verifyRegistrationResponse({
+      response: {
+        'id':
+          'U2FsdGVkX194cZ6vJ-bu1amfiwZWPdGvExLkbHUc1qO6wiP48-kbMtbhIYiADFRUWdrqU1AlKS4D26RyAFlItxpjiQ-KrkHC1rxMGG885fB8S_OhC3QPRk9v3OmaMxaY',
+        'rawId':
+          'U2FsdGVkX194cZ6vJ-bu1amfiwZWPdGvExLkbHUc1qO6wiP48-kbMtbhIYiADFRUWdrqU1AlKS4D26RyAFlItxpjiQ-KrkHC1rxMGG885fB8S_OhC3QPRk9v3OmaMxaY',
+        'response': {
+          'clientDataJSON':
+            'eyJvcmlnaW4iOiJodHRwczovL3dlYmF1dGhuLmlvIiwiY2hhbGxlbmdlIjoiUE9sVm1jdFFNY3ZTUjZlVW1nX2puaV9oUVdaMVlEVHJUai0wdi1JVEZUanNFS0pmc0R5SHJOUEtoamxyMWV5OUdyWjRvdktIblBobUVONlVlYXpNM0EiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
+          'attestationObject':
+            'o2NmbXRjdHBtZ2F0dFN0bXSmY2FsZzkBAGN2ZXJjMi4wY3g1Y4JZA5cwggOTMIICe6ADAgECAhA0eKzsz_GTUVDsmTJG9gexMA0GCSqGSIb3DQEBCwUAMCQxIjAgBgNVBAMMGUZJRE9URVNULVRQTS1JTlRFUk1FRElBVEUwIhgPMjAyNDA5MTIxNjE3MTZaGA8yMDUyMDEyODE3MTcxNlowADCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJYDCYSxb3nuo_qgk5Ff0GWmDIGCq3JTcECNAT6Gd6KVcjdNw3HOD-p5nzpkJ4EoN7O9wahPOYOWPAxQsXh4qK-D3npLNtHm4zMULsQTCA_gMFMd7X1BtXcVGrzOq4hNEyie1u7ty5Hmo5xXVii-HaxgRi_O3v9-_R_jhIuzZo48tYTyAtdePT0FxL90epy-tDqVKgficAQZaTFJ95X1YAafViCqRpBmWd3fmbsF8H-FIffdWsydDjpIiu5uBUqUbCg4SA-QuCAOgc4eib3J1vFu7n6dcq1moMyTPpUlcTHHuN8Ew73mu9mklKuMZJVF2piJ6RqMmxnZaLBnGnhlIGsCAwEAAaOB4DCB3TAOBgNVHQ8BAf8EBAMCB4AwEAYDVR0lBAkwBwYFZ4EFCAMwSAYDVR0RAQH_BD4wPKQ6MDgxNjANBgVngQUCAwwEaWQ6MTAPBgVngQUCAgwGSUJNVFBNMBQGBWeBBQIBDAtpZDpGRkZGRjFEMDAdBgNVHQ4EFgQUdk8-CPODzqMp6lg2bOhiZVPo-WcwHwYDVR0jBBgwFoAUvHi-E3IElw3G9QJ7XLqaKEmTe-swDAYDVR0TAQH_BAIwADAhBgsrBgEEAYLlHAEBBAQSBBC6-wkduBpEfq-fEvVer8w0MA0GCSqGSIb3DQEBCwUAA4IBAQBR2iunZ6r5U7udyHj6k4BL_Bh45abmBkb_Ke4VrSNj4oGjbvXyLxWXH3DbO9FTBy5PDkOA9y6yr7xShRFZextTULHEy4JKKo8AjUh7eN1lXF8ru9RWTgR20vRcVV7b6L479r6gL4Rj1SpscxHzU3bNIGFjXGgosnG0cvRRGquA59e21fKYjTsPVXdPqh4dCTtc6HPkpkJ6NAGc3G1IzxvlAJOxBO7kdgGZnj3j7dSQ_ZNxey2ehD1S05VMNTFz7cb2zeyOpWRlFaSZmF8GFVir6RdoHB0aRRqxB1mDkGL8JF4iz6tCNcmRia0reimfqsxzalTUSx55m0uW6k4Jsk1-WQKpMIICpTCCAkqgAwIBAgIQUYgKL85TOwfpegNk-LoWIDAKBggqhkjOPQQDAjAuMQswCQYDVQQGEwJVUzEMMAoGA1UECgwDSUJNMREwDwYDVQQDDAhGSURPVEVTVDAiGA8yMDI0MDkxMjE2MTcxNVoYDzIwNTIwMTI4MTcxNzE1WjAkMSIwIAYDVQQDDBlGSURPVEVTVC1UUE0tSU5URVJNRURJQVRFMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjO2MsXOpSR6L65loBV-iu1qbLXmfHTiZ6Qum8F7u-YTf3u7NzvoDc5NLxsc95xmOO21_L33QQ90fMS5T6RBPlc10qcCZn94mIWvOllcNuF-YdS8fF4dqqxS9sx1BzIHw_5Ugw55rpyCkFkuuWf4_WhH9XBDST0VyKIhCDqyvTKVike4do02YpTj7GevZ2lu2R9egO4H_ge-kLa9Lb4V7pt3sziJZzmmdYjZQpW_7ll_dxkvJGHGlmx7BNUvaYz4_S54OHwA5n23UjrrGI5j-MuLFuMvrlOB4pYmSgMo9d4EiicHmCVdufh5cQIQyhLtSJpNLWPIicJTOxneovvX8pwIDAQABo4GEMIGBMA4GA1UdDwEB_wQEAwIBhjAbBgNVHSUEFDASBgkrBgEEAYI3FSQGBWeBBQgDMB0GA1UdDgQWBBS8eL4TcgSXDcb1AntcupooSZN76zAfBgNVHSMEGDAWgBQX_QoP8NpeXBvZlnioDn4WYG-t8zASBgNVHRMBAf8ECDAGAQH_AgEAMAoGCCqGSM49BAMCA0kAMEYCIQCEow674gCO9xYpXPGzZTZoB75z-L2nc2Ro1tNlQnwLYQIhAP5IqEB0RitfwwFEnO02OXy4uLm2zmav7u9j7RYr3IMVZ3B1YkFyZWFYVgAjAAsABgRyAAAAEAAQAAMAEAAgGLJ6QoCtjGYzzEhin-5Nh07apP4zG9W7DBGu0LP5swkAIFDNnItK08SyMbn4WaxTIpzpierzi3slXLdOIVyhgPXMaGNlcnRJbmZvWGn_VENHgBcAAAAgZuxVBRKmcQ0K_ChBytGTmGx2Ldx_AM1sPPw1UCZa9KEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIAC82gnq37ZMkh4J4nqMK-z7TuAX5PoH0_92mLDl1yR3nFAABjc2lnWQEAWYYRG-cZqJXEfhg8xVixJXxWG2XBYY2W7aImrVXr7H9cP3x3K6OCAfnepl8ZkIwcsFQ_YiPg0qmt3qfkqDOVgvZJO2fEUdzeiY_6LPrCrWoUNVyB7K4XhquOS0bhTBR4jRBUDCQWYsUxSRwaBZd4gR4v66eqHKrcRM4faGXM1GE5c7BC6R6HFEzOt3Hw-QjM2RfkzDgz6-frJ9TCe-H02pmYc_Yl1xfHUQrgoGPivpwIIiaIchnKMXS21uREwArnGAfVkvgHag1iu6MQ9GMHyopYUduBLECegq26V_DxvDPH4zRY-fBZkZ3sfuZzNbcNDmQqYDvwLjUZ_G1CCnISOmhhdXRoRGF0YVjkdKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFAAAAALr7CR24GkR-r58S9V6vzDQAYFNhbHRlZF9feHGeryfm7tWpn4sGVj3RrxMS5Gx1HNajusIj-PPpGzLW4SGIgAxUVFna6lNQJSkuA9ukcgBZSLcaY4kPiq5Bwta8TBhvPOXwfEvzoQt0D0ZPb9zpmjMWmKUBAgMmIAEhWCAYsnpCgK2MZjPMSGKf7k2HTtqk_jMb1bsMEa7Qs_mzCSJYIFDNnItK08SyMbn4WaxTIpzpierzi3slXLdOIVyhgPXM',
+          'publicKeyAlgorithm': -7,
+          'publicKey':
+            'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEGLJ6QoCtjGYzzEhin-5Nh07apP4zG9W7DBGu0LP5swlQzZyLStPEsjG5-FmsUyKc6Ynq84t7JVy3TiFcoYD1zA',
+          'authenticatorData':
+            'dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFAAAAALr7CR24GkR-r58S9V6vzDQAYFNhbHRlZF9feHGeryfm7tWpn4sGVj3RrxMS5Gx1HNajusIj-PPpGzLW4SGIgAxUVFna6lNQJSkuA9ukcgBZSLcaY4kPiq5Bwta8TBhvPOXwfEvzoQt0D0ZPb9zpmjMWmKUBAgMmIAEhWCAYsnpCgK2MZjPMSGKf7k2HTtqk_jMb1bsMEa7Qs_mzCSJYIFDNnItK08SyMbn4WaxTIpzpierzi3slXLdOIVyhgPXM',
+          'transports': ['internal'],
+        },
+        'type': 'public-key',
+        'clientExtensionResults': {},
+      },
+      expectedChallenge:
+        'POlVmctQMcvSR6eUmg_jni_hQWZ1YDTrTj-0v-ITFTjsEKJfsDyHrNPKhjlr1ey9GrZ4ovKHnPhmEN6UeazM3A',
+      expectedOrigin: 'https://webauthn.io',
+      expectedRPID: 'webauthn.io',
+    });
+
+    assertEquals(verification.verified, true);
+  },
+);
+
+Deno.test(
+  'should fail if id-fido-gen-ce-aaguid extension is present and does not match AAGUID in auth data',
+  async () => {
+    // const response = await ;
+    await assertRejects(
+      () =>
+        verifyRegistrationResponse({
+          response: {
+            'id':
+              'U2FsdGVkX1-yvM_R9uOoWNsfZl0N5H88W380nJ9bTeB9MJpSfDg0GVijOa-_OQ6eeRRu5wYYVf5z0lVXngzuEa_RnFxpidxhLTPEU8Ba8BJZ84ibLBokQd7taN_cisJh',
+            'rawId':
+              'U2FsdGVkX1-yvM_R9uOoWNsfZl0N5H88W380nJ9bTeB9MJpSfDg0GVijOa-_OQ6eeRRu5wYYVf5z0lVXngzuEa_RnFxpidxhLTPEU8Ba8BJZ84ibLBokQd7taN_cisJh',
+            'response': {
+              'clientDataJSON':
+                'eyJvcmlnaW4iOiJodHRwczovL3dlYmF1dGhuLmlvIiwiY2hhbGxlbmdlIjoiMVpVQl91ZGl0amlKbXdiWXpKUVloUkF5cGZXQW9CS0lIbVdnVXZEeWJoSXhNdHhzSWdRdm1jZmMzbUFhVDRrSEJwNS12ekZidnBWLTZHUHYyeVJvM2ciLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
+              'attestationObject':
+                'o2NmbXRjdHBtZ2F0dFN0bXSmY2FsZzkBAGN2ZXJjMi4wY3g1Y4JZA5cwggOTMIICe6ADAgECAhA0eKzsz_GTUVDsmTJG9gexMA0GCSqGSIb3DQEBCwUAMCQxIjAgBgNVBAMMGUZJRE9URVNULVRQTS1JTlRFUk1FRElBVEUwIhgPMjAyNDA5MTIxNjE3MTZaGA8yMDUyMDEyODE3MTcxNlowADCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJYDCYSxb3nuo_qgk5Ff0GWmDIGCq3JTcECNAT6Gd6KVcjdNw3HOD-p5nzpkJ4EoN7O9wahPOYOWPAxQsXh4qK-D3npLNtHm4zMULsQTCA_gMFMd7X1BtXcVGrzOq4hNEyie1u7ty5Hmo5xXVii-HaxgRi_O3v9-_R_jhIuzZo48tYTyAtdePT0FxL90epy-tDqVKgficAQZaTFJ95X1YAafViCqRpBmWd3fmbsF8H-FIffdWsydDjpIiu5uBUqUbCg4SA-QuCAOgc4eib3J1vFu7n6dcq1moMyTPpUlcTHHuN8Ew73mu9mklKuMZJVF2piJ6RqMmxnZaLBnGnhlIGsCAwEAAaOB4DCB3TAOBgNVHQ8BAf8EBAMCB4AwEAYDVR0lBAkwBwYFZ4EFCAMwSAYDVR0RAQH_BD4wPKQ6MDgxNjANBgVngQUCAwwEaWQ6MTAPBgVngQUCAgwGSUJNVFBNMBQGBWeBBQIBDAtpZDpGRkZGRjFEMDAdBgNVHQ4EFgQUdk8-CPODzqMp6lg2bOhiZVPo-WcwHwYDVR0jBBgwFoAUvHi-E3IElw3G9QJ7XLqaKEmTe-swDAYDVR0TAQH_BAIwADAhBgsrBgEEAYLlHAEBBAQSBBC6-wkduBpEfq-fEvVer8w0MA0GCSqGSIb3DQEBCwUAA4IBAQBR2iunZ6r5U7udyHj6k4BL_Bh45abmBkb_Ke4VrSNj4oGjbvXyLxWXH3DbO9FTBy5PDkOA9y6yr7xShRFZextTULHEy4JKKo8AjUh7eN1lXF8ru9RWTgR20vRcVV7b6L479r6gL4Rj1SpscxHzU3bNIGFjXGgosnG0cvRRGquA59e21fKYjTsPVXdPqh4dCTtc6HPkpkJ6NAGc3G1IzxvlAJOxBO7kdgGZnj3j7dSQ_ZNxey2ehD1S05VMNTFz7cb2zeyOpWRlFaSZmF8GFVir6RdoHB0aRRqxB1mDkGL8JF4iz6tCNcmRia0reimfqsxzalTUSx55m0uW6k4Jsk1-WQKpMIICpTCCAkqgAwIBAgIQUYgKL85TOwfpegNk-LoWIDAKBggqhkjOPQQDAjAuMQswCQYDVQQGEwJVUzEMMAoGA1UECgwDSUJNMREwDwYDVQQDDAhGSURPVEVTVDAiGA8yMDI0MDkxMjE2MTcxNVoYDzIwNTIwMTI4MTcxNzE1WjAkMSIwIAYDVQQDDBlGSURPVEVTVC1UUE0tSU5URVJNRURJQVRFMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjO2MsXOpSR6L65loBV-iu1qbLXmfHTiZ6Qum8F7u-YTf3u7NzvoDc5NLxsc95xmOO21_L33QQ90fMS5T6RBPlc10qcCZn94mIWvOllcNuF-YdS8fF4dqqxS9sx1BzIHw_5Ugw55rpyCkFkuuWf4_WhH9XBDST0VyKIhCDqyvTKVike4do02YpTj7GevZ2lu2R9egO4H_ge-kLa9Lb4V7pt3sziJZzmmdYjZQpW_7ll_dxkvJGHGlmx7BNUvaYz4_S54OHwA5n23UjrrGI5j-MuLFuMvrlOB4pYmSgMo9d4EiicHmCVdufh5cQIQyhLtSJpNLWPIicJTOxneovvX8pwIDAQABo4GEMIGBMA4GA1UdDwEB_wQEAwIBhjAbBgNVHSUEFDASBgkrBgEEAYI3FSQGBWeBBQgDMB0GA1UdDgQWBBS8eL4TcgSXDcb1AntcupooSZN76zAfBgNVHSMEGDAWgBQX_QoP8NpeXBvZlnioDn4WYG-t8zASBgNVHRMBAf8ECDAGAQH_AgEAMAoGCCqGSM49BAMCA0kAMEYCIQCEow674gCO9xYpXPGzZTZoB75z-L2nc2Ro1tNlQnwLYQIhAP5IqEB0RitfwwFEnO02OXy4uLm2zmav7u9j7RYr3IMVZ3B1YkFyZWFYVgAjAAsABgRyAAAAEAAQAAMAEAAg6kOogN7nkNDsxY5fmYtttqCykGTO2VcWeaSz7Fljj8UAIDmGZyLBXXO4TSy6N60-qLMMb3j_9aodNJkEy3YR5yzIaGNlcnRJbmZvWGn_VENHgBcAAAAgUx5-BahLlOt5FP5KUOXwPXDLtIbn53QJ4bmxP49rix4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIAC5QsRivpgzax7csKstP3urrisTM9wQiz5EgyVCCm7LL_AABjc2lnWQEABxrFLgssFYJo3YrJO-O74x3biw94cSmVqbuFzHfzPbCy-a-KxglhiwDuAqFz4eg0InTaimv5HDp7NBXy6wZ8M45VxAc_PhifrgDM89CW9vpUMmEPZrWosK7oGU-1-7WEnAH8crqS4O36SRTNLxwck-YiAzJFTq2HgTAmbWSsUVvAyYjvVVnDSpYH54_-7b3M5blOt6pmuyq31QrBJ6rwlm17zIypANHXEU3JPmzs_MuEtaIqCGhyehaTg6MENeDr3ZTFAEC5ID14vkRNwzXMQnGAmPSMFkepvNq1fxuHYzEAV_8HQTSlbYiSV9Gl4U1hwXNuqB0VPHobdxXu7k317WhhdXRoRGF0YVjkdKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFAAAAABjsP-HgRUGbsjsvDeAJ8_oAYFNhbHRlZF9fsrzP0fbjqFjbH2ZdDeR_PFt_NJyfW03gfTCaUnw4NBlYozmvvzkOnnkUbucGGFX-c9JVV54M7hGv0ZxcaYncYS0zxFPAWvASWfOImywaJEHe7Wjf3IrCYaUBAgMmIAEhWCDqQ6iA3ueQ0OzFjl-Zi222oLKQZM7ZVxZ5pLPsWWOPxSJYIDmGZyLBXXO4TSy6N60-qLMMb3j_9aodNJkEy3YR5yzI',
+              'publicKeyAlgorithm': -7,
+              'publicKey':
+                'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6kOogN7nkNDsxY5fmYtttqCykGTO2VcWeaSz7Fljj8U5hmciwV1zuE0sujetPqizDG94__WqHTSZBMt2EecsyA',
+              'authenticatorData':
+                'dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFAAAAABjsP-HgRUGbsjsvDeAJ8_oAYFNhbHRlZF9fsrzP0fbjqFjbH2ZdDeR_PFt_NJyfW03gfTCaUnw4NBlYozmvvzkOnnkUbucGGFX-c9JVV54M7hGv0ZxcaYncYS0zxFPAWvASWfOImywaJEHe7Wjf3IrCYaUBAgMmIAEhWCDqQ6iA3ueQ0OzFjl-Zi222oLKQZM7ZVxZ5pLPsWWOPxSJYIDmGZyLBXXO4TSy6N60-qLMMb3j_9aodNJkEy3YR5yzI',
+              'transports': ['internal'],
+            },
+            'type': 'public-key',
+            'clientExtensionResults': {},
+          },
+          expectedChallenge:
+            '1ZUB_uditjiJmwbYzJQYhRAypfWAoBKIHmWgUvDybhIxMtxsIgQvmcfc3mAaT4kHBp5-vzFbvpV-6GPv2yRo3g',
+          expectedOrigin: 'https://webauthn.io',
+          expectedRPID: 'webauthn.io',
+        }),
+      Error,
+      '1.3.6.1.4.1.45724.1.1.4',
+    );
+  },
+);
