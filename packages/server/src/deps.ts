@@ -27,7 +27,7 @@ export { default as base64 } from 'https://deno.land/x/b64@1.1.27/src/base64.js'
 export { fetch as crossFetch } from 'https://esm.sh/cross-fetch@4.0.0';
 
 // @peculiar libraries
-export { AsnParser, AsnSerializer } from 'https://esm.sh/@peculiar/asn1-schema@2.3.8';
+export { AsnParser, AsnSerializer, OctetString } from 'https://esm.sh/@peculiar/asn1-schema@2.3.8';
 export {
   AuthorityKeyIdentifier,
   BasicConstraints,
@@ -35,6 +35,7 @@ export {
   CertificateList,
   CRLDistributionPoints,
   ExtendedKeyUsage,
+  Extensions,
   id_ce_authorityKeyIdentifier,
   id_ce_basicConstraints,
   id_ce_cRLDistributionPoints,
