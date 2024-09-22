@@ -21,7 +21,6 @@ export function decodeAuthenticatorExtensions(
 
 export type AuthenticationExtensionsAuthenticatorOutputs = {
   devicePubKey?: DevicePublicKeyAuthenticatorOutput;
-  uvm?: UVMAuthenticatorOutput;
 };
 
 export type DevicePublicKeyAuthenticatorOutput = {
@@ -30,12 +29,6 @@ export type DevicePublicKeyAuthenticatorOutput = {
   nonce?: Uint8Array;
   scope?: Uint8Array;
   aaguid?: Uint8Array;
-};
-
-// TODO: Need to verify this format
-// https://w3c.github.io/webauthn/#sctn-uvm-extension.
-export type UVMAuthenticatorOutput = {
-  uvm?: Uint8Array[];
 };
 
 /**
