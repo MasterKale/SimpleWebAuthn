@@ -19,24 +19,10 @@ export function decodeAuthenticatorExtensions(
   return convertMapToObjectDeep(toCBOR);
 }
 
-export type AuthenticationExtensionsAuthenticatorOutputs = {
-  devicePubKey?: DevicePublicKeyAuthenticatorOutput;
-  uvm?: UVMAuthenticatorOutput;
-};
-
-export type DevicePublicKeyAuthenticatorOutput = {
-  dpk?: Uint8Array;
-  sig?: string;
-  nonce?: Uint8Array;
-  scope?: Uint8Array;
-  aaguid?: Uint8Array;
-};
-
-// TODO: Need to verify this format
-// https://w3c.github.io/webauthn/#sctn-uvm-extension.
-export type UVMAuthenticatorOutput = {
-  uvm?: Uint8Array[];
-};
+/**
+ * Attempt to support authenticator extensions we might not know about in WebAuthn
+ */
+export type AuthenticationExtensionsAuthenticatorOutputs = unknown;
 
 /**
  * CBOR-encoded extensions can be deeply-nested Maps, which are too deep for a simple
