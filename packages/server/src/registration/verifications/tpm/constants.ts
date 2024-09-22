@@ -118,6 +118,10 @@ export const TPM_MANUFACTURERS: { [key: string]: ManufacturerInfo } = {
     name: 'IBM',
     id: 'IBM',
   },
+  'id:49424D00': { // Same ID for IBM as above, except the "D" is capitalized as per TPM spec
+    name: 'IBM',
+    id: 'IBM',
+  },
   'id:49465800': {
     name: 'Infineon',
     id: 'IFX',
