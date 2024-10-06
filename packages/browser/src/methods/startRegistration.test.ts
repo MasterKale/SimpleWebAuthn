@@ -68,7 +68,7 @@ afterEach(() => {
 });
 
 test('should convert options before passing to navigator.credentials.create(...)', async () => {
-  await startRegistration(goodOpts1);
+  await startRegistration({ optionsJSON: goodOpts1 });
 
   const argsPublicKey = mockNavigatorCreate.mock.calls[0][0].publicKey;
   const credId = argsPublicKey.excludeCredentials[0].id;
@@ -111,7 +111,7 @@ test('should return base64url-encoded response values', async () => {
     },
   );
 
-  const response = await startRegistration(goodOpts1);
+  const response = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(response.rawId).toEqual('6mUg8GzxDxs');
   expect(response.response.attestationObject).toEqual('bW9ja0F0dGU');
@@ -121,7 +121,7 @@ test('should return base64url-encoded response values', async () => {
 test("should throw error if WebAuthn isn't supported", async () => {
   mockSupportsWebauthn.mockReturnValue(false);
 
-  await expect(startRegistration(goodOpts1)).rejects.toThrow(
+  await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects.toThrow(
     'WebAuthn is not supported in this browser',
   );
 });
@@ -133,7 +133,7 @@ test('should throw error if attestation is cancelled for some reason', async () 
     });
   });
 
-  await expect(startRegistration(goodOpts1)).rejects.toThrow(
+  await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects.toThrow(
     'Registration was not completed',
   );
 });
@@ -151,7 +151,7 @@ test('should send extensions to authenticator if present in options', async () =
     ...goodOpts1,
     extensions,
   };
-  await startRegistration(optsWithExts);
+  await startRegistration({ optionsJSON: optsWithExts });
 
   const argsExtensions = mockNavigatorCreate.mock.calls[0][0].publicKey.extensions;
 
@@ -159,7 +159,7 @@ test('should send extensions to authenticator if present in options', async () =
 });
 
 test('should not set any extensions if not present in options', async () => {
-  await startRegistration(goodOpts1);
+  await startRegistration({ optionsJSON: goodOpts1 });
 
   const argsExtensions = mockNavigatorCreate.mock.calls[0][0].publicKey.extensions;
 
@@ -182,13 +182,13 @@ test('should include extension results', async () => {
   });
 
   // Extensions aren't present in this object, but it doesn't matter since we're faking the response
-  const response = await startRegistration(goodOpts1);
+  const response = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(response.clientExtensionResults).toEqual(extResults);
 });
 
 test('should include extension results when no extensions specified', async () => {
-  const response = await startRegistration(goodOpts1);
+  const response = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(response.clientExtensionResults).toEqual({});
 });
@@ -204,7 +204,7 @@ test('should support "cable" transport in excludeCredentials', async () => {
     ],
   };
 
-  await startRegistration(opts);
+  await startRegistration({ optionsJSON: opts });
 
   expect(
     mockNavigatorCreate.mock.calls[0][0].publicKey.excludeCredentials[0]
@@ -225,7 +225,7 @@ test('should return "cable" transport from response', async () => {
     type: 'webauthn.create',
   });
 
-  const regResponse = await startRegistration(goodOpts1);
+  const regResponse = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(regResponse.response.transports).toEqual(['cable']);
 });
@@ -234,8 +234,8 @@ test('should cancel an existing call when executed again', async () => {
   const abortSpy = jest.spyOn(AbortController.prototype, 'abort');
 
   // Fire off a request and immediately attempt a second one
-  startRegistration(goodOpts1);
-  await startRegistration(goodOpts1);
+  startRegistration({ optionsJSON: goodOpts1 });
+  await startRegistration({ optionsJSON: goodOpts1 });
   expect(abortSpy).toHaveBeenCalledTimes(1);
 });
 
@@ -251,7 +251,7 @@ test('should return authenticatorAttachment if present', async () => {
     });
   });
 
-  const response = await startRegistration(goodOpts1);
+  const response = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(response.authenticatorAttachment).toEqual('cross-platform');
 });
@@ -276,7 +276,7 @@ test('should return convenience values if getters present', async () => {
     });
   });
 
-  const response = await startRegistration(goodOpts1);
+  const response = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(response.response.publicKeyAlgorithm).toEqual(777);
   expect(response.response.publicKey).toEqual('AAAAAA');
@@ -299,7 +299,7 @@ test('should not return convenience values if getters missing', async () => {
     });
   });
 
-  const response = await startRegistration(goodOpts1);
+  const response = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(response.response.publicKeyAlgorithm).toBeUndefined();
   expect(response.response.publicKey).toBeUndefined();
@@ -352,9 +352,9 @@ test('should survive browser extensions that intercept WebAuthn and incorrectly 
     });
   });
 
-  await expect(startRegistration(goodOpts1)).resolves;
+  await expect(startRegistration({ optionsJSON: goodOpts1 })).resolves;
 
-  const response = await startRegistration(goodOpts1);
+  const response = await startRegistration({ optionsJSON: goodOpts1 });
 
   expect(response.response.publicKeyAlgorithm).toBeUndefined();
   expect(response.response.publicKey).toBeUndefined();
@@ -374,7 +374,7 @@ describe('WebAuthnError', () => {
     test.skip('should identify abort signal', async () => {
       mockNavigatorCreate.mockRejectedValueOnce(AbortError);
 
-      const rejected = await expect(startRegistration(goodOpts1)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/abort signal/i);
       rejected.toThrow(/AbortError/);
@@ -397,7 +397,7 @@ describe('WebAuthnError', () => {
         },
       };
 
-      const rejected = await expect(startRegistration(opts)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/discoverable credentials were required/i);
       rejected.toThrow(/no available authenticator supported/i);
@@ -419,7 +419,7 @@ describe('WebAuthnError', () => {
         },
       };
 
-      const rejected = await expect(startRegistration(opts)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/user verification was required/i);
       rejected.toThrow(/no available authenticator supported/i);
@@ -438,7 +438,7 @@ describe('WebAuthnError', () => {
     test('should identify re-registration attempt', async () => {
       mockNavigatorCreate.mockRejectedValueOnce(InvalidStateError);
 
-      const rejected = await expect(startRegistration(goodOpts1)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/authenticator/i);
       rejected.toThrow(/previously registered/i);
@@ -465,7 +465,7 @@ describe('WebAuthnError', () => {
       );
       mockNavigatorCreate.mockRejectedValueOnce(NotAllowedError);
 
-      const rejected = await expect(startRegistration(goodOpts1)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
       rejected.toThrow(Error);
       rejected.toThrow(/operation failed/i);
       rejected.toHaveProperty('name', 'NotAllowedError');
@@ -486,7 +486,7 @@ describe('WebAuthnError', () => {
       );
       mockNavigatorCreate.mockRejectedValueOnce(NotAllowedError);
 
-      const rejected = await expect(startRegistration(goodOpts1)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
       rejected.toThrow(Error);
       rejected.toThrow(/sites with TLS certificate errors/i);
       rejected.toHaveProperty('name', 'NotAllowedError');
@@ -506,7 +506,7 @@ describe('WebAuthnError', () => {
         pubKeyCredParams: [],
       };
 
-      const rejected = await expect(startRegistration(opts)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/pubKeyCredParams/i);
       rejected.toThrow(/public-key/i);
@@ -523,7 +523,7 @@ describe('WebAuthnError', () => {
         pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
       };
 
-      const rejected = await expect(startRegistration(opts)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/No available authenticator/i);
       rejected.toThrow(/pubKeyCredParams/i);
@@ -554,7 +554,7 @@ describe('WebAuthnError', () => {
 
       mockNavigatorCreate.mockRejectedValueOnce(SecurityError);
 
-      const rejected = await expect(startRegistration(goodOpts1)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(/1\.2\.3\.4/);
       rejected.toThrow(/invalid domain/i);
@@ -568,7 +568,7 @@ describe('WebAuthnError', () => {
 
       mockNavigatorCreate.mockRejectedValueOnce(SecurityError);
 
-      const rejected = await expect(startRegistration(goodOpts1)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(goodOpts1.rp.id);
       rejected.toThrow(/invalid for this domain/i);
@@ -592,7 +592,7 @@ describe('WebAuthnError', () => {
         },
       };
 
-      const rejected = await expect(startRegistration(opts)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
       rejected.toThrowError(WebAuthnError);
       rejected.toThrow(/user id/i);
       rejected.toThrow(/not between 1 and 64 characters/i);
@@ -608,7 +608,7 @@ describe('WebAuthnError', () => {
     test('should identify potential authenticator issues', async () => {
       mockNavigatorCreate.mockRejectedValueOnce(UnknownError);
 
-      const rejected = await expect(startRegistration(goodOpts1)).rejects;
+      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
       rejected.toThrow(WebAuthnError);
       rejected.toThrow(/authenticator/i);
       rejected.toThrow(/unable to process the specified options/i);

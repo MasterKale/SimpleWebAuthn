@@ -13,14 +13,20 @@ import { identifyRegistrationError } from '../helpers/identifyRegistrationError'
 import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
 import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
+export type StartRegistrationOpts = {
+  optionsJSON: PublicKeyCredentialCreationOptionsJSON;
+};
+
 /**
  * Begin authenticator "registration" via WebAuthn attestation
  *
  * @param optionsJSON Output from **@simplewebauthn/server**'s `generateRegistrationOptions()`
  */
 export async function startRegistration(
-  optionsJSON: PublicKeyCredentialCreationOptionsJSON,
+  options: StartRegistrationOpts,
 ): Promise<RegistrationResponseJSON> {
+  const { optionsJSON } = options;
+
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
@@ -39,16 +45,16 @@ export async function startRegistration(
   };
 
   // Finalize options
-  const options: CredentialCreationOptions = { publicKey };
+  const createOptions: CredentialCreationOptions = { publicKey };
   // Set up the ability to cancel this request if the user attempts another
-  options.signal = WebAuthnAbortService.createNewAbortSignal();
+  createOptions.signal = WebAuthnAbortService.createNewAbortSignal();
 
   // Wait for the user to complete attestation
   let credential;
   try {
-    credential = (await navigator.credentials.create(options)) as RegistrationCredential;
+    credential = (await navigator.credentials.create(createOptions)) as RegistrationCredential;
   } catch (err) {
-    throw identifyRegistrationError({ error: err as Error, options });
+    throw identifyRegistrationError({ error: err as Error, options: createOptions });
   }
 
   if (!credential) {
