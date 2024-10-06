@@ -361,6 +361,13 @@ test('should survive browser extensions that intercept WebAuthn and incorrectly 
   expect(response.response.authenticatorData).toBeUndefined();
 });
 
+test('should automatically register a.k.a. Conditional Create', async () => {
+  await startRegistration({ optionsJSON: goodOpts1, useAutoRegister: true });
+
+  // The most important bit
+  expect(mockNavigatorCreate.mock.calls[0][0].mediation).toEqual('conditional');
+});
+
 describe('WebAuthnError', () => {
   describe('AbortError', () => {
     const AbortError = generateCustomError('AbortError');
@@ -427,6 +434,29 @@ describe('WebAuthnError', () => {
       rejected.toHaveProperty(
         'code',
         'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT',
+      );
+      rejected.toHaveProperty('cause', ConstraintError);
+    });
+
+    test('should identify unsupported user verification during auto registration', async () => {
+      mockNavigatorCreate.mockRejectedValueOnce(ConstraintError);
+
+      const opts: PublicKeyCredentialCreationOptionsJSON = {
+        ...goodOpts1,
+        authenticatorSelection: {
+          userVerification: 'required',
+        },
+      };
+
+      const rejected = await expect(startRegistration({ optionsJSON: opts, useAutoRegister: true }))
+        .rejects;
+      rejected.toThrow(WebAuthnError);
+      rejected.toThrow(/user verification was required during automatic registration/i);
+      rejected.toThrow(/could not be performed/i);
+      rejected.toHaveProperty('name', 'ConstraintError');
+      rejected.toHaveProperty(
+        'code',
+        'ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE',
       );
       rejected.toHaveProperty('cause', ConstraintError);
     });
