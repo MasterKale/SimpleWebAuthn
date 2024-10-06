@@ -16,6 +16,7 @@ import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment'
 export type StartAuthenticationOpts = {
   optionsJSON: PublicKeyCredentialRequestOptionsJSON;
   useBrowserAutofill?: boolean;
+  verifyBrowserAutofillInput?: boolean;
 };
 
 /**
@@ -23,6 +24,7 @@ export type StartAuthenticationOpts = {
  *
  * @param optionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions()`
  * @param useBrowserAutofill (Optional) Initialize conditional UI to enable logging in via browser autofill prompts. Defaults to `false`.
+ * @param verifyBrowserAutofillInput (Optional) Ensure a suitable `<input>` element is present when `useBrowserAutofill` is `true`. Defaults to `true`.
  */
 export async function startAuthentication(
   options: StartAuthenticationOpts,
@@ -30,6 +32,7 @@ export async function startAuthentication(
   const {
     optionsJSON,
     useBrowserAutofill = false,
+    verifyBrowserAutofillInput = true,
   } = options;
 
   if (!browserSupportsWebAuthn()) {
@@ -70,7 +73,7 @@ export async function startAuthentication(
     );
 
     // WebAuthn autofill requires at least one valid input
-    if (eligibleInputs.length < 1) {
+    if (eligibleInputs.length < 1 && verifyBrowserAutofillInput) {
       throw Error(
         'No <input> with "webauthn" as the only or last value in its `autocomplete` attribute was detected',
       );
