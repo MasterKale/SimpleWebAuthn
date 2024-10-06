@@ -36,6 +36,18 @@ export function identifyRegistrationError({
         cause: error,
       });
     } else if (
+      // @ts-ignore: `mediation` doesn't yet exist on CredentialCreationOptions but it's possible as of Sept 2024
+      options.mediation === 'conditional' &&
+      publicKey.authenticatorSelection?.userVerification === 'required'
+    ) {
+      // https://w3c.github.io/webauthn/#sctn-createCredential (Step 22.4)
+      return new WebAuthnError({
+        message:
+          'User verification was required during automatic registration but it could not be performed',
+        code: 'ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE',
+        cause: error,
+      });
+    } else if (
       publicKey.authenticatorSelection?.userVerification === 'required'
     ) {
       // https://www.w3.org/TR/webauthn-2/#sctn-op-make-cred (Step 5)

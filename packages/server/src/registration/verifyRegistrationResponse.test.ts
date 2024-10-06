@@ -560,6 +560,44 @@ Deno.test('should throw an error if user verification is required but user was n
   mockParseAuthData.restore();
 });
 
+Deno.test(
+  'should optionally support user presence flag being false (as in conditional create)',
+  async () => {
+    const authData = decodeAttestationObject(
+      isoBase64URL.toBuffer(attestationFIDOU2F.response.attestationObject),
+    ).get('authData');
+    const actualAuthData = parseAuthenticatorData(authData);
+
+    const mockParseAuthData = stub(
+      _parseAuthenticatorDataInternals,
+      'stubThis',
+      returnsNext([
+        {
+          ...actualAuthData,
+          flags: {
+            ...actualAuthData.flags,
+            up: false,
+            uv: false,
+          },
+        },
+      ]),
+    );
+
+    const verification = await verifyRegistrationResponse({
+      response: attestationFIDOU2F,
+      expectedChallenge: attestationFIDOU2FChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+      requireUserPresence: false,
+      requireUserVerification: false,
+    });
+
+    assert(verification.verified);
+
+    mockParseAuthData.restore();
+  },
+);
+
 Deno.test('should validate TPM RSA response (SHA256)', async () => {
   const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
   const verification = await verifyRegistrationResponse({

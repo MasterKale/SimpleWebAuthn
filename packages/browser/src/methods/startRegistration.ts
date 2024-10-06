@@ -15,17 +15,19 @@ import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment'
 
 export type StartRegistrationOpts = {
   optionsJSON: PublicKeyCredentialCreationOptionsJSON;
+  useAutoRegister?: boolean;
 };
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
  *
  * @param optionsJSON Output from **@simplewebauthn/server**'s `generateRegistrationOptions()`
+ * @param useAutoRegister (Optional) Try to silently create a passkey with the password manager that the user just signed in with. Defaults to `false`.
  */
 export async function startRegistration(
   options: StartRegistrationOpts,
 ): Promise<RegistrationResponseJSON> {
-  const { optionsJSON } = options;
+  const { optionsJSON, useAutoRegister = false } = options;
 
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
@@ -44,8 +46,21 @@ export async function startRegistration(
     ),
   };
 
+  // Prepare options for `.create()`
+  const createOptions: CredentialCreationOptions = {};
+
+  /**
+   * Try to use conditional create to register a passkey for the user with the password manager
+   * the user just used to authenticate with. The user won't be shown any prominent UI by the
+   * browser.
+   */
+  if (useAutoRegister) {
+    // @ts-ignore: `mediation` doesn't yet exist on CredentialCreationOptions but it's possible as of Sept 2024
+    createOptions.mediation = 'conditional' as CredentialMediationRequirement;
+  }
+
   // Finalize options
-  const createOptions: CredentialCreationOptions = { publicKey };
+  createOptions.publicKey = publicKey;
   // Set up the ability to cancel this request if the user attempts another
   createOptions.signal = WebAuthnAbortService.createNewAbortSignal();
 
