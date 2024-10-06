@@ -344,6 +344,32 @@ test('should throw error if no acceptable <input> is found', async () => {
   rejected.toThrow(/no <input>/i);
 });
 
+test('should not throw error when autofill input verification flag is false', async () => {
+  // No suitable <input> is present in the "light DOM", which would normally raise...
+  document.body.innerHTML = '<swan-autofill></swan-autofill>';
+
+  // ...But a suitable <input> IS inside of a web component's "shadow DOM" and we know it
+  const swanAutofill = document.querySelector('swan-autofill');
+  const shadowRoot = swanAutofill!.attachShadow({ mode: 'open' });
+  shadowRoot.innerHTML = `
+    <label for="username">Username</label>
+    <input
+      type="text"
+      name="username"
+      autocomplete="username webauthn"
+      autofocus
+    />
+  `;
+
+  await expect(
+    startAuthentication({
+      optionsJSON: goodOpts1,
+      useBrowserAutofill: true,
+      verifyBrowserAutofillInput: false,
+    }),
+  ).resolves;
+});
+
 test('should throw error if "webauthn" is not final autocomplete token', async () => {
   /**
    * According to WHATWG "webauthn" must be the final token in the autocomplete attribute when
