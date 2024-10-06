@@ -563,6 +563,26 @@ Deno.test('should throw an error if user verification is required but user was n
 Deno.test(
   'should optionally support user presence flag being false (as in conditional create)',
   async () => {
+    const authData = decodeAttestationObject(
+      isoBase64URL.toBuffer(attestationFIDOU2F.response.attestationObject),
+    ).get('authData');
+    const actualAuthData = parseAuthenticatorData(authData);
+
+    const mockParseAuthData = stub(
+      _parseAuthenticatorDataInternals,
+      'stubThis',
+      returnsNext([
+        {
+          ...actualAuthData,
+          flags: {
+            ...actualAuthData.flags,
+            up: false,
+            uv: false,
+          },
+        },
+      ]),
+    );
+
     const verification = await verifyRegistrationResponse({
       response: attestationFIDOU2F,
       expectedChallenge: attestationFIDOU2FChallenge,
@@ -573,6 +593,8 @@ Deno.test(
     });
 
     assert(verification.verified);
+
+    mockParseAuthData.restore();
   },
 );
 
