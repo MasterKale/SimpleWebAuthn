@@ -35,6 +35,7 @@ export type VerifyRegistrationResponseOpts = {
   expectedOrigin: string | string[];
   expectedRPID?: string | string[];
   expectedType?: string | string[];
+  requireUserPresence?: boolean;
   requireUserVerification?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
@@ -49,6 +50,7 @@ export type VerifyRegistrationResponseOpts = {
  * @param expectedOrigin - Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID - RP ID (or array of IDs) that was specified in the registration options
  * @param expectedType **(Optional)** - The response type expected ('webauthn.create')
+ * @param requireUserPresence **(Optional)** - Enforce user presence by the authenticator (or skip it during auto registration) Defaults to `true`
  * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
  * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to all supported algorithm IDs
  */
@@ -61,6 +63,7 @@ export async function verifyRegistrationResponse(
     expectedOrigin,
     expectedRPID,
     expectedType,
+    requireUserPresence = true,
     requireUserVerification = true,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
@@ -186,14 +189,14 @@ export async function verifyRegistrationResponse(
   }
 
   // Make sure someone was physically present
-  if (!flags.up) {
-    throw new Error('User not present during registration');
+  if (requireUserPresence && !flags.up) {
+    throw new Error('User presence was required, but user was not present');
   }
 
   // Enforce user verification if specified
   if (requireUserVerification && !flags.uv) {
     throw new Error(
-      'User verification required, but user could not be verified',
+      'User verification was required, but user could not be verified',
     );
   }
 
