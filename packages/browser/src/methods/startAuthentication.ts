@@ -13,6 +13,11 @@ import { identifyAuthenticationError } from '../helpers/identifyAuthenticationEr
 import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
 import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
 
+export type StartAuthenticationOpts = {
+  optionsJSON: PublicKeyCredentialRequestOptionsJSON;
+  useBrowserAutofill?: boolean;
+};
+
 /**
  * Begin authenticator "login" via WebAuthn assertion
  *
@@ -20,9 +25,13 @@ import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment'
  * @param useBrowserAutofill (Optional) Initialize conditional UI to enable logging in via browser autofill prompts. Defaults to `false`.
  */
 export async function startAuthentication(
-  optionsJSON: PublicKeyCredentialRequestOptionsJSON,
-  useBrowserAutofill = false,
+  options: StartAuthenticationOpts,
 ): Promise<AuthenticationResponseJSON> {
+  const {
+    optionsJSON,
+    useBrowserAutofill = false,
+  } = options;
+
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
   }
@@ -44,7 +53,7 @@ export async function startAuthentication(
   };
 
   // Prepare options for `.get()`
-  const options: CredentialRequestOptions = {};
+  const getOptions: CredentialRequestOptions = {};
 
   /**
    * Set up the page to prompt the user to select a credential for authentication via the browser's
@@ -69,22 +78,22 @@ export async function startAuthentication(
 
     // `CredentialMediationRequirement` doesn't know about "conditional" yet as of
     // typescript@4.6.3
-    options.mediation = 'conditional' as CredentialMediationRequirement;
+    getOptions.mediation = 'conditional' as CredentialMediationRequirement;
     // Conditional UI requires an empty allow list
     publicKey.allowCredentials = [];
   }
 
   // Finalize options
-  options.publicKey = publicKey;
+  getOptions.publicKey = publicKey;
   // Set up the ability to cancel this request if the user attempts another
-  options.signal = WebAuthnAbortService.createNewAbortSignal();
+  getOptions.signal = WebAuthnAbortService.createNewAbortSignal();
 
   // Wait for the user to complete assertion
   let credential;
   try {
-    credential = (await navigator.credentials.get(options)) as AuthenticationCredential;
+    credential = (await navigator.credentials.get(getOptions)) as AuthenticationCredential;
   } catch (err) {
-    throw identifyAuthenticationError({ error: err as Error, options });
+    throw identifyAuthenticationError({ error: err as Error, options: getOptions });
   }
 
   if (!credential) {
