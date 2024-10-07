@@ -22,6 +22,7 @@ export type VerifyAuthenticationResponseOpts = {
   authenticator: AuthenticatorDevice;
   expectedType?: string | string[];
   requireUserVerification?: boolean;
+  allowEmbeddedAuthentication?: boolean;
   advancedFIDOConfig?: {
     userVerification?: UserVerificationRequirement;
   };
@@ -39,6 +40,7 @@ export type VerifyAuthenticationResponseOpts = {
  * @param authenticator - An internal {@link AuthenticatorDevice} matching the credential's ID
  * @param expectedType **(Optional)** - The response type expected ('webauthn.get')
  * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
+ * @param allowEmbeddedAuthentication **(Optional)** - Allow credential use from within an iframe embedded on a different origin ("cross-origin"). Defaults to `false`
  * @param advancedFIDOConfig **(Optional)** - Options for satisfying more stringent FIDO RP feature requirements
  * @param advancedFIDOConfig.userVerification **(Optional)** - Enable alternative rules for evaluating the User Presence and User Verified flags in authenticator data: UV (and UP) flags are optional unless this value is `"required"`
  */
@@ -53,6 +55,7 @@ export async function verifyAuthenticationResponse(
     expectedType,
     authenticator,
     requireUserVerification = true,
+    allowEmbeddedAuthentication = false,
     advancedFIDOConfig,
   } = options;
   const { id, rawId, type: credentialType, response: assertionResponse } = response;
@@ -84,7 +87,7 @@ export async function verifyAuthenticationResponse(
 
   const clientDataJSON = decodeClientDataJSON(assertionResponse.clientDataJSON);
 
-  const { type, origin, challenge, tokenBinding } = clientDataJSON;
+  const { type, origin, challenge, tokenBinding, crossOrigin } = clientDataJSON;
 
   // Make sure we're handling an authentication
   if (Array.isArray(expectedType)) {
@@ -129,6 +132,14 @@ export async function verifyAuthenticationResponse(
     if (origin !== expectedOrigin) {
       throw new Error(
         `Unexpected authentication response origin "${origin}", expected "${expectedOrigin}"`,
+      );
+    }
+  }
+
+  if (crossOrigin !== undefined) {
+    if (crossOrigin && !allowEmbeddedAuthentication) {
+      throw new Error(
+        `Registration response crossOrigin was true but embedded registration was disallowed`,
       );
     }
   }
