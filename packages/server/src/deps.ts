@@ -3,7 +3,6 @@ export type {
   AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticationResponseJSON,
-  AuthenticatorDevice,
   AuthenticatorSelectionCriteria,
   AuthenticatorTransportFuture,
   Base64URLString,
@@ -15,6 +14,7 @@ export type {
   PublicKeyCredentialRequestOptionsJSON,
   RegistrationResponseJSON,
   UserVerificationRequirement,
+  WebAuthnCredential,
 } from '../../types/src/index.ts';
 
 // tiny_cbor (a.k.a. tiny-cbor in Node land)

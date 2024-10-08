@@ -45,9 +45,9 @@ Deno.test('should verify FIDO U2F attestation', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'fido-u2f');
-  assertEquals(verification.registrationInfo?.counter, 0);
+  assertEquals(verification.registrationInfo?.credential.counter, 0);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIMiRyw5pUoMhBjCrcQND6lJPaRHA0f-XWcKBb5ZwWk1eIlggFJu6aan4o7epl6qa9n9T-6KsIMvZE2PcTnLj8rN58is',
     ),
@@ -79,15 +79,15 @@ Deno.test('should verify Packed (EC2) attestation', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'packed');
-  assertEquals(verification.registrationInfo?.counter, 1589874425);
+  assertEquals(verification.registrationInfo?.credential.counter, 1589874425);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIEoxVVqK-oIGmqoDEyO4KjmMx5R2HeMM4LQQXh8sE01PIlggtzuuoMN5fWnAIuuXdlfshOGu1k3ApBUtDJ8eKiuo_6c',
     ),
   );
   assertEquals(
-    verification.registrationInfo?.credentialID,
+    verification.registrationInfo?.credential.id,
     'AYThY1csINY4JrbHyGmqTl1nL_F1zjAF3hSAIngz8kAcjugmAMNVvxZRwqpEH-bNHHAIv291OX5ko9eDf_5mu3UB2BvsScr2K-ppM4owOpGsqwg5tZglqqmxIm1Q',
   );
 });
@@ -103,15 +103,15 @@ Deno.test('should verify Packed (X5C) attestation', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'packed');
-  assertEquals(verification.registrationInfo?.counter, 28);
+  assertEquals(verification.registrationInfo?.credential.counter, 28);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIGwlsYCNyRb4AD9cyTw6cH5VS-uzflmmO1UldGGe9eIaIlggvadzKD8p6wKLjgYfxRxldjCMGRV0YyM13osWbKIPrF8',
     ),
   );
   assertEquals(
-    verification.registrationInfo?.credentialID,
+    verification.registrationInfo?.credential.id,
     '4rrvMciHCkdLQ2HghazIp1sMc8TmV8W8RgoX-x8tqV_1AmlqWACqUK8mBGLandr-htduQKPzgb2yWxOFV56Tlg',
   );
 });
@@ -126,15 +126,15 @@ Deno.test('should verify None attestation', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'none');
-  assertEquals(verification.registrationInfo?.counter, 0);
+  assertEquals(verification.registrationInfo?.credential.counter, 0);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYID5PQTZQQg6haZFQWFzqfAOyQ_ENsMH8xxQ4GRiNPsqrIlggU8IVUOV8qpgk_Jh-OTaLuZL52KdX1fTht07X4DiQPow',
     ),
   );
   assertEquals(
-    verification.registrationInfo?.credentialID,
+    verification.registrationInfo?.credential.id,
     'AdKXJEch1aV5Wo7bj7qLHskVY4OoNaj9qu8TPdJ7kSAgUeRxWNngXlcNIGt4gexZGKVGcqZpqqWordXb_he1izY',
   );
   assertEquals(
@@ -166,15 +166,15 @@ Deno.test('should verify None attestation w/RSA public key', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'none');
-  assertEquals(verification.registrationInfo?.counter, 0);
+  assertEquals(verification.registrationInfo?.credential.counter, 0);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQDxfpXrj0ba_AH30JJ_-W7BHSOPugOD8aEDdNBKc1gjB9AmV3FPl2aL0fwiOMKtM_byI24qXb2FzcyjC7HUVkHRtzkAQnahXckI4wY_01koaY6iwXuIE3Ya0Zjs2iZyz6u4G_abGnWdObqa_kHxc3CHR7Xy5MDkAkKyX6TqU0tgHZcEhDd_Lb5ONJDwg4wvKlZBtZYElfMuZ6lonoRZ7qR_81rGkDZyFaxp6RlyvzEbo4ijeIaHQylqCz-oFm03ifZMOfRHYuF4uTjJDRH-g4BW1f3rdi7DTHk1hJnIw1IyL_VFIQ9NifkAguYjNCySCUNpYli2eMrPhAu5dYJFFjINIUMBAAE',
     ),
   );
   assertEquals(
-    verification.registrationInfo?.credentialID,
+    verification.registrationInfo?.credential.id,
     'kGXv4RJWLeXRw8Yf3T22K3Gq_GGeDv9OKYmAHLm0Ylo',
   );
   assertEquals(
@@ -622,15 +622,15 @@ Deno.test('should validate TPM RSA response (SHA256)', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'tpm');
-  assertEquals(verification.registrationInfo?.counter, 30);
+  assertEquals(verification.registrationInfo?.credential.counter, 30);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pAEDAzkBACBZAQCtxzw59Wsl8xWP97wPTu2TSDlushwshL8GedHAHO1R62m3nNy21hCLJlQabfLepRUQ_v9mq3PCmV81tBSqtRGU5_YlK0R2yeu756SnT39c6hKC3PBPt_xdjL_ccz4H_73DunfB63QZOtdeAsswV7WPLqMARofuM-LQ_LHnNguCypDcxhADuUqQtogfwZsknTVIPxzGcfqnQ7ERF9D9AOWIQ8YjOsTi_B2zS8SOySKIFUGwwYcPG7DiCE-QJcI-fpydRDnEq6UxbkYgB7XK4BlmPKlwuXkBDX9egl_Ma4B7W2WJvYbKevu6Z8Kc5y-OITpNVDYKbBK3qKyh4yIUpB1NIUMBAAE',
     ),
   );
   assertEquals(
-    verification.registrationInfo?.credentialID,
+    verification.registrationInfo?.credential.id,
     'lGkWHPe88VpnNYgVBxzon_MRR9-gmgODveQ16uM_bPM',
   );
   assertEquals(
@@ -664,15 +664,15 @@ Deno.test('should validate TPM RSA response (SHA1)', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'tpm');
-  assertEquals(verification.registrationInfo?.counter, 97);
+  assertEquals(verification.registrationInfo?.credential.counter, 97);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pAEDAzn__iBZAQCzl_wD24PZ5z-po2FrwoQVdd13got_CkL8p4B_NvJBC5OwAYKDilii_wj-0CA8ManbpSInx9Tdnz6t91OhudwUT0-W_BHSLK_MqFcjZWrR5LYVmVpz1EgH3DrOTra4AlogEq2D2CYktPrPe7joE-oT3vAYXK8vzQDLRyaxI_Z1qS4KLlLCdajW8PGpw1YRjMDw6s69GZU8mXkgNPMCUh1TZ1bnCvJTO9fnmLjDjqdQGRU4bWo8tFjCL8g1-2WD_2n0-twt6n-Uox5VnR1dQJG4awMlanBCkGGpOb3WBDQ8K10YJJ2evPhJKGJahBvu2Dxmq6pLCAXCv0ma3EHj-PmDIUMBAAE',
     ),
   );
   assertEquals(
-    verification.registrationInfo?.credentialID,
+    verification.registrationInfo?.credential.id,
     'oELnad0f6-g2BtzEn_78iLNoubarlq0xFtOtAMXnflU',
   );
   assertEquals(
@@ -706,15 +706,15 @@ Deno.test('should validate Android-Key response', async () => {
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.fmt, 'android-key');
-  assertEquals(verification.registrationInfo?.counter, 108);
+  assertEquals(verification.registrationInfo?.credential.counter, 108);
   assertEquals(
-    verification.registrationInfo?.credentialPublicKey,
+    verification.registrationInfo?.credential.publicKey,
     isoBase64URL.toBuffer(
       'pQECAyYgASFYIEjCq7woGNN_42rbaqMgJvz0nuKTWNRrR29lMX3J239oIlgg6IcAXqPJPIjSrClHDAmbJv_EShYhYq0R9-G3k744n7Y',
     ),
   );
   assertEquals(
-    verification.registrationInfo?.credentialID,
+    verification.registrationInfo?.credential.id,
     'PPa1spYTB680cQq5q6qBtFuPLLdG1FQ73EastkT8n0o',
   );
   assertEquals(
