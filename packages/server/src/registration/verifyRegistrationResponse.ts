@@ -3,6 +3,7 @@ import type {
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
   RegistrationResponseJSON,
+  WebAuthnCredential,
 } from '../deps.ts';
 import {
   AttestationFormat,
@@ -294,11 +295,14 @@ export async function verifyRegistrationResponse(
 
     toReturn.registrationInfo = {
       fmt,
-      counter,
       aaguid: convertAAGUIDToString(aaguid),
-      credentialID: isoBase64URL.fromBuffer(credentialID),
-      credentialPublicKey,
       credentialType,
+      credential: {
+        id: isoBase64URL.fromBuffer(credentialID),
+        publicKey: credentialPublicKey,
+        counter,
+        transports: response.response.transports,
+      },
       attestationObject,
       userVerified: flags.uv,
       credentialDeviceType,
@@ -342,10 +346,8 @@ export type VerifiedRegistrationResponse = {
   verified: boolean;
   registrationInfo?: {
     fmt: AttestationFormat;
-    counter: number;
     aaguid: string;
-    credentialID: Base64URLString;
-    credentialPublicKey: Uint8Array;
+    credential: WebAuthnCredential;
     credentialType: 'public-key';
     attestationObject: Uint8Array;
     userVerified: boolean;

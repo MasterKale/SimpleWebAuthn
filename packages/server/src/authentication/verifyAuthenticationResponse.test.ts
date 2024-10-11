@@ -14,7 +14,7 @@ import {
   parseAuthenticatorData,
 } from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';
-import { AuthenticationResponseJSON, AuthenticatorDevice } from '../deps.ts';
+import { AuthenticationResponseJSON, WebAuthnCredential } from '../deps.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { assertObjectMatch } from 'https://deno.land/std@0.198.0/assert/assert_object_match.ts';
 import { assertFalse } from 'https://deno.land/std@0.198.0/assert/assert_false.ts';
@@ -25,7 +25,7 @@ Deno.test('should verify an assertion response', async () => {
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
-    authenticator: authenticator,
+    credential,
     requireUserVerification: false,
   });
 
@@ -38,14 +38,14 @@ Deno.test('should return authenticator info after verification', async () => {
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
-    authenticator: authenticator,
+    credential,
     requireUserVerification: false,
   });
 
   assertEquals(verification.authenticationInfo.newCounter, 144);
   assertEquals(
     verification.authenticationInfo.credentialID,
-    authenticator.credentialID,
+    credential.id,
   );
   assertEquals(verification.authenticationInfo?.origin, assertionOrigin);
   assertEquals(verification.authenticationInfo?.rpID, 'dev.dontneeda.pw');
@@ -59,7 +59,7 @@ Deno.test('should throw when response challenge is not expected value', async ()
         expectedChallenge: 'shouldhavebeenthisvalue',
         expectedOrigin: 'https://different.address',
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'authentication response challenge',
@@ -74,7 +74,7 @@ Deno.test('should throw when response origin is not expected value', async () =>
         expectedChallenge: assertionChallenge,
         expectedOrigin: 'https://different.address',
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'authentication response origin',
@@ -101,7 +101,7 @@ Deno.test('should throw when assertion type is not webauthn.create', async () =>
         expectedChallenge: assertionChallenge,
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'authentication response type',
@@ -132,7 +132,7 @@ Deno.test('should throw error if user was not present', async () => {
         expectedChallenge: assertionChallenge,
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'not present',
@@ -145,7 +145,7 @@ Deno.test('should throw error if previous counter value is not less than in resp
   // This'll match the `counter` value in `assertionResponse`, simulating a potential replay attack
   const badCounter = 144;
   const badDevice = {
-    ...authenticator,
+    ...credential,
     counter: badCounter,
   };
 
@@ -156,7 +156,7 @@ Deno.test('should throw error if previous counter value is not less than in resp
         expectedChallenge: assertionChallenge,
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: badDevice,
+        credential: badDevice,
         requireUserVerification: false,
       }),
     Error,
@@ -184,7 +184,7 @@ Deno.test('should throw error if assertion RP ID is unexpected value', async () 
         expectedChallenge: assertionChallenge,
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'RP ID',
@@ -199,7 +199,7 @@ Deno.test('should not compare counters if both are 0', async () => {
     expectedChallenge: assertionFirstTimeUsedChallenge,
     expectedOrigin: assertionFirstTimeUsedOrigin,
     expectedRPID: 'dev.dontneeda.pw',
-    authenticator: authenticatorFirstTimeUsed,
+    credential: authenticatorFirstTimeUsed,
     requireUserVerification: false,
   });
 
@@ -233,7 +233,7 @@ Deno.test('should throw an error if user verification is required but user was n
         expectedChallenge: assertionChallenge,
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
         requireUserVerification: true,
       }),
     Error,
@@ -265,9 +265,9 @@ Deno.test('should verify TPM assertion', { ignore: true }, async () => {
     expectedChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
-    authenticator: {
-      credentialPublicKey: isoBase64URL.toBuffer('BAEAAQ'),
-      credentialID: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
+    credential: {
+      publicKey: isoBase64URL.toBuffer('BAEAAQ'),
+      id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
       counter: 0,
     },
   });
@@ -281,7 +281,7 @@ Deno.test('should support multiple possible origins', async () => {
     expectedChallenge: assertionChallenge,
     expectedOrigin: ['https://simplewebauthn.dev', assertionOrigin],
     expectedRPID: 'dev.dontneeda.pw',
-    authenticator: authenticator,
+    credential,
     requireUserVerification: false,
   });
 
@@ -297,7 +297,7 @@ Deno.test('should throw an error if origin not in list of expected origins', asy
         expectedChallenge: assertionChallenge,
         expectedOrigin: ['https://simplewebauthn.dev', 'https://fizz.buzz'],
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'Unexpected authentication response origin',
@@ -310,7 +310,7 @@ Deno.test('should support multiple possible RP IDs', async () => {
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: ['dev.dontneeda.pw', 'simplewebauthn.dev'],
-    authenticator: authenticator,
+    credential,
     requireUserVerification: false,
   });
 
@@ -326,7 +326,7 @@ Deno.test('should throw an error if RP ID not in list of possible RP IDs', async
         expectedChallenge: assertionChallenge,
         expectedOrigin: assertionOrigin,
         expectedRPID: ['simplewebauthn.dev'],
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'Unexpected RP ID',
@@ -343,7 +343,7 @@ Deno.test('should throw an error if type not the expected type', async () => {
         // assertionResponse contains webauthn.get, this should produce an error
         expectedType: 'payment.get',
         expectedRPID: 'localhost',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'Unexpected authentication response type',
@@ -360,7 +360,7 @@ Deno.test('should throw an error if type not in list of expected types', async (
         // assertionResponse contains webauthn.get, this should produce an error
         expectedType: ['payment.get', 'something.get'],
         expectedRPID: 'localhost',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'Unexpected authentication response type',
@@ -397,10 +397,10 @@ Deno.test('should pass verification if custom challenge verifier returns true', 
     },
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
-    authenticator: {
-      credentialID:
+    credential: {
+      id:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
-      credentialPublicKey: isoBase64URL.toBuffer(
+      publicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
       counter: 0,
@@ -418,7 +418,7 @@ Deno.test('should fail verification if custom challenge verifier returns false',
         expectedChallenge: (challenge) => challenge === 'willNeverMatch',
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'Custom challenge verifier returned false',
@@ -457,10 +457,10 @@ Deno.test('should pass verification if custom challenge verifier returns a Promi
     },
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
-    authenticator: {
-      credentialID:
+    credential: {
+      id:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
-      credentialPublicKey: isoBase64URL.toBuffer(
+      publicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
       counter: 0,
@@ -478,7 +478,7 @@ Deno.test('should fail verification if custom challenge verifier returns a Promi
         expectedChallenge: (challenge) => Promise.resolve(challenge === 'willNeverMatch'),
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'Custom challenge verifier returned false',
@@ -493,7 +493,7 @@ Deno.test('should fail verification if custom challenge verifier returns a Promi
         expectedChallenge: () => Promise.reject(new Error('rejected')),
         expectedOrigin: assertionOrigin,
         expectedRPID: 'dev.dontneeda.pw',
-        authenticator: authenticator,
+        credential,
       }),
     Error,
     'rejected',
@@ -520,10 +520,10 @@ Deno.test('should return authenticator extension output', async () => {
     expectedOrigin: 'android:apk-key-hash:gx7sq_pxhxhrIQdLyfG0pxKwiJ7hOk2DJQ4xvKd438Q',
     expectedRPID: 'try-webauthn.appspot.com',
     expectedChallenge: 'iZsVCztrDW7D2U_GHCIlYKLwV2bCsBTRqVQUnJXn9Tk',
-    authenticator: {
-      credentialID:
+    credential: {
+      id:
         'AaIBxnYfL2pDWJmIii6CYgHBruhVvFGHheWamphVioG_TnEXxKA9MW4FWnJh21zsbmRpRJso9i2JmAtWOtXfVd4oXTgYVusXwhWWsA',
-      credentialPublicKey: isoBase64URL.toBuffer(
+      publicKey: isoBase64URL.toBuffer(
         'pQECAyYgASFYILTrxTUQv3X4DRM6L_pk65FSMebenhCx3RMsTKoBm-AxIlggEf3qk5552QLNSh1T1oQs7_2C2qysDwN4r4fCp52Hsqs',
       ),
       counter: 0,
@@ -554,7 +554,7 @@ Deno.test('should return credential backup info', async () => {
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
-    authenticator: authenticator,
+    credential,
     requireUserVerification: false,
   });
 
@@ -571,7 +571,7 @@ Deno.test('should return user verified flag after successful auth', async () => 
     expectedChallenge: assertionChallenge,
     expectedOrigin: assertionOrigin,
     expectedRPID: 'dev.dontneeda.pw',
-    authenticator: authenticator,
+    credential,
     requireUserVerification: false,
   });
 
@@ -602,12 +602,11 @@ const assertionChallenge = isoBase64URL.fromUTF8String(
 );
 const assertionOrigin = 'https://dev.dontneeda.pw';
 
-const authenticator: AuthenticatorDevice = {
-  credentialPublicKey: isoBase64URL.toBuffer(
+const credential: WebAuthnCredential = {
+  publicKey: isoBase64URL.toBuffer(
     'pQECAyYgASFYIIheFp-u6GvFT2LNGovf3ZrT0iFVBsA_76rRysxRG9A1Ilgg8WGeA6hPmnab0HAViUYVRkwTNcN77QBf_RR0dv3lIvQ',
   ),
-  credentialID:
-    'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
+  id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
   counter: 143,
 };
 
@@ -631,11 +630,10 @@ const assertionFirstTimeUsedChallenge = isoBase64URL.fromUTF8String(
   'totallyUniqueValueEveryAssertion',
 );
 const assertionFirstTimeUsedOrigin = 'https://dev.dontneeda.pw';
-const authenticatorFirstTimeUsed: AuthenticatorDevice = {
-  credentialPublicKey: isoBase64URL.toBuffer(
+const authenticatorFirstTimeUsed: WebAuthnCredential = {
+  publicKey: isoBase64URL.toBuffer(
     'pQECAyYgASFYIGmaxR4mBbukc2QhtW2ldhAAd555r-ljlGQN8MbcTnPPIlgg9CyUlE-0AB2fbzZbNgBvJuRa7r6o2jPphOmtyNPR_kY',
   ),
-  credentialID:
-    'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
+  id: 'wSisR0_4hlzw3Y1tj4uNwwifIhRa-ZxWJwWbnfror0pVK9qPdBPO5pW3gasPqn6wXHb0LNhXB_IrA1nFoSQJ9A',
   counter: 0,
 };

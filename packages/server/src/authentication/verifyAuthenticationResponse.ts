@@ -1,9 +1,9 @@
 import type {
   AuthenticationResponseJSON,
-  AuthenticatorDevice,
   Base64URLString,
   CredentialDeviceType,
   UserVerificationRequirement,
+  WebAuthnCredential,
 } from '../deps.ts';
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { toHash } from '../helpers/toHash.ts';
@@ -19,7 +19,7 @@ export type VerifyAuthenticationResponseOpts = {
   expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
   expectedOrigin: string | string[];
   expectedRPID: string | string[];
-  authenticator: AuthenticatorDevice;
+  credential: WebAuthnCredential;
   expectedType?: string | string[];
   requireUserVerification?: boolean;
   allowEmbeddedAuthentication?: boolean;
@@ -37,7 +37,7 @@ export type VerifyAuthenticationResponseOpts = {
  * @param expectedChallenge - The base64url-encoded `options.challenge` returned by `generateAuthenticationOptions()`
  * @param expectedOrigin - Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID - RP ID (or array of IDs) that was specified in the registration options
- * @param authenticator - An internal {@link AuthenticatorDevice} matching the credential's ID
+ * @param credential - An internal {@link WebAuthnCredential} corresponding to `id` in the authentication response
  * @param expectedType **(Optional)** - The response type expected ('webauthn.get')
  * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
  * @param allowEmbeddedAuthentication **(Optional)** - Allow credential use from within an iframe embedded on a different origin ("cross-origin"). Defaults to `false`
@@ -53,7 +53,7 @@ export async function verifyAuthenticationResponse(
     expectedOrigin,
     expectedRPID,
     expectedType,
-    authenticator,
+    credential,
     requireUserVerification = true,
     allowEmbeddedAuthentication = false,
     advancedFIDOConfig,
@@ -233,15 +233,15 @@ export async function verifyAuthenticationResponse(
   const signature = isoBase64URL.toBuffer(assertionResponse.signature);
 
   if (
-    (counter > 0 || authenticator.counter > 0) &&
-    counter <= authenticator.counter
+    (counter > 0 || credential.counter > 0) &&
+    counter <= credential.counter
   ) {
     // Error out when the counter in the DB is greater than or equal to the counter in the
     // dataStruct. It's related to how the authenticator maintains the number of times its been
     // used for this client. If this happens, then someone's somehow increased the counter
     // on the device without going through this site
     throw new Error(
-      `Response counter value ${counter} was lower than expected ${authenticator.counter}`,
+      `Response counter value ${counter} was lower than expected ${credential.counter}`,
     );
   }
 
@@ -251,11 +251,11 @@ export async function verifyAuthenticationResponse(
     verified: await verifySignature({
       signature,
       data: signatureBase,
-      credentialPublicKey: authenticator.credentialPublicKey,
+      credentialPublicKey: credential.publicKey,
     }),
     authenticationInfo: {
       newCounter: counter,
-      credentialID: authenticator.credentialID,
+      credentialID: credential.id,
       userVerified: flags.uv,
       credentialDeviceType,
       credentialBackedUp,
