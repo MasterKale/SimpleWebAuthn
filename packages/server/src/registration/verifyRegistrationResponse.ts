@@ -1,5 +1,4 @@
 import type {
-  Base64URLString,
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
   RegistrationResponseJSON,
