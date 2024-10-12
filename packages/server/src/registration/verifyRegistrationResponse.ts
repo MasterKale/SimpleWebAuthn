@@ -38,7 +38,6 @@ export type VerifyRegistrationResponseOpts = {
   expectedType?: string | string[];
   requireUserPresence?: boolean;
   requireUserVerification?: boolean;
-  allowEmbeddedRegistration?: boolean;
   supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
 };
 
@@ -54,7 +53,6 @@ export type VerifyRegistrationResponseOpts = {
  * @param expectedType **(Optional)** - The response type expected ('webauthn.create')
  * @param requireUserPresence **(Optional)** - Enforce user presence by the authenticator (or skip it during auto registration) Defaults to `true`
  * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
- * @param allowEmbeddedRegistration **(Optional)** - Allow credential registration from within an iframe embedded on a different origin ("cross-origin"). Defaults to `false`
  * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to all supported algorithm IDs
  */
 export async function verifyRegistrationResponse(
@@ -68,7 +66,6 @@ export async function verifyRegistrationResponse(
     expectedType,
     requireUserPresence = true,
     requireUserVerification = true,
-    allowEmbeddedRegistration = false,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
   } = options;
   const { id, rawId, type: credentialType, response: attestationResponse } = response;
@@ -94,7 +91,7 @@ export async function verifyRegistrationResponse(
     attestationResponse.clientDataJSON,
   );
 
-  const { type, origin, challenge, tokenBinding, crossOrigin } = clientDataJSON;
+  const { type, origin, challenge, tokenBinding } = clientDataJSON;
 
   // Make sure we're handling an registration
   if (Array.isArray(expectedType)) {
@@ -142,14 +139,6 @@ export async function verifyRegistrationResponse(
     if (origin !== expectedOrigin) {
       throw new Error(
         `Unexpected registration response origin "${origin}", expected "${expectedOrigin}"`,
-      );
-    }
-  }
-
-  if (crossOrigin !== undefined) {
-    if (crossOrigin && !allowEmbeddedRegistration) {
-      throw new Error(
-        `Registration response crossOrigin was true but embedded registration was disallowed`,
       );
     }
   }
