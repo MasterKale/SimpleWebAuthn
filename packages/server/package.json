@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/server",
-  "version": "10.0.1",
+  "version": "11.0.0",
   "description": "Lerna/npm wrapper around Deno for @simplewebauthn/server",
   "scripts": {
     "build": "deno task build",
