@@ -1,5 +1,140 @@
 # Changelog
 
+## v11.0.0 - The one that auto-registers
+
+Say hello to support for automatic passkey registration, support for valid conditional UI `<input>`
+elements stashed away in web components, and to the new `WebAuthnCredential` type that modernizes
+some logic within.
+
+There are some breaking changes in this release! Please see **Breaking Changes** below for refactor
+guidance.
+
+### Packages
+
+- @simplewebauthn/browser@11.0.0
+- @simplewebauthn/server@11.0.0
+- @simplewebauthn/types@11.0.0
+
+### Changes
+
+- **[browser] [server]** A new `useAutoRegister` argument has been added to `startRegistration()` to
+  support attempts to automatically register passkeys for users who just completed non-passkey auth.
+  `verifyRegistrationResponse()` has gained a new `requireUserPresence` option that can be set to
+  `false` when verifying responses from `startRegistration({ useAutoRegister: true, ... })`
+  ([#623](https://github.com/MasterKale/SimpleWebAuthn/pull/623))
+- **[browser]** A new `verifyBrowserAutofillInput` argument has been added to
+  `startAuthentication()` to disable throwing an error when a correctly configured `<input>` element
+  cannot be found (but perhaps a valid one is present in a web component shadow's DOM)
+  ([#621](https://github.com/MasterKale/SimpleWebAuthn/pull/621))
+- **[server] [types]** The `AuthenticatorDevice` type has been renamed to `WebAuthnCredential` and
+  has had its properties renamed. The return value out of `verifyRegistrationResponse()` and
+  corresponding inputs into `verifyAuthenticationResponse()` have been updated accordingly. See
+  **Breaking Changes** below for refactor guidance
+  ([#625](https://github.com/MasterKale/SimpleWebAuthn/pull/625))
+- **[server]** `verifyRegistrationResponse()` now verifies that the authenticator data AAGUID
+  matches the leaf cert's `id-fido-gen-ce-aaguid` extension AAGUID when it is present
+  ([#609](https://github.com/MasterKale/SimpleWebAuthn/pull/609))
+- **[server]** TPM attestation verification recognizes the corrected TPM manufacturer identifier for
+  IBM ([#610](https://github.com/MasterKale/SimpleWebAuthn/pull/610))
+- **[server]** Types for the defunct authenticator extensions `uvm` and `dpk` have been removed
+  ([#611](https://github.com/MasterKale/SimpleWebAuthn/pull/611))
+
+### Breaking Changes
+
+#### [browser] Positional arguments in `startRegistration()` and `startAuthentication()` have been replaced by a single object
+
+Property names in the object match the names of the previously-positional arguments. To update
+existing implementations, wrap existing options in an object with corresponding properties:
+
+**Before:**
+
+```ts
+startRegistration(options);
+startAuthentication(options, true);
+```
+
+**After:**
+
+```ts
+startRegistration({ optionsJSON: options });
+startAuthentication({ optionsJSON: options, useBrowserAutofill: true });
+```
+
+#### [server] [types] The `AuthenticatorDevice` type has been renamed to `WebAuthnCredential`
+
+`AuthenticatorDevice.credentialID` and `AuthenticatorDevice.credentialPublicKey` have been shortened
+to `WebAuthnCredential.id` and `WebAuthnCredential.publicKey` respectively.
+
+`verifyRegistrationResponse()` has been updated accordingly to return a new `credential` value of
+type `WebAuthnCredential`. Update code that stores `credentialID`, `credentialPublicKey`, and
+`counter` out of `verifyRegistrationResponse()` to store `credential.id`, `credential.publicKey`,
+and `credential.counter` instead:
+
+**Before:**
+
+```ts
+const { registrationInfo } = await verifyRegistrationResponse({...});
+
+storeInDatabase(
+  registrationInfo.credentialID,
+  registrationInfo.credentialPublicKey,
+  registrationInfo.counter,
+  body.response.transports,
+);
+```
+
+**After:**
+
+```ts
+const { registrationInfo } = await verifyRegistrationResponse({...});
+
+storeInDatabase(
+  registrationInfo.credential.id,
+  registrationInfo.credential.publicKey,
+  registrationInfo.credential.counter,
+  registrationInfo.credential.transports,
+);
+```
+
+Update calls to `verifyAuthenticationResponse()` to match the new `credential` argument that
+replaces the `authenticator` argument:
+
+**Before:**
+
+```ts
+import { AuthenticatorDevice } from '@simplewebauthn/types';
+
+const authenticator: AuthenticatorDevice = {
+  credentialID: ...,
+  credentialPublicKey: ...,
+  counter: 0,
+  transports: [...],
+};
+
+const verification = await verifyAuthenticationResponse({
+  // ...
+  authenticator,
+});
+```
+
+**After:**
+
+```ts
+import { WebAuthnCredential } from '@simplewebauthn/types';
+
+const credential: WebAuthnCredential = {
+  id: ...,
+  publicKey: ...,
+  counter: 0,
+  transports: [...],
+};
+
+const verification = await verifyAuthenticationResponse({
+  // ...
+  credential,
+});
+```
+
 ## v10.0.1
 
 ### Packages
