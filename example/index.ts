@@ -34,8 +34,8 @@ import type {
 
 import type {
   AuthenticationResponseJSON,
-  AuthenticatorDevice,
   RegistrationResponseJSON,
+  WebAuthnCredential,
 } from '@simplewebauthn/types';
 
 import { LoggedInUser } from './example-server';
@@ -81,7 +81,7 @@ if (ENABLE_CONFORMANCE === 'true') {
 }
 
 /**
- * RP ID represents the "scope" of websites on which a authenticator should be usable. The Origin
+ * RP ID represents the "scope" of websites on which a credential should be usable. The Origin
  * represents the expected URL from which registration or authentication occurs.
  */
 export const rpID = RP_ID;
@@ -94,17 +94,17 @@ export let expectedOrigin = '';
  * 2FA and Passwordless WebAuthn flows expect you to be able to uniquely identify the user that
  * performs registration or authentication. The user ID you specify here should be your internal,
  * _unique_ ID for that user (uuid, etc...). Avoid using identifying information here, like email
- * addresses, as it may be stored within the authenticator.
+ * addresses, as it may be stored within the credential.
  *
  * Here, the example server assumes the following user has completed login:
  */
 const loggedInUserId = 'internalUserId';
 
-const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
+const inMemoryUserDB: { [loggedInUserId: string]: LoggedInUser } = {
   [loggedInUserId]: {
     id: loggedInUserId,
     username: `user@${rpID}`,
-    devices: [],
+    credentials: [],
   },
 };
 
@@ -112,14 +112,14 @@ const inMemoryUserDeviceDB: { [loggedInUserId: string]: LoggedInUser } = {
  * Registration (a.k.a. "Registration")
  */
 app.get('/generate-registration-options', async (req, res) => {
-  const user = inMemoryUserDeviceDB[loggedInUserId];
+  const user = inMemoryUserDB[loggedInUserId];
 
   const {
     /**
      * The username can be a human-readable name, email, etc... as it is intended only for display.
      */
     username,
-    devices,
+    credentials,
   } = user;
 
   const opts: GenerateRegistrationOptionsOpts = {
@@ -129,15 +129,15 @@ app.get('/generate-registration-options', async (req, res) => {
     timeout: 60000,
     attestationType: 'none',
     /**
-     * Passing in a user's list of already-registered authenticator IDs here prevents users from
-     * registering the same device multiple times. The authenticator will simply throw an error in
-     * the browser if it's asked to perform registration when one of these ID's already resides
-     * on it.
+     * Passing in a user's list of already-registered credential IDs here prevents users from
+     * registering the same authenticator multiple times. The authenticator will simply throw an
+     * error in the browser if it's asked to perform registration when it recognizes one of the
+     * credential ID's.
      */
-    excludeCredentials: devices.map((dev) => ({
-      id: dev.credentialID,
+    excludeCredentials: credentials.map((cred) => ({
+      id: cred.id,
       type: 'public-key',
-      transports: dev.transports,
+      transports: cred.transports,
     })),
     authenticatorSelection: {
       residentKey: 'discouraged',
@@ -158,7 +158,7 @@ app.get('/generate-registration-options', async (req, res) => {
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
-   * after you verify an authenticator response.
+   * after you verify the registration response.
    */
   req.session.currentChallenge = options.challenge;
 
@@ -168,7 +168,7 @@ app.get('/generate-registration-options', async (req, res) => {
 app.post('/verify-registration', async (req, res) => {
   const body: RegistrationResponseJSON = req.body;
 
-  const user = inMemoryUserDeviceDB[loggedInUserId];
+  const user = inMemoryUserDB[loggedInUserId];
 
   const expectedChallenge = req.session.currentChallenge;
 
@@ -191,21 +191,21 @@ app.post('/verify-registration', async (req, res) => {
   const { verified, registrationInfo } = verification;
 
   if (verified && registrationInfo) {
-    const { credentialPublicKey, credentialID, counter } = registrationInfo;
+    const { credential } = registrationInfo;
 
-    const existingDevice = user.devices.find((device) => device.credentialID === credentialID);
+    const existingCredential = user.credentials.find((cred) => cred.id === credential.id);
 
-    if (!existingDevice) {
+    if (!existingCredential) {
       /**
-       * Add the returned device to the user's list of devices
+       * Add the returned credential to the user's list of credentials
        */
-      const newDevice: AuthenticatorDevice = {
-        credentialPublicKey,
-        credentialID,
-        counter,
+      const newCredential: WebAuthnCredential = {
+        id: credential.id,
+        publicKey: credential.publicKey,
+        counter: credential.counter,
         transports: body.response.transports,
       };
-      user.devices.push(newDevice);
+      user.credentials.push(newCredential);
     }
   }
 
@@ -219,14 +219,14 @@ app.post('/verify-registration', async (req, res) => {
  */
 app.get('/generate-authentication-options', async (req, res) => {
   // You need to know the user by this point
-  const user = inMemoryUserDeviceDB[loggedInUserId];
+  const user = inMemoryUserDB[loggedInUserId];
 
   const opts: GenerateAuthenticationOptionsOpts = {
     timeout: 60000,
-    allowCredentials: user.devices.map((dev) => ({
-      id: dev.credentialID,
+    allowCredentials: user.credentials.map((cred) => ({
+      id: cred.id,
       type: 'public-key',
-      transports: dev.transports,
+      transports: cred.transports,
     })),
     /**
      * Wondering why user verification isn't required? See here:
@@ -241,7 +241,7 @@ app.get('/generate-authentication-options', async (req, res) => {
 
   /**
    * The server needs to temporarily remember this value for verification, so don't lose it until
-   * after you verify an authenticator response.
+   * after you verify the authentication response.
    */
   req.session.currentChallenge = options.challenge;
 
@@ -251,20 +251,20 @@ app.get('/generate-authentication-options', async (req, res) => {
 app.post('/verify-authentication', async (req, res) => {
   const body: AuthenticationResponseJSON = req.body;
 
-  const user = inMemoryUserDeviceDB[loggedInUserId];
+  const user = inMemoryUserDB[loggedInUserId];
 
   const expectedChallenge = req.session.currentChallenge;
 
-  let dbAuthenticator;
-  // "Query the DB" here for an authenticator matching `credentialID`
-  for (const dev of user.devices) {
-    if (dev.credentialID === body.id) {
-      dbAuthenticator = dev;
+  let dbCredential: WebAuthnCredential | undefined;
+  // "Query the DB" here for a credential matching `cred.id`
+  for (const cred of user.credentials) {
+    if (cred.id === body.id) {
+      dbCredential = cred;
       break;
     }
   }
 
-  if (!dbAuthenticator) {
+  if (!dbCredential) {
     return res.status(400).send({
       error: 'Authenticator is not registered with this site',
     });
@@ -277,7 +277,7 @@ app.post('/verify-authentication', async (req, res) => {
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
-      authenticator: dbAuthenticator,
+      credential: dbCredential,
       requireUserVerification: false,
     };
     verification = await verifyAuthenticationResponse(opts);
@@ -290,8 +290,8 @@ app.post('/verify-authentication', async (req, res) => {
   const { verified, authenticationInfo } = verification;
 
   if (verified) {
-    // Update the authenticator's counter in the DB to the newest count in the authentication
-    dbAuthenticator.counter = authenticationInfo.newCounter;
+    // Update the credential's counter in the DB to the newest count in the authentication
+    dbCredential.counter = authenticationInfo.newCounter;
   }
 
   req.session.currentChallenge = undefined;

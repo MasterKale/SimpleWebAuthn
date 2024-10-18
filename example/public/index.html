@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.es5.umd.min.js"></script>
+    <script src="https://unpkg.com/@simplewebauthn/browser@11.0.0/dist/bundle/index.es5.umd.min.js"></script>
     <script>
       const { startAuthentication } = SimpleWebAuthnBrowser;
       /**
@@ -40,7 +40,7 @@
         .then(resp => resp.json())
         .then(opts => {
           console.log('Authentication Options (Autofill)', opts);
-          startAuthentication(opts, true)
+          startAuthentication({ optionsJSON: opts, useAutofill: true })
             .then(async asseResp => {
               // We can assume the DOM has loaded by now because it had to for the user to be able
               // to interact with an input to choose a credential from the autofill
@@ -178,7 +178,7 @@
 
             hideAuthForm();
 
-            attResp = await startRegistration(opts);
+            attResp = await startRegistration({ optionsJSON: opts });
             printDebug(elemDebug, 'Registration Response', JSON.stringify(attResp, null, 2));
           } catch (error) {
             if (error.name === 'InvalidStateError') {
@@ -232,7 +232,7 @@
 
             hideAuthForm();
 
-            asseResp = await startAuthentication(opts);
+            asseResp = await startAuthentication({ optionsJSON: opts });
             printDebug(elemDebug, 'Authentication Response', JSON.stringify(asseResp, null, 2));
           } catch (error) {
             elemError.innerText = error;
