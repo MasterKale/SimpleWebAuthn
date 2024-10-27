@@ -58,7 +58,11 @@ https://github.com/sponsors/MasterKale
 
 ### 🌟 Platinum Sponsor
 
-![Auth0byOkta_stack_rgb_blk_270w](https://github.com/user-attachments/assets/82bd296f-81c9-455f-b561-29119bd941c3)
+<p class="sponsor-logo">
+  <img src="https://github.com/user-attachments/assets/82bd296f-81c9-455f-b561-29119bd941c3" width="270" height="101" alt="Auth0 by Okta" />
+  <br />
+  <a href="https://a0.to/signup/simplewebauthn"><em>Simple Authentication. Make login our problem. Not yours.</em></a>
+</p>
 
 ### 🏅 Gold Sponsor
 
