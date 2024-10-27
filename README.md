@@ -50,15 +50,19 @@ import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 
 ## Sponsors
 
-Thank you very much to those below who sponsor my work. Your contributions help keep the open-source
-dream alive 🙇
+Thank you very much to those who sponsor my work. Your contributions help keep the open-source
+dream alive 🙇‍♂️
 
 Interested in sponsoring this project? See here for more info:
 https://github.com/sponsors/MasterKale
 
-<!-- ### Platinum Sponsor
+### 🌟 Platinum Sponsor
 
-![Okta_Wordmark_Black_S_270](https://github.com/user-attachments/assets/b412ae6e-bda8-4558-aaf5-92e31fab4c22) -->
+![Auth0byOkta_stack_rgb_blk_270w](https://github.com/user-attachments/assets/82bd296f-81c9-455f-b561-29119bd941c3)
+
+### 🏅 Gold Sponsor
+
+![authsignal_270w](https://github.com/user-attachments/assets/475e8759-bb1a-4614-b3f9-b38002b11f34)
 
 ## Example
 
