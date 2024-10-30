@@ -59,17 +59,21 @@ https://github.com/sponsors/MasterKale
 ### 🌟 Platinum Sponsor <!-- omit from toc -->
 
 <p class="sponsor-logo">
-  <img src="https://github.com/user-attachments/assets/82bd296f-81c9-455f-b561-29119bd941c3" width="270" height="101" alt="Auth0 by Okta" />
-  <br />
-  <a href="https://a0.to/signup/simplewebauthn"><em>Simple Authentication. Make login our problem. Not yours.</em></a>
+  <a href="https://a0.to/signup/simplewebauthn">
+    <img src="https://github.com/user-attachments/assets/82bd296f-81c9-455f-b561-29119bd941c3" width="270" height="101" alt="Auth0 by Okta" />
+    <br />
+    <em>Simple Authentication. Make login our problem. Not yours.</em>
+  </a>
 </p>
 
 ### 🏅 Gold Sponsor <!-- omit from toc -->
 
 <p class="sponsor-logo">
-  <img src="https://github.com/user-attachments/assets/475e8759-bb1a-4614-b3f9-b38002b11f34" width="270" height="63" alt="Authsignal" />
-  <br />
-  <a href="https://www.authsignal.com"><em>Simple, drop-in passkeys and MFA as a Service</em></a>
+  <a href="https://www.authsignal.com">
+    <img src="https://github.com/user-attachments/assets/475e8759-bb1a-4614-b3f9-b38002b11f34" width="270" height="63" alt="Authsignal" />
+    <br />
+    <em>Simple, drop-in passkeys and MFA as a Service</em>
+  </a>
 </p>
 
 ## Example
