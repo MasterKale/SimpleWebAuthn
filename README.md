@@ -66,7 +66,11 @@ https://github.com/sponsors/MasterKale
 
 ### 🏅 Gold Sponsor
 
-![authsignal_270w](https://github.com/user-attachments/assets/475e8759-bb1a-4614-b3f9-b38002b11f34)
+<p class="sponsor-logo">
+  <img src="https://github.com/user-attachments/assets/475e8759-bb1a-4614-b3f9-b38002b11f34" width="270" height="63" alt="Authsignal" />
+  <br />
+  <a href="https://www.authsignal.com"><em>Simple, drop-in passkeys and MFA as a Service</em></a>
+</p>
 
 ## Example
 
