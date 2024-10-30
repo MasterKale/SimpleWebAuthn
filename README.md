@@ -50,13 +50,13 @@ import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 
 ## Sponsors
 
-Thank you very much to those who sponsor my work. Your contributions help keep the open-source
-dream alive 🙇‍♂️
+Thank you very much to those who sponsor my work. Your contributions help keep the open-source dream
+alive 🙇‍♂️
 
 Interested in sponsoring this project? See here for more info:
 https://github.com/sponsors/MasterKale
 
-### 🌟 Platinum Sponsor
+### 🌟 Platinum Sponsor <!-- omit from toc -->
 
 <p class="sponsor-logo">
   <img src="https://github.com/user-attachments/assets/82bd296f-81c9-455f-b561-29119bd941c3" width="270" height="101" alt="Auth0 by Okta" />
@@ -64,7 +64,7 @@ https://github.com/sponsors/MasterKale
   <a href="https://a0.to/signup/simplewebauthn"><em>Simple Authentication. Make login our problem. Not yours.</em></a>
 </p>
 
-### 🏅 Gold Sponsor
+### 🏅 Gold Sponsor <!-- omit from toc -->
 
 <p class="sponsor-logo">
   <img src="https://github.com/user-attachments/assets/475e8759-bb1a-4614-b3f9-b38002b11f34" width="270" height="63" alt="Authsignal" />
