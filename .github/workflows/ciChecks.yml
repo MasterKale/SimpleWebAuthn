@@ -40,10 +40,10 @@ jobs:
 
     # Install pnpm w/cache for quicker installs
     # https://github.com/pnpm/action-setup#use-cache-to-reduce-installation-time
-    - name: Setup pnpm 8.6.12
+    - name: Setup pnpm 9.12.3
       uses: pnpm/action-setup@v2
       with:
-        version: 8.6.12
+        version: 9.12.3
         run_install: false
     - name: Get pnpm store directory
       shell: bash

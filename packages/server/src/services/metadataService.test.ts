@@ -12,7 +12,6 @@ import { _fetchInternals } from '../helpers/fetch.ts';
 import { BaseMetadataService, MetadataService } from './metadataService.ts';
 import type { MetadataStatement } from '../metadata/mdsTypes.ts';
 
-// const _fetch = fetch as unknown as jest.Mock;
 let mockFetch: Stub;
 
 describe('Method: initialize()', () => {

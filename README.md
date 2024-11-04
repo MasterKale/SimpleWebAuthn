@@ -100,7 +100,7 @@ Install the following before proceeding:
 
 - **Node 20.x**
 - **Deno 1.41.x**
-- **pnpm 8.6.x**
+- **pnpm 9.12.x**
 
 After pulling down the code, set up dependencies:
 
