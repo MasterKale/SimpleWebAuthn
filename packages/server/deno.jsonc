@@ -2,6 +2,10 @@
   "tasks": {
     "build": "deno run -A build_npm.ts"
   },
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 100
+  },
   "imports": {
     "tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
     "@hexagon/base64": "npm:@hexagon/base64@^1.1.27",

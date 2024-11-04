@@ -1,5 +1,9 @@
 {
   "tasks": {
     "build": "deno run -A build_npm.ts"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 100
   }
 }
