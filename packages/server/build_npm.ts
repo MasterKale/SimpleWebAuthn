@@ -1,4 +1,4 @@
-import { build, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
+import { build, emptyDir } from 'https://deno.land/x/dnt@0.40.0/mod.ts';
 
 const outDir = './npm';
 
@@ -16,6 +16,7 @@ await build({
     { name: '.', path: './src/index.ts' },
     { name: './helpers', path: './src/helpers/index.ts' },
   ],
+  importMap: './deno.jsonc',
   outDir,
   shims: {
     deno: {
@@ -66,38 +67,6 @@ await build({
   },
   // Map from Deno package to NPM package for Node build
   mappings: {
-    'https://deno.land/x/b64@1.1.27/src/base64.js': {
-      name: '@hexagon/base64',
-      version: '^1.1.27',
-    },
-    'https://esm.sh/cross-fetch@4.0.0': {
-      name: 'cross-fetch',
-      version: '^4.0.0',
-    },
-    'https://esm.sh/@peculiar/asn1-schema@2.3.8': {
-      name: '@peculiar/asn1-schema',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-x509@2.3.8': {
-      name: '@peculiar/asn1-x509',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-ecc@2.3.8': {
-      name: '@peculiar/asn1-ecc',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-rsa@2.3.8': {
-      name: '@peculiar/asn1-rsa',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-android@2.3.10': {
-      name: '@peculiar/asn1-android',
-      version: '^2.3.10',
-    },
-    'https://deno.land/x/tiny_cbor@0.2.2/index.ts': {
-      name: '@levischuck/tiny-cbor',
-      version: '^0.2.2',
-    },
     // Mapping for '../../types/src/index.ts' in deps.ts
     '../types/src/index.ts': {
       name: '@simplewebauthn/types',
