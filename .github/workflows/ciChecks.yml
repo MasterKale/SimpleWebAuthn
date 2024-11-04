@@ -20,7 +20,7 @@ jobs:
         deno-version: [ 'v1.46.x', 'v2.0.x' ]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # Install Node
     - name: Setup Node.js ${{ matrix.node-version }}
@@ -41,7 +41,7 @@ jobs:
     # Install pnpm w/cache for quicker installs
     # https://github.com/pnpm/action-setup#use-cache-to-reduce-installation-time
     - name: Setup pnpm 9.12.3
-      uses: pnpm/action-setup@v2
+      uses: pnpm/action-setup@v4
       with:
         version: 9.12.3
         run_install: false
@@ -50,7 +50,7 @@ jobs:
       run: |
         echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
     - name: Setup pnpm cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ env.STORE_PATH }}
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
