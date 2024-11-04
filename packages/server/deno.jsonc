@@ -1,5 +1,17 @@
 {
   "tasks": {
     "build": "deno run -A build_npm.ts"
+  },
+  "imports": {
+    "tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
+    "@hexagon/base64": "npm:@hexagon/base64@^1.1.27",
+    "@levischuck/tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
+    "@peculiar/asn1-android": "npm:@peculiar/asn1-android@^2.3.10",
+    "@peculiar/asn1-ecc": "npm:@peculiar/asn1-ecc@^2.3.8",
+    "@peculiar/asn1-rsa": "npm:@peculiar/asn1-rsa@^2.3.8",
+    "@peculiar/asn1-schema": "npm:@peculiar/asn1-schema@^2.3.8",
+    "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.3.8",
+    "@simplewebauthn/types": "../types/src/index.ts",
+    "cross-fetch": "npm:cross-fetch@^4.0.0"
   }
 }
