@@ -246,7 +246,6 @@ Deno.test('should throw an error if user verification is required but user was n
 // TODO: Get a real TPM authentication response in here
 Deno.test('should verify TPM assertion', { ignore: true }, async () => {
   const expectedChallenge = 'dG90YWxseVVuaXF1ZVZhbHVlRXZlcnlBc3NlcnRpb24';
-  // jest.spyOn(isoBase64URL, "toString").mockReturnValueOnce(expectedChallenge);
   const verification = await verifyAuthenticationResponse({
     response: {
       id: 'YJ8FMM-AmcUt73XPX341WXWd7ypBMylGjjhu0g3VzME',
