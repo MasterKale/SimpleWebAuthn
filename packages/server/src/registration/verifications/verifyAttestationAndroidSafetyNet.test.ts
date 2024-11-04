@@ -1,7 +1,7 @@
 import { assert, assertRejects } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 import { FakeTime } from 'https://deno.land/std@0.198.0/testing/time.ts';
+import { RegistrationResponseJSON } from '@simplewebauthn/types';
 
-import { RegistrationResponseJSON } from '../../deps.ts';
 import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet.ts';
 
 import { decodeAttestationObject } from '../../helpers/decodeAttestationObject.ts';

@@ -1,5 +1,5 @@
-import { base64 } from '../../deps.ts';
-import type { Base64URLString } from '../../deps.ts';
+import base64 from '@hexagon/base64';
+import type { Base64URLString } from '@simplewebauthn/types';
 
 /**
  * Decode from a Base64URL-encoded string to an ArrayBuffer. Best used when converting a

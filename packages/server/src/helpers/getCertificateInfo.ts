@@ -1,4 +1,5 @@
-import { AsnParser, BasicConstraints, Certificate, id_ce_basicConstraints } from '../deps.ts';
+import { AsnParser } from '@peculiar/asn1-schema';
+import { BasicConstraints, Certificate, id_ce_basicConstraints } from '@peculiar/asn1-x509';
 
 export type CertificateInfo = {
   issuer: Issuer;

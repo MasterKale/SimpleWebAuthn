@@ -1,4 +1,6 @@
-import { AsnParser, Certificate } from '../../deps.ts';
+import { AsnParser } from '@peculiar/asn1-schema';
+import { Certificate } from '@peculiar/asn1-x509';
+
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';

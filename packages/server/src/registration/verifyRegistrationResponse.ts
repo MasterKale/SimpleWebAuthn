@@ -3,7 +3,8 @@ import type {
   CredentialDeviceType,
   RegistrationResponseJSON,
   WebAuthnCredential,
-} from '../deps.ts';
+} from '@simplewebauthn/types';
+
 import {
   AttestationFormat,
   AttestationStatement,

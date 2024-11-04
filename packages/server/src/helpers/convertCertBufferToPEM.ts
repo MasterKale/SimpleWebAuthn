@@ -1,4 +1,5 @@
-import type { Base64URLString } from '../deps.ts';
+import type { Base64URLString } from '@simplewebauthn/types';
+
 import { isoBase64URL } from './iso/index.ts';
 
 /**

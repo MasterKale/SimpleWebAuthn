@@ -1,4 +1,4 @@
-import { crossFetch } from '../deps.ts';
+import { fetch as crossFetch } from 'cross-fetch';
 
 /**
  * A simple method for requesting data via standard `fetch`. Should work

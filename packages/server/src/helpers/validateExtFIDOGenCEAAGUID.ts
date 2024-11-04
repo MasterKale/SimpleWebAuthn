@@ -1,4 +1,6 @@
-import { AsnParser, Extensions, OctetString } from '../deps.ts';
+import { AsnParser, OctetString } from '@peculiar/asn1-schema';
+import { Extensions } from '@peculiar/asn1-x509';
+
 import { isoUint8Array } from './iso/index.ts';
 
 /**

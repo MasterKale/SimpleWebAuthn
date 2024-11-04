@@ -5,8 +5,8 @@ import {
   assertRejects,
 } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts';
+import { RegistrationResponseJSON } from '@simplewebauthn/types';
 
-import { RegistrationResponseJSON } from '../deps.ts';
 import { verifyRegistrationResponse } from './verifyRegistrationResponse.ts';
 import {
   _decodeAttestationObjectInternals,
