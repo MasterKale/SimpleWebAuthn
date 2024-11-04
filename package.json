@@ -43,7 +43,7 @@
   "lint-staged": {
     "*.{ts,js}": [
       "deno lint",
-      "deno fmt",
+      "deno fmt -c ./deno.jsonc",
       "git add"
     ]
   }
