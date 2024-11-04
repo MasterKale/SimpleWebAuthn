@@ -107,11 +107,11 @@ importers:
         version: 4.0.0(encoding@0.1.13)
     devDependencies:
       '@deno/shim-deno-test':
-        specifier: ~0.4.0
-        version: 0.4.0
+        specifier: ~0.5.0
+        version: 0.5.0
       '@types/node':
-        specifier: ^18.11.9
-        version: 18.17.8
+        specifier: ^20.9.0
+        version: 20.17.6
       picocolors:
         specifier: ^1.0.0
         version: 1.0.0
@@ -358,8 +358,8 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@deno/shim-deno-test@0.4.0':
-    resolution: {integrity: sha512-oYWcD7CpERZy/TXMTM9Tgh1HD/POHlbY9WpzmAk+5H8DohcxG415Qws8yLGlim3EaKBT2v3lJv01x4G0BosnaQ==}
+  '@deno/shim-deno-test@0.5.0':
+    resolution: {integrity: sha512-4nMhecpGlPi0cSzT67L+Tm+GOJqvuk8gqHBziqcUQOarnuIax1z96/gJHCSIz2Z0zhxE6Rzwb3IZXPtFh51j+w==}
 
   '@emnapi/core@1.3.1':
     resolution: {integrity: sha512-pVGjBIt1Y6gg3EJN8jTcfpP/+uuRksIo055oE/OBkDNcjZqVbfkWCksG1Jp4yZnj3iKWyWX8fdG/j6UDYPbFog==}
@@ -867,9 +867,6 @@ packages:
 
   '@types/minimist@1.2.2':
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
-
-  '@types/node@18.17.8':
-    resolution: {integrity: sha512-Av/7MqX/iNKwT9Tr60V85NqMnsmh8ilfJoBlIVibkXfitk9Q22D9Y5mSpm+FvG5DET7EbVfB40bOiLzKgYFgPw==}
 
   '@types/node@20.17.6':
     resolution: {integrity: sha512-VEI7OdvK2wP7XHnsuXbAJnEpEkF6NjSN45QJlL4VGqZSXsnicpesdTWsg9RISeSdYd3yeRj/y3k5KGjUXYnFwQ==}
@@ -4049,7 +4046,7 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@deno/shim-deno-test@0.4.0': {}
+  '@deno/shim-deno-test@0.5.0': {}
 
   '@emnapi/core@1.3.1':
     dependencies:
@@ -4864,8 +4861,6 @@ snapshots:
 
   '@types/minimist@1.2.2': {}
 
-  '@types/node@18.17.8': {}
-
   '@types/node@20.17.6':
     dependencies:
       undici-types: 6.19.8
@@ -4874,7 +4869,7 @@ snapshots:
 
   '@types/resolve@1.17.1':
     dependencies:
-      '@types/node': 18.17.8
+      '@types/node': 20.17.6
 
   '@types/stack-utils@2.0.1': {}
 
