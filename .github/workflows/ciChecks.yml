@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         node-version: [ 20, 22 ]
-        deno-version: [ 'v1.41.0', 'v1.46.3' ]
+        deno-version: [ 'v1.46.x', 'v2.0.x' ]
 
     steps:
     - uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
 
     # Install Deno
     - name: Setup Deno ${{ matrix.deno-version }}
-      uses: denoland/setup-deno@v1
+      uses: denoland/setup-deno@v2
       with:
         deno-version: ${{ matrix.deno-version }}
     - name: Confirm installed Deno version

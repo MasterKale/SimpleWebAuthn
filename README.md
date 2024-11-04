@@ -99,7 +99,7 @@ request new features, or to suggest changes to existing features.
 Install the following before proceeding:
 
 - **Node 20.x**
-- **Deno 1.41.x**
+- **Deno v1.46.x**
 - **pnpm 9.12.x**
 
 After pulling down the code, set up dependencies:
