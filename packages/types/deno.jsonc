@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "build": "deno run -A build_npm.ts"
+    "build": "deno run -A build_npm.ts",
+    "extract-dom-types": "deno run -A extract-dom-types.ts"
   },
   "fmt": {
     "singleQuote": true,

@@ -1,7 +1,7 @@
 /**
- * Generated from typescript@5.1.6 typescript/lib/lib.dom.d.ts
- * To regenerate, run the following command from the project root:
- * npx lerna --scope=@simplewebauthn/types exec -- npm run extract-dom-types
+ * Generated from typescript@5.6.3
+ * To regenerate, run the following command from the package root:
+ * deno task extract-dom-types
  */
 // BEGIN CODEGEN
 /**
@@ -26,8 +26,11 @@ export interface AuthenticatorAssertionResponse extends AuthenticatorResponse {
 export interface AuthenticatorAttestationResponse extends AuthenticatorResponse {
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAttestationResponse/attestationObject) */
     readonly attestationObject: ArrayBuffer;
+    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAttestationResponse/getAuthenticatorData) */
     getAuthenticatorData(): ArrayBuffer;
+    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAttestationResponse/getPublicKey) */
     getPublicKey(): ArrayBuffer | null;
+    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAttestationResponse/getPublicKeyAlgorithm) */
     getPublicKeyAlgorithm(): COSEAlgorithmIdentifier;
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/AuthenticatorAttestationResponse/getTransports) */
     getTransports(): string[];
@@ -37,6 +40,7 @@ export interface AuthenticationExtensionsClientInputs {
     appid?: string;
     credProps?: boolean;
     hmacCreateSecret?: boolean;
+    minPinLength?: boolean;
 }
 
 export interface AuthenticationExtensionsClientOutputs {
@@ -80,6 +84,7 @@ export interface Crypto {
  * [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential)
  */
 export interface PublicKeyCredential extends Credential {
+    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential/authenticatorAttachment) */
     readonly authenticatorAttachment: string | null;
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/PublicKeyCredential/rawId) */
     readonly rawId: ArrayBuffer;
@@ -160,7 +165,9 @@ export interface SubtleCrypto {
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey) */
     exportKey(format: "jwk", key: CryptoKey): Promise<JsonWebKey>;
     exportKey(format: Exclude<KeyFormat, "jwk">, key: CryptoKey): Promise<ArrayBuffer>;
+    exportKey(format: KeyFormat, key: CryptoKey): Promise<ArrayBuffer | JsonWebKey>;
     /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey) */
+    generateKey(algorithm: "Ed25519", extractable: boolean, keyUsages: ReadonlyArray<"sign" | "verify">): Promise<CryptoKeyPair>;
     generateKey(algorithm: RsaHashedKeyGenParams | EcKeyGenParams, extractable: boolean, keyUsages: ReadonlyArray<KeyUsage>): Promise<CryptoKeyPair>;
     generateKey(algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params, extractable: boolean, keyUsages: ReadonlyArray<KeyUsage>): Promise<CryptoKey>;
     generateKey(algorithm: AlgorithmIdentifier, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKeyPair | CryptoKey>;
@@ -279,17 +286,17 @@ export interface JsonWebKey {
     y?: string;
 }
 
+export interface CryptoKeyPair {
+    privateKey: CryptoKey;
+    publicKey: CryptoKey;
+}
+
 export interface RsaHashedKeyGenParams extends RsaKeyGenParams {
     hash: HashAlgorithmIdentifier;
 }
 
 export interface EcKeyGenParams extends Algorithm {
     namedCurve: NamedCurve;
-}
-
-export interface CryptoKeyPair {
-    privateKey: CryptoKey;
-    publicKey: CryptoKey;
 }
 
 export interface AesKeyGenParams extends Algorithm {
