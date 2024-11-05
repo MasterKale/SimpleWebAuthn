@@ -1,33 +1,36 @@
+/// <reference lib="DOM" />
+import { assert } from '@std/assert';
+
 import * as index from './index.ts';
 
-test('should export method `startRegistration`', () => {
-  expect(index.startRegistration).toBeDefined();
+Deno.test('should export method `startRegistration`', () => {
+  assert(index.startRegistration);
 });
 
-test('should export method `startAuthentication`', () => {
-  expect(index.startAuthentication).toBeDefined();
+Deno.test('should export method `startAuthentication`', () => {
+  assert(index.startAuthentication);
 });
 
-test('should export method `browserSupportsWebAuthn`', () => {
-  expect(index.browserSupportsWebAuthn).toBeDefined();
+Deno.test('should export method `browserSupportsWebAuthn`', () => {
+  assert(index.browserSupportsWebAuthn);
 });
 
-test('should export method `browserSupportsWebAuthnAutofill`', () => {
-  expect(index.browserSupportsWebAuthnAutofill).toBeDefined();
+Deno.test('should export method `browserSupportsWebAuthnAutofill`', () => {
+  assert(index.browserSupportsWebAuthnAutofill);
 });
 
-test('should export method `platformAuthenticatorIsAvailable`', () => {
-  expect(index.platformAuthenticatorIsAvailable).toBeDefined();
+Deno.test('should export method `platformAuthenticatorIsAvailable`', () => {
+  assert(index.platformAuthenticatorIsAvailable);
 });
 
-test('should export method `base64URLStringToBuffer`', () => {
-  expect(index.base64URLStringToBuffer).toBeDefined();
+Deno.test('should export method `base64URLStringToBuffer`', () => {
+  assert(index.base64URLStringToBuffer);
 });
 
-test('should export method `bufferToBase64URLString`', () => {
-  expect(index.bufferToBase64URLString).toBeDefined();
+Deno.test('should export method `bufferToBase64URLString`', () => {
+  assert(index.bufferToBase64URLString);
 });
 
-test('should export singleton `WebAuthnAbortService`', () => {
-  expect(index.WebAuthnAbortService).toBeDefined();
+Deno.test('should export singleton `WebAuthnAbortService`', () => {
+  assert(index.WebAuthnAbortService);
 });
