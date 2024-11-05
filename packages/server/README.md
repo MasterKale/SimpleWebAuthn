@@ -5,7 +5,7 @@
 
 - [Installation](#installation)
   - [Node LTS 20.x or higher](#node-lts-20x-or-higher)
-  - [Deno v1.33.x or higher](#deno-v133x-or-higher)
+  - [Deno v1.43.x or higher](#deno-v143x-or-higher)
 - [Usage](#usage)
 - [Supported Attestation Formats](#supported-attestation-formats)
 
@@ -13,19 +13,27 @@
 
 ### Node LTS 20.x or higher
 
-This package is available on **npm** and supports **both CommonJS and
-[ECMAScript modules (ESM)](https://nodejs.org/api/esm.html#enabling)** projects:
+This package can be installed from **NPM** (with support for **both CommonJS and
+[ECMAScript modules (ESM)](https://nodejs.org/api/esm.html#enabling)** projects) or **JSR**:
 
 ```sh
-npm install @simplewebauthn/server
+$ npm install @simplewebauthn/server
 ```
 
-### Deno v1.33.x or higher
+```sh
+$ npx jsr add @simplewebauthn/server
+```
 
-It is also available for import into Deno projects from **deno.land/x**:
+### Deno v1.43.x or higher
+
+It is also available for import into Deno projects from **deno.land/x** or **JSR**:
 
 ```ts
 import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
+```
+
+```sh
+$ deno add jsr:@simplewebauthn/server
 ```
 
 ## Usage
