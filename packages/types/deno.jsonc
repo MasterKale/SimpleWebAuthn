@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/types",
-  "version": "11.0.0-alpha1",
+  "version": "11.0.0-alpha2",
   "exports": "./src/index.ts",
   "tasks": {
     "extract-dom-types": "deno run -A extract-dom-types.ts"
