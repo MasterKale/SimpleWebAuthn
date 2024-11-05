@@ -1,0 +1,26 @@
+{
+  "name": "@simplewebauthn/browser",
+  "version": "11.0.0-alpha2",
+  "exports": "./src/index.ts",
+  "tasks": {
+    "build": "rimraf dist && rollup -c",
+    "test": "deno test -A src/",
+    "test:watch": "deno test -A --watch src/"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 100
+  },
+  "imports": {
+    "@simplewebauthn/types": "jsr:@simplewebauthn/types@^11.0.0-alpha1"
+  },
+  "publish": {
+    "include": ["./src/**/*.ts"],
+    "exclude": [
+      "./src/**/*.test.ts",
+      "./src/setupTests.ts",
+      "./src/**/__mocks__",
+      "./src/**/__jest__"
+    ]
+  }
+}

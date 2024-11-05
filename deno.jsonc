@@ -12,6 +12,7 @@
     "typescript": "npm:typescript@^5.6.3"
   },
   "workspace": [
+    "./packages/browser",
     "./packages/server",
     "./packages/types"
   ]
