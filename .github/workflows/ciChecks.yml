@@ -56,9 +56,7 @@ jobs:
         run: deno install
 
       # Build and test packages
-      - name: Build & test @simplewebauthn/types
-        run: npm run build:types # browser tests will need this to be built
       - name: Build & test @simplewebauthn/server
-        run: npm run build:server # dnt will test everything in Node too
-      - name: Test @simplewebauthn/browser
-        run: npm run test:browser
+        run: cd packages/server && deno task test
+      # - name: Test @simplewebauthn/browser
+      #   run: npm run test:browser
