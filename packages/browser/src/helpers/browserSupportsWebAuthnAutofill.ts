@@ -17,7 +17,7 @@ export function browserSupportsWebAuthnAutofill(): Promise<boolean> {
    * want. I think I'm fine with this for now since it's _supposed_ to be temporary, until TS types
    * have a chance to catch up.
    */
-  const globalPublicKeyCredential = window
+  const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
   if (globalPublicKeyCredential.isConditionalMediationAvailable === undefined) {
