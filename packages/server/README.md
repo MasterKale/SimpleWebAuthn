@@ -21,7 +21,7 @@ $ npm install @simplewebauthn/server
 ```
 
 ```sh
-$ npx jsr add @simplewebauthn/server
+$ npx jsr add @simplewebauthn/server @simplewebauthn/types
 ```
 
 ### Deno v1.43.x or higher
@@ -33,7 +33,7 @@ import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
 ```
 
 ```sh
-$ deno add jsr:@simplewebauthn/server
+$ deno add jsr:@simplewebauthn/server jsr:@simplewebauthn/types
 ```
 
 ## Usage
