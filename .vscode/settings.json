@@ -1,7 +1,7 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
-  "deno.path": "${userHome}/.deno/bin/deno",
+  "deno.path": "/opt/homebrew/bin/deno",
   "deno.enablePaths": [
     "./packages/server",
     "./packages/types"
