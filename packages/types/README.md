@@ -7,22 +7,30 @@ TypeScript typings for **@simplewebauthn/server** and **@simplewebauthn/browser*
 
 - [Installation](#installation)
   - [Node LTS 20.x or higher](#node-lts-20x-or-higher)
-  - [Deno v1.33.x or higher](#deno-v133x-or-higher)
+  - [Deno v1.43.x or higher](#deno-v143x-or-higher)
 
 ## Installation
 
 ### Node LTS 20.x or higher
 
-This package is available on **npm**:
+This package can be installed from **npm** or **jsr**:
 
 ```sh
-npm install @simplewebauthn/types
+$ npm install @simplewebauthn/types
 ```
 
-### Deno v1.33.x or higher
+```sh
+$ npx jsr add @simplewebauthn/types
+```
 
-It is also available for import into Deno projects from **deno.land/x**:
+### Deno v1.43.x or higher
+
+It is available for import into Deno projects from **deno.land/x** or **jsr**:
 
 ```ts
 import {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
+```
+
+```sh
+$ deno add jsr:@simplewebauthn/types
 ```
