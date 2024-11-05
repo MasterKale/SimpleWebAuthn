@@ -41,13 +41,22 @@ type VerificationMode = 'permissive' | 'strict';
 
 const log = getLogger('MetadataService');
 
+interface MetadataService {
+  initialize(opts?: {
+    mdsServers?: string[];
+    statements?: MetadataStatement[];
+    verificationMode?: VerificationMode;
+  }): Promise<void>;
+  getStatement(aaguid: string | Uint8Array): Promise<MetadataStatement | undefined>;
+}
+
 /**
- * A basic service for coordinating interactions with the FIDO Metadata Service. This includes BLOB
- * download and parsing, and on-demand requesting and caching of individual metadata statements.
+ * An implementation of `MetadataService` that can download and parse BLOBs, and support on-demand
+ * requesting and caching of individual metadata statements.
  *
  * https://fidoalliance.org/metadata/
  */
-export class BaseMetadataService {
+export class BaseMetadataService implements MetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
@@ -326,5 +335,10 @@ export class BaseMetadataService {
   }
 }
 
-// Export a service singleton
-export const MetadataService = new BaseMetadataService();
+/**
+ * A basic service for coordinating interactions with the FIDO Metadata Service. This includes BLOB
+ * download and parsing, and on-demand requesting and caching of individual metadata statements.
+ *
+ * https://fidoalliance.org/metadata/
+ */
+export const MetadataService: MetadataService = new BaseMetadataService();
