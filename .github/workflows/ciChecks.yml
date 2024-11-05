@@ -37,28 +37,23 @@ jobs:
       - name: Confirm installed Deno version
         run: deno -V
 
-      # Install pnpm w/cache for quicker installs
-      # https://github.com/pnpm/action-setup#use-cache-to-reduce-installation-time
-      - name: Setup pnpm 9.12.3
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.12.3
-          run_install: false
-      - name: Get pnpm store directory
+      # Set up caching for quicker installs
+      - name: Get DENO_DIR store directory
         shell: bash
+        # Expecting "DENO_DIR location: /Users/matt/Library/Caches/deno" somewhere in `deno info`
         run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - name: Setup pnpm cache
+          echo "DENO_DIR=$(deno info | grep "DENO_DIR" | awk '{print $3}')" >> $GITHUB_ENV
+      - name: Setup Deno cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-dir-${{ hashFiles('**/deno.lock') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-deno-dir-
 
       # Install deps
       - name: Install dependencies
-        run: pnpm install
+        run: deno install
 
       # Build and test packages
       - name: Build & test @simplewebauthn/types
