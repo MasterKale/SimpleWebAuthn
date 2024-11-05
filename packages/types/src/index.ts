@@ -255,3 +255,5 @@ export interface PublicKeyCredentialFuture extends PublicKeyCredential {
  * - `"multiDevice"` credentials can be backed up
  */
 export type CredentialDeviceType = 'singleDevice' | 'multiDevice';
+
+export type haha = 'lol';
