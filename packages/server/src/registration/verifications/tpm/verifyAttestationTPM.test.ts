@@ -1,5 +1,5 @@
-import { assertEquals, assertRejects } from 'https://deno.land/std@0.198.0/assert/mod.ts';
-import { FakeTime } from 'https://deno.land/std@0.198.0/testing/time.ts';
+import { assertEquals, assertRejects } from '@std/assert';
+import { FakeTime } from '@std/testing/time';
 
 import { verifyRegistrationResponse } from '../../verifyRegistrationResponse.ts';
 

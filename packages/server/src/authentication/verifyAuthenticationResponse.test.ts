@@ -2,10 +2,13 @@ import {
   assert,
   assertEquals,
   assertExists,
+  assertFalse,
+  assertObjectMatch,
   assertRejects,
-} from 'https://deno.land/std@0.198.0/assert/mod.ts';
-import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts';
-import { AuthenticationResponseJSON, WebAuthnCredential } from '@simplewebauthn/types';
+} from '@std/assert';
+import { returnsNext, stub } from '@std/testing/mock';
+import type { AuthenticationResponseJSON, WebAuthnCredential } from '@simplewebauthn/types';
+import {} from '@std/assert';
 
 import { verifyAuthenticationResponse } from './verifyAuthenticationResponse.ts';
 
@@ -16,8 +19,6 @@ import {
 } from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
-import { assertObjectMatch } from 'https://deno.land/std@0.198.0/assert/assert_object_match.ts';
-import { assertFalse } from 'https://deno.land/std@0.198.0/assert/assert_false.ts';
 
 Deno.test('should verify an assertion response', async () => {
   const verification = await verifyAuthenticationResponse({

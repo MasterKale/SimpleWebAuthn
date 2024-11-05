@@ -1,4 +1,4 @@
-import { assert } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assert } from '@std/assert';
 
 import { COSEALG, COSECRV, COSEKEYS, COSEKTY, COSEPublicKeyOKP } from '../../cose.ts';
 import { verifyOKP } from './verifyOKP.ts';

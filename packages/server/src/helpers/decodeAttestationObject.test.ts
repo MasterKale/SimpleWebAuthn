@@ -1,4 +1,4 @@
-import { assert, assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assert, assertEquals } from '@std/assert';
 
 import { decodeAttestationObject } from './decodeAttestationObject.ts';
 import { isoBase64URL } from './iso/index.ts';

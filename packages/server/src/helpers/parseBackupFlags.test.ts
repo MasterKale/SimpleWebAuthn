@@ -1,7 +1,6 @@
-import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertEquals, assertThrows } from '@std/assert';
 
 import { InvalidBackupFlags, parseBackupFlags } from './parseBackupFlags.ts';
-import { assertThrows } from 'https://deno.land/std@0.198.0/assert/assert_throws.ts';
 
 Deno.test('should return single-device cred, not backed up', () => {
   const parsed = parseBackupFlags({ be: false, bs: false });

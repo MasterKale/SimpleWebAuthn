@@ -1,11 +1,6 @@
-import {
-  assert,
-  assertEquals,
-  assertFalse,
-  assertRejects,
-} from 'https://deno.land/std@0.198.0/assert/mod.ts';
-import { returnsNext, stub } from 'https://deno.land/std@0.198.0/testing/mock.ts';
-import { RegistrationResponseJSON } from '@simplewebauthn/types';
+import { assert, assertEquals, assertFalse, assertObjectMatch, assertRejects } from '@std/assert';
+import { returnsNext, stub } from '@std/testing/mock';
+import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse.ts';
 import {
@@ -23,7 +18,6 @@ import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { COSEKEYS } from '../helpers/cose.ts';
 import { SettingsService } from '../services/settingsService.ts';
-import { assertObjectMatch } from 'https://deno.land/std@0.198.0/assert/assert_object_match.ts';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
