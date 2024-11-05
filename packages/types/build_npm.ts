@@ -1,4 +1,4 @@
-import { build, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
+import { build, emptyDir } from 'https://deno.land/x/dnt@0.40.0/mod.ts';
 
 const outDir = './npm';
 const lernaPackageJSON: { version: string } = JSON.parse(
