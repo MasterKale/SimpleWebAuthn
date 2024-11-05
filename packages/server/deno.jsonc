@@ -1,6 +1,13 @@
 {
+  "name": "@simplewebauthn/server",
+  "version": "11.0.0-alpha1",
+  "exports": {
+    ".": "./src/index.ts",
+    "./helpers": "./src/helpers/index.ts"
+  },
   "tasks": {
-    "build": "deno run -A build_npm.ts"
+    "test": "deno test -A src/",
+    "test:watch": "deno test -A --watch src/"
   },
   "fmt": {
     "singleQuote": true,
@@ -17,5 +24,15 @@
     "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.3.8",
     "@simplewebauthn/types": "../types/src/index.ts",
     "cross-fetch": "npm:cross-fetch@^4.0.0"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE.md",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.test.ts"
+    ]
   }
 }
