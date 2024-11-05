@@ -3,7 +3,6 @@
   "version": "11.0.0-alpha1",
   "exports": "./src/index.ts",
   "tasks": {
-    "build": "deno run -A build_npm.ts",
     "extract-dom-types": "deno run -A extract-dom-types.ts"
   },
   "fmt": {
