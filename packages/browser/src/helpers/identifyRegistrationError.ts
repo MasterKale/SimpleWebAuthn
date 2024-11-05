@@ -1,5 +1,5 @@
-import { isValidDomain } from './isValidDomain';
-import { WebAuthnError } from './webAuthnError';
+import { isValidDomain } from './isValidDomain.ts';
+import { WebAuthnError } from './webAuthnError.ts';
 
 /**
  * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.create()`

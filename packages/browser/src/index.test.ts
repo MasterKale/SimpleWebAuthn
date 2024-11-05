@@ -1,4 +1,4 @@
-import * as index from './index';
+import * as index from './index.ts';
 
 test('should export method `startRegistration`', () => {
   expect(index.startRegistration).toBeDefined();

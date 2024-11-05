@@ -5,15 +5,15 @@ import {
   PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/types';
 
-import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
-import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill';
-import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
-import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
-import { WebAuthnError } from '../helpers/webAuthnError';
-import { generateCustomError } from '../helpers/__jest__/generateCustomError';
-import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn.ts';
+import { browserSupportsWebAuthnAutofill } from '../helpers/browserSupportsWebAuthnAutofill.ts';
+import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer.ts';
+import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString.ts';
+import { WebAuthnError } from '../helpers/webAuthnError.ts';
+import { generateCustomError } from '../helpers/__jest__/generateCustomError.ts';
+import { WebAuthnAbortService } from '../helpers/webAuthnAbortService.ts';
 
-import { startAuthentication } from './startAuthentication';
+import { startAuthentication } from './startAuthentication.ts';
 
 jest.mock('../helpers/browserSupportsWebAuthn');
 jest.mock('../helpers/browserSupportsWebAuthnAutofill');

@@ -1,6 +1,6 @@
 import { PublicKeyCredentialFuture } from '@simplewebauthn/types';
 
-import { browserSupportsWebAuthn } from './browserSupportsWebAuthn';
+import { browserSupportsWebAuthn } from './browserSupportsWebAuthn.ts';
 
 /**
  * Determine if the browser supports conditional UI, so that WebAuthn credentials can

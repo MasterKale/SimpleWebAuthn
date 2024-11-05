@@ -4,13 +4,14 @@ import {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
 } from '@simplewebauthn/types';
-import { generateCustomError } from '../helpers/__jest__/generateCustomError';
-import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
-import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
-import { WebAuthnError } from '../helpers/webAuthnError';
-import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
 
-import { startRegistration } from './startRegistration';
+import { generateCustomError } from '../helpers/__jest__/generateCustomError.ts';
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn.ts';
+import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer.ts';
+import { WebAuthnError } from '../helpers/webAuthnError.ts';
+import { WebAuthnAbortService } from '../helpers/webAuthnAbortService.ts';
+
+import { startRegistration } from './startRegistration.ts';
 
 jest.mock('../helpers/browserSupportsWebAuthn');
 

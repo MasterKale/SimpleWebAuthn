@@ -1,4 +1,4 @@
-import { platformAuthenticatorIsAvailable } from './platformAuthenticatorIsAvailable';
+import { platformAuthenticatorIsAvailable } from './platformAuthenticatorIsAvailable.ts';
 
 const mockIsUVPAA = jest.fn();
 

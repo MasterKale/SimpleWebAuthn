@@ -1,4 +1,4 @@
-import { WebAuthnAbortService } from './webAuthnAbortService';
+import { WebAuthnAbortService } from './webAuthnAbortService.ts';
 
 test('should create a new abort signal every time', () => {
   const signal1 = WebAuthnAbortService.createNewAbortSignal();
