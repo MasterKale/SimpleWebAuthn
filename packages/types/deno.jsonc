@@ -9,5 +9,12 @@
   "fmt": {
     "singleQuote": true,
     "lineWidth": 100
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE.md",
+      "src/**/*.ts"
+    ]
   }
 }
