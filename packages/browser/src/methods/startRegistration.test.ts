@@ -63,7 +63,7 @@ describe('Method: startRegistration', () => {
     globalThis.navigator.credentials = { create: createSpy };
 
     // Assume WebAuthn is available
-    _browserSupportsWebAuthnInternals.stubThis = spy(() => true);
+    _browserSupportsWebAuthnInternals.stubThis = () => true;
   });
 
   afterEach(() => {
@@ -96,24 +96,21 @@ describe('Method: startRegistration', () => {
   });
 
   it('should return base64url-encoded response values', async () => {
-    // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = {
-      create: async () => ({
-        id: '6mUg8GzxDxs',
-        rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
-        response: {
-          attestationObject: new Uint8Array([1, 2, 3, 4]),
-          clientDataJSON: new Uint8Array([5, 6, 7, 8]),
-          getTransports: () => [],
-          getAuthenticatorData: () => new Uint8Array(),
-          getPublicKey: () => null,
-          getPublicKeyAlgorithm: () => -999,
-        },
-        getClientExtensionResults: () => ({}),
-        type: 'public-key',
-        authenticatorAttachment: '',
-      }),
-    };
+    globalThis.navigator.credentials.create = async () => ({
+      id: '6mUg8GzxDxs',
+      rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
+      response: {
+        attestationObject: new Uint8Array([1, 2, 3, 4]),
+        clientDataJSON: new Uint8Array([5, 6, 7, 8]),
+        getTransports: () => [],
+        getAuthenticatorData: () => new Uint8Array(),
+        getPublicKey: () => null,
+        getPublicKeyAlgorithm: () => -999,
+      },
+      getClientExtensionResults: () => ({}),
+      type: 'public-key',
+      authenticatorAttachment: '',
+    });
 
     const response = await startRegistration({ optionsJSON: goodOpts1 });
 
@@ -123,7 +120,7 @@ describe('Method: startRegistration', () => {
   });
 
   it("should throw error if WebAuthn isn't supported", async () => {
-    _browserSupportsWebAuthnInternals.stubThis = spy(() => false);
+    _browserSupportsWebAuthnInternals.stubThis = () => false;
 
     await assertRejects(
       () => startRegistration({ optionsJSON: goodOpts1 }),
@@ -133,8 +130,7 @@ describe('Method: startRegistration', () => {
   });
 
   it('should throw error if attestation is cancelled for some reason', async () => {
-    // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = { create: spy(async () => null) };
+    globalThis.navigator.credentials.create = async () => null;
 
     await assertRejects(
       () => startRegistration({ optionsJSON: goodOpts1 }),
@@ -186,9 +182,10 @@ describe('Method: startRegistration', () => {
     };
 
     // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = {
-      create: async () => ({ response: {}, getClientExtensionResults: () => extResults }),
-    };
+    globalThis.navigator.credentials.create = async () => ({
+      response: {},
+      getClientExtensionResults: () => extResults,
+    });
 
     const response = await startRegistration({ optionsJSON: goodOpts1 });
 
@@ -224,20 +221,17 @@ describe('Method: startRegistration', () => {
   });
 
   it('should return "cable" transport from response', async () => {
-    // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = {
-      create: async () => ({
-        id: '6mUg8GzxDxs',
-        rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
-        response: {
-          attestationObject: new Uint8Array([1, 2, 3, 4]),
-          clientDataJSON: new Uint8Array([1, 2, 3, 4]),
-          getTransports: () => ['cable'],
-        },
-        getClientExtensionResults: () => ({}),
-        type: 'webauthn.create',
-      }),
-    };
+    globalThis.navigator.credentials.create = async () => ({
+      id: '6mUg8GzxDxs',
+      rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
+      response: {
+        attestationObject: new Uint8Array([1, 2, 3, 4]),
+        clientDataJSON: new Uint8Array([1, 2, 3, 4]),
+        getTransports: () => ['cable'],
+      },
+      getClientExtensionResults: () => ({}),
+      type: 'webauthn.create',
+    });
 
     const regResponse = await startRegistration({ optionsJSON: goodOpts1 });
 
@@ -255,13 +249,11 @@ describe('Method: startRegistration', () => {
 
   it('should return authenticatorAttachment if present', async () => {
     // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = {
-      create: async () => ({
-        response: {},
-        getClientExtensionResults: () => {},
-        authenticatorAttachment: 'cross-platform',
-      }),
-    };
+    globalThis.navigator.credentials.create = async () => ({
+      response: {},
+      getClientExtensionResults: () => {},
+      authenticatorAttachment: 'cross-platform',
+    });
 
     const response = await startRegistration({ optionsJSON: goodOpts1 });
 
@@ -275,16 +267,14 @@ describe('Method: startRegistration', () => {
      * that's already buried in the response.
      */
     // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = {
-      create: async () => ({
-        response: {
-          getPublicKeyAlgorithm: () => 777,
-          getPublicKey: () => new Uint8Array([0, 0, 0, 0]).buffer,
-          getAuthenticatorData: () => new Uint8Array([0, 0, 0, 0]).buffer,
-        },
-        getClientExtensionResults: () => {},
-      }),
-    };
+    globalThis.navigator.credentials.create = async () => ({
+      response: {
+        getPublicKeyAlgorithm: () => 777,
+        getPublicKey: () => new Uint8Array([0, 0, 0, 0]).buffer,
+        getAuthenticatorData: () => new Uint8Array([0, 0, 0, 0]).buffer,
+      },
+      getClientExtensionResults: () => {},
+    });
 
     const response = await startRegistration({ optionsJSON: goodOpts1 });
 
@@ -300,12 +290,10 @@ describe('Method: startRegistration', () => {
      * that's already buried in the response.
      */
     // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = {
-      create: async () => ({
-        response: {},
-        getClientExtensionResults: () => {},
-      }),
-    };
+    globalThis.navigator.credentials.create = async () => ({
+      response: {},
+      getClientExtensionResults: () => {},
+    });
 
     const response = await startRegistration({ optionsJSON: goodOpts1 });
 
@@ -341,23 +329,21 @@ describe('Method: startRegistration', () => {
      */
 
     // @ts-ignore: Super lame, making me stub out credman like this
-    globalThis.navigator.credentials = {
-      create: async () => ({
-        // Mock extension return values from the browser extension intercepting WebAuthn
-        response: {
-          getPublicKeyAlgorithm: () => {
-            throw new Error('I throw for some reason');
-          },
-          getPublicKey: () => {
-            throw new Error('I also throw for some reason');
-          },
-          getAuthenticatorData: () => {
-            throw new Error('I throw for some reason too');
-          },
+    globalThis.navigator.credentials.create = async () => ({
+      // Mock extension return values from the browser extension intercepting WebAuthn
+      response: {
+        getPublicKeyAlgorithm: () => {
+          throw new Error('I throw for some reason');
         },
-        getClientExtensionResults: () => {},
-      }),
-    };
+        getPublicKey: () => {
+          throw new Error('I also throw for some reason');
+        },
+        getAuthenticatorData: () => {
+          throw new Error('I throw for some reason too');
+        },
+      },
+      getClientExtensionResults: () => {},
+    });
 
     // Quiet down the `console.warn()` output when the getters above throw
     const stubConsoleWarn = stub(console, 'warn');
@@ -384,7 +370,7 @@ describe('Method: startRegistration', () => {
 
 describe('WebAuthnError', () => {
   beforeEach(() => {
-    _browserSupportsWebAuthnInternals.stubThis = spy(() => true);
+    _browserSupportsWebAuthnInternals.stubThis = () => true;
   });
 
   // describe('AbortError', () => {
