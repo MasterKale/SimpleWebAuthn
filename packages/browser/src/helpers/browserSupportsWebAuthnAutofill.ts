@@ -8,7 +8,9 @@ import { browserSupportsWebAuthn } from './browserSupportsWebAuthn.ts';
  */
 export function browserSupportsWebAuthnAutofill(): Promise<boolean> {
   if (!browserSupportsWebAuthn()) {
-    return new Promise((resolve) => resolve(false));
+    return _browserSupportsWebAuthnAutofillInternals.stubThis(
+      new Promise((resolve) => resolve(false)),
+    );
   }
 
   /**
@@ -21,8 +23,17 @@ export function browserSupportsWebAuthnAutofill(): Promise<boolean> {
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
   if (globalPublicKeyCredential.isConditionalMediationAvailable === undefined) {
-    return new Promise((resolve) => resolve(false));
+    return _browserSupportsWebAuthnAutofillInternals.stubThis(
+      new Promise((resolve) => resolve(false)),
+    );
   }
 
-  return globalPublicKeyCredential.isConditionalMediationAvailable();
+  return _browserSupportsWebAuthnAutofillInternals.stubThis(
+    globalPublicKeyCredential.isConditionalMediationAvailable(),
+  );
 }
+
+// Make it possible to stub the return value during testing
+export const _browserSupportsWebAuthnAutofillInternals = {
+  stubThis: (value: Promise<boolean>) => value,
+};
