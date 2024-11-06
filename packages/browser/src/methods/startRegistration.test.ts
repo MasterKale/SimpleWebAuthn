@@ -1,25 +1,20 @@
+/// <reference lib="DOM" />
+import { assertEquals, assertInstanceOf, assertRejects, assertStringIncludes } from '@std/assert';
+import { assertSpyCalls, type Spy, spy, stub } from '@std/testing/mock';
+import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialCreationOptionsJSON,
-  RegistrationCredential,
 } from '@simplewebauthn/types';
 
 import { generateCustomError } from '../helpers/__jest__/generateCustomError.ts';
-import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn.ts';
+import { _browserSupportsWebAuthnInternals } from '../helpers/browserSupportsWebAuthn.ts';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer.ts';
 import { WebAuthnError } from '../helpers/webAuthnError.ts';
 import { WebAuthnAbortService } from '../helpers/webAuthnAbortService.ts';
 
 import { startRegistration } from './startRegistration.ts';
-
-jest.mock('../helpers/browserSupportsWebAuthn');
-
-const mockNavigatorCreate = window.navigator.credentials.create as jest.Mock;
-const mockSupportsWebauthn = browserSupportsWebAuthn as jest.Mock;
-
-const mockAttestationObject = 'mockAtte';
-const mockClientDataJSON = 'mockClie';
 
 const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
   challenge: '1T6uHri4OAQ',
@@ -49,294 +44,306 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
   ],
 };
 
-beforeEach(() => {
-  // Stub out a response so the method won't throw
-  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
-    return new Promise((resolve) => {
-      resolve({ response: {}, getClientExtensionResults: () => ({}) });
-    });
+/**
+ * A basic method we can resolve when mocking `navigator.credentials.create()` so _something_ gets
+ * returned
+ */
+const defaultCreateResponse = async (...args: any[]) => ({
+  response: {},
+  getClientExtensionResults: () => ({}),
+});
+
+describe('Method: startRegistration', () => {
+  let createSpy: Spy;
+
+  beforeEach(() => {
+    // Stub out a response so the method won't throw
+    createSpy = spy(defaultCreateResponse);
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = { create: createSpy };
+
+    // Assume WebAuthn is available
+    _browserSupportsWebAuthnInternals.stubThis = spy(() => true);
   });
 
-  mockSupportsWebauthn.mockReturnValue(true);
-
-  // Reset the abort service so we get an accurate call count
-  WebAuthnAbortService.cancelCeremony();
-});
-
-afterEach(() => {
-  mockNavigatorCreate.mockReset();
-  mockSupportsWebauthn.mockReset();
-});
-
-test('should convert options before passing to navigator.credentials.create(...)', async () => {
-  await startRegistration({ optionsJSON: goodOpts1 });
-
-  const argsPublicKey = mockNavigatorCreate.mock.calls[0][0].publicKey;
-  const credId = argsPublicKey.excludeCredentials[0].id;
-
-  // Make sure challenge and user.id are converted to Buffers
-  expect(new Uint8Array(argsPublicKey.challenge)).toEqual(
-    new Uint8Array([213, 62, 174, 30, 184, 184, 56, 4]),
-  );
-  expect(new Uint8Array(argsPublicKey.user.id)).toEqual(
-    new Uint8Array([127, 138, 93, 203, 119, 233, 3, 126]),
-  );
-
-  // Confirm construction of excludeCredentials array
-  expect(credId instanceof ArrayBuffer).toEqual(true);
-  expect(credId.byteLength).toEqual(64);
-  expect(argsPublicKey.excludeCredentials[0].type).toEqual('public-key');
-  expect(argsPublicKey.excludeCredentials[0].transports).toEqual(['internal']);
-});
-
-test('should return base64url-encoded response values', async () => {
-  mockNavigatorCreate.mockImplementation(
-    (): Promise<RegistrationCredential> => {
-      return new Promise((resolve) => {
-        resolve({
-          id: '6mUg8GzxDxs',
-          rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
-          response: {
-            attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
-            clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
-            getTransports: () => [],
-            getAuthenticatorData: () => new Uint8Array(),
-            getPublicKey: () => null,
-            getPublicKeyAlgorithm: () => -999,
-          },
-          getClientExtensionResults: () => ({}),
-          type: 'public-key',
-          authenticatorAttachment: '',
-        });
-      });
-    },
-  );
-
-  const response = await startRegistration({ optionsJSON: goodOpts1 });
-
-  expect(response.rawId).toEqual('6mUg8GzxDxs');
-  expect(response.response.attestationObject).toEqual('bW9ja0F0dGU');
-  expect(response.response.clientDataJSON).toEqual('bW9ja0NsaWU');
-});
-
-test("should throw error if WebAuthn isn't supported", async () => {
-  mockSupportsWebauthn.mockReturnValue(false);
-
-  await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects.toThrow(
-    'WebAuthn is not supported in this browser',
-  );
-});
-
-test('should throw error if attestation is cancelled for some reason', async () => {
-  mockNavigatorCreate.mockImplementation((): Promise<null> => {
-    return new Promise((resolve) => {
-      resolve(null);
-    });
+  afterEach(() => {
+    // Reset the abort service so we get an accurate call count
+    WebAuthnAbortService.cancelCeremony();
   });
 
-  await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects.toThrow(
-    'Registration was not completed',
-  );
-});
+  it('should convert options before passing to navigator.credentials.create(...)', async () => {
+    await startRegistration({ optionsJSON: goodOpts1 });
 
-test('should send extensions to authenticator if present in options', async () => {
-  const extensions: AuthenticationExtensionsClientInputs = {
-    credProps: true,
-    appid: 'appidHere',
-    // @ts-ignore: Send arbitrary extensions
-    uvm: true,
-    // @ts-ignore: Send arbitrary extensions
-    appidExclude: 'appidExcludeHere',
-  };
-  const optsWithExts: PublicKeyCredentialCreationOptionsJSON = {
-    ...goodOpts1,
-    extensions,
-  };
-  await startRegistration({ optionsJSON: optsWithExts });
+    const args = createSpy.calls.at(0)?.args[0] as CredentialCreationOptions;
+    const argsPublicKey = args.publicKey!;
+    const credId = argsPublicKey.excludeCredentials?.[0].id;
 
-  const argsExtensions = mockNavigatorCreate.mock.calls[0][0].publicKey.extensions;
+    // Make sure challenge and user.id are converted to Buffers
+    assertEquals(
+      new Uint8Array(argsPublicKey.challenge as ArrayBuffer),
+      new Uint8Array([213, 62, 174, 30, 184, 184, 56, 4]),
+    );
+    assertEquals(
+      new Uint8Array(argsPublicKey.user.id as ArrayBuffer),
+      new Uint8Array([127, 138, 93, 203, 119, 233, 3, 126]),
+    );
 
-  expect(argsExtensions).toEqual(extensions);
-});
-
-test('should not set any extensions if not present in options', async () => {
-  await startRegistration({ optionsJSON: goodOpts1 });
-
-  const argsExtensions = mockNavigatorCreate.mock.calls[0][0].publicKey.extensions;
-
-  expect(argsExtensions).toEqual(undefined);
-});
-
-test('should include extension results', async () => {
-  const extResults: AuthenticationExtensionsClientOutputs = {
-    appid: true,
-    credProps: {
-      rk: true,
-    },
-  };
-
-  // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
-    return new Promise((resolve) => {
-      resolve({ response: {}, getClientExtensionResults: () => extResults });
-    });
+    // Confirm construction of excludeCredentials array
+    assertInstanceOf(credId, ArrayBuffer);
+    assertEquals(credId.byteLength, 64);
+    assertEquals(argsPublicKey.excludeCredentials?.[0].type, 'public-key');
+    assertEquals(argsPublicKey.excludeCredentials?.[0].transports, ['internal']);
   });
 
-  // Extensions aren't present in this object, but it doesn't matter since we're faking the response
-  const response = await startRegistration({ optionsJSON: goodOpts1 });
+  it('should return base64url-encoded response values', async () => {
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = {
+      create: async () => ({
+        id: '6mUg8GzxDxs',
+        rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
+        response: {
+          attestationObject: new Uint8Array([1, 2, 3, 4]),
+          clientDataJSON: new Uint8Array([5, 6, 7, 8]),
+          getTransports: () => [],
+          getAuthenticatorData: () => new Uint8Array(),
+          getPublicKey: () => null,
+          getPublicKeyAlgorithm: () => -999,
+        },
+        getClientExtensionResults: () => ({}),
+        type: 'public-key',
+        authenticatorAttachment: '',
+      }),
+    };
 
-  expect(response.clientExtensionResults).toEqual(extResults);
-});
+    const response = await startRegistration({ optionsJSON: goodOpts1 });
 
-test('should include extension results when no extensions specified', async () => {
-  const response = await startRegistration({ optionsJSON: goodOpts1 });
+    assertEquals(response.rawId, '6mUg8GzxDxs');
+    assertEquals(response.response.attestationObject, 'AQIDBA');
+    assertEquals(response.response.clientDataJSON, 'BQYHCA');
+  });
 
-  expect(response.clientExtensionResults).toEqual({});
-});
+  it("should throw error if WebAuthn isn't supported", async () => {
+    _browserSupportsWebAuthnInternals.stubThis = spy(() => false);
 
-test('should support "cable" transport in excludeCredentials', async () => {
-  const opts: PublicKeyCredentialCreationOptionsJSON = {
-    ...goodOpts1,
-    excludeCredentials: [
-      {
-        ...goodOpts1.excludeCredentials![0],
-        transports: ['cable'],
+    await assertRejects(
+      () => startRegistration({ optionsJSON: goodOpts1 }),
+      Error,
+      'WebAuthn is not supported in this browser',
+    );
+  });
+
+  it('should throw error if attestation is cancelled for some reason', async () => {
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = { create: spy(async () => null) };
+
+    await assertRejects(
+      () => startRegistration({ optionsJSON: goodOpts1 }),
+      Error,
+      'Registration was not completed',
+    );
+  });
+
+  it('should send extensions to authenticator if present in options', async () => {
+    const extensions: AuthenticationExtensionsClientInputs = {
+      credProps: true,
+      appid: 'appidHere',
+      // @ts-ignore: Send arbitrary extensions
+      uvm: true,
+      // @ts-ignore: Send arbitrary extensions
+      appidExclude: 'appidExcludeHere',
+    };
+
+    const optsWithExts: PublicKeyCredentialCreationOptionsJSON = {
+      ...goodOpts1,
+      extensions,
+    };
+
+    await startRegistration({ optionsJSON: optsWithExts });
+
+    const args = createSpy.calls.at(0)?.args[0] as CredentialCreationOptions;
+    const argsPublicKey = args.publicKey!;
+    const argsExtensions = argsPublicKey.extensions;
+
+    assertEquals(argsExtensions, extensions);
+  });
+
+  it('should not set any extensions if not present in options', async () => {
+    await startRegistration({ optionsJSON: goodOpts1 });
+
+    const args = createSpy.calls.at(0)?.args[0] as CredentialCreationOptions;
+    const argsPublicKey = args.publicKey!;
+    const argsExtensions = argsPublicKey.extensions;
+
+    assertEquals(argsExtensions, undefined);
+  });
+
+  it('should include extension results', async () => {
+    const extResults: AuthenticationExtensionsClientOutputs = {
+      appid: true,
+      credProps: {
+        rk: true,
       },
-    ],
-  };
+    };
 
-  await startRegistration({ optionsJSON: opts });
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = {
+      create: async () => ({ response: {}, getClientExtensionResults: () => extResults }),
+    };
 
-  expect(
-    mockNavigatorCreate.mock.calls[0][0].publicKey.excludeCredentials[0]
-      .transports[0],
-  ).toEqual('cable');
-});
+    const response = await startRegistration({ optionsJSON: goodOpts1 });
 
-test('should return "cable" transport from response', async () => {
-  mockNavigatorCreate.mockResolvedValue({
-    id: '6mUg8GzxDxs',
-    rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
-    response: {
-      attestationObject: Buffer.from(mockAttestationObject, 'ascii'),
-      clientDataJSON: Buffer.from(mockClientDataJSON, 'ascii'),
-      getTransports: () => ['cable'],
-    },
-    getClientExtensionResults: () => ({}),
-    type: 'webauthn.create',
+    assertEquals(response.clientExtensionResults, extResults);
   });
 
-  const regResponse = await startRegistration({ optionsJSON: goodOpts1 });
+  it('should include extension results when no extensions specified', async () => {
+    const response = await startRegistration({ optionsJSON: goodOpts1 });
 
-  expect(regResponse.response.transports).toEqual(['cable']);
-});
+    assertEquals(response.clientExtensionResults, {});
+  });
 
-test('should cancel an existing call when executed again', async () => {
-  const abortSpy = jest.spyOn(AbortController.prototype, 'abort');
+  it('should support "cable" transport in excludeCredentials', async () => {
+    const opts: PublicKeyCredentialCreationOptionsJSON = {
+      ...goodOpts1,
+      excludeCredentials: [
+        {
+          ...goodOpts1.excludeCredentials![0],
+          transports: ['cable'],
+        },
+      ],
+    };
 
-  // Fire off a request and immediately attempt a second one
-  startRegistration({ optionsJSON: goodOpts1 });
-  await startRegistration({ optionsJSON: goodOpts1 });
-  expect(abortSpy).toHaveBeenCalledTimes(1);
-});
+    await startRegistration({ optionsJSON: opts });
 
-test('should return authenticatorAttachment if present', async () => {
-  // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
-    return new Promise((resolve) => {
-      resolve({
+    const args = createSpy.calls.at(0)?.args[0] as CredentialCreationOptions;
+    const argsPublicKey = args.publicKey!;
+
+    assertEquals(
+      argsPublicKey?.excludeCredentials?.[0].transports?.[0],
+      'cable',
+    );
+  });
+
+  it('should return "cable" transport from response', async () => {
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = {
+      create: async () => ({
+        id: '6mUg8GzxDxs',
+        rawId: base64URLStringToBuffer('6mUg8GzxDxs'),
+        response: {
+          attestationObject: new Uint8Array([1, 2, 3, 4]),
+          clientDataJSON: new Uint8Array([1, 2, 3, 4]),
+          getTransports: () => ['cable'],
+        },
+        getClientExtensionResults: () => ({}),
+        type: 'webauthn.create',
+      }),
+    };
+
+    const regResponse = await startRegistration({ optionsJSON: goodOpts1 });
+
+    assertEquals(regResponse.response.transports, ['cable']);
+  });
+
+  it('should cancel an existing call when executed again', async () => {
+    const abortSpy = spy(AbortController.prototype, 'abort');
+
+    // Fire off a request and immediately attempt a second one
+    startRegistration({ optionsJSON: goodOpts1 });
+    await startRegistration({ optionsJSON: goodOpts1 });
+    assertSpyCalls(abortSpy, 1);
+  });
+
+  it('should return authenticatorAttachment if present', async () => {
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = {
+      create: async () => ({
         response: {},
         getClientExtensionResults: () => {},
         authenticatorAttachment: 'cross-platform',
-      });
-    });
+      }),
+    };
+
+    const response = await startRegistration({ optionsJSON: goodOpts1 });
+
+    assertEquals(response.authenticatorAttachment, 'cross-platform');
   });
 
-  const response = await startRegistration({ optionsJSON: goodOpts1 });
-
-  expect(response.authenticatorAttachment).toEqual('cross-platform');
-});
-
-test('should return convenience values if getters present', async () => {
-  /**
-   * I call them "convenience values" because the getters for public key algorithm,
-   * public key bytes, and authenticator data are alternative ways to access information
-   * that's already buried in the response.
-   */
-  // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
-    return new Promise((resolve) => {
-      resolve({
+  it('should return convenience values if getters present', async () => {
+    /**
+     * I call them "convenience values" because the getters for public key algorithm,
+     * public key bytes, and authenticator data are alternative ways to access information
+     * that's already buried in the response.
+     */
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = {
+      create: async () => ({
         response: {
           getPublicKeyAlgorithm: () => 777,
           getPublicKey: () => new Uint8Array([0, 0, 0, 0]).buffer,
           getAuthenticatorData: () => new Uint8Array([0, 0, 0, 0]).buffer,
         },
         getClientExtensionResults: () => {},
-      });
-    });
+      }),
+    };
+
+    const response = await startRegistration({ optionsJSON: goodOpts1 });
+
+    assertEquals(response.response.publicKeyAlgorithm, 777);
+    assertEquals(response.response.publicKey, 'AAAAAA');
+    assertEquals(response.response.authenticatorData, 'AAAAAA');
   });
 
-  const response = await startRegistration({ optionsJSON: goodOpts1 });
-
-  expect(response.response.publicKeyAlgorithm).toEqual(777);
-  expect(response.response.publicKey).toEqual('AAAAAA');
-  expect(response.response.authenticatorData).toEqual('AAAAAA');
-});
-
-test('should not return convenience values if getters missing', async () => {
-  /**
-   * I call them "convenience values" because the getters for public key algorithm,
-   * public key bytes, and authenticator data are alternative ways to access information
-   * that's already buried in the response.
-   */
-  // Mock extension return values from authenticator
-  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
-    return new Promise((resolve) => {
-      resolve({
+  it('should not return convenience values if getters missing', async () => {
+    /**
+     * I call them "convenience values" because the getters for public key algorithm,
+     * public key bytes, and authenticator data are alternative ways to access information
+     * that's already buried in the response.
+     */
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = {
+      create: async () => ({
         response: {},
         getClientExtensionResults: () => {},
-      });
-    });
+      }),
+    };
+
+    const response = await startRegistration({ optionsJSON: goodOpts1 });
+
+    assertEquals(response.response.publicKeyAlgorithm, undefined);
+    assertEquals(response.response.publicKey, undefined);
+    assertEquals(response.response.authenticatorData, undefined);
   });
 
-  const response = await startRegistration({ optionsJSON: goodOpts1 });
+  it('should survive browser extensions that intercept WebAuthn and incorrectly implement public key value getters', async () => {
+    /**
+     * 1Password browser extension v2.15.1 (the one that introduced passkeys support) seemed to have
+     * implemented the following methods on AuthenticatorAttestationResponse...
+     *
+     * - getPublicKeyAlgorithm()
+     * - getPublicKey()
+     * - getAuthenticatorData()
+     *
+     * ...But when you attempt to call them as methods they'll error out with `TypeError`'s:
+     *
+     * Safari:
+     * > TypeError: Can only call AuthenticatorAttestationResponse.getPublicKeyAlgorithm on instances
+     * > of AuthenticatorAttestationResponse
+     *
+     * Chrome:
+     * > TypeError: Illegal invocation
+     *
+     * Firefox:
+     * > N/A (it handled it fine for some reason)
+     *
+     * Make sure `startRegistration()` can survive this scenario.
+     *
+     * See https://github.com/MasterKale/SimpleWebAuthn/issues/438 for more context.
+     */
 
-  expect(response.response.publicKeyAlgorithm).toBeUndefined();
-  expect(response.response.publicKey).toBeUndefined();
-  expect(response.response.authenticatorData).toBeUndefined();
-});
-
-test('should survive browser extensions that intercept WebAuthn and incorrectly implement public key value getters', async () => {
-  /**
-   * 1Password browser extension v2.15.1 (the one that introduced passkeys support) seemed to have
-   * implemented the following methods on AuthenticatorAttestationResponse...
-   *
-   * - getPublicKeyAlgorithm()
-   * - getPublicKey()
-   * - getAuthenticatorData()
-   *
-   * ...But when you attempt to call them as methods they'll error out with `TypeError`'s:
-   *
-   * Safari:
-   * > TypeError: Can only call AuthenticatorAttestationResponse.getPublicKeyAlgorithm on instances
-   * > of AuthenticatorAttestationResponse
-   *
-   * Chrome:
-   * > TypeError: Illegal invocation
-   *
-   * Firefox:
-   * > N/A (it handled it fine for some reason)
-   *
-   * Make sure `startRegistration()` can survive this scenario.
-   *
-   * See https://github.com/MasterKale/SimpleWebAuthn/issues/438 for more context.
-   */
-
-  // Mock extension return values from the browser extension intercepting WebAuthn
-  mockNavigatorCreate.mockImplementation((): Promise<unknown> => {
-    return new Promise((resolve) => {
-      resolve({
+    // @ts-ignore: Super lame, making me stub out credman like this
+    globalThis.navigator.credentials = {
+      create: async () => ({
+        // Mock extension return values from the browser extension intercepting WebAuthn
         response: {
           getPublicKeyAlgorithm: () => {
             throw new Error('I throw for some reason');
@@ -349,54 +356,70 @@ test('should survive browser extensions that intercept WebAuthn and incorrectly 
           },
         },
         getClientExtensionResults: () => {},
-      });
-    });
+      }),
+    };
+
+    // Quiet down the `console.warn()` output when the getters above throw
+    const stubConsoleWarn = stub(console, 'warn');
+
+    const response = await startRegistration({ optionsJSON: goodOpts1 });
+
+    assertEquals(response.response.publicKeyAlgorithm, undefined);
+    assertEquals(response.response.publicKey, undefined);
+    assertEquals(response.response.authenticatorData, undefined);
+
+    stubConsoleWarn.restore();
   });
 
-  await expect(startRegistration({ optionsJSON: goodOpts1 })).resolves;
+  it('should automatically register a.k.a. Conditional Create', async () => {
+    await startRegistration({ optionsJSON: goodOpts1, useAutoRegister: true });
 
-  const response = await startRegistration({ optionsJSON: goodOpts1 });
+    const args = createSpy.calls.at(0)?.args[0] as CredentialCreationOptions;
+    const argsMediation = (args as any).mediation;
 
-  expect(response.response.publicKeyAlgorithm).toBeUndefined();
-  expect(response.response.publicKey).toBeUndefined();
-  expect(response.response.authenticatorData).toBeUndefined();
-});
-
-test('should automatically register a.k.a. Conditional Create', async () => {
-  await startRegistration({ optionsJSON: goodOpts1, useAutoRegister: true });
-
-  // The most important bit
-  expect(mockNavigatorCreate.mock.calls[0][0].mediation).toEqual('conditional');
+    // The most important bit
+    assertEquals(argsMediation, 'conditional');
+  });
 });
 
 describe('WebAuthnError', () => {
-  describe('AbortError', () => {
-    const AbortError = generateCustomError('AbortError');
-    /**
-     * We can't actually test this because nothing in startRegistration() propagates the abort
-     * signal. But if you invoked WebAuthn via this and then manually sent an abort signal I guess
-     * this will catch.
-     *
-     * As a matter of fact I couldn't actually get any browser to respect the abort signal...
-     */
-    test.skip('should identify abort signal', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(AbortError);
-
-      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/abort signal/i);
-      rejected.toThrow(/AbortError/);
-      rejected.toHaveProperty('code', 'ERROR_CEREMONY_ABORTED');
-      rejected.toHaveProperty('cause', AbortError);
-    });
+  beforeEach(() => {
+    _browserSupportsWebAuthnInternals.stubThis = spy(() => true);
   });
+
+  // describe('AbortError', () => {
+  //   const AbortError = generateCustomError('AbortError');
+  //   /**
+  //    * We can't actually test this because nothing in startRegistration() propagates the abort
+  //    * signal. But if you invoked WebAuthn via this and then manually sent an abort signal I guess
+  //    * this will catch.
+  //    *
+  //    * As a matter of fact I couldn't actually get any browser to respect the abort signal...
+  //    */
+  //   Deno.test('should identify abort signal', async () => {
+  //     mockNavigatorCreate.mockRejectedValueOnce(AbortError);
+
+  //     const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
+  //     rejected.toThrow(WebAuthnError);
+  //     rejected.toThrow(/abort signal/i);
+  //     rejected.toThrow(/AbortError/);
+  //     rejected.toHaveProperty('code', 'ERROR_CEREMONY_ABORTED');
+  //     rejected.toHaveProperty('cause', AbortError);
+  //   });
+  // });
 
   describe('ConstraintError', () => {
     const ConstraintError = generateCustomError('ConstraintError');
 
-    test('should identify unsupported discoverable credentials', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(ConstraintError);
+    beforeEach(() => {
+      const createSpy = spy(async () => {
+        throw ConstraintError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
+    });
 
+    it('should identify unsupported discoverable credentials', async () => {
       const opts: PublicKeyCredentialCreationOptionsJSON = {
         ...goodOpts1,
         authenticatorSelection: {
@@ -405,21 +428,23 @@ describe('WebAuthnError', () => {
         },
       };
 
-      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/discoverable credentials were required/i);
-      rejected.toThrow(/no available authenticator supported/i);
-      rejected.toHaveProperty('name', 'ConstraintError');
-      rejected.toHaveProperty(
-        'code',
-        'ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT',
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: opts }),
+        WebAuthnError,
       );
-      rejected.toHaveProperty('cause', ConstraintError);
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(
+        rejected.message.toLowerCase(),
+        'discoverable credentials were required',
+      );
+      assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator supported');
+      assertEquals(rejected.name, 'ConstraintError');
+      assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT');
+      assertEquals(rejected.cause, ConstraintError);
     });
 
-    test('should identify unsupported user verification', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(ConstraintError);
-
+    it('should identify unsupported user verification', async () => {
       const opts: PublicKeyCredentialCreationOptionsJSON = {
         ...goodOpts1,
         authenticatorSelection: {
@@ -427,21 +452,20 @@ describe('WebAuthnError', () => {
         },
       };
 
-      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/user verification was required/i);
-      rejected.toThrow(/no available authenticator supported/i);
-      rejected.toHaveProperty('name', 'ConstraintError');
-      rejected.toHaveProperty(
-        'code',
-        'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT',
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: opts }),
+        WebAuthnError,
       );
-      rejected.toHaveProperty('cause', ConstraintError);
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), 'user verification was required');
+      assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator supported');
+      assertEquals(rejected.name, 'ConstraintError');
+      assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT');
+      assertEquals(rejected.cause, ConstraintError);
     });
 
-    test('should identify unsupported user verification during auto registration', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(ConstraintError);
-
+    it('should identify unsupported user verification during auto registration', async () => {
       const opts: PublicKeyCredentialCreationOptionsJSON = {
         ...goodOpts1,
         authenticatorSelection: {
@@ -449,41 +473,51 @@ describe('WebAuthnError', () => {
         },
       };
 
-      const rejected = await expect(startRegistration({ optionsJSON: opts, useAutoRegister: true }))
-        .rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/user verification was required during automatic registration/i);
-      rejected.toThrow(/could not be performed/i);
-      rejected.toHaveProperty('name', 'ConstraintError');
-      rejected.toHaveProperty(
-        'code',
-        'ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE',
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: opts, useAutoRegister: true }),
+        WebAuthnError,
       );
-      rejected.toHaveProperty('cause', ConstraintError);
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(
+        rejected.message.toLowerCase(),
+        'user verification was required during automatic registration',
+      );
+      assertStringIncludes(rejected.message.toLowerCase(), 'could not be performed');
+      assertEquals(rejected.name, 'ConstraintError');
+      assertEquals(rejected.code, 'ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE');
+      assertEquals(rejected.cause, ConstraintError);
     });
   });
 
   describe('InvalidStateError', () => {
     const InvalidStateError = generateCustomError('InvalidStateError');
 
-    test('should identify re-registration attempt', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(InvalidStateError);
+    beforeEach(() => {
+      const createSpy = spy(async () => {
+        throw InvalidStateError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
+    });
 
-      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/authenticator/i);
-      rejected.toThrow(/previously registered/i);
-      rejected.toHaveProperty('name', 'InvalidStateError');
-      rejected.toHaveProperty(
-        'code',
-        'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED',
+    it('should identify re-registration attempt', async () => {
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: goodOpts1 }),
+        WebAuthnError,
       );
-      rejected.toHaveProperty('cause', InvalidStateError);
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), 'authenticator');
+      assertStringIncludes(rejected.message.toLowerCase(), 'previously registered');
+      assertEquals(rejected.name, 'InvalidStateError');
+      assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED');
+      assertEquals(rejected.cause, InvalidStateError);
     });
   });
 
   describe('NotAllowedError', () => {
-    test('should pass through error message (iOS Safari - Operation failed)', async () => {
+    it('should pass through error message (iOS Safari - Operation failed)', async () => {
       /**
        * Thrown when biometric is not enrolled, or a Safari bug prevents conditional UI from being
        * aborted properly between page reloads.
@@ -494,17 +528,26 @@ describe('WebAuthnError', () => {
         'NotAllowedError',
         'Operation failed.',
       );
-      mockNavigatorCreate.mockRejectedValueOnce(NotAllowedError);
 
-      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
-      rejected.toThrow(Error);
-      rejected.toThrow(/operation failed/i);
-      rejected.toHaveProperty('name', 'NotAllowedError');
-      rejected.toHaveProperty('code', 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
-      rejected.toHaveProperty('cause', NotAllowedError);
+      const createSpy = spy(async () => {
+        throw NotAllowedError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
+
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: goodOpts1 }),
+        WebAuthnError,
+      );
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), 'operation failed');
+      assertEquals(rejected.name, 'NotAllowedError');
+      assertEquals(rejected.code, 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
+      assertEquals(rejected.cause, NotAllowedError);
     });
 
-    test('should pass through error message (Chrome M110 - Bad TLS Cert)', async () => {
+    it('should pass through error message (Chrome M110 - Bad TLS Cert)', async () => {
       /**
        * Starting from Chrome M110, WebAuthn is blocked if the site is being displayed on a URL with
        * TLS certificate issues. This includes during development.
@@ -515,104 +558,132 @@ describe('WebAuthnError', () => {
         'NotAllowedError',
         'WebAuthn is not supported on sites with TLS certificate errors.',
       );
-      mockNavigatorCreate.mockRejectedValueOnce(NotAllowedError);
 
-      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
-      rejected.toThrow(Error);
-      rejected.toThrow(/sites with TLS certificate errors/i);
-      rejected.toHaveProperty('name', 'NotAllowedError');
-      rejected.toHaveProperty('code', 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
-      rejected.toHaveProperty('cause', NotAllowedError);
+      const createSpy = spy(async () => {
+        throw NotAllowedError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
+
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: goodOpts1 }),
+        WebAuthnError,
+      );
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), 'sites with tls certificate errors');
+      assertEquals(rejected.name, 'NotAllowedError');
+      assertEquals(rejected.code, 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
+      assertEquals(rejected.cause, NotAllowedError);
     });
   });
 
   describe('NotSupportedError', () => {
     const NotSupportedError = generateCustomError('NotSupportedError');
 
-    test('should identify missing "public-key" entries in pubKeyCredParams', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(NotSupportedError);
+    beforeEach(() => {
+      const createSpy = spy(async () => {
+        throw NotSupportedError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
+    });
 
+    it('should identify missing "public-key" entries in pubKeyCredParams', async () => {
       const opts = {
         ...goodOpts1,
         pubKeyCredParams: [],
       };
 
-      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/pubKeyCredParams/i);
-      rejected.toThrow(/public-key/i);
-      rejected.toHaveProperty('name', 'NotSupportedError');
-      rejected.toHaveProperty('code', 'ERROR_MALFORMED_PUBKEYCREDPARAMS');
-      rejected.toHaveProperty('cause', NotSupportedError);
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: opts }),
+        WebAuthnError,
+      );
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), 'pubkeycredparams');
+      assertStringIncludes(rejected.message.toLowerCase(), 'public-key');
+      assertEquals(rejected.name, 'NotSupportedError');
+      assertEquals(rejected.code, 'ERROR_MALFORMED_PUBKEYCREDPARAMS');
+      assertEquals(rejected.cause, NotSupportedError);
     });
 
-    test('should identify no authenticator supports algs in pubKeyCredParams', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(NotSupportedError);
-
+    it('should identify no authenticator supports algs in pubKeyCredParams', async () => {
       const opts: PublicKeyCredentialCreationOptionsJSON = {
         ...goodOpts1,
         pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
       };
 
-      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/No available authenticator/i);
-      rejected.toThrow(/pubKeyCredParams/i);
-      rejected.toHaveProperty('name', 'NotSupportedError');
-      rejected.toHaveProperty(
-        'code',
-        'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG',
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: opts }),
+        WebAuthnError,
       );
-      rejected.toHaveProperty('cause', NotSupportedError);
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator');
+      assertStringIncludes(rejected.message.toLowerCase(), 'pubkeycredparams');
+      assertEquals(rejected.name, 'NotSupportedError');
+      assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG');
+      assertEquals(rejected.cause, NotSupportedError);
     });
   });
 
   describe('SecurityError', () => {
     const SecurityError = generateCustomError('SecurityError');
 
-    let _originalHostName: string;
-
     beforeEach(() => {
-      _originalHostName = window.location.hostname;
+      const createSpy = spy(async () => {
+        throw SecurityError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
+
+      // @ts-ignore
+      globalThis.location = { hostname: '' } as unknown;
     });
 
-    afterEach(() => {
-      window.location.hostname = _originalHostName;
+    it('should identify invalid domain', async () => {
+      globalThis.location.hostname = '1.2.3.4';
+
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: goodOpts1 }),
+        WebAuthnError,
+      );
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), '1.2.3.4');
+      assertStringIncludes(rejected.message.toLowerCase(), 'invalid domain');
+      assertEquals(rejected.name, 'SecurityError');
+      assertEquals(rejected.code, 'ERROR_INVALID_DOMAIN');
+      assertEquals(rejected.cause, SecurityError);
     });
 
-    test('should identify invalid domain', async () => {
-      window.location.hostname = '1.2.3.4';
+    it('should identify invalid RP ID', async () => {
+      globalThis.location.hostname = 'simplewebauthn.com';
 
-      mockNavigatorCreate.mockRejectedValueOnce(SecurityError);
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: goodOpts1 }),
+        WebAuthnError,
+      );
 
-      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
-      rejected.toThrowError(WebAuthnError);
-      rejected.toThrow(/1\.2\.3\.4/);
-      rejected.toThrow(/invalid domain/i);
-      rejected.toHaveProperty('name', 'SecurityError');
-      rejected.toHaveProperty('code', 'ERROR_INVALID_DOMAIN');
-      rejected.toHaveProperty('cause', SecurityError);
-    });
-
-    test('should identify invalid RP ID', async () => {
-      window.location.hostname = 'simplewebauthn.com';
-
-      mockNavigatorCreate.mockRejectedValueOnce(SecurityError);
-
-      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
-      rejected.toThrowError(WebAuthnError);
-      rejected.toThrow(goodOpts1.rp.id);
-      rejected.toThrow(/invalid for this domain/i);
-      rejected.toHaveProperty('name', 'SecurityError');
-      rejected.toHaveProperty('code', 'ERROR_INVALID_RP_ID');
-      rejected.toHaveProperty('cause', SecurityError);
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), `${goodOpts1.rp.id}`);
+      assertStringIncludes(rejected.message.toLowerCase(), 'invalid for this domain');
+      assertEquals(rejected.name, 'SecurityError');
+      assertEquals(rejected.code, 'ERROR_INVALID_RP_ID');
+      assertEquals(rejected.cause, SecurityError);
     });
   });
 
   describe('TypeError', () => {
-    test('should identify malformed user ID', async () => {
+    it('should identify malformed user ID', async () => {
       const typeError = new TypeError('user id is bad');
-      mockNavigatorCreate.mockRejectedValueOnce(typeError);
+
+      const createSpy = spy(async () => {
+        throw typeError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
 
       const opts = {
         ...goodOpts1,
@@ -623,30 +694,47 @@ describe('WebAuthnError', () => {
         },
       };
 
-      const rejected = await expect(startRegistration({ optionsJSON: opts })).rejects;
-      rejected.toThrowError(WebAuthnError);
-      rejected.toThrow(/user id/i);
-      rejected.toThrow(/not between 1 and 64 characters/i);
-      rejected.toHaveProperty('name', 'TypeError');
-      rejected.toHaveProperty('code', 'ERROR_INVALID_USER_ID_LENGTH');
-      rejected.toHaveProperty('cause', typeError);
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: opts }),
+        WebAuthnError,
+      );
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), `user id`);
+      assertStringIncludes(rejected.message.toLowerCase(), 'not between 1 and 64 characters');
+      assertEquals(rejected.name, 'TypeError');
+      assertEquals(rejected.code, 'ERROR_INVALID_USER_ID_LENGTH');
+      assertEquals(rejected.cause, typeError);
     });
   });
 
   describe('UnknownError', () => {
     const UnknownError = generateCustomError('UnknownError');
 
-    test('should identify potential authenticator issues', async () => {
-      mockNavigatorCreate.mockRejectedValueOnce(UnknownError);
+    beforeEach(() => {
+      const createSpy = spy(async () => {
+        throw UnknownError;
+      });
+      // @ts-ignore: Super lame, making me stub out credman like this
+      globalThis.navigator.credentials = { create: createSpy };
+    });
 
-      const rejected = await expect(startRegistration({ optionsJSON: goodOpts1 })).rejects;
-      rejected.toThrow(WebAuthnError);
-      rejected.toThrow(/authenticator/i);
-      rejected.toThrow(/unable to process the specified options/i);
-      rejected.toThrow(/could not create a new credential/i);
-      rejected.toHaveProperty('name', 'UnknownError');
-      rejected.toHaveProperty('code', 'ERROR_AUTHENTICATOR_GENERAL_ERROR');
-      rejected.toHaveProperty('cause', UnknownError);
+    it('should identify potential authenticator issues', async () => {
+      const rejected = await assertRejects(
+        () => startRegistration({ optionsJSON: goodOpts1 }),
+        WebAuthnError,
+      );
+
+      assertInstanceOf(rejected, WebAuthnError);
+      assertStringIncludes(rejected.message.toLowerCase(), `authenticator`);
+      assertStringIncludes(
+        rejected.message.toLowerCase(),
+        'unable to process the specified options',
+      );
+      assertStringIncludes(rejected.message.toLowerCase(), 'could not create a new credential');
+      assertEquals(rejected.name, 'UnknownError');
+      assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_GENERAL_ERROR');
+      assertEquals(rejected.cause, UnknownError);
     });
   });
 });

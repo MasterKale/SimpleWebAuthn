@@ -97,11 +97,11 @@ export function identifyRegistrationError({
       cause: error,
     });
   } else if (error.name === 'SecurityError') {
-    const effectiveDomain = window.location.hostname;
+    const effectiveDomain = globalThis.location.hostname;
     if (!isValidDomain(effectiveDomain)) {
       // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 7)
       return new WebAuthnError({
-        message: `${window.location.hostname} is an invalid domain`,
+        message: `${globalThis.location.hostname} is an invalid domain`,
         code: 'ERROR_INVALID_DOMAIN',
         cause: error,
       });
