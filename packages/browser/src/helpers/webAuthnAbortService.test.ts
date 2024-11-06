@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals, assertInstanceOf } from '@std/assert';
+import { assertEquals, assertInstanceOf, assertNotEquals } from '@std/assert';
 import { assertSpyCalls, spy } from '@std/testing/mock';
 
 import { WebAuthnAbortService } from './webAuthnAbortService.ts';
