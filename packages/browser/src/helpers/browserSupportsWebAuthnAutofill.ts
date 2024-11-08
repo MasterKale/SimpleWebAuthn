@@ -22,7 +22,7 @@ export function browserSupportsWebAuthnAutofill(): Promise<boolean> {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
-  if (globalPublicKeyCredential.isConditionalMediationAvailable === undefined) {
+  if (globalPublicKeyCredential?.isConditionalMediationAvailable === undefined) {
     return _browserSupportsWebAuthnAutofillInternals.stubThis(
       new Promise((resolve) => resolve(false)),
     );
