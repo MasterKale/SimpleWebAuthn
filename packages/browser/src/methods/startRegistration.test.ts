@@ -417,13 +417,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts }),
         WebAuthnError,
+        'Discoverable credentials were required'
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(
-        rejected.message.toLowerCase(),
-        'discoverable credentials were required',
-      );
       assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator supported');
       assertEquals(rejected.name, 'ConstraintError');
       assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT');
@@ -441,10 +437,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts }),
         WebAuthnError,
+        'User verification was required'
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), 'user verification was required');
       assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator supported');
       assertEquals(rejected.name, 'ConstraintError');
       assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT');
@@ -462,13 +457,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts, useAutoRegister: true }),
         WebAuthnError,
+        'User verification was required during automatic registration',
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(
-        rejected.message.toLowerCase(),
-        'user verification was required during automatic registration',
-      );
       assertStringIncludes(rejected.message.toLowerCase(), 'could not be performed');
       assertEquals(rejected.name, 'ConstraintError');
       assertEquals(rejected.code, 'ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE');
@@ -491,11 +482,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
+        'authenticator was previously registered'
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), 'authenticator');
-      assertStringIncludes(rejected.message.toLowerCase(), 'previously registered');
       assertEquals(rejected.name, 'InvalidStateError');
       assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED');
       assertEquals(rejected.cause, InvalidStateError);
@@ -524,10 +513,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
+        'Operation failed'
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), 'operation failed');
       assertEquals(rejected.name, 'NotAllowedError');
       assertEquals(rejected.code, 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
       assertEquals(rejected.cause, NotAllowedError);
@@ -554,10 +542,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
+        'sites with TLS certificate errors'
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), 'sites with tls certificate errors');
       assertEquals(rejected.name, 'NotAllowedError');
       assertEquals(rejected.code, 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY');
       assertEquals(rejected.cause, NotAllowedError);
@@ -584,11 +571,10 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts }),
         WebAuthnError,
+        'pubKeyCredParams',
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), 'pubkeycredparams');
-      assertStringIncludes(rejected.message.toLowerCase(), 'public-key');
+      assertStringIncludes(rejected.message, 'public-key');
       assertEquals(rejected.name, 'NotSupportedError');
       assertEquals(rejected.code, 'ERROR_MALFORMED_PUBKEYCREDPARAMS');
       assertEquals(rejected.cause, NotSupportedError);
@@ -603,11 +589,10 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts }),
         WebAuthnError,
+        'No available authenticator',
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator');
-      assertStringIncludes(rejected.message.toLowerCase(), 'pubkeycredparams');
+      assertStringIncludes(rejected.message, 'pubKeyCredParams');
       assertEquals(rejected.name, 'NotSupportedError');
       assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG');
       assertEquals(rejected.cause, NotSupportedError);
@@ -626,6 +611,8 @@ describe('WebAuthnError', () => {
 
       // @ts-ignore
       globalThis.location = { hostname: '' } as unknown;
+      // @ts-ignore
+      globalThis.window = globalThis;
     });
 
     it('should identify invalid domain', async () => {
@@ -634,11 +621,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
+        '1.2.3.4 is an invalid domain'
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), '1.2.3.4');
-      assertStringIncludes(rejected.message.toLowerCase(), 'invalid domain');
       assertEquals(rejected.name, 'SecurityError');
       assertEquals(rejected.code, 'ERROR_INVALID_DOMAIN');
       assertEquals(rejected.cause, SecurityError);
@@ -650,11 +635,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
+        `RP ID "${goodOpts1.rp.id}" is invalid for this domain`,
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), `${goodOpts1.rp.id}`);
-      assertStringIncludes(rejected.message.toLowerCase(), 'invalid for this domain');
       assertEquals(rejected.name, 'SecurityError');
       assertEquals(rejected.code, 'ERROR_INVALID_RP_ID');
       assertEquals(rejected.cause, SecurityError);
@@ -683,11 +666,9 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts }),
         WebAuthnError,
+        'User ID was not between 1 and 64 characters',
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), `user id`);
-      assertStringIncludes(rejected.message.toLowerCase(), 'not between 1 and 64 characters');
       assertEquals(rejected.name, 'TypeError');
       assertEquals(rejected.code, 'ERROR_INVALID_USER_ID_LENGTH');
       assertEquals(rejected.cause, typeError);
@@ -709,15 +690,11 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
+        'authenticator',
       );
 
-      assertInstanceOf(rejected, WebAuthnError);
-      assertStringIncludes(rejected.message.toLowerCase(), `authenticator`);
-      assertStringIncludes(
-        rejected.message.toLowerCase(),
-        'unable to process the specified options',
-      );
-      assertStringIncludes(rejected.message.toLowerCase(), 'could not create a new credential');
+      assertStringIncludes(rejected.message, 'unable to process the specified options');
+      assertStringIncludes(rejected.message, 'could not create a new credential');
       assertEquals(rejected.name, 'UnknownError');
       assertEquals(rejected.code, 'ERROR_AUTHENTICATOR_GENERAL_ERROR');
       assertEquals(rejected.cause, UnknownError);
