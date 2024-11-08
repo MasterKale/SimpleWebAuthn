@@ -8,6 +8,7 @@
     "@std/assert": "jsr:@std/assert@^1.0.7",
     "@std/path": "jsr:@std/path@^1.0.8",
     "@std/testing": "jsr:@std/testing@^1.0.4",
+    "jsdom": "npm:jsdom@^25.0.1",
     "ts-morph": "npm:ts-morph@^24.0.0",
     "typescript": "npm:typescript@^5.6.3"
   },
