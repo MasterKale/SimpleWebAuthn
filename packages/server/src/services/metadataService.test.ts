@@ -77,7 +77,7 @@ describe('Method: getStatement()', () => {
       statements: [],
     });
 
-    assertRejects(
+    await assertRejects(
       () => MetadataService.getStatement('not-a-real-aaguid'),
     );
   });
