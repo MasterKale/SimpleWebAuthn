@@ -58,5 +58,5 @@ jobs:
       # Build and test packages
       - name: Build & test @simplewebauthn/server
         run: cd packages/server && deno task test
-      # - name: Test @simplewebauthn/browser
-      #   run: npm run test:browser
+      - name: Test @simplewebauthn/browser
+        run: cd packages/browser && deno task test
