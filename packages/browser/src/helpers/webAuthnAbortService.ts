@@ -1,4 +1,9 @@
-class BaseWebAuthnAbortService {
+interface WebAuthnAbortService {
+  createNewAbortSignal(): AbortSignal;
+  cancelCeremony(): void;
+}
+
+class BaseWebAuthnAbortService implements WebAuthnAbortService {
   private controller: AbortController | undefined;
 
   /**
@@ -6,7 +11,7 @@ class BaseWebAuthnAbortService {
    * reload the page. This is automatically called whenever `startRegistration()` and
    * `startAuthentication()` are called.
    */
-  createNewAbortSignal() {
+  createNewAbortSignal(): AbortSignal {
     // Abort any existing calls to navigator.credentials.create() or navigator.credentials.get()
     if (this.controller) {
       const abortError = new Error(
@@ -25,7 +30,7 @@ class BaseWebAuthnAbortService {
   /**
    * Manually cancel any active WebAuthn registration or authentication attempt.
    */
-  cancelCeremony() {
+  cancelCeremony(): void {
     if (this.controller) {
       const abortError = new Error(
         'Manually cancelling existing WebAuthn API call',
@@ -45,4 +50,4 @@ class BaseWebAuthnAbortService {
  * developers building projects that use client-side routing to better control the behavior of
  * their UX in response to router navigation events.
  */
-export const WebAuthnAbortService = new BaseWebAuthnAbortService();
+export const WebAuthnAbortService: WebAuthnAbortService = new BaseWebAuthnAbortService();
