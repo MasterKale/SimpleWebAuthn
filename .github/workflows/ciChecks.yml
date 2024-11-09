@@ -56,7 +56,7 @@ jobs:
         run: deno install
 
       # Build and test packages
-      - name: Build & test @simplewebauthn/server
+      - name: Test @simplewebauthn/server
         run: cd packages/server && deno task test
       - name: Test @simplewebauthn/browser
         run: cd packages/browser && deno task test
