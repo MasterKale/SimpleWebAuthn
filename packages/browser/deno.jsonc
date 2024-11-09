@@ -15,11 +15,14 @@
     "@simplewebauthn/types": "jsr:@simplewebauthn/types@^11.0.0-alpha1"
   },
   "publish": {
-    "include": ["./src/**/*.ts"],
+    "include": [
+      "README.md",
+      "LICENSE.md",
+      "./src/**/*.ts"
+    ],
     "exclude": [
       "./src/**/*.test.ts",
       "./src/setupTests.ts",
-      "./src/**/__mocks__",
       "./src/**/__jest__"
     ]
   }
