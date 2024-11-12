@@ -11,7 +11,10 @@ import {
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from '@simplewebauthn/server';
-import { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/types';
+import {
+  AuthenticationResponseJSON,
+  RegistrationResponseJSON,
+} from '@simplewebauthn/types';
 
 import { expectedOrigin, rpID } from './index';
 import { LoggedInUser } from './example-server';
@@ -62,8 +65,8 @@ fetch('https://mds3.fido.tools/getEndpoints', {
   body: JSON.stringify({ endpoint: `${expectedOrigin}${fidoRouteSuffix}` }),
   headers: { 'Content-Type': 'application/json' },
 })
-  .then((resp) => resp.json())
-  .then((json) => {
+  .then(resp => resp.json())
+  .then(json => {
     const mdsServers: string[] = json.result;
 
     return MetadataService.initialize({
@@ -97,6 +100,7 @@ const inMemoryUserDeviceDB: { [username: string]: LoggedInFIDOUser } = {
 // A cheap way of remembering who's "logged in" between the request for options and the response
 let loggedInUsername: string | undefined = undefined;
 
+/* prettier-ignore */
 const supportedAlgorithmIDs = [
   -7,
   -8,
@@ -131,14 +135,14 @@ fidoConformanceRouter.post('/attestation/options', async (req, res) => {
     const newUser = {
       id: username,
       username,
-      devices: [],
+      credentials: [],
     };
 
     inMemoryUserDeviceDB[username] = newUser;
     user = newUser;
   }
 
-  const { devices } = user;
+  const { credentials } = user;
 
   const opts = await generateRegistrationOptions({
     rpName,
@@ -149,8 +153,8 @@ fidoConformanceRouter.post('/attestation/options', async (req, res) => {
     attestationType: attestation,
     authenticatorSelection,
     extensions,
-    excludeCredentials: devices.map((dev) => ({
-      id: dev.credentialID,
+    excludeCredentials: credentials.map(cred => ({
+      id: cred.id,
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
@@ -197,17 +201,17 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   const { verified, registrationInfo } = verification;
 
   if (verified && registrationInfo) {
-    const { credentialPublicKey, credentialID, counter } = registrationInfo;
+    const { publicKey, id, counter } = registrationInfo.credential;
 
-    const existingDevice = user.devices.find((device) => device.credentialID === credentialID);
+    const existingDevice = user.credentials.find(cred => cred.id === id);
 
     if (!existingDevice) {
       /**
        * Add the returned device to the user's list of devices
        */
-      user.devices.push({
-        credentialPublicKey,
-        credentialID,
+      user.credentials.push({
+        publicKey,
+        id,
         counter,
       });
     }
@@ -230,14 +234,14 @@ fidoConformanceRouter.post('/assertion/options', async (req, res) => {
 
   const user = inMemoryUserDeviceDB[username];
 
-  const { devices } = user;
+  const { credentials } = user;
 
   const opts = await generateAuthenticationOptions({
     rpID,
     extensions,
     userVerification,
-    allowCredentials: devices.map((dev) => ({
-      id: dev.credentialID,
+    allowCredentials: credentials.map(cred => ({
+      id: cred.id,
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
@@ -269,9 +273,9 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
     return res.status(400).send({ errorMessage: msg });
   }
 
-  const existingDevice = user.devices.find((device) => device.credentialID === id);
+  const existingCredential = user.credentials.find(cred => cred.id === id);
 
-  if (!existingDevice) {
+  if (!existingCredential) {
     const msg = `Could not find device matching ${id}`;
     console.error(`RP - authentication: ${msg}`);
     return res.status(400).send({ errorMessage: msg });
@@ -284,7 +288,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
-      authenticator: existingDevice,
+      credential: existingCredential,
       advancedFIDOConfig: { userVerification },
       requireUserVerification: false,
     });
@@ -297,7 +301,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const { verified, authenticationInfo } = verification;
 
   if (verified) {
-    existingDevice.counter = authenticationInfo.newCounter;
+    existingCredential.counter = authenticationInfo.newCounter;
   }
 
   return res.send({
