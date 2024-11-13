@@ -4,7 +4,6 @@
     "lineWidth": 100
   },
   "imports": {
-    "@deno/cache-dir": "jsr:@deno/cache-dir@^0.13.2",
     "@std/assert": "jsr:@std/assert@^1.0.7",
     "@std/path": "jsr:@std/path@^1.0.8",
     "@std/testing": "jsr:@std/testing@^1.0.4",
