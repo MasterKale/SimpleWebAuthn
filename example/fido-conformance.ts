@@ -11,6 +11,7 @@ import {
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/types';
 
 import { expectedOrigin, rpID } from './index';
@@ -77,23 +78,8 @@ fetch('https://mds3.fido.tools/getEndpoints', {
     console.log('🔐 FIDO Conformance routes ready');
   });
 
-const inMemoryUserDeviceDB: { [username: string]: LoggedInFIDOUser } = {
-  // [username]: string: {
-  //   id: loggedInUserId,
-  //   username: 'user@yourdomain.com',
-  //   devices: [
-  //     /**
-  //      * {
-  //      *   credentialID: string,
-  //      *   publicKey: string,
-  //      *   counter: number,
-  //      * }
-  //      */
-  //   ],
-  //   currentChallenge: undefined,
-  //   currentAuthenticationUserVerification: undefined,
-  // },
-};
+const inMemoryUserDB: { [username: string]: LoggedInFIDOUser } = {};
+
 // A cheap way of remembering who's "logged in" between the request for options and the response
 let loggedInUsername: string | undefined = undefined;
 
@@ -126,31 +112,31 @@ fidoConformanceRouter.post('/attestation/options', async (req, res) => {
 
   loggedInUsername = username;
 
-  let user = inMemoryUserDeviceDB[username];
+  let user = inMemoryUserDB[username];
   if (!user) {
     const newUser = {
       id: username,
       username,
-      devices: [],
+      credentials: [],
     };
 
-    inMemoryUserDeviceDB[username] = newUser;
+    inMemoryUserDB[username] = newUser;
     user = newUser;
   }
 
-  const { devices } = user;
+  const { credentials } = user;
 
   const opts = await generateRegistrationOptions({
     rpName,
     rpID,
-    userID: username,
+    userID: isoBase64URL.toBuffer(username),
     userName: username,
     userDisplayName: displayName,
     attestationType: attestation,
     authenticatorSelection,
     extensions,
-    excludeCredentials: devices.map((dev) => ({
-      id: dev.credentialID,
+    excludeCredentials: credentials.map((cred) => ({
+      id: cred.id,
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
@@ -175,7 +161,7 @@ fidoConformanceRouter.post('/attestation/options', async (req, res) => {
 fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   const body: RegistrationResponseJSON = req.body;
 
-  const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
+  const user = inMemoryUserDB[`${loggedInUsername}`];
 
   const expectedChallenge = req.session.currentChallenge;
 
@@ -197,18 +183,18 @@ fidoConformanceRouter.post('/attestation/result', async (req, res) => {
   const { verified, registrationInfo } = verification;
 
   if (verified && registrationInfo) {
-    const { credentialPublicKey, credentialID, counter } = registrationInfo;
+    const { credential } = registrationInfo;
 
-    const existingDevice = user.devices.find((device) => device.credentialID === credentialID);
+    const existingCredential = user.credentials.find((cred) => cred.id === credential.id);
 
-    if (!existingDevice) {
+    if (!existingCredential) {
       /**
-       * Add the returned device to the user's list of devices
+       * Add the returned credential to the user's list of credentials
        */
-      user.devices.push({
-        credentialPublicKey,
-        credentialID,
-        counter,
+      user.credentials.push({
+        id: credential.id,
+        publicKey: credential.publicKey,
+        counter: credential.counter,
       });
     }
   }
@@ -228,16 +214,16 @@ fidoConformanceRouter.post('/assertion/options', async (req, res) => {
 
   loggedInUsername = username;
 
-  const user = inMemoryUserDeviceDB[username];
+  const user = inMemoryUserDB[username];
 
-  const { devices } = user;
+  const { credentials } = user;
 
   const opts = await generateAuthenticationOptions({
     rpID,
     extensions,
     userVerification,
-    allowCredentials: devices.map((dev) => ({
-      id: dev.credentialID,
+    allowCredentials: credentials.map((cred) => ({
+      id: cred.id,
       type: 'public-key',
       transports: ['usb', 'ble', 'nfc', 'internal'],
     })),
@@ -257,7 +243,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const body: AuthenticationResponseJSON = req.body;
   const { id } = body;
 
-  const user = inMemoryUserDeviceDB[`${loggedInUsername}`];
+  const user = inMemoryUserDB[`${loggedInUsername}`];
 
   // Pull up values specified when generation authentication options
   const expectedChallenge = req.session.currentChallenge;
@@ -269,10 +255,10 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
     return res.status(400).send({ errorMessage: msg });
   }
 
-  const existingDevice = user.devices.find((device) => device.credentialID === id);
+  const existingCredential = user.credentials.find((cred) => cred.id === id);
 
-  if (!existingDevice) {
-    const msg = `Could not find device matching ${id}`;
+  if (!existingCredential) {
+    const msg = `Could not find credential matching ${id}`;
     console.error(`RP - authentication: ${msg}`);
     return res.status(400).send({ errorMessage: msg });
   }
@@ -284,7 +270,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
       expectedChallenge: `${expectedChallenge}`,
       expectedOrigin,
       expectedRPID: rpID,
-      authenticator: existingDevice,
+      credential: existingCredential,
       advancedFIDOConfig: { userVerification },
       requireUserVerification: false,
     });
@@ -297,7 +283,7 @@ fidoConformanceRouter.post('/assertion/result', async (req, res) => {
   const { verified, authenticationInfo } = verification;
 
   if (verified) {
-    existingDevice.counter = authenticationInfo.newCounter;
+    existingCredential.counter = authenticationInfo.newCounter;
   }
 
   return res.send({
