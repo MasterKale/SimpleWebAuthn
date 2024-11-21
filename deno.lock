@@ -529,14 +529,8 @@
       "npm:typescript@^5.6.3"
     ],
     "members": {
-      "packages/browser": {
-        "dependencies": [
-          "jsr:@simplewebauthn/types@^11.0.0-alpha1"
-        ]
-      },
       "packages/server": {
         "dependencies": [
-          "jsr:@simplewebauthn/types@^11.0.0-alpha1",
           "npm:@hexagon/base64@^1.1.27",
           "npm:@levischuck/tiny-cbor@~0.2.2",
           "npm:@peculiar/asn1-android@^2.3.10",
