@@ -6,6 +6,7 @@
     "./helpers": "./src/helpers/index.ts"
   },
   "tasks": {
+    "build": "deno task test && deno run -A build_npm.ts",
     "test": "deno test -A src/",
     "test:watch": "deno test -A --watch src/"
   },
