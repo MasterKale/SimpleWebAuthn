@@ -3,8 +3,9 @@
   "version": "11.0.0-alpha2",
   "exports": "./src/index.ts",
   "tasks": {
-    "build:rollup": "rimraf dist && rollup -c",
+    "build:rollup-old": "rimraf dist && rollup -c",
     "build": "deno task test && deno run -A build_npm.ts",
+    "build:debug": "deno run -A build_npm.ts",
     "test": "deno test -A src/",
     "test:watch": "deno test -A --watch src/"
   },
