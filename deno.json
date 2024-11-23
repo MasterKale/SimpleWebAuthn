@@ -6,9 +6,9 @@
     "build:types": "(cd packages/types; deno task build)",
     "build:browser": "(cd packages/browser; deno task build)",
     "build:server": "(cd packages/server; deno task build)",
-    "publish:types": "deno task build:types && (cd packages/types; deno task publish)",
-    "publish:browser": "deno task build:browser && (cd packages/browser; deno task publish)",
-    "publish:server": "deno task build:server && (cd packages/server; deno task publish)"
+    "publish:types": "(cd packages/types; deno task publish)",
+    "publish:browser": "(cd packages/browser; deno task publish)",
+    "publish:server": "(cd packages/server; deno task publish)"
   },
   "fmt": {
     "singleQuote": true,
