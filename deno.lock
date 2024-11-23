@@ -37,8 +37,8 @@
     "npm:@peculiar/asn1-schema@^2.3.8": "2.3.13",
     "npm:@peculiar/asn1-x509@^2.3.8": "2.3.13",
     "npm:@rollup/plugin-babel@^6.0.4": "6.0.4_@babel+core@7.26.0_rollup@4.27.3",
-    "npm:@rollup/plugin-commonjs@^28.0.1": "28.0.1_rollup@4.27.3_picomatch@4.0.2",
     "npm:@rollup/plugin-node-resolve@^15.3.0": "15.3.0_rollup@4.27.3",
+    "npm:@rollup/plugin-replace@^6.0.1": "6.0.1_rollup@4.27.3",
     "npm:@rollup/plugin-terser@~0.4.4": "0.4.4_rollup@4.27.3",
     "npm:cross-fetch@4": "4.0.0",
     "npm:jsdom@^25.0.1": "25.0.1",
@@ -1032,19 +1032,6 @@
         "rollup"
       ]
     },
-    "@rollup/plugin-commonjs@28.0.1_rollup@4.27.3_picomatch@4.0.2": {
-      "integrity": "sha512-+tNWdlWKbpB3WgBN7ijjYkq9X5uhjmcvyjEght4NmH5fAU++zfQzAJ6wumLS+dNcvwEZhKx2Z+skY8m7v0wGSA==",
-      "dependencies": [
-        "@rollup/pluginutils",
-        "commondir",
-        "estree-walker",
-        "fdir",
-        "is-reference",
-        "magic-string",
-        "picomatch",
-        "rollup"
-      ]
-    },
     "@rollup/plugin-node-resolve@15.3.0_rollup@4.27.3": {
       "integrity": "sha512-9eO5McEICxMzJpDW9OnMYSv4Sta3hmt7VtBFz5zR9273suNOydOyq/FrGeGy+KsTRFm8w0SLVhzig2ILFT63Ag==",
       "dependencies": [
@@ -1053,6 +1040,14 @@
         "deepmerge",
         "is-module",
         "resolve",
+        "rollup"
+      ]
+    },
+    "@rollup/plugin-replace@6.0.1_rollup@4.27.3": {
+      "integrity": "sha512-2sPh9b73dj5IxuMmDAsQWVFT7mR+yoHweBaXG2W/R8vQ+IWZlnaI7BR7J6EguVQUp1hd8Z7XuozpDjEKQAAC2Q==",
+      "dependencies": [
+        "@rollup/pluginutils",
+        "magic-string",
         "rollup"
       ]
     },
@@ -1244,9 +1239,6 @@
     "commander@2.20.3": {
       "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="
     },
-    "commondir@1.0.1": {
-      "integrity": "sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg=="
-    },
     "convert-source-map@2.0.0": {
       "integrity": "sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg=="
     },
@@ -1383,12 +1375,6 @@
     },
     "is-potential-custom-element-name@1.0.1": {
       "integrity": "sha512-bCYeRA2rVibKZd+s2625gGnGF/t7DSqDs4dP7CrLA1m7jKWz6pps0LpYLJN8Q64HtmPKJ1hrN3nzPNKFEKOUiQ=="
-    },
-    "is-reference@1.2.1": {
-      "integrity": "sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==",
-      "dependencies": [
-        "@types/estree"
-      ]
     },
     "js-tokens@4.0.0": {
       "integrity": "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ=="
@@ -1770,8 +1756,8 @@
       "jsr:@std/testing@^1.0.4",
       "npm:@babel/preset-env@^7.26.0",
       "npm:@rollup/plugin-babel@^6.0.4",
-      "npm:@rollup/plugin-commonjs@^28.0.1",
       "npm:@rollup/plugin-node-resolve@^15.3.0",
+      "npm:@rollup/plugin-replace@^6.0.1",
       "npm:@rollup/plugin-terser@~0.4.4",
       "npm:jsdom@^25.0.1",
       "npm:rollup-plugin-version-injector@^1.3.3",
