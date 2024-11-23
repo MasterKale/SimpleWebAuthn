@@ -82,6 +82,8 @@ async function buildESMAndCJS() {
  * Generate a UMD bundle using Rollup and Babel
  */
 async function buildUMD() {
+  console.log('Building UMD bundle...');
+
   // Rollup plugin to remove injected copyright notices
   const cleanCopyrightCommentInUMDBundleTargetingES5 = () => {
     return {
@@ -166,6 +168,7 @@ async function buildUMD() {
     // Generate a bundle
     const bundle = await rollup(rollupOptions);
 
+    console.log('Writing bundle...')
     // Write the bundle to file
     await bundle.write(rollupOptions.output as OutputOptions);
 
@@ -174,6 +177,8 @@ async function buildUMD() {
   } catch (error) {
     throw new Error('Failed to generate Rollup bundle', { cause: error });
   }
+
+  console.log('Complete!');
 }
 
 /**
