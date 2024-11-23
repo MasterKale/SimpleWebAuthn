@@ -98,29 +98,25 @@ request new features, or to suggest changes to existing features.
 
 Install the following before proceeding:
 
-- **Node 20.x**
-- **Deno v1.46.x**
-- **pnpm 9.12.x**
+- **Deno v2.0.x**
 
 After pulling down the code, set up dependencies:
 
 ```sh
-$> pnpm run bootstrap-monorepo
+$> deno install
 ```
 
 To run unit tests for all workspace packages, use the `test` series of scripts:
 
 ```sh
-# Run All tests
-$> pnpm run test
 # Run an individual package's tests
-$> pnpm run test:browser
-$> pnpm run test:server
+$> cd packages/browser/ && deno task test
+$> cd packages/server/ && deno task test
 ```
 
-Tests can be run in watch mode with the `dev` series of scripts:
+Tests can be run in watch mode with the `test:watch` series of scripts:
 
 ```sh
-$> pnpm run dev:browser
-$> pnpm run dev:server
+$> cd packages/browser/ && deno task test:watch
+$> cd packages/server/ && deno task test:watch
 ```

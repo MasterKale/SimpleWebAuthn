@@ -11,7 +11,7 @@ Notes for myself that I don't want cluttering up the README
 Run this first to update **packages/types/dom.ts** then commit the changes:
 
 ```
-(cd packages/types; pnpm run extract-dom-types)
+(cd packages/types; deno task extract-dom-types)
 ```
 
 ### Step 1: Determine which packages need to be published
