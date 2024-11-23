@@ -417,7 +417,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts }),
         WebAuthnError,
-        'Discoverable credentials were required'
+        'Discoverable credentials were required',
       );
 
       assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator supported');
@@ -437,7 +437,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: opts }),
         WebAuthnError,
-        'User verification was required'
+        'User verification was required',
       );
 
       assertStringIncludes(rejected.message.toLowerCase(), 'no available authenticator supported');
@@ -482,7 +482,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
-        'authenticator was previously registered'
+        'authenticator was previously registered',
       );
 
       assertEquals(rejected.name, 'InvalidStateError');
@@ -513,7 +513,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
-        'Operation failed'
+        'Operation failed',
       );
 
       assertEquals(rejected.name, 'NotAllowedError');
@@ -542,7 +542,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
-        'sites with TLS certificate errors'
+        'sites with TLS certificate errors',
       );
 
       assertEquals(rejected.name, 'NotAllowedError');
@@ -621,7 +621,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startRegistration({ optionsJSON: goodOpts1 }),
         WebAuthnError,
-        '1.2.3.4 is an invalid domain'
+        '1.2.3.4 is an invalid domain',
       );
 
       assertEquals(rejected.name, 'SecurityError');

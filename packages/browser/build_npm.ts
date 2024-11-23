@@ -87,7 +87,8 @@ async function buildUMD() {
     return {
       name: 'cleanCopyrightCommentInUMDBundleTargetingES5',
       renderChunk: async (code: string) => {
-        const comment = `/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */`;
+        const comment =
+          `/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */`;
         return code.indexOf(comment) > -1 ? code.replace(comment, '') : null;
       },
     };

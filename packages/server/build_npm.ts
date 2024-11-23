@@ -69,7 +69,7 @@ await build({
     dependencies: {
       // Deno workspaces maps this identifier locally, make sure it's defined in the NPM package
       '@simplewebauthn/types': `^${typesDenoJSON.version}`,
-    }
+    },
   },
   // Map from Deno package to NPM package for Node build
   mappings: {},

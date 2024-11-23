@@ -553,7 +553,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startAuthentication({ optionsJSON: goodOpts1 }),
         WebAuthnError,
-        '1.2.3.4 is an invalid domain'
+        '1.2.3.4 is an invalid domain',
       );
 
       assertEquals(rejected.name, 'SecurityError');
@@ -567,7 +567,7 @@ describe('WebAuthnError', () => {
       const rejected = await assertRejects(
         () => startAuthentication({ optionsJSON: goodOpts1 }),
         WebAuthnError,
-        `RP ID "${goodOpts1.rpId}" is invalid for this domain`
+        `RP ID "${goodOpts1.rpId}" is invalid for this domain`,
       );
 
       assertEquals(rejected.name, 'SecurityError');
