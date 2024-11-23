@@ -6,14 +6,11 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 
-const outDir = './npm';
+import denoJSON from './deno.json' with { type: 'json' };
+import typesDenoJSON from '../types/deno.json' with { type: 'json' };
 
-const denoJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('./deno.jsonc'),
-);
-const typesDenoJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('../types/deno.jsonc'),
-);
+
+const outDir = './npm';
 
 /**
  * Generate ESM and CJS builds using Deno to Node Transform (dnt)

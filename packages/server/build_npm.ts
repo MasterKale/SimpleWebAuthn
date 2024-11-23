@@ -1,13 +1,10 @@
 import { build, emptyDir } from '@deno/dnt';
 
-const outDir = './npm';
+import denoJSON from './deno.json' with { type: 'json' };
+import typesDenoJSON from '../types/deno.json' with { type: 'json' };
 
-const denoJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('./deno.jsonc'),
-);
-const typesDenoJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('../types/deno.jsonc'),
-);
+
+const outDir = './npm';
 
 await emptyDir(outDir);
 
