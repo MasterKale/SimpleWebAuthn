@@ -3,7 +3,6 @@ import { build, emptyDir } from '@deno/dnt';
 import denoJSON from './deno.json' with { type: 'json' };
 import typesDenoJSON from '../types/deno.json' with { type: 'json' };
 
-
 const outDir = './npm';
 
 await emptyDir(outDir);
