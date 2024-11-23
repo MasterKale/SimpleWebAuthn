@@ -24,7 +24,7 @@ async function buildESMAndCJS() {
   await build({
     entryPoints: ['./src/index.ts'],
     outDir,
-    importMap: './deno.jsonc',
+    importMap: './deno.json',
     shims: {
       deno: {
         test: 'dev',

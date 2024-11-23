@@ -17,7 +17,7 @@ await build({
     { name: './helpers', path: './src/helpers/index.ts' },
   ],
   outDir,
-  importMap: './deno.jsonc',
+  importMap: './deno.json',
   shims: {
     deno: {
       test: 'dev',
