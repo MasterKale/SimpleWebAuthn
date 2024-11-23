@@ -11,6 +11,10 @@ following to your **deps.ts** file:
 ```ts
 import {
   // ...
+} from 'https://deno.land/x/simplewebauthn/deno/browser.ts';
+
+import {
+  // ...
 } from 'https://deno.land/x/simplewebauthn/deno/server.ts';
 
 import {
