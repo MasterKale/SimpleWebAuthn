@@ -13,6 +13,14 @@
     "singleQuote": true,
     "lineWidth": 100
   },
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable"
+    ]
+  },
   "imports": {
     "@babel/preset-env": "npm:@babel/preset-env@^7.26.0",
     "@deno/cache-dir": "jsr:@deno/cache-dir@^0.13.2",
