@@ -1,7 +1,8 @@
 import { build, emptyDir } from '@deno/dnt';
-import { type InputOption, type OutputOptions, rollup, type RollupBuild } from 'rollup';
+import { rollup, type RollupOptions, type OutputOptions } from 'rollup';
 import terser from '@rollup/plugin-terser';
 import versionInjector from 'rollup-plugin-version-injector';
+import nodeResolve from '@rollup/plugin-node-resolve';
 
 const outDir = './npm';
 
@@ -67,6 +68,7 @@ async function buildESMAndCJS() {
     // TypeScript tsconfig.json config
     compilerOptions: {
       lib: ['ES2022', 'DOM'],
+      target: 'ES2021',
     },
   });
 
@@ -113,33 +115,37 @@ async function buildUMD() {
     },
   });
 
-  const rollupInputOptions: InputOption = `${outDir}/esm/index.js`;
-  const rollupOutputOptions: OutputOptions = {
-    dir: `${outDir}`,
-    format: 'umd',
-    name: 'SimpleWebAuthnBrowser',
-    entryFileNames: 'bundle/[name].es5.umd.min.js',
+  const rollupOptions: RollupOptions = {
+    input: `${outDir}/esm/index.js`,
+    output: {
+      dir: `${outDir}`,
+      format: 'umd',
+      name: 'SimpleWebAuthnBrowser',
+      entryFileNames: 'bundle/[name].es5.umd.min.js',
+      plugins: [
+        // @ts-ignore: `terser()` is callable
+        terser(),
+        cleanTslibCommentInUMDBundleTargetingES5(),
+      ],
+    },
     plugins: [
       // TODO: Figure out how to get this back up and running
       // typescript({ tsconfig: './tsconfig.es5.json' }),
-      // @ts-ignore: yes, `terser()` is callable
-      terser(),
-      // TODO: Figure out how to get this back up and running
-      // cleanTslibCommentInUMDBundleTargetingES5(),
+      // @ts-ignore: `nodeResolve()` is callable
+      nodeResolve(),
       swanVersionInjector,
     ],
   };
 
-  let bundle: RollupBuild;
   try {
     // Process inputs
-    bundle = await rollup({ input: rollupInputOptions });
+    const bundle = await rollup(rollupOptions);
 
     // an array of file names this bundle depends on
     // console.log(bundle.watchFiles);
 
     // Write the bundle to file
-    await bundle.write(rollupOutputOptions);
+    await bundle.write(rollupOptions.output as OutputOptions);
 
     // Close the bundle
     await bundle.close();
