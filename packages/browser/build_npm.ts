@@ -2,6 +2,7 @@ import { build, emptyDir } from '@deno/dnt';
 import { rollup, type RollupOptions, type OutputOptions } from 'rollup';
 import terser from '@rollup/plugin-terser';
 import versionInjector from 'rollup-plugin-version-injector';
+import commonJS from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
 
 const outDir = './npm';
@@ -131,6 +132,8 @@ async function buildUMD() {
     plugins: [
       // TODO: Figure out how to get this back up and running
       // typescript({ tsconfig: './tsconfig.es5.json' }),
+      // @ts-ignore: `commonJS()` is callable
+      commonJS(),
       // @ts-ignore: `nodeResolve()` is callable
       nodeResolve(),
       swanVersionInjector,
