@@ -168,7 +168,7 @@ async function buildUMD() {
     // Generate a bundle
     const bundle = await rollup(rollupOptions);
 
-    console.log('Writing bundle...')
+    console.log('Writing bundle...');
     // Write the bundle to file
     await bundle.write(rollupOptions.output as OutputOptions);
 

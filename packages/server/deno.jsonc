@@ -8,7 +8,10 @@
   "tasks": {
     "build": "deno task test && deno run -A build_npm.ts",
     "test": "deno test -A src/",
-    "test:watch": "deno test -A --watch src/"
+    "test:watch": "deno test -A --watch src/",
+    "publish": "deno task publish:jsr && deno task publish:npm",
+    "publish:jsr": "deno publish",
+    "publish:npm": "(cd npm; npm publish)"
   },
   "fmt": {
     "singleQuote": true,
@@ -32,7 +35,8 @@
       "src/**/*.ts"
     ],
     "exclude": [
-      "src/**/*.test.ts"
+      "src/**/*.test.ts",
+      "./npm"
     ]
   }
 }
