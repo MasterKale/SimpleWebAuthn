@@ -3,7 +3,8 @@ import { rollup, type RollupOptions, type OutputOptions } from 'rollup';
 import terser from '@rollup/plugin-terser';
 import versionInjector from 'rollup-plugin-version-injector';
 import commonJS from '@rollup/plugin-commonjs';
-import nodeResolve from '@rollup/plugin-node-resolve';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { babel, getBabelOutputPlugin } from '@rollup/plugin-babel';
 
 const outDir = './npm';
 
@@ -120,23 +121,34 @@ async function buildUMD() {
     input: `${outDir}/esm/index.js`,
     output: {
       dir: `${outDir}`,
-      format: 'umd',
+      format: 'esm',
       name: 'SimpleWebAuthnBrowser',
       entryFileNames: 'bundle/[name].es5.umd.min.js',
       plugins: [
+        getBabelOutputPlugin({
+          moduleId: 'SimpleWebAuthnBrowser',
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                modules: 'umd',
+                targets: {
+                  ie: '10',
+                },
+              },
+            ],
+          ],
+        }),
         // @ts-ignore: `terser()` is callable
         terser(),
         cleanTslibCommentInUMDBundleTargetingES5(),
+        swanVersionInjector,
       ],
     },
     plugins: [
-      // TODO: Figure out how to get this back up and running
-      // typescript({ tsconfig: './tsconfig.es5.json' }),
       // @ts-ignore: `commonJS()` is callable
-      commonJS(),
-      // @ts-ignore: `nodeResolve()` is callable
+      // commonJS(),
       nodeResolve(),
-      swanVersionInjector,
     ],
   };
 
