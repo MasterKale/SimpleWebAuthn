@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/browser",
-  "version": "11.0.0-alpha2",
+  "version": "11.0.0-alpha3",
   "exports": "./src/index.ts",
   "tasks": {
     "build": "deno task test && deno run -A build_npm.ts",

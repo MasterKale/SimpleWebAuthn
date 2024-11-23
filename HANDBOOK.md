@@ -32,9 +32,13 @@ Update `"version"` in the following **deno.json** files for each package that ne
 
 Continue using your best judgement on what an appropriate new version number should be.
 
+Commit these changes.
+
 ### Step 3: Update CHANGELOG.md
 
 Add entries to CHANGELOG.md for the packages determined in the step above.
+
+Commit these changes.
 
 ### Step 4: Create a git tag for the chosen version
 
