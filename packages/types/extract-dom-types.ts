@@ -97,6 +97,7 @@ const outputSourceFile = project.createSourceFile(`src/dom.ts`, undefined, {
   overwrite: true,
 });
 outputSourceFile.addStatements([
+  `// deno-fmt-ignore-file`,
   `/**`,
   ` * Generated from typescript@${version}`,
   ` * To regenerate, run the following command from the package root:`,
