@@ -8,9 +8,10 @@
 
 - [@simplewebauthn/browser](#simplewebauthnbrowser)
   - [Installation](#installation)
+    - [Deno v1.43.x or higher](#deno-v143x-or-higher)
     - [UMD](#umd)
       - [ES5](#es5)
-      - [ES2018](#es2018)
+      - [ES2021](#es2021)
   - [Usage](#usage)
 
 ## Installation
@@ -19,6 +20,28 @@ This package is available on **npm**:
 
 ```sh
 npm install @simplewebauthn/browser
+```
+
+This package can be installed from **NPM** or **JSR**:
+
+```sh
+$ npm install @simplewebauthn/browser
+```
+
+```sh
+$ npx jsr add @simplewebauthn/browser
+```
+
+### Deno v1.43.x or higher
+
+It is also available for import into Deno projects from **deno.land/x** or **JSR**:
+
+```ts
+import {...} from 'https://deno.land/x/simplewebauthn/deno/browser.ts';
+```
+
+```sh
+$ deno add jsr:@simplewebauthn/browser jsr:@simplewebauthn/types
 ```
 
 ### UMD
@@ -40,7 +63,7 @@ include the `ES5` version:
 <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.es5.umd.min.js"></script>
 ```
 
-#### ES2018
+#### ES2021
 
 If you only need to support modern browsers, include the `ES2018` version:
 
