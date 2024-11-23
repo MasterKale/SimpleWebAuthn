@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@david/code-block-writer@^13.0.2": "13.0.3",
     "jsr:@deno/cache-dir@~0.10.3": "0.10.3",
+    "jsr:@deno/cache-dir@~0.13.2": "0.13.2",
     "jsr:@deno/dnt@~0.41.3": "0.41.3",
     "jsr:@deno/graph@~0.73.1": "0.73.1",
     "jsr:@std/assert@0.223": "0.223.0",
@@ -61,11 +62,20 @@
         "jsr:@std/path@0.223"
       ]
     },
+    "@deno/cache-dir@0.13.2": {
+      "integrity": "c22419dfe27ab85f345bee487aaaadba498b005cce3644e9d2528db035c5454d",
+      "dependencies": [
+        "jsr:@std/fmt@0.223",
+        "jsr:@std/fs@0.223",
+        "jsr:@std/io",
+        "jsr:@std/path@0.223"
+      ]
+    },
     "@deno/dnt@0.41.3": {
       "integrity": "b2ef2c8a5111eef86cb5bfcae103d6a2938e8e649e2461634a7befb7fc59d6d2",
       "dependencies": [
         "jsr:@david/code-block-writer",
-        "jsr:@deno/cache-dir",
+        "jsr:@deno/cache-dir@~0.10.3",
         "jsr:@std/fmt@1",
         "jsr:@std/fs@1",
         "jsr:@std/path@1",
@@ -1750,6 +1760,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@deno/cache-dir@~0.13.2",
       "jsr:@deno/dnt@~0.41.3",
       "jsr:@std/assert@^1.0.7",
       "jsr:@std/path@^1.0.8",
