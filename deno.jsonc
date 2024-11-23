@@ -1,5 +1,6 @@
 {
   "tasks": {
+    "version": "deno run -A whatGotUpdated.ts",
     "test:browser": "(cd packages/browser; deno task test)",
     "test:server": "(cd packages/server; deno task test)",
     "build:types": "(cd packages/types; deno task build)",
