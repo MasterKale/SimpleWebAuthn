@@ -4,11 +4,13 @@
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/browser?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/browser)
+[![JSR](https://jsr.io/badges/@simplewebauthn/browser?style=for-the-badge)](https://jsr.io/@simplewebauthn/browser)
 ![Browser Support](https://img.shields.io/badge/Browser-ES5+-brightgreen?style=for-the-badge&logo=Mozilla+Firefox)
 
 - [@simplewebauthn/browser](#simplewebauthnbrowser)
   - [Installation](#installation)
-    - [Deno v1.43.x or higher](#deno-v143x-or-higher)
+    - [Node LTS 20.x and higher](#node-lts-20x-and-higher)
+    - [Deno v1.43 and higher](#deno-v143-and-higher)
     - [UMD](#umd)
       - [ES5](#es5)
       - [ES2021](#es2021)
@@ -16,32 +18,31 @@
 
 ## Installation
 
-This package is available on **npm**:
+This package can be installed from **NPM**, **JSR**, or **deno.land/x**:
+
+### Node LTS 20.x and higher
 
 ```sh
-npm install @simplewebauthn/browser
-```
-
-This package can be installed from **NPM** or **JSR**:
-
-```sh
-$ npm install @simplewebauthn/browser
+$ npm install @simplewebauthn/browser @simplewebauthn/types
 ```
 
 ```sh
-$ npx jsr add @simplewebauthn/browser
+$ npx jsr add @simplewebauthn/browser @simplewebauthn/types
 ```
 
-### Deno v1.43.x or higher
-
-It is also available for import into Deno projects from **deno.land/x** or **JSR**:
-
-```ts
-import {...} from 'https://deno.land/x/simplewebauthn/deno/browser.ts';
-```
+### Deno v1.43 and higher
 
 ```sh
 $ deno add jsr:@simplewebauthn/browser jsr:@simplewebauthn/types
+```
+
+```sh
+$ deno add npm:@simplewebauthn/browser npm:@simplewebauthn/types
+```
+
+```ts
+import {...} from 'https://deno.land/x/simplewebauthn/deno/browser.ts';
+import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```
 
 ### UMD
@@ -65,7 +66,7 @@ include the `ES5` version:
 
 #### ES2021
 
-If you only need to support modern browsers, include the `ES2018` version:
+If you only need to support modern browsers, include the `ES2021` version:
 
 ```html
 <script src="https://unpkg.com/@simplewebauthn/browser"></script>

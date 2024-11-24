@@ -1,10 +1,12 @@
-# SimpleWebAuthn Project <!-- omit in toc -->
+# SimpleWebAuthn <!-- omit in toc -->
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/search?q=simplewebauthn)
+[![JSR Scope](https://jsr.io/badges/@simplewebauthn?style=for-the-badge)](https://jsr.io/@simplewebauthn)
 
 - [Overview](#overview)
 - [Installation](#installation)
+- [Documentation](#documentation)
 - [Sponsors](#sponsors)
 - [Example](#example)
 - [Contributions](#contributions)
@@ -12,7 +14,7 @@
 
 ## Overview
 
-This monorepo contains two complimentary libraries to help reduce the amount of work needed to
+This project features two complimentary libraries to help reduce the amount of work needed to
 incorporate WebAuthn into a website. The following packages are maintained here:
 
 - [@simplewebauthn/server](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/server)
@@ -22,31 +24,18 @@ An additional package is also included that contains shared TypeScript definitio
 
 - [@simplewebauthn/types](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/types/)
 
-See these packages' READMEs for more specific implementation information.
-
-**API Documentation**
-
-In-depth documentation for all of the packages in this project is available here:
-https://simplewebauthn.dev/docs/
-
 ## Installation
 
-These packages are all available on **npm** for use in **Node LTS 20.x** projects and supports
-**both CommonJS and [ECMAScript modules (ESM)](https://nodejs.org/api/esm.html#enabling)**:
+SimpleWebAuthn is available on **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)**,
+**[JSR](https://jsr.io/@simplewebauthn)**, and **[deno.land/x](https://deno.land/x/simplewebauthn)**
+for import into **Node LTS 20.x and higher**, **Deno v1.43 and higher** projects, and other
+compatible runtimes (Cloudflare Workers, Bun, etc...)
 
-```sh
-npm install @simplewebauthn/browser
-npm install @simplewebauthn/server
-npm install @simplewebauthn/types
-```
+See the packages' READMEs for more specific installation information.
 
-The **server** and **types** packages are also available for import into **Deno v1.33.x** projects
-from **deno.land/x**:
+## Documentation
 
-```ts
-import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
-import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
-```
+In-depth documentation for this project is available at https://simplewebauthn.dev/docs
 
 ## Sponsors
 

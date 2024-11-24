@@ -2,38 +2,41 @@
 
 ![WebAuthn](https://img.shields.io/badge/WebAuthn-Simplified-blueviolet?style=for-the-badge&logo=WebAuthn)
 [![npm (scoped)](https://img.shields.io/npm/v/@simplewebauthn/server?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/@simplewebauthn/server)
+[![JSR](https://jsr.io/badges/@simplewebauthn/server?style=for-the-badge)](https://jsr.io/@simplewebauthn/server)
 
 - [Installation](#installation)
-  - [Node LTS 20.x or higher](#node-lts-20x-or-higher)
-  - [Deno v1.43.x or higher](#deno-v143x-or-higher)
+  - [Node LTS 20.x and higher](#node-lts-20x-and-higher)
+  - [Deno v1.43 and higher](#deno-v143-and-higher)
 - [Usage](#usage)
 - [Supported Attestation Formats](#supported-attestation-formats)
 
 ## Installation
 
-### Node LTS 20.x or higher
+This package can be installed from **NPM**, **JSR**, or **deno.land/x**:
 
-This package can be installed from **NPM** (with support for **both CommonJS and
-[ECMAScript modules (ESM)](https://nodejs.org/api/esm.html#enabling)** projects) or **JSR**:
-
-```sh
-$ npm install @simplewebauthn/server
-```
+### Node LTS 20.x and higher
 
 ```sh
-$ npx jsr add @simplewebauthn/server
+$ npm install @simplewebauthn/server @simplewebauthn/types
 ```
 
-### Deno v1.43.x or higher
-
-It is also available for import into Deno projects from **deno.land/x** or **JSR**:
-
-```ts
-import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
+```sh
+$ npx jsr add @simplewebauthn/server @simplewebauthn/types
 ```
+
+### Deno v1.43 and higher
 
 ```sh
 $ deno add jsr:@simplewebauthn/server jsr:@simplewebauthn/types
+```
+
+```sh
+$ deno add npm:@simplewebauthn/server npm:@simplewebauthn/types
+```
+
+```ts
+import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
+import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```
 
 ## Usage
