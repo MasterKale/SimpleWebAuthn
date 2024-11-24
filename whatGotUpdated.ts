@@ -105,7 +105,8 @@ function getChangedWorkspacePackages(changedFiles: string[], workspaceDirs: stri
 
   for (const file of changedFiles) {
     for (const workspace of workspaceDirs) {
-      if (file.startsWith(workspace)) {
+      // Check if a package's source code has been modified
+      if (file.startsWith(`${workspace}/src`)) {
         matchedPackages.add(workspace);
       }
     }
