@@ -5,7 +5,7 @@
   "deno.enable": true,
   "deno.config": "./deno.json",
   "deno.disablePaths": [
-    "./scratchenv-node",
+    "./scratchenv",
     "./example"
   ],
   "editor.rulers": [
