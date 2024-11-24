@@ -7,7 +7,7 @@
 - [Installation](#installation)
   - [Node LTS 20.x and higher](#node-lts-20x-and-higher)
   - [Deno v1.43 and higher](#deno-v143-and-higher)
-- [Usage](#usage)
+- [Documentation](#documentation)
 - [Supported Attestation Formats](#supported-attestation-formats)
 
 ## Installation
@@ -39,7 +39,7 @@ import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
 import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```
 
-## Usage
+## Documentation
 
 You can find in-depth documentation on this package here:
 https://simplewebauthn.dev/docs/packages/server

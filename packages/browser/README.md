@@ -14,7 +14,7 @@
     - [UMD](#umd)
       - [ES5](#es5)
       - [ES2021](#es2021)
-  - [Usage](#usage)
+  - [Documentation](#documentation)
 
 ## Installation
 
@@ -72,7 +72,7 @@ If you only need to support modern browsers, include the `ES2021` version:
 <script src="https://unpkg.com/@simplewebauthn/browser"></script>
 ```
 
-## Usage
+## Documentation
 
 You can find in-depth documentation on this package here:
 https://simplewebauthn.dev/docs/packages/browser
