@@ -11,6 +11,6 @@ example/*.crt
 example/fido-conformance-mds/*
 !example/fido-conformance-mds/.gitkeep
 packages/*/package-lock.json
-scratchenv/
+scratchenv*
 .nx/cache
 .nx/workspace-data

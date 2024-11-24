@@ -4,6 +4,10 @@
   "deno.path": "/opt/homebrew/bin/deno",
   "deno.enable": true,
   "deno.config": "./deno.json",
+  "deno.disablePaths": [
+    "./scratchenv-node",
+    "./example"
+  ],
   "editor.rulers": [
     100
   ],
