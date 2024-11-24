@@ -26,10 +26,9 @@ An additional package is also included that contains shared TypeScript definitio
 
 ## Installation
 
-SimpleWebAuthn is available on **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)**,
-**[JSR](https://jsr.io/@simplewebauthn)**, and **[deno.land/x](https://deno.land/x/simplewebauthn)**
-for import into **Node LTS 20.x and higher**, **Deno v1.43 and higher** projects, and other
-compatible runtimes (Cloudflare Workers, Bun, etc...)
+SimpleWebAuthn can be installed from **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)** and
+**[JSR](https://jsr.io/@simplewebauthn)** in **Node LTS 20.x and higher**, **Deno v1.43 and higher**
+projects, and other compatible runtimes (Cloudflare Workers, Bun, etc...)
 
 See the packages' READMEs for more specific installation information.
 

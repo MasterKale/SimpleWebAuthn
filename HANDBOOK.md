@@ -50,9 +50,6 @@ The following commands can be run from the root of the monorepo to build the res
 then **publish it to both [NPM](https://www.npmjs.com/search?q=%40simplewebauthn) and
 [JSR](https://jsr.io/@simplewebauthn)**.
 
-Publishing to **[deno.land/x](https://deno.land/x/simplewebauthn)** will happen as part of the last
-step at the end of this handbook.
-
 #### Need to publish @simplewebauthn/types?
 
 ```

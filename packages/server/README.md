@@ -12,7 +12,8 @@
 
 ## Installation
 
-This package can be installed from **NPM**, **JSR**, or **deno.land/x**:
+This package can be installed from **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)** and
+**[JSR](https://jsr.io/@simplewebauthn)**:
 
 ### Node LTS 20.x and higher
 
@@ -31,12 +32,8 @@ $ deno add jsr:@simplewebauthn/server jsr:@simplewebauthn/types
 ```
 
 ```sh
+# Available in Deno v1.46 and higher
 $ deno add npm:@simplewebauthn/server npm:@simplewebauthn/types
-```
-
-```ts
-import {...} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
-import type {...} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```
 
 ## Documentation

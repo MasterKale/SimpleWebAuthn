@@ -1,15 +1,18 @@
-# Simple imports for Deno projects
+# [DEPRECATED] deno.land/x support
 
-These **.ts** files enable shorter imports of the various packages available in this monorepo when
-importing SimpleWebAuthn from https://deno.land/x/simplewebauthn.
+Importing SimpleWebAuthn packages from `"https://deno.land/x/simplewebauthn/..."` URLs is no longer
+supported. Please use `deno add` to install them from **[JSR](https://jsr.io/@simplewebauthn)**
+instead:
 
-## Installation
+```sh
+# Deno v1.42 and higher
+$ deno add jsr:@simplewebauthn/...
+```
 
-For example, to import the **server** or **types** packages into your Deno project, add the
-following to your **deps.ts** file:
+These packages can also be imported from
+**[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)**:
 
-```ts
-import { ... } from 'https://deno.land/x/simplewebauthn/deno/browser.ts';
-import { ... } from 'https://deno.land/x/simplewebauthn/deno/server.ts';
-import type { ... } from 'https://deno.land/x/simplewebauthn/deno/types.ts';
+```sh
+# Deno v1.46 and higher
+$ deno add npm:@simplewebauthn/...
 ```
