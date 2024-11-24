@@ -9,15 +9,7 @@ For example, to import the **server** or **types** packages into your Deno proje
 following to your **deps.ts** file:
 
 ```ts
-import {
-  // ...
-} from 'https://deno.land/x/simplewebauthn/deno/browser.ts';
-
-import {
-  // ...
-} from 'https://deno.land/x/simplewebauthn/deno/server.ts';
-
-import {
-  // ...
-} from 'https://deno.land/x/simplewebauthn/deno/types.ts';
+import { ... } from 'https://deno.land/x/simplewebauthn/deno/browser.ts';
+import { ... } from 'https://deno.land/x/simplewebauthn/deno/server.ts';
+import type { ... } from 'https://deno.land/x/simplewebauthn/deno/types.ts';
 ```
