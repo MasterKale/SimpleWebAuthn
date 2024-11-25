@@ -1,9 +1,94 @@
 # Changelog
 
-## v11.0.0-alpha3
+## v12.0.0 - The one that claims a JSR scope
 
-This build is **functionally identical** as v11.0.0. This one just involves massive monorepo
-infrastructure changes that I'm putting through its paces.
+All SimpleWebAuthn packages are now available for installation from the
+[JavaScript Registry (JSR)](https://jsr.io/@simplewebauthn)! JSR is an "open-source package registry
+for modern JavaScript and TypeScript" - you can read more about this new package registry and its
+ESM-centric capabilities [here](https://jsr.io/docs/why).
+
+**All packages in v12.0.0 are functionally identical to v11.0.0!** And JSR package hosting is **in
+addition to** existing package hosting on NPM. Nothing changes about package installation via
+`npm install`. Read on for more information.
+
+### Packages
+
+- @simplewebauthn/browser@12.0.0
+- @simplewebauthn/server@12.0.0
+- @simplewebauthn/types@12.0.0
+
+### Changes
+
+- **[browser]** **[server]** **[types]** All packages can now be installed from JSR wherever JSR
+  imports are supported ([#634](https://github.com/MasterKale/SimpleWebAuthn/pull/634))
+- **[browser]** Deno projects using frameworks like Fresh can now import and use
+  **@simplewebauthn/browser** ([#634](https://github.com/MasterKale/SimpleWebAuthn/pull/634))
+
+To install from JSR, use `npx jsr add @simplewebauthn/...` or `deno add jsr:@simplewebauthn/...`
+depending on which package manager is available.
+
+#### Projects using `npm` for package management:
+
+```sh
+npx jsr add @simplewebauthn/browser
+```
+
+```sh
+npx jsr add @simplewebauthn/server
+```
+
+```sh
+npx jsr add @simplewebauthn/types
+```
+
+#### Projects using `deno` for package management:
+
+```sh
+deno add jsr:@simplewebauthn/browser
+```
+
+```sh
+deno add jsr:@simplewebauthn/server
+```
+
+```sh
+deno add jsr:@simplewebauthn/types
+```
+
+#### Projects using HTTPS modules via deno.land/x:
+
+v12.0.0 officially deprecates importing SimpleWebAuthn from deno.land/x. See **Breaking Changes**
+below for refactor guidance.
+
+### Breaking Changes
+
+Importing SimpleWebAuthn packages from `"https://deno.land/x/simplewebauthn/..."` URLs is no longer
+supported. Please use Deno's native support for JSR imports instead, available in projects running
+Deno v1.42 and higher.
+
+**Before:**
+
+```ts
+import { generateAuthenticationOptions } from 'https://deno.land/x/simplewebauthn/deno/server.ts';
+```
+
+**After:**
+
+```ts
+import { generateAuthenticationOptions } from 'jsr:@simplewebauthn/server';
+```
+
+Alternatively, use `deno add` to install these packages from
+**[JSR](https://jsr.io/@simplewebauthn)**:
+
+```sh
+# Deno v1.42 and higher
+deno add jsr:@simplewebauthn/server
+```
+
+```ts
+import { generateAuthenticationOptions } from '@simplewebauthn/server';
+```
 
 ## v11.0.0 - The one that auto-registers
 
