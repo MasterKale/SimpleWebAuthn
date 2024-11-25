@@ -20,7 +20,7 @@ import { generateAuthenticationOptions } from 'jsr:@simplewebauthn/server';
 Alternatively, use `deno add` to install them from **[JSR](https://jsr.io/@simplewebauthn)**:
 
 ```sh
-# Deno v1.42 and higher
+# Deno v1.43 and higher
 deno add jsr:@simplewebauthn/server
 ```
 
