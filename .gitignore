@@ -14,3 +14,7 @@ packages/*/package-lock.json
 scratchenv*
 .nx/cache
 .nx/workspace-data
+# Test coverage
+cov_profile/
+html_cov/
+cov.lcov
