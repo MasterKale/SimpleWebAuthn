@@ -8,7 +8,6 @@ import {
 } from '@std/assert';
 import { returnsNext, stub } from '@std/testing/mock';
 import type { AuthenticationResponseJSON, WebAuthnCredential } from '@simplewebauthn/types';
-import {} from '@std/assert';
 
 import { verifyAuthenticationResponse } from './verifyAuthenticationResponse.ts';
 
