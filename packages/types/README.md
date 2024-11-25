@@ -18,11 +18,11 @@ This package can be installed from **[NPM](https://www.npmjs.com/search?q=%40sim
 ### Node LTS 20.x and higher
 
 ```sh
-$ npm install @simplewebauthn/types
+npm install @simplewebauthn/types
 ```
 
 ### Deno v1.43 and higher
 
 ```sh
-$ deno add jsr:@simplewebauthn/types
+deno add jsr:@simplewebauthn/types
 ```

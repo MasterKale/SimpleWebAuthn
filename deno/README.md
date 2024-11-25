@@ -21,7 +21,7 @@ Alternatively, use `deno add` to install them from **[JSR](https://jsr.io/@simpl
 
 ```sh
 # Deno v1.42 and higher
-$ deno add jsr:@simplewebauthn/server
+deno add jsr:@simplewebauthn/server
 ```
 
 ```ts
