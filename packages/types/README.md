@@ -12,8 +12,8 @@ TypeScript typings for **@simplewebauthn/server** and **@simplewebauthn/browser*
 
 ## Installation
 
-This package can be installed from **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)** and
-**[JSR](https://jsr.io/@simplewebauthn)**:
+This package can be installed from **[NPM](https://www.npmjs.com/package/@simplewebauthn/types)**
+and **[JSR](https://jsr.io/@simplewebauthn/types)**:
 
 ### Node LTS 20.x and higher
 

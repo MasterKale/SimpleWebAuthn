@@ -12,8 +12,8 @@
 
 ## Installation
 
-This package can be installed from **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)** and
-**[JSR](https://jsr.io/@simplewebauthn)**:
+This package can be installed from **[NPM](https://www.npmjs.com/package/@simplewebauthn/server)**
+and **[JSR](https://jsr.io/@simplewebauthn/server)**:
 
 ### Node LTS 20.x and higher
 
