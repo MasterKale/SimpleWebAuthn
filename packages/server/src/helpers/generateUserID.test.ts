@@ -1,4 +1,4 @@
-import { assert, assertNotEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assert, assertNotEquals } from '@std/assert';
 
 import { generateUserID } from './generateUserID.ts';
 

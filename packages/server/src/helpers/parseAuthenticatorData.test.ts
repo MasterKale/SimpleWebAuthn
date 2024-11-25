@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertEquals } from '@std/assert';
 
 import { parseAuthenticatorData } from './parseAuthenticatorData.ts';
 import { AuthenticationExtensionsAuthenticatorOutputs } from './decodeAuthenticatorExtensions.ts';

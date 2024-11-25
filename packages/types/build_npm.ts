@@ -1,16 +1,13 @@
-import { build, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
+import { build, emptyDir } from '@deno/dnt';
+
+import denoJSON from './deno.json' with { type: 'json' };
 
 const outDir = './npm';
-const lernaPackageJSON: { version: string } = JSON.parse(
-  await Deno.readTextFile('./package.json'),
-);
 
 await emptyDir(outDir);
 
 await build({
-  entryPoints: [
-    { name: '.', path: './src/index.ts' },
-  ],
+  entryPoints: ['./src/index.ts'],
   outDir,
   shims: {},
   // Keeping declarations in a single types/ directory to mimic the original file structure
@@ -19,7 +16,7 @@ await build({
   // package.json values
   package: {
     name: '@simplewebauthn/types',
-    version: lernaPackageJSON.version,
+    version: denoJSON.version,
     description: 'TypeScript types used by the @simplewebauthn series of libraries',
     license: 'MIT',
     author: 'Matthew Miller <matthew@millerti.me>',

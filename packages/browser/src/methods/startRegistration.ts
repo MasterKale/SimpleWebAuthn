@@ -5,13 +5,13 @@ import {
   RegistrationResponseJSON,
 } from '@simplewebauthn/types';
 
-import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString';
-import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer';
-import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn';
-import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor';
-import { identifyRegistrationError } from '../helpers/identifyRegistrationError';
-import { WebAuthnAbortService } from '../helpers/webAuthnAbortService';
-import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment';
+import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString.ts';
+import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer.ts';
+import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn.ts';
+import { toPublicKeyCredentialDescriptor } from '../helpers/toPublicKeyCredentialDescriptor.ts';
+import { identifyRegistrationError } from '../helpers/identifyRegistrationError.ts';
+import { WebAuthnAbortService } from '../helpers/webAuthnAbortService.ts';
+import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment.ts';
 
 export type StartRegistrationOpts = {
   optionsJSON: PublicKeyCredentialCreationOptionsJSON;

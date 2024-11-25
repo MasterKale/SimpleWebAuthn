@@ -1,4 +1,4 @@
-import { assert, assertFalse } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assert, assertFalse } from '@std/assert';
 
 import { verifyJWT } from './verifyJWT.ts';
 import { convertPEMToBytes } from '../helpers/convertPEMToBytes.ts';
@@ -24,7 +24,7 @@ Deno.test('should fail to verify a JWT with a bad signature', async () => {
  * aren't one of two supported combinations. In this test the key curve is
  * P-384 and the hash alg is SHA-256...
  *
- * See https://deno.land/x/deno@v1.36.1/ext/crypto/00_crypto.js?source#L1338
+ * See https://deno.land/x/deno@v2.0.4/ext/crypto/00_crypto.js?source#L1317
  *
  * I raised an issue about this here:
  * https://github.com/denoland/deno/issues/20198

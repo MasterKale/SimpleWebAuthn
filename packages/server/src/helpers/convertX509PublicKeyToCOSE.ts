@@ -1,12 +1,6 @@
-import {
-  AsnParser,
-  Certificate,
-  ECParameters,
-  id_ecPublicKey,
-  id_secp256r1,
-  id_secp384r1,
-  RSAPublicKey,
-} from '../deps.ts';
+import { AsnParser } from '@peculiar/asn1-schema';
+import { Certificate } from '@peculiar/asn1-x509';
+import { ECParameters, id_ecPublicKey, id_secp256r1, id_secp384r1 } from '@peculiar/asn1-ecc';
 import {
   COSECRV,
   COSEKEYS,
@@ -15,6 +9,8 @@ import {
   COSEPublicKeyEC2,
   COSEPublicKeyRSA,
 } from './cose.ts';
+import { RSAPublicKey } from '@peculiar/asn1-rsa';
+
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 
 export function convertX509PublicKeyToCOSE(

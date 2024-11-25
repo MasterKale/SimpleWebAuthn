@@ -1,5 +1,6 @@
+import type { Base64URLString } from '@simplewebauthn/types';
+
 import { isoBase64URL } from './iso/index.ts';
-import type { Base64URLString } from '../deps.ts';
 
 /**
  * Decode an authenticator's base64url-encoded clientDataJSON to JSON

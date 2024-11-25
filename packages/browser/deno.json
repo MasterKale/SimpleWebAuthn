@@ -1,0 +1,30 @@
+{
+  "name": "@simplewebauthn/browser",
+  "version": "11.0.0-alpha3",
+  "exports": "./src/index.ts",
+  "tasks": {
+    "build": "deno task test && deno run -A build_npm.ts",
+    "test": "deno test -A src/",
+    "test:watch": "deno test -A --watch src/",
+    "publish": "deno task build && deno task publish:jsr && deno task publish:npm",
+    "publish:jsr": "deno publish",
+    "publish:npm": "(cd npm; npm publish)"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 100
+  },
+  "imports": {},
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE.md",
+      "./src/**/*.ts"
+    ],
+    "exclude": [
+      "./src/**/*.test.ts",
+      "./src/**/__jest__",
+      "./npm"
+    ]
+  }
+}

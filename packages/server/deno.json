@@ -1,0 +1,42 @@
+{
+  "name": "@simplewebauthn/server",
+  "version": "11.0.0-alpha3",
+  "exports": {
+    ".": "./src/index.ts",
+    "./helpers": "./src/helpers/index.ts"
+  },
+  "tasks": {
+    "build": "deno task test && deno run -A build_npm.ts",
+    "test": "deno test -A src/",
+    "test:watch": "deno test -A --watch src/",
+    "publish": "deno task build && deno task publish:jsr && deno task publish:npm",
+    "publish:jsr": "deno publish",
+    "publish:npm": "(cd npm; npm publish)"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 100
+  },
+  "imports": {
+    "tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
+    "@hexagon/base64": "npm:@hexagon/base64@^1.1.27",
+    "@levischuck/tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
+    "@peculiar/asn1-android": "npm:@peculiar/asn1-android@^2.3.10",
+    "@peculiar/asn1-ecc": "npm:@peculiar/asn1-ecc@^2.3.8",
+    "@peculiar/asn1-rsa": "npm:@peculiar/asn1-rsa@^2.3.8",
+    "@peculiar/asn1-schema": "npm:@peculiar/asn1-schema@^2.3.8",
+    "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.3.8",
+    "cross-fetch": "npm:cross-fetch@^4.0.0"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE.md",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.test.ts",
+      "./npm"
+    ]
+  }
+}

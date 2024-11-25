@@ -1,4 +1,4 @@
-import { assertObjectMatch } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertObjectMatch } from '@std/assert';
 
 import { decodeAuthenticatorExtensions } from './decodeAuthenticatorExtensions.ts';
 import { isoUint8Array } from './iso/index.ts';

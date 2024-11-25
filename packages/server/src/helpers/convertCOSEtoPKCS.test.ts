@@ -1,4 +1,4 @@
-import { assertThrows } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertThrows } from '@std/assert';
 
 import { isoCBOR } from './iso/index.ts';
 

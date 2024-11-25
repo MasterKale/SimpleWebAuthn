@@ -1,4 +1,5 @@
-import { AsnSerializer } from '../deps.ts';
+import { AsnSerializer } from '@peculiar/asn1-schema';
+
 import { isCertRevoked } from './isCertRevoked.ts';
 import { verifySignature } from './verifySignature.ts';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';

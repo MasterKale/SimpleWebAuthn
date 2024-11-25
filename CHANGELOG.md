@@ -1,5 +1,10 @@
 # Changelog
 
+## v11.0.0-alpha3
+
+This build is **functionally identical** as v11.0.0. This one just involves massive monorepo
+infrastructure changes that I'm putting through its paces.
+
 ## v11.0.0 - The one that auto-registers
 
 Say hello to support for automatic passkey registration, support for valid conditional UI `<input>`

@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from 'https://deno.land/std@0.198.0/assert/mod.ts';
+import { assertEquals, assertRejects } from '@std/assert';
 
 import { verifyRegistrationResponse } from '../verifyRegistrationResponse.ts';
 

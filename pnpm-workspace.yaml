@@ -1,4 +1,0 @@
-packages:
-  - "packages/browser"
-  - "packages/server/npm"
-  - "packages/types/npm"

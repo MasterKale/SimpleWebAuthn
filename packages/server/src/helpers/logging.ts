@@ -1,5 +1,3 @@
-// import { debug, Debugger } from '../deps.ts';
-
 // const defaultLogger = debug('SimpleWebAuthn');
 
 /**

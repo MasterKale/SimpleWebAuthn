@@ -4,7 +4,8 @@ import type {
   CredentialDeviceType,
   UserVerificationRequirement,
   WebAuthnCredential,
-} from '../deps.ts';
+} from '@simplewebauthn/types';
+
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { verifySignature } from '../helpers/verifySignature.ts';

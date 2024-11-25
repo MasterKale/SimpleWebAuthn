@@ -1,13 +1,9 @@
-import { build, emptyDir } from 'https://deno.land/x/dnt@0.38.0/mod.ts';
+import { build, emptyDir } from '@deno/dnt';
+
+import denoJSON from './deno.json' with { type: 'json' };
+import typesDenoJSON from '../types/deno.json' with { type: 'json' };
 
 const outDir = './npm';
-
-const lernaPackageJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('./package.json'),
-);
-const typesPackageJSON: { version: string } = JSON.parse(
-  Deno.readTextFileSync('../types/npm/package.json'),
-);
 
 await emptyDir(outDir);
 
@@ -17,6 +13,7 @@ await build({
     { name: './helpers', path: './src/helpers/index.ts' },
   ],
   outDir,
+  importMap: './deno.json',
   shims: {
     deno: {
       test: 'dev',
@@ -24,10 +21,12 @@ await build({
   },
   // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
   typeCheck: false,
+  // TODO: Re-enable if https://github.com/denoland/dnt/issues/430 can get resolved
+  test: false,
   // package.json values
   package: {
     name: '@simplewebauthn/server',
-    version: lernaPackageJSON.version,
+    version: denoJSON.version,
     description: 'SimpleWebAuthn for Servers',
     license: 'MIT',
     author: 'Matthew Miller <matthew@millerti.me>',
@@ -63,47 +62,13 @@ await build({
         ],
       },
     },
+    dependencies: {
+      // Deno workspaces maps this identifier locally, make sure it's defined in the NPM package
+      '@simplewebauthn/types': `^${typesDenoJSON.version}`,
+    },
   },
   // Map from Deno package to NPM package for Node build
-  mappings: {
-    'https://deno.land/x/b64@1.1.27/src/base64.js': {
-      name: '@hexagon/base64',
-      version: '^1.1.27',
-    },
-    'https://esm.sh/cross-fetch@4.0.0': {
-      name: 'cross-fetch',
-      version: '^4.0.0',
-    },
-    'https://esm.sh/@peculiar/asn1-schema@2.3.8': {
-      name: '@peculiar/asn1-schema',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-x509@2.3.8': {
-      name: '@peculiar/asn1-x509',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-ecc@2.3.8': {
-      name: '@peculiar/asn1-ecc',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-rsa@2.3.8': {
-      name: '@peculiar/asn1-rsa',
-      version: '^2.3.8',
-    },
-    'https://esm.sh/@peculiar/asn1-android@2.3.10': {
-      name: '@peculiar/asn1-android',
-      version: '^2.3.10',
-    },
-    'https://deno.land/x/tiny_cbor@0.2.2/index.ts': {
-      name: '@levischuck/tiny-cbor',
-      version: '^0.2.2',
-    },
-    // Mapping for '../../types/src/index.ts' in deps.ts
-    '../types/src/index.ts': {
-      name: '@simplewebauthn/types',
-      version: `^${typesPackageJSON.version}`,
-    },
-  },
+  mappings: {},
   // TypeScript tsconfig.json config
   compilerOptions: {
     lib: ['ES2021'],

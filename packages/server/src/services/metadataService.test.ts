@@ -1,11 +1,6 @@
-import { assertEquals, assertRejects } from 'https://deno.land/std@0.198.0/assert/mod.ts';
-import { afterEach, beforeEach, describe, it } from 'https://deno.land/std@0.198.0/testing/bdd.ts';
-import {
-  assertSpyCallArg,
-  assertSpyCalls,
-  Stub,
-  stub,
-} from 'https://deno.land/std@0.198.0/testing/mock.ts';
+import { assertEquals, assertRejects } from '@std/assert';
+import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
+import { assertSpyCallArg, assertSpyCalls, type Stub, stub } from '@std/testing/mock';
 
 import { _fetchInternals } from '../helpers/fetch.ts';
 
@@ -82,7 +77,7 @@ describe('Method: getStatement()', () => {
       statements: [],
     });
 
-    assertRejects(
+    await assertRejects(
       () => MetadataService.getStatement('not-a-real-aaguid'),
     );
   });

@@ -1,12 +1,13 @@
+import { AsnParser } from '@peculiar/asn1-schema';
 import {
-  AsnParser,
   Certificate,
   ExtendedKeyUsage,
   id_ce_extKeyUsage,
   id_ce_subjectAltName,
   Name,
   SubjectAlternativeName,
-} from '../../../deps.ts';
+} from '@peculiar/asn1-x509';
+
 import type { AttestationFormatVerifierOpts } from '../../verifyRegistrationResponse.ts';
 import { decodeCredentialPublicKey } from '../../../helpers/decodeCredentialPublicKey.ts';
 import {

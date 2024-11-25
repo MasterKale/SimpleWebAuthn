@@ -1,33 +1,25 @@
-import { browserSupportsWebAuthn } from './browserSupportsWebAuthn';
+/// <reference lib="DOM" />
+import { assert, assertEquals, assertFalse } from '@std/assert';
 
-beforeEach(() => {
-  // @ts-ignore 2741
-  window.PublicKeyCredential = jest.fn().mockReturnValue(() => {});
+import { browserSupportsWebAuthn } from './browserSupportsWebAuthn.ts';
+
+Deno.test('should return true when browser supports WebAuthn', () => {
+  // @ts-ignore: Stubbing out PublicKeyCredential so it exists
+  globalThis.PublicKeyCredential = () => {};
+  assert(browserSupportsWebAuthn());
 });
 
-test('should return true when browser supports WebAuthn', () => {
-  expect(browserSupportsWebAuthn()).toBe(true);
-});
-
-test('should return false when browser does not support WebAuthn', () => {
+Deno.test('should return false when browser does not support WebAuthn', () => {
   // This looks weird but it appeases the linter so it's _fiiiine_
-  delete (window as { PublicKeyCredential: unknown }).PublicKeyCredential;
-  expect(browserSupportsWebAuthn()).toBe(false);
+  delete (globalThis as { PublicKeyCredential: unknown }).PublicKeyCredential;
+  assertFalse(browserSupportsWebAuthn());
 });
 
-test('should return false when window is undefined', () => {
+Deno.test('should return false when window is undefined', () => {
   // Make window undefined as it is in node environments.
-  const windowSpy = jest.spyOn<typeof globalThis, 'window'>(
-    global,
-    'window',
-    'get',
-  );
-  // @ts-ignore: Intentionally making window unavailable
-  windowSpy.mockImplementation(() => undefined);
+  // @ts-ignore: Intentionally making globalThis unavailable
+  globalThis = undefined;
 
-  expect(window).toBe(undefined);
-  expect(browserSupportsWebAuthn()).toBe(false);
-
-  // Restore original window value.
-  windowSpy.mockRestore();
+  assertEquals(globalThis, undefined);
+  assertFalse(browserSupportsWebAuthn());
 });

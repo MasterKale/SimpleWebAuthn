@@ -1,4 +1,4 @@
-import { tinyCbor } from '../../deps.ts';
+import * as tinyCbor from 'tiny-cbor';
 
 /**
  * Whatever CBOR encoder is used should keep CBOR data the same length when data is re-encoded

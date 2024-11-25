@@ -2,11 +2,12 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
   "deno.path": "/opt/homebrew/bin/deno",
-  "deno.enablePaths": [
-    "./packages/server",
-    "./packages/types"
+  "deno.enable": true,
+  "deno.config": "./deno.json",
+  "deno.disablePaths": [
+    "./scratchenv",
+    "./example"
   ],
-  "deno.config": "./deno.jsonc",
   "editor.rulers": [
     100
   ],

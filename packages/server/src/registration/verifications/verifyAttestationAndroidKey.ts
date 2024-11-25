@@ -1,4 +1,7 @@
-import { AsnParser, Certificate, id_ce_keyDescription, KeyDescription } from '../../deps.ts';
+import { AsnParser } from '@peculiar/asn1-schema';
+import { Certificate } from '@peculiar/asn1-x509';
+import { id_ce_keyDescription, KeyDescription } from '@peculiar/asn1-android';
+
 import type { AttestationFormatVerifierOpts } from '../verifyRegistrationResponse.ts';
 import { convertCertBufferToPEM } from '../../helpers/convertCertBufferToPEM.ts';
 import { validateCertificatePath } from '../../helpers/validateCertificatePath.ts';

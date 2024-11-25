@@ -2,15 +2,15 @@
  * @packageDocumentation
  * @module @simplewebauthn/browser
  */
-import { startRegistration } from './methods/startRegistration';
-import { startAuthentication } from './methods/startAuthentication';
-import { browserSupportsWebAuthn } from './helpers/browserSupportsWebAuthn';
-import { platformAuthenticatorIsAvailable } from './helpers/platformAuthenticatorIsAvailable';
-import { browserSupportsWebAuthnAutofill } from './helpers/browserSupportsWebAuthnAutofill';
-import { base64URLStringToBuffer } from './helpers/base64URLStringToBuffer';
-import { bufferToBase64URLString } from './helpers/bufferToBase64URLString';
-import { WebAuthnAbortService } from './helpers/webAuthnAbortService';
-import { WebAuthnError } from './helpers/webAuthnError';
+import { startRegistration } from './methods/startRegistration.ts';
+import { startAuthentication } from './methods/startAuthentication.ts';
+import { browserSupportsWebAuthn } from './helpers/browserSupportsWebAuthn.ts';
+import { platformAuthenticatorIsAvailable } from './helpers/platformAuthenticatorIsAvailable.ts';
+import { browserSupportsWebAuthnAutofill } from './helpers/browserSupportsWebAuthnAutofill.ts';
+import { base64URLStringToBuffer } from './helpers/base64URLStringToBuffer.ts';
+import { bufferToBase64URLString } from './helpers/bufferToBase64URLString.ts';
+import { WebAuthnAbortService } from './helpers/webAuthnAbortService.ts';
+import { WebAuthnError } from './helpers/webAuthnError.ts';
 
 export {
   base64URLStringToBuffer,
@@ -24,4 +24,4 @@ export {
   WebAuthnError,
 };
 
-export type { WebAuthnErrorCode } from './helpers/webAuthnError';
+export type { WebAuthnErrorCode } from './helpers/webAuthnError.ts';

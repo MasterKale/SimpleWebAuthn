@@ -4,7 +4,8 @@ import type {
   Base64URLString,
   PublicKeyCredentialRequestOptionsJSON,
   UserVerificationRequirement,
-} from '../deps.ts';
+} from '@simplewebauthn/types';
+
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 

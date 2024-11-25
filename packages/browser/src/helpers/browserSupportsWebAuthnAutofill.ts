@@ -1,6 +1,6 @@
 import { PublicKeyCredentialFuture } from '@simplewebauthn/types';
 
-import { browserSupportsWebAuthn } from './browserSupportsWebAuthn';
+import { browserSupportsWebAuthn } from './browserSupportsWebAuthn.ts';
 
 /**
  * Determine if the browser supports conditional UI, so that WebAuthn credentials can
@@ -8,7 +8,9 @@ import { browserSupportsWebAuthn } from './browserSupportsWebAuthn';
  */
 export function browserSupportsWebAuthnAutofill(): Promise<boolean> {
   if (!browserSupportsWebAuthn()) {
-    return new Promise((resolve) => resolve(false));
+    return _browserSupportsWebAuthnAutofillInternals.stubThis(
+      new Promise((resolve) => resolve(false)),
+    );
   }
 
   /**
@@ -17,12 +19,21 @@ export function browserSupportsWebAuthnAutofill(): Promise<boolean> {
    * want. I think I'm fine with this for now since it's _supposed_ to be temporary, until TS types
    * have a chance to catch up.
    */
-  const globalPublicKeyCredential = window
+  const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
-  if (globalPublicKeyCredential.isConditionalMediationAvailable === undefined) {
-    return new Promise((resolve) => resolve(false));
+  if (globalPublicKeyCredential?.isConditionalMediationAvailable === undefined) {
+    return _browserSupportsWebAuthnAutofillInternals.stubThis(
+      new Promise((resolve) => resolve(false)),
+    );
   }
 
-  return globalPublicKeyCredential.isConditionalMediationAvailable();
+  return _browserSupportsWebAuthnAutofillInternals.stubThis(
+    globalPublicKeyCredential.isConditionalMediationAvailable(),
+  );
 }
+
+// Make it possible to stub the return value during testing
+export const _browserSupportsWebAuthnAutofillInternals = {
+  stubThis: (value: Promise<boolean>) => value,
+};

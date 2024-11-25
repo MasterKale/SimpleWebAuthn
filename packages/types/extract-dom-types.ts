@@ -4,6 +4,8 @@
  * package.json in the root of the monorepo. This is why `npm run build` here will run this file
  * before finally building the package using dnt.
  */
+import { DenoDir } from '@deno/cache-dir';
+import { join } from '@std/path';
 // n.b. ts-morph is a sibling devDependency of typescript, so that the module
 // loader will resolve our project's typescript package, not the transient
 // dependency of ts-morph. We only want to reference our typescript dependency
@@ -41,11 +43,19 @@ const types = [
   'UserVerificationRequirement',
 ];
 
-const project = new Project({ skipAddingFilesFromTsConfig: true });
-const domSourcePath = 'typescript/lib/lib.dom.d.ts';
-const domSourceFile = project.addSourceFileAtPath(
-  require.resolve(domSourcePath),
+// Construct the path to TypeScript in Deno's cache
+const denoDir = new DenoDir();
+const domSourcePath = join(
+  denoDir.root,
+  `npm/registry.npmjs.org/typescript/${version}/lib/lib.dom.d.ts`,
 );
+
+// Check that the file exists
+Deno.statSync(domSourcePath);
+
+// Begin extracting types
+const project = new Project({ skipAddingFilesFromTsConfig: true });
+const domSourceFile = project.addSourceFileAtPath(domSourcePath);
 const resolvedNodes = new Set<InterfaceDeclaration | TypeAliasDeclaration>();
 const unresolvedNodes = new Set<InterfaceDeclaration | TypeAliasDeclaration>(
   types.map((type) => {
@@ -87,10 +97,11 @@ const outputSourceFile = project.createSourceFile(`src/dom.ts`, undefined, {
   overwrite: true,
 });
 outputSourceFile.addStatements([
+  `// deno-fmt-ignore-file`,
   `/**`,
-  ` * Generated from typescript@${version} ${domSourcePath}`,
-  ` * To regenerate, run the following command from the project root:`,
-  ` * npx lerna --scope=@simplewebauthn/types exec -- npm run extract-dom-types`,
+  ` * Generated from typescript@${version}`,
+  ` * To regenerate, run the following command from the package root:`,
+  ` * deno task extract-dom-types`,
   ` */`,
   `// BEGIN CODEGEN`,
 ]);

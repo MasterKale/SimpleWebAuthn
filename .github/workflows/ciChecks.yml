@@ -5,66 +5,58 @@ name: CI Checks
 
 on:
   push:
-    branches: [ master, beta ]
+    branches: [master, beta]
   pull_request:
-    branches: [ master, beta ]
+    branches: [master, beta]
 
 jobs:
   unit_tests:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [ 20, 22 ]
-        deno-version: [ 'v1.46.x', 'v2.0.x' ]
+        node-version: [20, 22]
+        deno-version: ['v2.0.x']
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    # Install Node
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: Confirm installed Node version
-      run: node -v
+      # Install Node
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Confirm installed Node version
+        run: node -v
 
-    # Install Deno
-    - name: Setup Deno ${{ matrix.deno-version }}
-      uses: denoland/setup-deno@v2
-      with:
-        deno-version: ${{ matrix.deno-version }}
-    - name: Confirm installed Deno version
-      run: deno -V
+      # Install Deno
+      - name: Setup Deno ${{ matrix.deno-version }}
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ matrix.deno-version }}
+      - name: Confirm installed Deno version
+        run: deno -V
 
-    # Install pnpm w/cache for quicker installs
-    # https://github.com/pnpm/action-setup#use-cache-to-reduce-installation-time
-    - name: Setup pnpm 9.12.3
-      uses: pnpm/action-setup@v4
-      with:
-        version: 9.12.3
-        run_install: false
-    - name: Get pnpm store directory
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
+      # Set up caching for quicker installs
+      - name: Get DENO_DIR store directory
+        shell: bash
+        # Expecting "DENO_DIR location: /Users/matt/Library/Caches/deno" somewhere in `deno info`
+        run: |
+          echo "DENO_DIR=$(deno info | grep "DENO_DIR" | awk '{print $3}')" >> $GITHUB_ENV
+      - name: Setup Deno cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-dir-${{ hashFiles('**/deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-dir-
 
-    # Install deps
-    - name: Install dependencies
-      run: pnpm install
+      # Install deps
+      - name: Install dependencies
+        run: deno install
 
-    # Build and test packages
-    - name: Build & test @simplewebauthn/types
-      run: npm run build:types   # browser tests will need this to be built
-    - name: Build & test @simplewebauthn/server
-      run: npm run build:server  # dnt will test everything in Node too
-    - name: Test @simplewebauthn/browser
-      run: npm run test:browser
+      # Build and test packages
+      - name: Test @simplewebauthn/server
+        run: cd packages/server && deno task test
+      - name: Test @simplewebauthn/browser
+        run: cd packages/browser && deno task test

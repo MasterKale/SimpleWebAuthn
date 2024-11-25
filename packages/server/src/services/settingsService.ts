@@ -11,7 +11,15 @@ import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
 
 type RootCertIdentifier = AttestationFormat | 'mds';
 
-class BaseSettingsService {
+interface SettingsService {
+  setRootCertificates(opts: {
+    identifier: RootCertIdentifier;
+    certificates: (Uint8Array | string)[];
+  }): void;
+  getRootCertificates(opts: { identifier: RootCertIdentifier }): string[];
+}
+
+class BaseSettingsService implements SettingsService {
   // Certificates are stored as PEM-formatted strings
   private pemCertificates: Map<RootCertIdentifier, string[]>;
 
@@ -53,7 +61,21 @@ class BaseSettingsService {
   }
 }
 
-export const SettingsService = new BaseSettingsService();
+/**
+ * A basic service for specifying acceptable root certificates for all supported attestation
+ * statement formats.
+ *
+ * In addition, default root certificates are included for the following statement formats:
+ *
+ * - `'android-key'`
+ * - `'android-safetynet'`
+ * - `'apple'`
+ * - `'android-mds'`
+ *
+ * These can be overwritten as needed by setting alternative root certificates for their format
+ * identifier using `setRootCertificates()`.
+ */
+export const SettingsService: SettingsService = new BaseSettingsService();
 
 // Initialize default certificates
 SettingsService.setRootCertificates({

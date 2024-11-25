@@ -7,7 +7,8 @@ import type {
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialParameters,
-} from '../deps.ts';
+} from '@simplewebauthn/types';
+
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 import { generateUserID } from '../helpers/generateUserID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';

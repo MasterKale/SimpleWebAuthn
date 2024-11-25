@@ -1,4 +1,6 @@
-import { AsnParser, ECDSASigValue } from '../../../deps.ts';
+import { AsnParser } from '@peculiar/asn1-schema';
+import { ECDSASigValue } from '@peculiar/asn1-ecc';
+
 import { COSECRV } from '../../cose.ts';
 import { isoUint8Array } from '../index.ts';
 

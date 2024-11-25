@@ -1,0 +1,26 @@
+{
+  "name": "@simplewebauthn/types",
+  "version": "11.0.0-alpha3",
+  "exports": "./src/index.ts",
+  "tasks": {
+    "build": "deno run -A build_npm.ts",
+    "extract-dom-types": "deno run -A extract-dom-types.ts",
+    "publish": "deno task build && deno task publish:jsr && deno task publish:npm",
+    "publish:jsr": "deno publish",
+    "publish:npm": "(cd npm; npm publish)"
+  },
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 100
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE.md",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "./npm"
+    ]
+  }
+}
