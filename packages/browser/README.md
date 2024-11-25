@@ -27,19 +27,10 @@ This package can be installed from **[NPM](https://www.npmjs.com/search?q=%40sim
 $ npm install @simplewebauthn/browser @simplewebauthn/types
 ```
 
-```sh
-$ npx jsr add @simplewebauthn/browser @simplewebauthn/types
-```
-
 ### Deno v1.43 and higher
 
 ```sh
 $ deno add jsr:@simplewebauthn/browser jsr:@simplewebauthn/types
-```
-
-```sh
-# Available in Deno v1.46 and higher
-$ deno add npm:@simplewebauthn/browser npm:@simplewebauthn/types
 ```
 
 ### UMD

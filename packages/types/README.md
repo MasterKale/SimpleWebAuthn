@@ -21,17 +21,8 @@ This package can be installed from **[NPM](https://www.npmjs.com/search?q=%40sim
 $ npm install @simplewebauthn/types
 ```
 
-```sh
-$ npx jsr add @simplewebauthn/types
-```
-
 ### Deno v1.43 and higher
 
 ```sh
 $ deno add jsr:@simplewebauthn/types
-```
-
-```sh
-# Available in Deno v1.46 and higher
-$ deno add npm:@simplewebauthn/types
 ```
