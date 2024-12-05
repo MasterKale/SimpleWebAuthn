@@ -6,8 +6,23 @@ import type { MetadataStatement } from '../metadata/mdsTypes.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 
 Deno.test('should verify attestation with metadata (android-safetynet)', async () => {
-  // notBefore: 2022-01-25T10:00:34.000Z,
-  //  notAfter: 2022-04-25T10:00:33.000Z
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2022-01-25T10:00:34.000Z,
+  //   notAfter: 2022-04-25T10:00:33.000Z
+  // }
+  // {
+  //   notBefore: 2020-08-13T00:00:42.000Z,
+  //   notAfter: 2027-09-30T00:00:42.000Z
+  // }
+  // {
+  //   notBefore: 2020-06-19T00:00:42.000Z,
+  //   notAfter: 2028-01-28T00:00:42.000Z
+  // }
+  // {
+  //   notBefore: 1998-09-01T12:00:00.000Z,
+  //   notAfter: 2028-01-28T12:00:00.000Z
+  // }
   const fakedNow = new FakeTime(new Date('2022-02-01T00:00:00.000Z'));
 
   const metadataStatementJSONSafetyNet: MetadataStatement = {
