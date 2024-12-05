@@ -9,23 +9,23 @@ import { convertPEMToBytes } from './convertPEMToBytes.ts';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
- * @param x5cPEMCerts Typically the result of `x5c.map(convertASN1toPEM)`
- * @param trustAnchors PEM-formatted certs that an attestation statement x5c may chain back to
+ * @param x5cCertsPEM Typically the result of `x5c.map(convertASN1toPEM)`
+ * @param trustAnchorsPEM PEM-formatted certs that an attestation statement x5c may chain back to
  */
 export async function validateCertificatePath(
-  x5cPEMCerts: string[],
-  trustAnchors: string[] = [],
+  x5cCertsPEM: string[],
+  trustAnchorsPEM: string[] = [],
 ): Promise<boolean> {
-  if (trustAnchors.length === 0) {
+  if (trustAnchorsPEM.length === 0) {
     // We have no trust anchors to chain back to, so skip path validation
     return true;
   }
 
   let invalidSubjectAndIssuerError = false;
   let certificateNotYetValidOrExpiredErrorMessage = undefined;
-  for (const anchor of trustAnchors) {
+  for (const anchorPEM of trustAnchorsPEM) {
     try {
-      const certsWithTrustAnchor = x5cPEMCerts.concat([anchor]);
+      const certsWithTrustAnchor = x5cCertsPEM.concat([anchorPEM]);
       await _validatePath(certsWithTrustAnchor);
       // If we successfully validated a path then there's no need to continue. Reset any existing
       // errors that were thrown by earlier trust anchors
@@ -59,22 +59,22 @@ export async function validateCertificatePath(
  * @param x5cCerts X.509 `x5c` certs in PEM string format
  * @param anchorCert X.509 trust anchor cert in PEM string format
  */
-async function _validatePath(x5cCertsWithTrustAnchor: string[]): Promise<boolean> {
-  if (new Set(x5cCertsWithTrustAnchor).size !== x5cCertsWithTrustAnchor.length) {
+async function _validatePath(x5cCertsWithTrustAnchorPEM: string[]): Promise<boolean> {
+  if (new Set(x5cCertsWithTrustAnchorPEM).size !== x5cCertsWithTrustAnchorPEM.length) {
     throw new Error('Invalid certificate path: found duplicate certificates');
   }
 
   // Make sure no certs are revoked, and all are within their time validity window
-  for (const certificate of x5cCertsWithTrustAnchor) {
-    const certInfo = getCertificateInfo(convertPEMToBytes(certificate));
+  for (const certificatePEM of x5cCertsWithTrustAnchorPEM) {
+    const certInfo = getCertificateInfo(convertPEMToBytes(certificatePEM));
     await assertCertNotRevoked(certInfo.parsedCertificate);
-    assertCertIsWithinValidTimeWindow(certInfo, certificate);
+    assertCertIsWithinValidTimeWindow(certInfo, certificatePEM);
   }
 
   // Make sure each x5c cert is issued by the next certificate in the chain
-  for (let i = 0; i < (x5cCertsWithTrustAnchor.length - 1); i += 1) {
-    const subjectPem = x5cCertsWithTrustAnchor[i];
-    const issuerPem = x5cCertsWithTrustAnchor[i + 1];
+  for (let i = 0; i < (x5cCertsWithTrustAnchorPEM.length - 1); i += 1) {
+    const subjectPem = x5cCertsWithTrustAnchorPEM[i];
+    const issuerPem = x5cCertsWithTrustAnchorPEM[i + 1];
 
     const subjectInfo = getCertificateInfo(convertPEMToBytes(subjectPem));
     const issuerInfo = getCertificateInfo(convertPEMToBytes(issuerPem));
