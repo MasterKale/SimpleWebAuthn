@@ -10,7 +10,7 @@ import { convertPEMToBytes } from './convertPEMToBytes.ts';
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
  * @param x5cPEMCerts Typically the result of `x5c.map(convertASN1toPEM)`
- * @param trustAnchors Certificates that an attestation statement x5c may chain back to
+ * @param trustAnchors PEM-formatted certs that an attestation statement x5c may chain back to
  */
 export async function validateCertificatePath(
   x5cPEMCerts: string[],
