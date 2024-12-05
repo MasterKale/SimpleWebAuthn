@@ -3,11 +3,25 @@
     "version": "deno run -A whatGotUpdated.ts",
     "test:browser": "(cd packages/browser; deno task test)",
     "test:server": "(cd packages/server; deno task test)",
-    "test:coverage": "deno task test:coverage:collect && deno task test:coverage:lcov && deno task test:coverage:html && deno task test:coverage:view",
+    "test:coverage": {
+      "command": "(cd html_cov/ && python -m http.server -b 127.0.0.1)",
+      "dependencies": [
+        "test:coverage:html"
+      ]
+    },
+    "test:coverage:html": {
+      "command": "genhtml -o html_cov --ignore-errors inconsistent cov.lcov",
+      "dependencies": [
+        "test:coverage:lcov"
+      ]
+    },
+    "test:coverage:lcov": {
+      "command": "deno coverage --lcov --output=cov.lcov cov_profile/",
+      "dependencies": [
+        "test:coverage:collect"
+      ]
+    },
     "test:coverage:collect": "deno test -A --coverage=cov_profile",
-    "test:coverage:lcov": "deno coverage --lcov --output=cov.lcov cov_profile/",
-    "test:coverage:html": "genhtml -o html_cov --ignore-errors inconsistent cov.lcov",
-    "test:coverage:view": "(cd html_cov/ && python -m http.server -b 127.0.0.1)",
     "build:types": "(cd packages/types; deno task build)",
     "build:browser": "(cd packages/browser; deno task build)",
     "build:server": "(cd packages/server; deno task build)",

@@ -6,10 +6,20 @@
     "./helpers": "./src/helpers/index.ts"
   },
   "tasks": {
-    "build": "deno task test && deno run -A build_npm.ts",
+    "build": {
+      "command": "deno run -A build_npm.ts",
+      "dependencies": [
+        "test"
+      ]
+    },
     "test": "deno test -A src/",
     "test:watch": "deno test -A --watch src/",
-    "publish": "deno task build && deno task publish:jsr && deno task publish:npm",
+    "publish": {
+      "command": "deno task publish:jsr && deno task publish:npm",
+      "dependencies": [
+        "build"
+      ]
+    },
     "publish:jsr": "deno publish",
     "publish:npm": "(cd npm; npm publish)"
   },
