@@ -61,9 +61,20 @@ Deno.test('should verify Android SafetyNet attestation', async () => {
     rpIdHash,
   } = await getResponseValues(attestationAndroidSafetyNet);
 
-  // notBefore: 2017-06-15T00:00:42.000Z
-  // notAfter: 2021-12-15T00:00:42.000Z
-  const mockDate = new FakeTime(new Date('2021-11-15T00:00:42.000Z'));
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2018-10-10T07:19:45.000Z,
+  //   notAfter: 2019-10-09T07:19:45.000Z
+  // }
+  // {
+  //   notBefore: 2017-06-15T00:00:42.000Z,
+  //   notAfter: 2021-12-15T00:00:42.000Z
+  // }
+  // {
+  //   notBefore: 1998-09-01T12:00:00.000Z,
+  //   notAfter: 2028-01-28T12:00:00.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2019-10-01T00:00:42.000Z'));
 
   const verified = await verifyAttestationAndroidSafetyNet({
     attStmt,
@@ -121,9 +132,24 @@ Deno.test('should validate response with cert path completed with GlobalSign R1 
     rpIdHash,
   } = await getResponseValues(safetyNetUsingGSR1RootCert);
 
-  // notBefore: 2006-12-15T08:00:00.000Z
-  // notAfter: 2021-12-15T08:00:00.000Z
-  const mockDate = new FakeTime(new Date('2021-11-15T00:00:42.000Z'));
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2021-07-19T13:13:42.000Z,
+  //   notAfter: 2021-10-17T13:13:41.000Z
+  // }
+  // {
+  //   notBefore: 2020-08-13T00:00:42.000Z,
+  //   notAfter: 2027-09-30T00:00:42.000Z
+  // }
+  // {
+  //   notBefore: 2020-06-19T00:00:42.000Z,
+  //   notAfter: 2028-01-28T00:00:42.000Z
+  // }
+  // {
+  //   notBefore: 1998-09-01T12:00:00.000Z,
+  //   notAfter: 2028-01-28T12:00:00.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2021-10-15T00:00:42.000Z'));
 
   const verified = await verifyAttestationAndroidSafetyNet({
     attStmt,
