@@ -63,6 +63,7 @@ export interface PublicKeyCredentialCreationOptionsJSON {
   authenticatorSelection?: AuthenticatorSelectionCriteria;
   hints?: PublicKeyCredentialHint[];
   attestation?: AttestationConveyancePreference;
+  attestationFormats?: AttestationFormat[];
   extensions?: AuthenticationExtensionsClientInputs;
 }
 
@@ -272,3 +273,17 @@ export type CredentialDeviceType = 'singleDevice' | 'multiDevice';
  * These values are less strict than `authenticatorAttachment`
  */
 export type PublicKeyCredentialHint = 'hybrid' | 'security-key' | 'client-device';
+
+/**
+ * Values for an attestation object's `fmt`
+ *
+ * See https://www.iana.org/assignments/webauthn/webauthn.xhtml#webauthn-attestation-statement-format-ids
+ */
+export type AttestationFormat =
+  | 'fido-u2f'
+  | 'packed'
+  | 'android-safetynet'
+  | 'android-key'
+  | 'tpm'
+  | 'apple'
+  | 'none';
