@@ -5,6 +5,7 @@ import type {
   Base64URLString,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialHint,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/types';
 
@@ -77,6 +78,7 @@ const defaultSupportedAlgorithmIDs: COSEAlgorithmIdentifier[] = [-8, -7, -257];
  * @param authenticatorSelection **(Optional)** - Advanced criteria for restricting the types of authenticators that may be used. Defaults to `{ residentKey: 'preferred', userVerification: 'preferred' }`
  * @param extensions **(Optional)** - Additional plugins the authenticator or browser should use during attestation
  * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to `[-8, -7, -257]`
+ * @param preferredAuthenticatorType **(Optional)** - Encourage the browser to prompt the user to register a specific type of authenticator
  */
 export async function generateRegistrationOptions(
   options: {
@@ -95,6 +97,7 @@ export async function generateRegistrationOptions(
     authenticatorSelection?: AuthenticatorSelectionCriteria;
     extensions?: AuthenticationExtensionsClientInputs;
     supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
+    preferredAuthenticatorType?: 'securityKey' | 'localDevice' | 'remoteDevice';
   },
 ): Promise<PublicKeyCredentialCreationOptionsJSON> {
   const {
@@ -110,6 +113,7 @@ export async function generateRegistrationOptions(
     authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
     supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
+    preferredAuthenticatorType,
   } = options;
 
   /**
@@ -178,6 +182,24 @@ export async function generateRegistrationOptions(
     _userID = await generateUserID();
   }
 
+  /**
+   * Map authenticator preference to hints. Map to authenticatorAttachment as well for
+   * backwards-compatibility.
+   */
+  const hints: PublicKeyCredentialHint[] = [];
+  if (preferredAuthenticatorType) {
+    if (preferredAuthenticatorType === 'securityKey') {
+      hints.push('security-key');
+      authenticatorSelection.authenticatorAttachment = 'cross-platform';
+    } else if (preferredAuthenticatorType === 'localDevice') {
+      hints.push('client-device');
+      authenticatorSelection.authenticatorAttachment = 'platform';
+    } else if (preferredAuthenticatorType === 'remoteDevice') {
+      hints.push('hybrid');
+      authenticatorSelection.authenticatorAttachment = 'cross-platform';
+    }
+  }
+
   return {
     challenge: isoBase64URL.fromBuffer(_challenge),
     rp: {
@@ -208,5 +230,6 @@ export async function generateRegistrationOptions(
       ...extensions,
       credProps: true,
     },
+    hints,
   };
 }
