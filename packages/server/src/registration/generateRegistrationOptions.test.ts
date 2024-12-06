@@ -12,7 +12,7 @@ Deno.test('should generate credential request options suitable for sending via J
   const userID = isoUint8Array.fromUTF8String('1234');
   const userName = 'usernameHere';
   const timeout = 1;
-  const attestationType = 'indirect';
+  const attestationType = 'direct';
   const userDisplayName = 'userDisplayName';
 
   const options = await generateRegistrationOptions({

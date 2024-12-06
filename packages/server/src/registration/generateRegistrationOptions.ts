@@ -1,5 +1,4 @@
 import type {
-  AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticatorSelectionCriteria,
   AuthenticatorTransportFuture,
@@ -12,24 +11,6 @@ import type {
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 import { generateUserID } from '../helpers/generateUserID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
-
-export type GenerateRegistrationOptionsOpts = {
-  rpName: string;
-  rpID: string;
-  userName: string;
-  userID?: Uint8Array;
-  challenge?: string | Uint8Array;
-  userDisplayName?: string;
-  timeout?: number;
-  attestationType?: AttestationConveyancePreference;
-  excludeCredentials?: {
-    id: Base64URLString;
-    transports?: AuthenticatorTransportFuture[];
-  }[];
-  authenticatorSelection?: AuthenticatorSelectionCriteria;
-  extensions?: AuthenticationExtensionsClientInputs;
-  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
-};
 
 /**
  * Supported crypto algo identifiers
@@ -98,7 +79,23 @@ const defaultSupportedAlgorithmIDs: COSEAlgorithmIdentifier[] = [-8, -7, -257];
  * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to `[-8, -7, -257]`
  */
 export async function generateRegistrationOptions(
-  options: GenerateRegistrationOptionsOpts,
+  options: {
+    rpName: string;
+    rpID: string;
+    userName: string;
+    userID?: Uint8Array;
+    challenge?: string | Uint8Array;
+    userDisplayName?: string;
+    timeout?: number;
+    attestationType?: 'direct' | 'enterprise' | 'none';
+    excludeCredentials?: {
+      id: Base64URLString;
+      transports?: AuthenticatorTransportFuture[];
+    }[];
+    authenticatorSelection?: AuthenticatorSelectionCriteria;
+    extensions?: AuthenticationExtensionsClientInputs;
+    supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
+  },
 ): Promise<PublicKeyCredentialCreationOptionsJSON> {
   const {
     rpName,
