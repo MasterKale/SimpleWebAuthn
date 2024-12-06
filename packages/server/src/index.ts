@@ -18,6 +18,8 @@ export {
   verifyRegistrationResponse,
 };
 
+import type { GenerateRegistrationOptionsOpts } from './registration/generateRegistrationOptions.ts';
+import type { GenerateAuthenticationOptionsOpts } from './authentication/generateAuthenticationOptions.ts';
 import type { MetadataStatement } from './metadata/mdsTypes.ts';
 import type {
   VerifiedRegistrationResponse,
@@ -29,6 +31,8 @@ import type {
 } from './authentication/verifyAuthenticationResponse.ts';
 
 export type {
+  GenerateAuthenticationOptionsOpts,
+  GenerateRegistrationOptionsOpts,
   MetadataStatement,
   VerifiedAuthenticationResponse,
   VerifiedRegistrationResponse,

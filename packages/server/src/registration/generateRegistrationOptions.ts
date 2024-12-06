@@ -13,6 +13,8 @@ import { generateChallenge } from '../helpers/generateChallenge.ts';
 import { generateUserID } from '../helpers/generateUserID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
+export type GenerateRegistrationOptionsOpts = Parameters<typeof generateRegistrationOptions>[0];
+
 /**
  * Supported crypto algo identifiers
  * See https://w3c.github.io/webauthn/#sctn-alg-identifier

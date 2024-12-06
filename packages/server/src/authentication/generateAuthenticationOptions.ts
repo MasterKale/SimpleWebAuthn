@@ -8,6 +8,8 @@ import type {
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 
+export type GenerateAuthenticationOptionsOpts = Parameters<typeof generateAuthenticationOptions>[0];
+
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator authentication
  *
