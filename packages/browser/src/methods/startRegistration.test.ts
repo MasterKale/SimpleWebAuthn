@@ -42,6 +42,8 @@ const goodOpts1: PublicKeyCredentialCreationOptionsJSON = {
       transports: ['internal'],
     },
   ],
+  hints: ['client-device', 'hybrid', 'security-key'],
+  attestationFormats: ['packed'],
 };
 
 /**
@@ -93,6 +95,12 @@ describe('Method: startRegistration', () => {
     assertEquals(credId.byteLength, 64);
     assertEquals(argsPublicKey.excludeCredentials?.[0].type, 'public-key');
     assertEquals(argsPublicKey.excludeCredentials?.[0].transports, ['internal']);
+
+    // Confirm hints and attestationFormats
+    // @ts-ignore: we know `hints` are becoming available in browsers
+    assertEquals(argsPublicKey.hints, ['client-device', 'hybrid', 'security-key']);
+    // @ts-ignore: we know `attestationFormats` are becoming available in browsers
+    assertEquals(argsPublicKey.attestationFormats, ['packed']);
   });
 
   it('should return base64url-encoded response values', async () => {
