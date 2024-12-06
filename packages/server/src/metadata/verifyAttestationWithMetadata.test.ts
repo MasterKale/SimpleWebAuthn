@@ -1,10 +1,30 @@
 import { assertEquals } from '@std/assert';
+import { FakeTime } from '@std/testing/time';
 
 import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata.ts';
-import { MetadataStatement } from '../metadata/mdsTypes.ts';
+import type { MetadataStatement } from '../metadata/mdsTypes.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 
 Deno.test('should verify attestation with metadata (android-safetynet)', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2022-01-25T10:00:34.000Z,
+  //   notAfter: 2022-04-25T10:00:33.000Z
+  // }
+  // {
+  //   notBefore: 2020-08-13T00:00:42.000Z,
+  //   notAfter: 2027-09-30T00:00:42.000Z
+  // }
+  // {
+  //   notBefore: 2020-06-19T00:00:42.000Z,
+  //   notAfter: 2028-01-28T00:00:42.000Z
+  // }
+  // {
+  //   notBefore: 1998-09-01T12:00:00.000Z,
+  //   notAfter: 2028-01-28T12:00:00.000Z
+  // }
+  const fakedNow = new FakeTime(new Date('2022-02-01T00:00:00.000Z'));
+
   const metadataStatementJSONSafetyNet: MetadataStatement = {
     legalHeader: 'https://fidoalliance.org/metadata/metadata-statement-legal-header/',
     aaguid: 'b93fd961-f2e6-462f-b122-82002247de78',
@@ -56,6 +76,8 @@ Deno.test('should verify attestation with metadata (android-safetynet)', async (
   });
 
   assertEquals(verified, true);
+
+  fakedNow.restore();
 });
 
 Deno.test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator algorithm in metadata', async () => {
@@ -233,6 +255,59 @@ Deno.test('should verify idmelon attestation with updated root certificate', asy
   ];
   const credentialPublicKey =
     'pQECAyYgASFYINuJbeLdkZwgKtUw2VSopICTTO5PKdj95GXJ7JCsQi7iIlggxygEp0_P0oMXhfw2BjtL0M7-yIpnk5uSHc0oNkXfdJw';
+
+  const verified = await verifyAttestationWithMetadata({
+    statement: metadataStatement,
+    credentialPublicKey: isoBase64URL.toBuffer(credentialPublicKey),
+    x5c,
+  });
+
+  assertEquals(verified, true);
+});
+
+Deno.test('should verify when trust anchor is an intermediate certificate', async () => {
+  /**
+   * See https://github.com/MasterKale/SimpleWebAuthn/issues/647 for more context, basically
+   * HID sells authenticators that are "unique" for their use of intermediate certificates as trust
+   * anchors. This has been a problem for many other WebAuthn libraries, and now it's my turn to
+   * deal with an errant assumption from early in this project's life.
+   *
+   * The metadata statement below is a slimmed down version of it as pulled from MDS on Dec 2024
+   */
+  const metadataStatement: MetadataStatement = {
+    legalHeader:
+      'Submission of this statement and retrieval and use of this statement indicates acceptance of the appropriate agreement located at https://fidoalliance.org/metadata/metadata-legal-terms/.',
+    aaguid: '692db549-7ae5-44d5-a1e5-dd20a493b723',
+    description: 'HID Crescendo Key',
+    authenticatorVersion: 10,
+    protocolFamily: 'fido2',
+    schema: 3,
+    upv: [{ major: 1, minor: 0 }],
+    authenticationAlgorithms: ['secp256r1_ecdsa_sha256_raw'],
+    publicKeyAlgAndEncodings: ['cose'],
+    attestationTypes: ['basic_full'],
+    userVerificationDetails: [
+      [{ userVerificationMethod: 'passcode_external' }],
+      [{ userVerificationMethod: 'none' }],
+      [{ userVerificationMethod: 'presence_internal' }],
+      [
+        { userVerificationMethod: 'passcode_external' },
+        { userVerificationMethod: 'presence_internal' },
+      ],
+    ],
+    keyProtection: ['hardware', 'secure_element'],
+    matcherProtection: ['on_chip'],
+    tcDisplay: [],
+    attestationRootCertificates: [
+      'MIIDCDCCAq+gAwIBAgIQQAFqUNTHZ8kBN8u/bCk+xDAKBggqhkjOPQQDAjBrMQswCQYDVQQGEwJVUzETMBEGA1UEChMKSElEIEdsb2JhbDEiMCAGA1UECxMZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjEjMCEGA1UEAxMaRklETyBBdHRlc3RhdGlvbiBSb290IENBIDEwHhcNMTkwNDI0MTkzMTIzWhcNNDQwNDI3MTkzMTIzWjBmMQswCQYDVQQGEwJVUzETMBEGA1UEChMKSElEIEdsb2JhbDEiMCAGA1UECxMZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjEeMBwGA1UEAxMVRklETyBBdHRlc3RhdGlvbiBDQSAyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4nK9ctzk6GEGFNQBcrnBBmWU+dCnuHQAARrB2Eyc8MbsljkSFhZtfz/Rw6SuVIDk5VakDzrKBAOJ9v0Rvg/406OCATgwggE0MBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYDVR0PAQH/BAQDAgGGMIGEBggrBgEFBQcBAQR4MHYwLgYIKwYBBQUHMAGGImh0dHA6Ly9oaWQuZmlkby5vY3NwLmlkZW50cnVzdC5jb20wRAYIKwYBBQUHMAKGOGh0dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vcm9vdHMvSElERklET1Jvb3RjYTEucDdjMB8GA1UdIwQYMBaAFB2m3iwWSYHvWTHbJiHAyKDp+CSjMEcGA1UdHwRAMD4wPKA6oDiGNmh0dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL0hJREZJRE9Sb290Y2ExLmNybDAdBgNVHQ4EFgQUDLCbuLslcclrOZIz57Fu0imSMQ8wCgYIKoZIzj0EAwIDRwAwRAIgDCW5IrbjEI/y35lPjx9a+/sF4lPSoZdBHgFgTWC+8VICIEqs2SPzUHgHVh65Ajl1oIUmhh0C2lyR/Zdk7O3u1TIK',
+    ],
+  };
+
+  const x5c = [
+    'MIIDLjCCAtSgAwIBAgIQQAFs2JXwQcL5Eh4rnp2ASjAKBggqhkjOPQQDAjBmMQswCQYDVQQGEwJVUzETMBEGA1UEChMKSElEIEdsb2JhbDEiMCAGA1UECxMZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjEeMBwGA1UEAxMVRklETyBBdHRlc3RhdGlvbiBDQSAyMB4XDTE5MDgyODE0MTY0MFoXDTM5MDgyMzE0MTY0MFowaTELMAkGA1UEBhMCVVMxHzAdBgNVBAoTFkhJRCBHbG9iYWwgQ29ycG9yYXRpb24xIjAgBgNVBAsTGUF1dGhlbnRpY2F0b3IgQXR0ZXN0YXRpb24xFTATBgNVBAMTDENyZXNjZW5kb0tleTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABAGouI654w6qbGonSTStO2cESYTo8Ezr8OJiPkMl02d6K6i44wXCKV2i+w+bpR6vgYQZ/cKQxMS4uGytqPRNPIejggFfMIIBWzAOBgNVHQ8BAf8EBAMCB4AwgYAGCCsGAQUFBwEBBHQwcjAuBggrBgEFBQcwAYYiaHR0cDovL2hpZC5maWRvLm9jc3AuaWRlbnRydXN0LmNvbTBABggrBgEFBQcwAoY0aHR0cDovL3ZhbGlkYXRpb24uaWRlbnRydXN0LmNvbS9jZXJ0cy9oaWRmaWRvY2EyLnA3YzAfBgNVHSMEGDAWgBQMsJu4uyVxyWs5kjPnsW7SKZIxDzAJBgNVHRMEAjAAMEMGA1UdHwQ8MDowOKA2oDSGMmh0dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL2hpZGZpZG9jYTIuY3JsMBMGCysGAQQBguUcAgEBBAQDAgQwMB0GA1UdDgQWBBR9h/lCWeTiMUhRS1tj31hBXaOurzAhBgsrBgEEAYLlHAEBBAQSBBBpLbVJeuVE1aHl3SCkk7cjMAoGCCqGSM49BAMCA0gAMEUCIQDpDa1ZbAfCTlBMiDUuB5XH8hnhZUF1JCuCmc+ShI4ZTwIga/ApAudL5R8HxOOHgk8AA/JpgCkMmYDQLVq0QF6oxrU=',
+  ];
+  const credentialPublicKey =
+    'pQECAyYgASFYIL80Thvv0K7ftQDCmrwLFELMZxm7s1I1VmPRMYMMkleHIlggtk7VFv4ABu7en1D7I74t66bn2ghLS9-qdcWPDujOvJQ';
 
   const verified = await verifyAttestationWithMetadata({
     statement: metadataStatement,

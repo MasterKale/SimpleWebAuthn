@@ -503,26 +503,41 @@ Deno.test('should throw error if unsupported alg is used', async () => {
   mockDecodePubKey.restore();
 });
 
-Deno.test('should not include authenticator info if not verified', async () => {
-  const mockVerifySignature = stub(
-    _verifySignatureInternals,
-    'stubThis',
-    returnsNext([new Promise((resolve) => resolve(false))]),
-  );
+Deno.test(
+  'should not include authenticator info if not verified',
+  {
+    /**
+     * CI likes to intermittently fail this test with the following:
+     *
+     * > An async operation to verify data was started in this test, but never completed. This is
+     * > often caused by not awaiting the result of a `crypto.subtle.verify` call
+     *
+     * I suspect it's something to do with how `_verifySignatureInternals.stubThis` is being mocked.
+     * This will disable this warning on an otherwise passing test.
+     */
+    sanitizeOps: false,
+  },
+  async () => {
+    const mockVerifySignature = stub(
+      _verifySignatureInternals,
+      'stubThis',
+      returnsNext([new Promise((resolve) => resolve(false))]),
+    );
 
-  const verification = await verifyRegistrationResponse({
-    response: attestationFIDOU2F,
-    expectedChallenge: attestationFIDOU2FChallenge,
-    expectedOrigin: 'https://dev.dontneeda.pw',
-    expectedRPID: 'dev.dontneeda.pw',
-    requireUserVerification: false,
-  });
+    const verification = await verifyRegistrationResponse({
+      response: attestationFIDOU2F,
+      expectedChallenge: attestationFIDOU2FChallenge,
+      expectedOrigin: 'https://dev.dontneeda.pw',
+      expectedRPID: 'dev.dontneeda.pw',
+      requireUserVerification: false,
+    });
 
-  assertFalse(verification.verified);
-  assertEquals(verification.registrationInfo, undefined);
+    assertFalse(verification.verified);
+    assertEquals(verification.registrationInfo, undefined);
 
-  mockVerifySignature.restore();
-});
+    mockVerifySignature.restore();
+  },
+);
 
 Deno.test('should throw an error if user verification is required but user was not verified', async () => {
   const mockParseAuthData = stub(
