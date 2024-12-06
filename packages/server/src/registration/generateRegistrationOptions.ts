@@ -1,11 +1,11 @@
 import type {
-  AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticatorSelectionCriteria,
   AuthenticatorTransportFuture,
   Base64URLString,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialHint,
   PublicKeyCredentialParameters,
 } from '@simplewebauthn/types';
 
@@ -13,23 +13,7 @@ import { generateChallenge } from '../helpers/generateChallenge.ts';
 import { generateUserID } from '../helpers/generateUserID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
-export type GenerateRegistrationOptionsOpts = {
-  rpName: string;
-  rpID: string;
-  userName: string;
-  userID?: Uint8Array;
-  challenge?: string | Uint8Array;
-  userDisplayName?: string;
-  timeout?: number;
-  attestationType?: AttestationConveyancePreference;
-  excludeCredentials?: {
-    id: Base64URLString;
-    transports?: AuthenticatorTransportFuture[];
-  }[];
-  authenticatorSelection?: AuthenticatorSelectionCriteria;
-  extensions?: AuthenticationExtensionsClientInputs;
-  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
-};
+export type GenerateRegistrationOptionsOpts = Parameters<typeof generateRegistrationOptions>[0];
 
 /**
  * Supported crypto algo identifiers
@@ -96,9 +80,27 @@ const defaultSupportedAlgorithmIDs: COSEAlgorithmIdentifier[] = [-8, -7, -257];
  * @param authenticatorSelection **(Optional)** - Advanced criteria for restricting the types of authenticators that may be used. Defaults to `{ residentKey: 'preferred', userVerification: 'preferred' }`
  * @param extensions **(Optional)** - Additional plugins the authenticator or browser should use during attestation
  * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to `[-8, -7, -257]`
+ * @param preferredAuthenticatorType **(Optional)** - Encourage the browser to prompt the user to register a specific type of authenticator
  */
 export async function generateRegistrationOptions(
-  options: GenerateRegistrationOptionsOpts,
+  options: {
+    rpName: string;
+    rpID: string;
+    userName: string;
+    userID?: Uint8Array;
+    challenge?: string | Uint8Array;
+    userDisplayName?: string;
+    timeout?: number;
+    attestationType?: 'direct' | 'enterprise' | 'none';
+    excludeCredentials?: {
+      id: Base64URLString;
+      transports?: AuthenticatorTransportFuture[];
+    }[];
+    authenticatorSelection?: AuthenticatorSelectionCriteria;
+    extensions?: AuthenticationExtensionsClientInputs;
+    supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
+    preferredAuthenticatorType?: 'securityKey' | 'localDevice' | 'remoteDevice';
+  },
 ): Promise<PublicKeyCredentialCreationOptionsJSON> {
   const {
     rpName,
@@ -113,6 +115,7 @@ export async function generateRegistrationOptions(
     authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
     supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
+    preferredAuthenticatorType,
   } = options;
 
   /**
@@ -181,6 +184,24 @@ export async function generateRegistrationOptions(
     _userID = await generateUserID();
   }
 
+  /**
+   * Map authenticator preference to hints. Map to authenticatorAttachment as well for
+   * backwards-compatibility.
+   */
+  const hints: PublicKeyCredentialHint[] = [];
+  if (preferredAuthenticatorType) {
+    if (preferredAuthenticatorType === 'securityKey') {
+      hints.push('security-key');
+      authenticatorSelection.authenticatorAttachment = 'cross-platform';
+    } else if (preferredAuthenticatorType === 'localDevice') {
+      hints.push('client-device');
+      authenticatorSelection.authenticatorAttachment = 'platform';
+    } else if (preferredAuthenticatorType === 'remoteDevice') {
+      hints.push('hybrid');
+      authenticatorSelection.authenticatorAttachment = 'cross-platform';
+    }
+  }
+
   return {
     challenge: isoBase64URL.fromBuffer(_challenge),
     rp: {
@@ -211,5 +232,6 @@ export async function generateRegistrationOptions(
       ...extensions,
       credProps: true,
     },
+    hints,
   };
 }

@@ -12,7 +12,7 @@ Deno.test('should generate credential request options suitable for sending via J
   const userID = isoUint8Array.fromUTF8String('1234');
   const userName = 'usernameHere';
   const timeout = 1;
-  const attestationType = 'indirect';
+  const attestationType = 'direct';
   const userDisplayName = 'userDisplayName';
 
   const options = await generateRegistrationOptions({
@@ -56,6 +56,7 @@ Deno.test('should generate credential request options suitable for sending via J
       extensions: {
         credProps: true,
       },
+      hints: [],
     },
   );
 });
@@ -333,4 +334,55 @@ Deno.test('should raise if string is specified for userID', async () => {
     Error,
     'String values for `userID` are no longer supported. See https://simplewebauthn.dev/docs/advanced/server/custom-user-ids',
   );
+});
+
+Deno.test('should map undefined authenticator preference to empty hint', async () => {
+  const options = await generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userName: 'usernameHere',
+    preferredAuthenticatorType: undefined,
+  });
+
+  assertEquals(options.hints, []);
+});
+
+Deno.test('should map "securityKey" authenticator preference to hint and attachment', async () => {
+  const options = await generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userName: 'usernameHere',
+    preferredAuthenticatorType: 'securityKey',
+  });
+
+  assertEquals(options.hints, ['security-key']);
+  assertEquals(options.authenticatorSelection?.authenticatorAttachment, 'cross-platform');
+});
+
+Deno.test('should map "localDevice" authenticator preference to hint and attachment', async () => {
+  const options = await generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userName: 'usernameHere',
+    preferredAuthenticatorType: 'localDevice',
+  });
+
+  assertEquals(options.hints, ['client-device']);
+  assertEquals(options.authenticatorSelection?.authenticatorAttachment, 'platform');
+});
+
+Deno.test('should map "remoteDevice" authenticator preference to hint and attachment', async () => {
+  const options = await generateRegistrationOptions({
+    rpName: 'SimpleWebAuthn',
+    rpID: 'not.real',
+    challenge: 'totallyrandomvalue',
+    userName: 'usernameHere',
+    preferredAuthenticatorType: 'remoteDevice',
+  });
+
+  assertEquals(options.hints, ['hybrid']);
+  assertEquals(options.authenticatorSelection?.authenticatorAttachment, 'cross-platform');
 });

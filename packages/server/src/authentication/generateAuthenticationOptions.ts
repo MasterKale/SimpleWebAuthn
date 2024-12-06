@@ -3,23 +3,12 @@ import type {
   AuthenticatorTransportFuture,
   Base64URLString,
   PublicKeyCredentialRequestOptionsJSON,
-  UserVerificationRequirement,
 } from '@simplewebauthn/types';
 
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 
-export type GenerateAuthenticationOptionsOpts = {
-  rpID: string;
-  allowCredentials?: {
-    id: Base64URLString;
-    transports?: AuthenticatorTransportFuture[];
-  }[];
-  challenge?: string | Uint8Array;
-  timeout?: number;
-  userVerification?: UserVerificationRequirement;
-  extensions?: AuthenticationExtensionsClientInputs;
-};
+export type GenerateAuthenticationOptionsOpts = Parameters<typeof generateAuthenticationOptions>[0];
 
 /**
  * Prepare a value to pass into navigator.credentials.get(...) for authenticator authentication
@@ -34,7 +23,17 @@ export type GenerateAuthenticationOptionsOpts = {
  * @param extensions **(Optional)** - Additional plugins the authenticator or browser should use during authentication
  */
 export async function generateAuthenticationOptions(
-  options: GenerateAuthenticationOptionsOpts,
+  options: {
+    rpID: string;
+    allowCredentials?: {
+      id: Base64URLString;
+      transports?: AuthenticatorTransportFuture[];
+    }[];
+    challenge?: string | Uint8Array;
+    timeout?: number;
+    userVerification?: 'required' | 'preferred' | 'discouraged';
+    extensions?: AuthenticationExtensionsClientInputs;
+  },
 ): Promise<PublicKeyCredentialRequestOptionsJSON> {
   const {
     allowCredentials,
