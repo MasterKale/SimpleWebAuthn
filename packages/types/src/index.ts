@@ -61,6 +61,7 @@ export interface PublicKeyCredentialCreationOptionsJSON {
   timeout?: number;
   excludeCredentials?: PublicKeyCredentialDescriptorJSON[];
   authenticatorSelection?: AuthenticatorSelectionCriteria;
+  hints?: PublicKeyCredentialHint[];
   attestation?: AttestationConveyancePreference;
   extensions?: AuthenticationExtensionsClientInputs;
 }
@@ -75,6 +76,7 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   rpId?: string;
   allowCredentials?: PublicKeyCredentialDescriptorJSON[];
   userVerification?: UserVerificationRequirement;
+  hints?: PublicKeyCredentialHint[];
   extensions?: AuthenticationExtensionsClientInputs;
 }
 
@@ -255,3 +257,18 @@ export interface PublicKeyCredentialFuture extends PublicKeyCredential {
  * - `"multiDevice"` credentials can be backed up
  */
 export type CredentialDeviceType = 'singleDevice' | 'multiDevice';
+
+/**
+ * Categories of authenticators that Relying Parties can pass along to browsers during
+ * registration. Browsers that understand these values can optimize their modal experience to
+ * start the user off in a particular registration flow:
+ *
+ * - `hybrid`: A platform authenticator on a mobile device
+ * - `security-key`: A portable FIDO2 authenticator capable of being used on multiple devices via a USB or NFC connection
+ * - `client-device`: The device that WebAuthn is being called on. Typically synonymous with platform authenticators
+ *
+ * See https://w3c.github.io/webauthn/#enumdef-publickeycredentialhint
+ *
+ * These values are less strict than `authenticatorAttachment`
+ */
+export type PublicKeyCredentialHint = 'hybrid' | 'security-key' | 'client-device';
