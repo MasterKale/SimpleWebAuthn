@@ -12,11 +12,7 @@ import { identifyAuthenticationError } from '../helpers/identifyAuthenticationEr
 import { WebAuthnAbortService } from '../helpers/webAuthnAbortService.ts';
 import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment.ts';
 
-export type StartAuthenticationOpts = {
-  optionsJSON: PublicKeyCredentialRequestOptionsJSON;
-  useBrowserAutofill?: boolean;
-  verifyBrowserAutofillInput?: boolean;
-};
+export type StartAuthenticationOpts = Parameters<typeof startAuthentication>[0];
 
 /**
  * Begin authenticator "login" via WebAuthn assertion
@@ -26,7 +22,11 @@ export type StartAuthenticationOpts = {
  * @param verifyBrowserAutofillInput (Optional) Ensure a suitable `<input>` element is present when `useBrowserAutofill` is `true`. Defaults to `true`.
  */
 export async function startAuthentication(
-  options: StartAuthenticationOpts,
+  options: {
+    optionsJSON: PublicKeyCredentialRequestOptionsJSON;
+    useBrowserAutofill?: boolean;
+    verifyBrowserAutofillInput?: boolean;
+  },
 ): Promise<AuthenticationResponseJSON> {
   const {
     optionsJSON,

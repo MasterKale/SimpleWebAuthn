@@ -12,10 +12,7 @@ import { identifyRegistrationError } from '../helpers/identifyRegistrationError.
 import { WebAuthnAbortService } from '../helpers/webAuthnAbortService.ts';
 import { toAuthenticatorAttachment } from '../helpers/toAuthenticatorAttachment.ts';
 
-export type StartRegistrationOpts = {
-  optionsJSON: PublicKeyCredentialCreationOptionsJSON;
-  useAutoRegister?: boolean;
-};
+export type StartRegistrationOpts = Parameters<typeof startRegistration>[0];
 
 /**
  * Begin authenticator "registration" via WebAuthn attestation
@@ -24,7 +21,10 @@ export type StartRegistrationOpts = {
  * @param useAutoRegister (Optional) Try to silently create a passkey with the password manager that the user just signed in with. Defaults to `false`.
  */
 export async function startRegistration(
-  options: StartRegistrationOpts,
+  options: {
+    optionsJSON: PublicKeyCredentialCreationOptionsJSON;
+    useAutoRegister?: boolean;
+  },
 ): Promise<RegistrationResponseJSON> {
   const { optionsJSON, useAutoRegister = false } = options;
 
