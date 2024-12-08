@@ -1,18 +1,16 @@
 {
   "name": "@simplewebauthn/types",
-  "version": "12.0.0",
+  "version": "do-not-publish-this-package",
   "exports": "./src/index.ts",
   "tasks": {
-    "build": "deno run -A build_npm.ts",
     "extract-dom-types": "deno run -A extract-dom-types.ts",
-    "publish": {
-      "command": "deno task publish:jsr && deno task publish:npm",
+    "codegen": {
+      "description": "Copy the types in this project into the browser and server packages",
+      "command": "deno run -A codegen.ts",
       "dependencies": [
-        "build"
+        "extract-dom-types"
       ]
-    },
-    "publish:jsr": "deno publish",
-    "publish:npm": "(cd npm; npm publish)"
+    }
   },
   "fmt": {
     "singleQuote": true,
