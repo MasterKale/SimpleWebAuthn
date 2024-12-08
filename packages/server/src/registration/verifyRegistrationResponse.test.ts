@@ -1,8 +1,8 @@
 import { assert, assertEquals, assertFalse, assertObjectMatch, assertRejects } from '@std/assert';
 import { returnsNext, stub } from '@std/testing/mock';
-import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse.ts';
+import type { RegistrationResponseJSON } from '../types/index.ts';
 import {
   _decodeAttestationObjectInternals,
   decodeAttestationObject,

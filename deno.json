@@ -22,10 +22,19 @@
       ]
     },
     "test:coverage:collect": "deno test -A --coverage=cov_profile",
-    "build:types": "(cd packages/types; deno task build)",
-    "build:browser": "(cd packages/browser; deno task build)",
-    "build:server": "(cd packages/server; deno task build)",
-    "publish:types": "(cd packages/types; deno task publish)",
+    "codegen:types": "(cd packages/types; deno task codegen)",
+    "build:browser": {
+      "command": "(cd packages/browser; deno task build)",
+      "dependencies": [
+        "codegen:types"
+      ]
+    },
+    "build:server": {
+      "command": "(cd packages/server; deno task build)",
+      "dependencies": [
+        "codegen:types"
+      ]
+    },
     "publish:browser": "(cd packages/browser; deno task publish)",
     "publish:server": "(cd packages/server; deno task publish)"
   },

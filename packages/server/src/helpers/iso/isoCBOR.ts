@@ -1,3 +1,7 @@
+/**
+ * A runtime-agnostic collection of methods for working with CBOR encoding
+ * @module
+ */
 import * as tinyCbor from 'tiny-cbor';
 
 /**

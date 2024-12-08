@@ -1,16 +1,19 @@
 interface WebAuthnAbortService {
+  /**
+   * Prepare an abort signal that will help support multiple auth attempts without needing to
+   * reload the page. This is automatically called whenever `startRegistration()` and
+   * `startAuthentication()` are called.
+   */
   createNewAbortSignal(): AbortSignal;
+  /**
+   * Manually cancel any active WebAuthn registration or authentication attempt.
+   */
   cancelCeremony(): void;
 }
 
 class BaseWebAuthnAbortService implements WebAuthnAbortService {
   private controller: AbortController | undefined;
 
-  /**
-   * Prepare an abort signal that will help support multiple auth attempts without needing to
-   * reload the page. This is automatically called whenever `startRegistration()` and
-   * `startAuthentication()` are called.
-   */
   createNewAbortSignal(): AbortSignal {
     // Abort any existing calls to navigator.credentials.create() or navigator.credentials.get()
     if (this.controller) {
@@ -27,9 +30,6 @@ class BaseWebAuthnAbortService implements WebAuthnAbortService {
     return newController.signal;
   }
 
-  /**
-   * Manually cancel any active WebAuthn registration or authentication attempt.
-   */
   cancelCeremony(): void {
     if (this.controller) {
       const abortError = new Error(

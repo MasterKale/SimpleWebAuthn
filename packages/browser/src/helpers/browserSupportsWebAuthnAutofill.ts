@@ -1,5 +1,4 @@
-import { PublicKeyCredentialFuture } from '@simplewebauthn/types';
-
+import type { PublicKeyCredentialFuture } from '../types/index.ts';
 import { browserSupportsWebAuthn } from './browserSupportsWebAuthn.ts';
 
 /**

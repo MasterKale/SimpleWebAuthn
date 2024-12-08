@@ -1,3 +1,13 @@
+// deno-fmt-ignore-file
+/**
+ * DO NOT MODIFY THESE FILES!
+ *
+ * These files were copied from the **types** package. To update this file, make changes to those
+ * files instead and then run the following command from the monorepo root folder:
+ *
+ * deno task codegen:types
+ */
+// BEGIN CODEGEN
 import type {
   AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,

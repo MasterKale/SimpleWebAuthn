@@ -3,8 +3,7 @@ import type {
   AuthenticatorTransportFuture,
   Base64URLString,
   PublicKeyCredentialRequestOptionsJSON,
-} from '@simplewebauthn/types';
-
+} from '../types/index.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 

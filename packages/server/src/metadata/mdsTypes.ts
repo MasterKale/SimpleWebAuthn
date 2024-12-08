@@ -1,9 +1,11 @@
-import type { Base64URLString } from '@simplewebauthn/types';
+import type { Base64URLString } from '../types/index.ts';
 
 /**
  * Metadata Service structures
  * https://fidoalliance.org/specs/mds/fido-metadata-service-v3.0-ps-20210518.html
  */
+
+/** */
 export type MDSJWTHeader = {
   alg: string;
   typ: string;
@@ -136,7 +138,9 @@ export type ExtensionDescriptor = {
   fail_if_unknown: boolean;
 };
 
-// langCode -> "en-US", "ja-JP", etc...
+/**
+ * langCode -> "en-US", "ja-JP", etc...
+ */
 export type AlternativeDescriptions = { [langCode: string]: string };
 
 export type MetadataStatement = {

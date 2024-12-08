@@ -14,6 +14,14 @@
     },
     "test": "deno test -A src/",
     "test:watch": "deno test -A --watch src/",
+    "docs:serve": {
+      "command": "deno run -A jsr:@std/http/file-server --host 127.0.0.1 docs/",
+      "dependencies": [
+        "docs:html"
+      ]
+    },
+    "docs:html": "deno doc --html src/index.ts",
+    "docs:lint": "deno doc --lint src/index.ts",
     "publish": {
       "command": "deno task publish:jsr && deno task publish:npm",
       "dependencies": [
