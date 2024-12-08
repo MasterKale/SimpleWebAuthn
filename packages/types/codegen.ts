@@ -1,12 +1,13 @@
 const sourcePath = './src';
 const outputPaths = [
-  '../browser/src/types/',
-  '../server/src/types/',
+  '../browser/src/types',
+  '../server/src/types',
 ];
-const sourceFiles = Deno.readDirSync(sourcePath);
+// Spread to an array so we consume the `Iterable` from `.readDirSync()`. This lets us read these
+// file properties multiple times while only reading the directory once.
+const sourceFiles = [...Deno.readDirSync(sourcePath)];
 
-const codegenNotice = `
-// deno-fmt-ignore-file
+const codegenNotice = `// deno-fmt-ignore-file
 /**
  * DO NOT MODIFY THESE FILES!
  *
