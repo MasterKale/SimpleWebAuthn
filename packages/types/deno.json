@@ -1,5 +1,5 @@
 {
-  "name": "@simplewebauthn/types",
+  "name": "@simplewebauthn/types-unpublished",
   "version": "do-not-publish-this-package",
   "exports": "./src/index.ts",
   "tasks": {
