@@ -1,8 +1,3 @@
-/**
- * @packageDocumentation
- * @module @simplewebauthn/types
- */
-
 import type {
   AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
