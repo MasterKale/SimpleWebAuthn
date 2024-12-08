@@ -4,7 +4,6 @@ import type {
   RegistrationResponseJSON,
   WebAuthnCredential,
 } from '../types/index.ts';
-
 import {
   type AttestationFormat,
   type AttestationStatement,
@@ -30,16 +29,10 @@ import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM.t
 import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey.ts';
 import { verifyAttestationApple } from './verifications/verifyAttestationApple.ts';
 
-export type VerifyRegistrationResponseOpts = {
-  response: RegistrationResponseJSON;
-  expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
-  expectedOrigin: string | string[];
-  expectedRPID?: string | string[];
-  expectedType?: string | string[];
-  requireUserPresence?: boolean;
-  requireUserVerification?: boolean;
-  supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
-};
+/**
+ * Configurable options when calling `verifyRegistrationResponse()`
+ */
+export type VerifyRegistrationResponseOpts = Parameters<typeof verifyRegistrationResponse>[0];
 
 /**
  * Verify that the user has legitimately completed the registration process
@@ -56,7 +49,16 @@ export type VerifyRegistrationResponseOpts = {
  * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to all supported algorithm IDs
  */
 export async function verifyRegistrationResponse(
-  options: VerifyRegistrationResponseOpts,
+  options: {
+    response: RegistrationResponseJSON;
+    expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
+    expectedOrigin: string | string[];
+    expectedRPID?: string | string[];
+    expectedType?: string | string[];
+    requireUserPresence?: boolean;
+    requireUserVerification?: boolean;
+    supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
+  },
 ): Promise<VerifiedRegistrationResponse> {
   const {
     response,
