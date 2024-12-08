@@ -7,6 +7,7 @@
  *
  * These types are an unorthodox way of saying "these Maps should involve these discrete lists of
  * keys", but it works.
+ * @module
  */
 export type COSEPublicKey = {
   // Getters

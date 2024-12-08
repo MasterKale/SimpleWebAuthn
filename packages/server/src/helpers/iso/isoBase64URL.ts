@@ -1,3 +1,7 @@
+/**
+ * A runtime-agnostic collection of methods for working with Base64URL encoding
+ * @module
+ */
 import base64 from '@hexagon/base64';
 
 import type { Base64URLString } from '../../types/index.ts';
