@@ -37,3 +37,4 @@ export type {
 };
 
 export * from './types/index.ts';
+export * from './metadata/mdsTypes.ts';
