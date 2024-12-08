@@ -35,9 +35,11 @@ enum SERVICE_STATE {
   READY,
 }
 
-// Allow MetadataService to accommodate unregistered AAGUIDs ("permissive"), or only allow
-// registered AAGUIDs ("strict"). Currently primarily impacts how `getStatement()` operates
-type VerificationMode = 'permissive' | 'strict';
+/**
+ * Allow MetadataService to accommodate unregistered AAGUIDs (`"permissive"`), or only allow
+ * registered AAGUIDs (`"strict"`). Currently primarily impacts how `getStatement()` operates
+ */
+export type VerificationMode = 'permissive' | 'strict';
 
 const log = getLogger('MetadataService');
 

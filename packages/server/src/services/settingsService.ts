@@ -9,7 +9,7 @@ import {
 import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
 import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
 
-type RootCertIdentifier = AttestationFormat | 'mds';
+export type RootCertIdentifier = AttestationFormat | 'mds';
 
 interface SettingsService {
   /**
