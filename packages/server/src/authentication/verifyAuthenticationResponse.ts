@@ -4,14 +4,14 @@ import type {
   CredentialDeviceType,
   UserVerificationRequirement,
   WebAuthnCredential,
-} from '@simplewebauthn/types';
+} from '../types/index.ts';
 
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { verifySignature } from '../helpers/verifySignature.ts';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
 import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import type { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 

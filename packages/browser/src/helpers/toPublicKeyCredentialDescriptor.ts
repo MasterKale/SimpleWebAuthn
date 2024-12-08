@@ -2,8 +2,7 @@ import type {
   AuthenticatorTransport,
   PublicKeyCredentialDescriptor,
   PublicKeyCredentialDescriptorJSON,
-} from '@simplewebauthn/types';
-
+} from '../types/index.ts';
 import { base64URLStringToBuffer } from './base64URLStringToBuffer.ts';
 
 export function toPublicKeyCredentialDescriptor(

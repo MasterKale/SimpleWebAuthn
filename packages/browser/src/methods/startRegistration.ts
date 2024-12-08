@@ -1,10 +1,9 @@
-import {
+import type {
   AuthenticatorTransportFuture,
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
   RegistrationResponseJSON,
-} from '@simplewebauthn/types';
-
+} from '../types/index.ts';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString.ts';
 import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer.ts';
 import { browserSupportsWebAuthn } from '../helpers/browserSupportsWebAuthn.ts';

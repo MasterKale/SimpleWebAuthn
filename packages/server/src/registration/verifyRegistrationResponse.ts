@@ -3,14 +3,14 @@ import type {
   CredentialDeviceType,
   RegistrationResponseJSON,
   WebAuthnCredential,
-} from '@simplewebauthn/types';
+} from '../types/index.ts';
 
 import {
-  AttestationFormat,
-  AttestationStatement,
+  type AttestationFormat,
+  type AttestationStatement,
   decodeAttestationObject,
 } from '../helpers/decodeAttestationObject.ts';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import type { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';

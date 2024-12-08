@@ -1,4 +1,4 @@
-import type { Base64URLString } from '@simplewebauthn/types';
+import type { Base64URLString } from '../types/index.ts';
 
 /**
  * Metadata Service structures

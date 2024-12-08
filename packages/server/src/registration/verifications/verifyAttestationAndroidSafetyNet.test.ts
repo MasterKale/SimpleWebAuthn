@@ -1,9 +1,9 @@
 import { assert, assertRejects } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
-import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 
 import { verifyAttestationAndroidSafetyNet } from './verifyAttestationAndroidSafetyNet.ts';
 
+import type { RegistrationResponseJSON } from '../../types/index.ts';
 import { decodeAttestationObject } from '../../helpers/decodeAttestationObject.ts';
 import { parseAuthenticatorData } from '../../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../../helpers/toHash.ts';

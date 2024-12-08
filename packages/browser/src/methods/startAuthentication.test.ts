@@ -7,19 +7,17 @@ import {
   assertRejects,
   assertStringIncludes,
 } from '@std/assert';
-import { assertSpyCalls, type Spy, spy, stub } from '@std/testing/mock';
+import { assertSpyCalls, type Spy, spy } from '@std/testing/mock';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { JSDOM } from 'jsdom';
-import {
-  AuthenticationCredential,
+import type {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialRequestOptionsJSON,
-} from '@simplewebauthn/types';
+} from '../types/index.ts';
 
 import { _browserSupportsWebAuthnInternals } from '../helpers/browserSupportsWebAuthn.ts';
 import { _browserSupportsWebAuthnAutofillInternals } from '../helpers/browserSupportsWebAuthnAutofill.ts';
-import { base64URLStringToBuffer } from '../helpers/base64URLStringToBuffer.ts';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString.ts';
 import { WebAuthnError } from '../helpers/webAuthnError.ts';
 import { generateCustomError } from '../helpers/__jest__/generateCustomError.ts';

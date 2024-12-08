@@ -1,4 +1,4 @@
-import type { Crypto } from '@simplewebauthn/types';
+import type { Crypto } from '../../../types/index.ts';
 
 let webCrypto: Crypto | undefined = undefined;
 
