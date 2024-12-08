@@ -22,13 +22,13 @@ and **[JSR](https://jsr.io/@simplewebauthn/browser)**:
 ### Node LTS 20.x and higher
 
 ```sh
-npm install @simplewebauthn/browser @simplewebauthn/types
+npm install @simplewebauthn/browser
 ```
 
 ### Deno v1.43 and higher
 
 ```sh
-deno add jsr:@simplewebauthn/browser jsr:@simplewebauthn/types
+deno add jsr:@simplewebauthn/browser
 ```
 
 ### UMD
