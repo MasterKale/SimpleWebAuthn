@@ -2,6 +2,8 @@
 
 TypeScript typings for **@simplewebauthn/server** and **@simplewebauthn/browser**.
 
+> NOTE: This package was formerly published as **@simplewebauthn/types**
+
 ## Including these types in other packages
 
 The types in this package are codegen'd into **@simplewebauthn/browser** and
