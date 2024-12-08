@@ -25,3 +25,5 @@ export {
 };
 
 export type { WebAuthnErrorCode } from './helpers/webAuthnError.ts';
+
+export * from './types/index.ts';

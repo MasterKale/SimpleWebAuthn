@@ -1,7 +1,3 @@
-/**
- * @packageDocumentation
- * @module @simplewebauthn/server
- */
 import { generateRegistrationOptions } from './registration/generateRegistrationOptions.ts';
 import { verifyRegistrationResponse } from './registration/verifyRegistrationResponse.ts';
 import { generateAuthenticationOptions } from './authentication/generateAuthenticationOptions.ts';
@@ -39,3 +35,5 @@ export type {
   VerifyAuthenticationResponseOpts,
   VerifyRegistrationResponseOpts,
 };
+
+export * from './types/index.ts';
