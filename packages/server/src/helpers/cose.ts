@@ -9,6 +9,10 @@
  * keys", but it works.
  * @module
  */
+
+/**
+ * COSE public key common values
+ */
 export type COSEPublicKey = {
   // Getters
   get(key: COSEKEYS.kty): COSEKTY | undefined;
@@ -18,6 +22,9 @@ export type COSEPublicKey = {
   set(key: COSEKEYS.alg, value: COSEALG): void;
 };
 
+/**
+ * Values specific to Octet Key Pair public keys
+ */
 export type COSEPublicKeyOKP = COSEPublicKey & {
   // Getters
   get(key: COSEKEYS.crv): number | undefined;
@@ -27,6 +34,9 @@ export type COSEPublicKeyOKP = COSEPublicKey & {
   set(key: COSEKEYS.x, value: Uint8Array): void;
 };
 
+/**
+ * Values specific to Elliptic Curve Cryptography public keys
+ */
 export type COSEPublicKeyEC2 = COSEPublicKey & {
   // Getters
   get(key: COSEKEYS.crv): number | undefined;
@@ -38,6 +48,9 @@ export type COSEPublicKeyEC2 = COSEPublicKey & {
   set(key: COSEKEYS.y, value: Uint8Array): void;
 };
 
+/**
+ * Values specific to RSA public keys
+ */
 export type COSEPublicKeyRSA = COSEPublicKey & {
   // Getters
   get(key: COSEKEYS.n): Uint8Array | undefined;
@@ -47,6 +60,9 @@ export type COSEPublicKeyRSA = COSEPublicKey & {
   set(key: COSEKEYS.e, value: Uint8Array): void;
 };
 
+/**
+ * A type guard for determining if a COSE public key is an OKP key pair
+ */
 export function isCOSEPublicKeyOKP(
   cosePublicKey: COSEPublicKey,
 ): cosePublicKey is COSEPublicKeyOKP {
@@ -54,6 +70,9 @@ export function isCOSEPublicKeyOKP(
   return isCOSEKty(kty) && kty === COSEKTY.OKP;
 }
 
+/**
+ * A type guard for determining if a COSE public key is an EC2 key pair
+ */
 export function isCOSEPublicKeyEC2(
   cosePublicKey: COSEPublicKey,
 ): cosePublicKey is COSEPublicKeyEC2 {
@@ -61,6 +80,9 @@ export function isCOSEPublicKeyEC2(
   return isCOSEKty(kty) && kty === COSEKTY.EC2;
 }
 
+/**
+ * A type guard for determining if a COSE public key is an RSA key pair
+ */
 export function isCOSEPublicKeyRSA(
   cosePublicKey: COSEPublicKey,
 ): cosePublicKey is COSEPublicKeyRSA {
