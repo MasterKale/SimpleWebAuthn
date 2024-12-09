@@ -3,16 +3,17 @@ import express from 'express';
 import fetch from 'node-fetch';
 
 import {
+  AuthenticationResponseJSON,
   generateAuthenticationOptions,
   generateRegistrationOptions,
   MetadataService,
   MetadataStatement,
+  RegistrationResponseJSON,
   SettingsService,
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { isoBase64URL } from '@simplewebauthn/server/helpers';
-import { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/types';
 
 import { expectedOrigin, rpID } from './index';
 import { LoggedInUser } from './example-server';

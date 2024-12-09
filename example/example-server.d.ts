@@ -1,4 +1,4 @@
-import type { WebAuthnCredential } from '@simplewebauthn/types';
+import type { WebAuthnCredential } from '@simplewebauthn/server';
 
 /**
  * You'll need a database to store a few things:
