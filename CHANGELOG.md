@@ -1,5 +1,57 @@
 # Changelog
 
+## v13.0.0 - The one where they share a type
+
+Hot on the heels of the last major release, v13 introduces support for registration hints! Refined
+types and improved attestation trust anchor verification are also included. Last but not least, we
+say goodbye to one of the project's packages for better docs and fewer dependencies to install. Read
+on for more information, including refactor advice for dealing with the retirement of
+**@simplewebauthn/types**.
+
+**Changes:**
+
+- **[server]** A new `preferredAuthenticatorType` argument can be set when calling
+  `generateRegistrationOptions()` to generate options that encourage the browser to direct the user
+  to register one of three types of authenticators: `'securityKey'`, `'localDevice'`, or
+  `'remoteDevice'` (a.k.a. opinionated
+  [WebAuthn hints](https://w3c.github.io/webauthn/#dom-publickeycredentialcreationoptions-hints)
+  support) ([#653](https://github.com/MasterKale/SimpleWebAuthn/pull/653))
+- **[browser]** `startRegistration()` will recognize `hints` if specified in `optionsJSON`
+  ([#652](https://github.com/MasterKale/SimpleWebAuthn/pull/652))
+- **[server]** Attestation verification now recognizes intermediate certificates as trust anchors
+  ([#650](https://github.com/MasterKale/SimpleWebAuthn/pull/650))
+- **[browser] [server]** The types previously maintained in the **types** package are now included
+  within the **browser** and **server** packages. See Breaking Changes below for more info
+  ([#655](https://github.com/MasterKale/SimpleWebAuthn/pull/655))
+
+### Breaking Changes
+
+**@typescript/types is being retired.** Its types will now be included directly in
+**@simplewebauthn/browser** and **@simplewebauthn/server**.
+
+To refactor existing imports from **/types**, simply import them from **/browser** or **/server**
+instead:
+
+**Before:**
+
+```ts
+import type {
+  AuthenticationResponseJSON,
+  RegistrationResponseJSON,
+  WebAuthnCredential,
+} from '@simplewebauthn/types'; // <--
+```
+
+**After:**
+
+```ts
+import type {
+  AuthenticationResponseJSON,
+  RegistrationResponseJSON,
+  WebAuthnCredential,
+} from '@simplewebauthn/server'; // <--
+```
+
 ## v12.0.0 - The one that claims a JSR scope
 
 All SimpleWebAuthn packages are now available for installation from the
