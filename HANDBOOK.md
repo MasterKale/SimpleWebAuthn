@@ -28,7 +28,6 @@ Update `"version"` in the following **deno.json** files for each package that ne
 
 - **@simplewebauthn/browser**: [packages/browser/deno.json](./packages/browser/deno.json)
 - **@simplewebauthn/server**: [packages/server/deno.json](./packages/server/deno.json)
-- **@simplewebauthn/types**: [packages/types/deno.json](./packages/types/deno.json)
 
 Continue using your best judgement on what an appropriate new version number should be.
 
@@ -46,12 +45,6 @@ The following commands can be run from the root of the monorepo to build the res
 then **publish it to both [NPM](https://www.npmjs.com/search?q=%40simplewebauthn) and
 [JSR](https://jsr.io/@simplewebauthn)**.
 
-#### Need to publish @simplewebauthn/types?
-
-```
-deno task publish:types
-```
-
 #### Need to publish @simplewebauthn/browser?
 
 ```
@@ -59,12 +52,6 @@ deno task publish:browser
 ```
 
 #### Need to publish @simplewebauthn/server?
-
-1.
-   - [ ] Make sure the correct version of **@simplewebauthn/types** is on NPM
-   - The `npm install` step that dnt performs while building **@simplewebauthn/server** pulls from
-     NPM. The build will fail if the version of **@simplewebauthn/types** specified in
-     [packages/types/deno.json](./packages/types/deno.json) is unavailable on NPM.
 
 ```
 deno task publish:server

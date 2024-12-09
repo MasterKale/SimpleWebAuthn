@@ -1,5 +1,4 @@
-import type { Base64URLString } from '@simplewebauthn/types';
-
+import type { Base64URLString } from '../types/index.ts';
 import { isoBase64URL } from './iso/index.ts';
 
 /**
@@ -23,7 +22,10 @@ export type ClientDataJSON = {
   };
 };
 
-// Make it possible to stub the return value during testing
+/**
+ * Make it possible to stub the return value during testing
+ * @ignore Don't include this in docs output
+ */
 export const _decodeClientDataJSONInternals = {
   stubThis: (value: ClientDataJSON) => value,
 };

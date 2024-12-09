@@ -20,10 +20,6 @@ incorporate WebAuthn into a website. The following packages are maintained here:
 - [@simplewebauthn/server](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/server)
 - [@simplewebauthn/browser](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/browser)
 
-An additional package is also included that contains shared TypeScript definitions:
-
-- [@simplewebauthn/types](https://github.com/MasterKale/SimpleWebAuthn/tree/master/packages/types/)
-
 ## Installation
 
 SimpleWebAuthn can be installed from **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)** and

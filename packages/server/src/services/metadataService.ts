@@ -35,18 +35,39 @@ enum SERVICE_STATE {
   READY,
 }
 
-// Allow MetadataService to accommodate unregistered AAGUIDs ("permissive"), or only allow
-// registered AAGUIDs ("strict"). Currently primarily impacts how `getStatement()` operates
-type VerificationMode = 'permissive' | 'strict';
+/**
+ * Allow MetadataService to accommodate unregistered AAGUIDs (`"permissive"`), or only allow
+ * registered AAGUIDs (`"strict"`). Currently primarily impacts how `getStatement()` operates
+ */
+export type VerificationMode = 'permissive' | 'strict';
 
 const log = getLogger('MetadataService');
 
 interface MetadataService {
+  /**
+   * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
+   *
+   * **Options:**
+   *
+   * @param opts.mdsServers An array of URLs to FIDO Alliance Metadata Service
+   * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
+   * @param opts.statements An array of local metadata statements
+   * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
+   * `"strict"` which throws errors during registration response verification when an
+   * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
+   * authenticators with unregistered AAGUIDs
+   */
   initialize(opts?: {
     mdsServers?: string[];
     statements?: MetadataStatement[];
     verificationMode?: VerificationMode;
   }): Promise<void>;
+  /**
+   * Get a metadata statement for a given AAGUID.
+   *
+   * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
+   * BLOB download.
+   */
   getStatement(aaguid: string | Uint8Array): Promise<MetadataStatement | undefined>;
 }
 
@@ -62,19 +83,6 @@ export class BaseMetadataService implements MetadataService {
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
   private verificationMode: VerificationMode = 'strict';
 
-  /**
-   * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
-   *
-   * **Options:**
-   *
-   * @param opts.mdsServers An array of URLs to FIDO Alliance Metadata Service
-   * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
-   * @param opts.statements An array of local metadata statements
-   * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
-   * `"strict"` which throws errors during registration response verification when an
-   * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
-   * authenticators with unregistered AAGUIDs
-   */
   async initialize(
     opts: {
       mdsServers?: string[];
@@ -144,12 +152,6 @@ export class BaseMetadataService implements MetadataService {
     this.setState(SERVICE_STATE.READY);
   }
 
-  /**
-   * Get a metadata statement for a given AAGUID.
-   *
-   * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
-   * BLOB download.
-   */
   async getStatement(
     aaguid: string | Uint8Array,
   ): Promise<MetadataStatement | undefined> {

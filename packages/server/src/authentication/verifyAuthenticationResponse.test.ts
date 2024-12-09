@@ -7,10 +7,10 @@ import {
   assertRejects,
 } from '@std/assert';
 import { returnsNext, stub } from '@std/testing/mock';
-import type { AuthenticationResponseJSON, WebAuthnCredential } from '@simplewebauthn/types';
 
 import { verifyAuthenticationResponse } from './verifyAuthenticationResponse.ts';
 
+import type { AuthenticationResponseJSON, WebAuthnCredential } from '../types/index.ts';
 import { _decodeClientDataJSONInternals } from '../helpers/decodeClientDataJSON.ts';
 import {
   _parseAuthenticatorDataInternals,

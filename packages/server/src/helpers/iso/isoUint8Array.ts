@@ -1,4 +1,9 @@
 /**
+ * A runtime-agnostic collection of methods for working with Uint8Arrays
+ * @module
+ */
+
+/**
  * Make sure two Uint8Arrays are deeply equivalent
  */
 export function areEqual(array1: Uint8Array, array2: Uint8Array): boolean {

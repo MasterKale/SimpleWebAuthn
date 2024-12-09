@@ -7,8 +7,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialHint,
   PublicKeyCredentialParameters,
-} from '@simplewebauthn/types';
-
+} from '../types/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 import { generateUserID } from '../helpers/generateUserID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';

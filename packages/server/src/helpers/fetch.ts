@@ -8,7 +8,10 @@ export function fetch(url: string): Promise<Response> {
   return _fetchInternals.stubThis(url);
 }
 
-// Make it possible to stub the return value during testing
+/**
+ * Make it possible to stub the return value during testing
+ * @ignore Don't include this in docs output
+ */
 export const _fetchInternals = {
   stubThis: (url: string) => crossFetch(url),
 };

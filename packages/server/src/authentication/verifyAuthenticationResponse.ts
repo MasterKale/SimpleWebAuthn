@@ -4,29 +4,20 @@ import type {
   CredentialDeviceType,
   UserVerificationRequirement,
   WebAuthnCredential,
-} from '@simplewebauthn/types';
-
+} from '../types/index.ts';
 import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { verifySignature } from '../helpers/verifySignature.ts';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
 import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
-import { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
+import type { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 
-export type VerifyAuthenticationResponseOpts = {
-  response: AuthenticationResponseJSON;
-  expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
-  expectedOrigin: string | string[];
-  expectedRPID: string | string[];
-  credential: WebAuthnCredential;
-  expectedType?: string | string[];
-  requireUserVerification?: boolean;
-  advancedFIDOConfig?: {
-    userVerification?: UserVerificationRequirement;
-  };
-};
+/**
+ * Configurable options when calling `verifyAuthenticationResponse()`
+ */
+export type VerifyAuthenticationResponseOpts = Parameters<typeof verifyAuthenticationResponse>[0];
 
 /**
  * Verify that the user has legitimately completed the authentication process
@@ -44,7 +35,18 @@ export type VerifyAuthenticationResponseOpts = {
  * @param advancedFIDOConfig.userVerification **(Optional)** - Enable alternative rules for evaluating the User Presence and User Verified flags in authenticator data: UV (and UP) flags are optional unless this value is `"required"`
  */
 export async function verifyAuthenticationResponse(
-  options: VerifyAuthenticationResponseOpts,
+  options: {
+    response: AuthenticationResponseJSON;
+    expectedChallenge: string | ((challenge: string) => boolean | Promise<boolean>);
+    expectedOrigin: string | string[];
+    expectedRPID: string | string[];
+    credential: WebAuthnCredential;
+    expectedType?: string | string[];
+    requireUserVerification?: boolean;
+    advancedFIDOConfig?: {
+      userVerification?: UserVerificationRequirement;
+    };
+  },
 ): Promise<VerifiedAuthenticationResponse> {
   const {
     response,

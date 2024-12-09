@@ -2,11 +2,11 @@
 import { assertEquals, assertInstanceOf, assertRejects, assertStringIncludes } from '@std/assert';
 import { assertSpyCalls, type Spy, spy, stub } from '@std/testing/mock';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
-import {
+import type {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialCreationOptionsJSON,
-} from '@simplewebauthn/types';
+} from '../types/index.ts';
 
 import { generateCustomError } from '../helpers/__jest__/generateCustomError.ts';
 import { _browserSupportsWebAuthnInternals } from '../helpers/browserSupportsWebAuthn.ts';

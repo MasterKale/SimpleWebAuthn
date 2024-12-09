@@ -9,13 +9,24 @@ import {
 import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
 import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
 
-type RootCertIdentifier = AttestationFormat | 'mds';
+export type RootCertIdentifier = AttestationFormat | 'mds';
 
 interface SettingsService {
+  /**
+   * Set potential root certificates for attestation formats that use them. Root certs will be tried
+   * one-by-one when validating a certificate path.
+   *
+   * Certificates can be specified as a raw `Buffer`, or as a PEM-formatted string. If a
+   * `Buffer` is passed in it will be converted to PEM format.
+   */
   setRootCertificates(opts: {
     identifier: RootCertIdentifier;
     certificates: (Uint8Array | string)[];
   }): void;
+
+  /**
+   * Get any registered root certificates for the specified attestation format
+   */
   getRootCertificates(opts: { identifier: RootCertIdentifier }): string[];
 }
 
@@ -27,13 +38,6 @@ class BaseSettingsService implements SettingsService {
     this.pemCertificates = new Map();
   }
 
-  /**
-   * Set potential root certificates for attestation formats that use them. Root certs will be tried
-   * one-by-one when validating a certificate path.
-   *
-   * Certificates can be specified as a raw `Buffer`, or as a PEM-formatted string. If a
-   * `Buffer` is passed in it will be converted to PEM format.
-   */
   setRootCertificates(opts: {
     identifier: RootCertIdentifier;
     certificates: (Uint8Array | string)[];
@@ -52,9 +56,6 @@ class BaseSettingsService implements SettingsService {
     this.pemCertificates.set(identifier, newCertificates);
   }
 
-  /**
-   * Get any registered root certificates for the specified attestation format
-   */
   getRootCertificates(opts: { identifier: RootCertIdentifier }): string[] {
     const { identifier } = opts;
     return this.pemCertificates.get(identifier) ?? [];

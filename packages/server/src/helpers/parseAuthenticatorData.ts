@@ -153,7 +153,10 @@ export type ParsedAuthenticatorData = {
   extensionsDataBuffer?: Uint8Array;
 };
 
-// Make it possible to stub the return value during testing
+/**
+ * Make it possible to stub the return value during testing
+ * @ignore Don't include this in docs output
+ */
 export const _parseAuthenticatorDataInternals = {
   stubThis: (value: ParsedAuthenticatorData) => value,
 };

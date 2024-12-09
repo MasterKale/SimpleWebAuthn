@@ -15,7 +15,10 @@ export async function generateUserID(): Promise<Uint8Array> {
   return _generateUserIDInternals.stubThis(newUserID);
 }
 
-// Make it possible to stub the return value during testing
+/**
+ * Make it possible to stub the return value during testing
+ * @ignore Don't include this in docs output
+ */
 export const _generateUserIDInternals = {
   stubThis: (value: Uint8Array) => value,
 };

@@ -1,66 +1,16 @@
-import { convertAAGUIDToString } from './convertAAGUIDToString.ts';
-import { convertCertBufferToPEM } from './convertCertBufferToPEM.ts';
-import { convertCOSEtoPKCS } from './convertCOSEtoPKCS.ts';
-import { decodeAttestationObject } from './decodeAttestationObject.ts';
-import { decodeClientDataJSON } from './decodeClientDataJSON.ts';
-import { decodeCredentialPublicKey } from './decodeCredentialPublicKey.ts';
-import { generateChallenge } from './generateChallenge.ts';
-import { generateUserID } from './generateUserID.ts';
-import { getCertificateInfo } from './getCertificateInfo.ts';
-import { isCertRevoked } from './isCertRevoked.ts';
-import { parseAuthenticatorData } from './parseAuthenticatorData.ts';
-import { toHash } from './toHash.ts';
-import { validateCertificatePath } from './validateCertificatePath.ts';
-import { verifySignature } from './verifySignature.ts';
-import { isoBase64URL, isoCBOR, isoCrypto, isoUint8Array } from './iso/index.ts';
-import * as cose from './cose.ts';
-
-export {
-  convertAAGUIDToString,
-  convertCertBufferToPEM,
-  convertCOSEtoPKCS,
-  cose,
-  decodeAttestationObject,
-  decodeClientDataJSON,
-  decodeCredentialPublicKey,
-  generateChallenge,
-  generateUserID,
-  getCertificateInfo,
-  isCertRevoked,
-  isoBase64URL,
-  isoCBOR,
-  isoCrypto,
-  isoUint8Array,
-  parseAuthenticatorData,
-  toHash,
-  validateCertificatePath,
-  verifySignature,
-};
-
-import type {
-  AttestationFormat,
-  AttestationObject,
-  AttestationStatement,
-} from './decodeAttestationObject.ts';
-import type { CertificateInfo } from './getCertificateInfo.ts';
-import type { ClientDataJSON } from './decodeClientDataJSON.ts';
-import type {
-  COSEPublicKey,
-  COSEPublicKeyEC2,
-  COSEPublicKeyOKP,
-  COSEPublicKeyRSA,
-} from './cose.ts';
-import type { ParsedAuthenticatorData } from './parseAuthenticatorData.ts';
-
-export type {
-  AttestationFormat,
-  AttestationObject,
-  AttestationStatement,
-  CertificateInfo,
-  ClientDataJSON,
-  COSEPublicKey,
-  COSEPublicKeyEC2,
-  COSEPublicKeyOKP,
-  COSEPublicKeyRSA,
-  ParsedAuthenticatorData,
-};
+export * from './convertAAGUIDToString.ts';
+export * from './convertCertBufferToPEM.ts';
+export * from './convertCOSEtoPKCS.ts';
+export * from './decodeAttestationObject.ts';
+export * from './decodeClientDataJSON.ts';
+export * from './decodeCredentialPublicKey.ts';
+export * from './generateChallenge.ts';
+export * from './generateUserID.ts';
+export * from './getCertificateInfo.ts';
+export * from './isCertRevoked.ts';
+export * from './parseAuthenticatorData.ts';
+export * from './toHash.ts';
+export * from './validateCertificatePath.ts';
+export * from './verifySignature.ts';
+export * from './iso/index.ts';
+export * as cose from './cose.ts';

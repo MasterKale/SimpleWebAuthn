@@ -1,4 +1,4 @@
-import type { CredentialDeviceType } from '@simplewebauthn/types';
+import type { CredentialDeviceType } from '../types/index.ts';
 
 /**
  * Make sense of Bits 3 and 4 in authenticator indicating:

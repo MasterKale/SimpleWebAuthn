@@ -18,13 +18,13 @@ and **[JSR](https://jsr.io/@simplewebauthn/server)**:
 ### Node LTS 20.x and higher
 
 ```sh
-npm install @simplewebauthn/server @simplewebauthn/types
+npm install @simplewebauthn/server
 ```
 
 ### Deno v1.43 and higher
 
 ```sh
-deno add jsr:@simplewebauthn/server jsr:@simplewebauthn/types
+deno add jsr:@simplewebauthn/server
 ```
 
 ## Documentation
