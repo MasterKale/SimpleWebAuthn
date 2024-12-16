@@ -1,5 +1,3 @@
-import { fetch as crossFetch } from 'cross-fetch';
-
 /**
  * A simple method for requesting data via standard `fetch`. Should work
  * across multiple runtimes.
@@ -13,5 +11,5 @@ export function fetch(url: string): Promise<Response> {
  * @ignore Don't include this in docs output
  */
 export const _fetchInternals = {
-  stubThis: (url: string) => crossFetch(url),
+  stubThis: (url: string) => globalThis.fetch(url),
 };
