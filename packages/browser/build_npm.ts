@@ -7,7 +7,6 @@ import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 
 import denoJSON from './deno.json' with { type: 'json' };
-import typesDenoJSON from '../types/deno.json' with { type: 'json' };
 
 const outDir = './npm';
 
