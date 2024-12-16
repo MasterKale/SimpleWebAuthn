@@ -26,8 +26,10 @@ on for more information, including refactor advice for dealing with the retireme
 
 ### Breaking Changes
 
-**@typescript/types is being retired.** Its types will now be included directly in
-**@simplewebauthn/browser** and **@simplewebauthn/server**.
+#### @typescript/types is being retired
+
+Its types will now be included directly in **@simplewebauthn/browser** and
+**@simplewebauthn/server**.
 
 To refactor existing imports from **/types**, simply import them from **/browser** or **/server**
 instead:
@@ -50,6 +52,45 @@ import type {
   RegistrationResponseJSON,
   WebAuthnCredential,
 } from '@simplewebauthn/server'; // <--
+```
+
+---
+
+#### [server] `attestationType` no longer accepts `'indirect'`
+
+The benefits of indirect attestation are too minimal to be useful for Relying Parties. In practice
+it is almost never used over ignoring the concept completely with `'none'` or needing to be
+intentional and setting `'direct'`.
+
+RP's that have been specifying `attestationType: 'indirect'` when calling
+`generateRegistrationOptions()` will need to refactor their code to either **omit**
+`attestationType` (`generateRegistrationOptions()` will default to `attestationType: 'none'`) or set
+`attestationType: 'direct'` instead:
+
+**Before:**
+
+```ts
+const options = await generateRegistrationOptions({
+  // ...
+  attestationType: 'indirect',
+});
+```
+
+**After:**
+
+```ts
+const options = await generateRegistrationOptions({
+  // ...
+});
+```
+
+-or-
+
+```ts
+const options = await generateRegistrationOptions({
+  // ...
+  attestationType: 'direct',
+});
 ```
 
 ## v12.0.0 - The one that claims a JSR scope
