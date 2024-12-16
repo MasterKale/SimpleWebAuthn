@@ -43,8 +43,7 @@
     "@peculiar/asn1-ecc": "npm:@peculiar/asn1-ecc@^2.3.8",
     "@peculiar/asn1-rsa": "npm:@peculiar/asn1-rsa@^2.3.8",
     "@peculiar/asn1-schema": "npm:@peculiar/asn1-schema@^2.3.8",
-    "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.3.8",
-    "cross-fetch": "npm:cross-fetch@^4.0.0"
+    "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.3.8"
   },
   "publish": {
     "include": [
