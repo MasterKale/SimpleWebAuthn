@@ -1,5 +1,17 @@
 # Changelog
 
+## v13.1.0
+
+**Changes:**
+
+- **[server]** The `cross-fetch` dependency has been removed from the project to silence in the
+  console `DeprecationWarning`'s about a "`punycode`" module
+  ([#661](https://github.com/MasterKale/SimpleWebAuthn/pull/661))
+- **[browser]** `startRegistration()` and `startAuthentication()` will now warn about calls made
+  using the pre-v11 call structure to encourage refactoring to use the current call structure, but
+  still try to handle such calls the best they can
+  ([#664](https://github.com/MasterKale/SimpleWebAuthn/pull/664))
+
 ## v13.0.0 - The one where they share a type
 
 Hot on the heels of the last major release, v13 introduces support for registration hints! Refined
