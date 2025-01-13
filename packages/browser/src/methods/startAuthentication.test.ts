@@ -7,7 +7,7 @@ import {
   assertRejects,
   assertStringIncludes,
 } from '@std/assert';
-import { assertSpyCalls, type Spy, spy } from '@std/testing/mock';
+import { assertSpyCalls, type Spy, spy, stub } from '@std/testing/mock';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { JSDOM } from 'jsdom';
 import type {
@@ -441,6 +441,31 @@ describe('Method: startAuthentication()', () => {
     const response = await startAuthentication({ optionsJSON: goodOpts1 });
 
     assertEquals(response.authenticatorAttachment, 'cross-platform');
+  });
+
+  it('should continue despite use of old call structure', async () => {
+    const stubConsoleWarn = stub(console, 'warn');
+
+    // @ts-ignore: Intentionally call this method in a pre-v11 way
+    await startAuthentication(goodOpts1);
+
+    assertSpyCalls(stubConsoleWarn, 1);
+
+    // Assert there's some browser console output
+    const warning = stubConsoleWarn.calls.at(0)?.args[0] as string;
+    assertStringIncludes(warning, 'startAuthentication() was not called correctly');
+
+    // Check that the method was able to handle the bad call anyway
+    const args = getSpy.calls.at(0)?.args[0] as CredentialCreationOptions;
+    const argsPublicKey = args.publicKey!;
+
+    // Make sure challenge and user.id are converted to Buffers
+    assertEquals(
+      new Uint8Array(argsPublicKey.challenge as ArrayBuffer),
+      new Uint8Array([213, 62, 174, 30, 184, 184, 56, 4]),
+    );
+
+    stubConsoleWarn.restore();
   });
 });
 

@@ -28,6 +28,16 @@ export async function startAuthentication(
     verifyBrowserAutofillInput?: boolean;
   },
 ): Promise<AuthenticationResponseJSON> {
+  // @ts-ignore: Intentionally check for old call structure to warn about improper API call
+  if (!options.optionsJSON && options.challenge) {
+    console.warn(
+      'startAuthentication() was not called correctly. It will try to continue with the provided options, but this call should be refactored to use the expected call structure instead. See https://simplewebauthn.dev/docs/packages/browser#typeerror-cannot-read-properties-of-undefined-reading-challenge for more information.',
+    );
+
+    // @ts-ignore: Reassign the options, passed in as a positional argument, to the expected variable
+    options = { optionsJSON: options };
+  }
+
   const {
     optionsJSON,
     useBrowserAutofill = false,
