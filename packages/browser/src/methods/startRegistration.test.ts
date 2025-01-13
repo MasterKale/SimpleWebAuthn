@@ -374,6 +374,31 @@ describe('Method: startRegistration', () => {
     // The most important bit
     assertEquals(argsMediation, 'conditional');
   });
+
+  it('should continue despite use of old call structure', async () => {
+    const stubConsoleWarn = stub(console, 'warn');
+
+    // @ts-ignore: Intentionally call this method in a pre-v11 way
+    await startRegistration(goodOpts1);
+
+    assertSpyCalls(stubConsoleWarn, 1);
+
+    // Assert there's some browser console output
+    const warning = stubConsoleWarn.calls.at(0)?.args[0] as string;
+    assertStringIncludes(warning, 'startRegistration() was not called correctly');
+
+    // Check that the method was able to handle the bad call anyway
+    const args = createSpy.calls.at(0)?.args[0] as CredentialCreationOptions;
+    const argsPublicKey = args.publicKey!;
+
+    // Make sure challenge and user.id are converted to Buffers
+    assertEquals(
+      new Uint8Array(argsPublicKey.challenge as ArrayBuffer),
+      new Uint8Array([213, 62, 174, 30, 184, 184, 56, 4]),
+    );
+
+    stubConsoleWarn.restore();
+  });
 });
 
 describe('WebAuthnError', () => {
