@@ -135,15 +135,19 @@ export async function verifyAttestationAndroidKey(
       throw new Error(`${_err.message} (Android Key)`);
     }
   } else {
+    /**
+     * Verify that x5c contains a full certificate path.
+     */
+    const x5cNoRootPEM = x5c.slice(0, -1).map(convertCertBufferToPEM);
+    const x5cRootPEM = x5c.slice(-1).map(convertCertBufferToPEM);
+
     try {
-      // Try validating the certificate path using the root certificates set via SettingsService
-      await validateCertificatePath(
-        x5c.map(convertCertBufferToPEM),
-        rootCertificates,
-      );
+      await validateCertificatePath(x5cNoRootPEM, x5cRootPEM);
     } catch (err) {
       const _err = err as Error;
-      throw new Error(`${_err.message} (AndroidKey)`);
+      throw new Error(`${_err.message} (Android Key)`);
+    }
+
     }
   }
 
