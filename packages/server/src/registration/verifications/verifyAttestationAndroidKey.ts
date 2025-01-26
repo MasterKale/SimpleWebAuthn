@@ -52,7 +52,10 @@ export async function verifyAttestationAndroidKey(
     );
   }
 
-  // Check that credentialPublicKey matches the public key in the attestation certificate
+  /**
+   * Verify that the public key in the first certificate in x5c matches the credentialPublicKey in
+   * the attestedCredentialData in authenticatorData.
+   */
   // Find the public cert in the certificate as PKCS
   const parsedCert = AsnParser.parse(x5c[0], Certificate);
   const parsedCertPubKey = new Uint8Array(
@@ -68,6 +71,10 @@ export async function verifyAttestationAndroidKey(
     );
   }
 
+  /**
+   * Verify that the attestationChallenge field in the attestation certificate extension data is
+   * identical to clientDataHash.
+   */
   // Find Android KeyStore Extension in certificate extensions
   const extKeyStore = parsedCert.tbsCertificate.extensions?.find(
     (ext) => ext.extnID === id_ce_keyDescription,
@@ -96,8 +103,12 @@ export async function verifyAttestationAndroidKey(
     );
   }
 
-  // Ensure that the key is strictly bound to the caller app identifier (shouldn't contain the
-  // [600] tag)
+  /**
+   * The AuthorizationList.allApplications field is not present on either authorization list
+   * (softwareEnforced nor teeEnforced), since PublicKeyCredential MUST be scoped to the RP ID.
+   *
+   * (i.e. These shouldn't contain the [600] tag)
+   */
   if (teeEnforced.allApplications !== undefined) {
     throw new Error(
       'teeEnforced contained "allApplications [600]" tag (AndroidKey)',
@@ -136,6 +147,11 @@ export async function verifyAttestationAndroidKey(
     }
   }
 
+  /**
+   * Verify that sig is a valid signature over the concatenation of authenticatorData and
+   * clientDataHash using the public key in the first certificate in x5c with the algorithm
+   * specified in alg.
+   */
   const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
 
   return verifySignature({
