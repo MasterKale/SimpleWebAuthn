@@ -32,23 +32,23 @@ export async function verifyAttestationAndroidKey(
 
   if (!x5c) {
     throw new Error(
-      'No attestation certificate provided in attestation statement (AndroidKey)',
+      'No attestation certificate provided in attestation statement (Android Key)',
     );
   }
 
   if (!sig) {
     throw new Error(
-      'No attestation signature provided in attestation statement (AndroidKey)',
+      'No attestation signature provided in attestation statement (Android Key)',
     );
   }
 
   if (!alg) {
-    throw new Error(`Attestation statement did not contain alg (AndroidKey)`);
+    throw new Error(`Attestation statement did not contain alg (Android Key)`);
   }
 
   if (!isCOSEAlg(alg)) {
     throw new Error(
-      `Attestation statement contained invalid alg ${alg} (AndroidKey)`,
+      `Attestation statement contained invalid alg ${alg} (Android Key)`,
     );
   }
 
@@ -67,7 +67,7 @@ export async function verifyAttestationAndroidKey(
 
   if (!isoUint8Array.areEqual(credPubKeyPKCS, parsedCertPubKey)) {
     throw new Error(
-      'Credential public key does not equal leaf cert public key (AndroidKey)',
+      'Credential public key does not equal leaf cert public key (Android Key)',
     );
   }
 
@@ -81,7 +81,7 @@ export async function verifyAttestationAndroidKey(
   );
 
   if (!extKeyStore) {
-    throw new Error('Certificate did not contain extKeyStore (AndroidKey)');
+    throw new Error('Certificate did not contain extKeyStore (Android Key)');
   }
 
   const parsedExtKeyStore = AsnParser.parse(
@@ -99,7 +99,7 @@ export async function verifyAttestationAndroidKey(
     )
   ) {
     throw new Error(
-      'Attestation challenge was not equal to client data hash (AndroidKey)',
+      'Attestation challenge was not equal to client data hash (Android Key)',
     );
   }
 
@@ -111,13 +111,13 @@ export async function verifyAttestationAndroidKey(
    */
   if (teeEnforced.allApplications !== undefined) {
     throw new Error(
-      'teeEnforced contained "allApplications [600]" tag (AndroidKey)',
+      'teeEnforced contained "allApplications [600]" tag (Android Key)',
     );
   }
 
   if (softwareEnforced.allApplications !== undefined) {
     throw new Error(
-      'teeEnforced contained "allApplications [600]" tag (AndroidKey)',
+      'teeEnforced contained "allApplications [600]" tag (Android Key)',
     );
   }
 
@@ -132,7 +132,7 @@ export async function verifyAttestationAndroidKey(
       });
     } catch (err) {
       const _err = err as Error;
-      throw new Error(`${_err.message} (AndroidKey)`);
+      throw new Error(`${_err.message} (Android Key)`);
     }
   } else {
     try {
