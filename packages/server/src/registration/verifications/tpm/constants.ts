@@ -102,86 +102,37 @@ type ManufacturerInfo = {
  * https://trustedcomputinggroup.org/wp-content/uploads/TCG-TPM-Vendor-ID-Registry-Version-1.02-Revision-1.00.pdf
  */
 export const TPM_MANUFACTURERS: { [key: string]: ManufacturerInfo } = {
-  'id:414D4400': {
-    name: 'AMD',
-    id: 'AMD',
-  },
-  'id:41544D4C': {
-    name: 'Atmel',
-    id: 'ATML',
-  },
-  'id:4252434D': {
-    name: 'Broadcom',
-    id: 'BRCM',
-  },
-  'id:49424d00': {
-    name: 'IBM',
-    id: 'IBM',
-  },
-  'id:49424D00': { // Same ID for IBM as above, except the "D" is capitalized as per TPM spec
-    name: 'IBM',
-    id: 'IBM',
-  },
-  'id:49465800': {
-    name: 'Infineon',
-    id: 'IFX',
-  },
-  'id:494E5443': {
-    name: 'Intel',
-    id: 'INTC',
-  },
-  'id:4C454E00': {
-    name: 'Lenovo',
-    id: 'LEN',
-  },
-  'id:4E534D20': {
-    name: 'National Semiconductor',
-    id: 'NSM',
-  },
-  'id:4E545A00': {
-    name: 'Nationz',
-    id: 'NTZ',
-  },
-  'id:4E544300': {
-    name: 'Nuvoton Technology',
-    id: 'NTC',
-  },
-  'id:51434F4D': {
-    name: 'Qualcomm',
-    id: 'QCOM',
-  },
-  'id:534D5343': {
-    name: 'SMSC',
-    id: 'SMSC',
-  },
-  'id:53544D20': {
-    name: 'ST Microelectronics',
-    id: 'STM',
-  },
-  'id:534D534E': {
-    name: 'Samsung',
-    id: 'SMSN',
-  },
-  'id:534E5300': {
-    name: 'Sinosun',
-    id: 'SNS',
-  },
-  'id:54584E00': {
-    name: 'Texas Instruments',
-    id: 'TXN',
-  },
-  'id:57454300': {
-    name: 'Winbond',
-    id: 'WEC',
-  },
-  'id:524F4343': {
-    name: 'Fuzhouk Rockchip',
-    id: 'ROCC',
-  },
-  'id:FFFFF1D0': {
-    name: 'FIDO Alliance',
-    id: 'FIDO',
-  },
+  'id:414D4400': { name: 'AMD', id: 'AMD' },
+  'id:414E5400': { name: 'Ant Group', id: 'ANT' },
+  'id:41544D4C': { name: 'Atmel', id: 'ATML' },
+  'id:4252434D': { name: 'Broadcom', id: 'BRCM' },
+  'id:4353434F': { name: 'Cisco', id: 'CSCO' },
+  'id:464C5953': { name: 'Flyslice Technologies', id: 'FLYS' },
+  'id:524F4343': { name: 'Fuzhou Rockchip', id: 'ROCC' },
+  'id:474F4F47': { name: 'Google', id: 'GOOG' },
+  'id:48504900': { name: 'HPI', id: 'HPI' },
+  'id:48504500': { name: 'HPE', id: 'HPE' },
+  'id:48495349': { name: 'Huawei', id: 'HISI' },
+  'id:49424d00': { name: 'IBM', id: 'IBM' },
+  'id:49424D00': { name: 'IBM', id: 'IBM' }, // Same ID for IBM as above, except the "D" is capitalized as per TPM spec
+  'id:49465800': { name: 'Infineon', id: 'IFX' },
+  'id:494E5443': { name: 'Intel', id: 'INTC' },
+  'id:4C454E00': { name: 'Lenovo', id: 'LEN' },
+  'id:4D534654': { name: 'Microsoft', id: 'MSFT' },
+  'id:4E534D20': { name: 'National Semiconductor', id: 'NSM' },
+  'id:4E545A00': { name: 'Nationz', id: 'NTZ' },
+  'id:4E534700': { name: 'NSING', id: 'NSG' },
+  'id:4E544300': { name: 'Nuvoton Technology', id: 'NTC' },
+  'id:51434F4D': { name: 'Qualcomm', id: 'QCOM' },
+  'id:534D534E': { name: 'Samsung', id: 'SMSN' },
+  'id:53454345': { name: 'SecEdge', id: 'SECE' },
+  'id:534E5300': { name: 'Sinosun', id: 'SNS' },
+  'id:534D5343': { name: 'SMSC', id: 'SMSC' },
+  'id:53544D20': { name: 'STMicroelectronics', id: 'STM' },
+  'id:54584E00': { name: 'Texas Instruments', id: 'TXN' },
+  'id:57454300': { name: 'Winbond', id: 'WEC' },
+  'id:5345414C': { name: 'Wisekey', id: 'SEAL' },
+  'id:FFFFF1D0': { name: 'FIDO Alliance', id: 'FIDO' }, // FIDO Conformance
 };
 
 /**
