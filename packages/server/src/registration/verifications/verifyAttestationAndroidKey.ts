@@ -32,27 +32,30 @@ export async function verifyAttestationAndroidKey(
 
   if (!x5c) {
     throw new Error(
-      'No attestation certificate provided in attestation statement (AndroidKey)',
+      'No attestation certificate provided in attestation statement (Android Key)',
     );
   }
 
   if (!sig) {
     throw new Error(
-      'No attestation signature provided in attestation statement (AndroidKey)',
+      'No attestation signature provided in attestation statement (Android Key)',
     );
   }
 
   if (!alg) {
-    throw new Error(`Attestation statement did not contain alg (AndroidKey)`);
+    throw new Error(`Attestation statement did not contain alg (Android Key)`);
   }
 
   if (!isCOSEAlg(alg)) {
     throw new Error(
-      `Attestation statement contained invalid alg ${alg} (AndroidKey)`,
+      `Attestation statement contained invalid alg ${alg} (Android Key)`,
     );
   }
 
-  // Check that credentialPublicKey matches the public key in the attestation certificate
+  /**
+   * Verify that the public key in the first certificate in x5c matches the credentialPublicKey in
+   * the attestedCredentialData in authenticatorData.
+   */
   // Find the public cert in the certificate as PKCS
   const parsedCert = AsnParser.parse(x5c[0], Certificate);
   const parsedCertPubKey = new Uint8Array(
@@ -64,17 +67,21 @@ export async function verifyAttestationAndroidKey(
 
   if (!isoUint8Array.areEqual(credPubKeyPKCS, parsedCertPubKey)) {
     throw new Error(
-      'Credential public key does not equal leaf cert public key (AndroidKey)',
+      'Credential public key does not equal leaf cert public key (Android Key)',
     );
   }
 
+  /**
+   * Verify that the attestationChallenge field in the attestation certificate extension data is
+   * identical to clientDataHash.
+   */
   // Find Android KeyStore Extension in certificate extensions
   const extKeyStore = parsedCert.tbsCertificate.extensions?.find(
     (ext) => ext.extnID === id_ce_keyDescription,
   );
 
   if (!extKeyStore) {
-    throw new Error('Certificate did not contain extKeyStore (AndroidKey)');
+    throw new Error('Certificate did not contain extKeyStore (Android Key)');
   }
 
   const parsedExtKeyStore = AsnParser.parse(
@@ -92,21 +99,25 @@ export async function verifyAttestationAndroidKey(
     )
   ) {
     throw new Error(
-      'Attestation challenge was not equal to client data hash (AndroidKey)',
+      'Attestation challenge was not equal to client data hash (Android Key)',
     );
   }
 
-  // Ensure that the key is strictly bound to the caller app identifier (shouldn't contain the
-  // [600] tag)
+  /**
+   * The AuthorizationList.allApplications field is not present on either authorization list
+   * (softwareEnforced nor teeEnforced), since PublicKeyCredential MUST be scoped to the RP ID.
+   *
+   * (i.e. These shouldn't contain the [600] tag)
+   */
   if (teeEnforced.allApplications !== undefined) {
     throw new Error(
-      'teeEnforced contained "allApplications [600]" tag (AndroidKey)',
+      'teeEnforced contained "allApplications [600]" tag (Android Key)',
     );
   }
 
   if (softwareEnforced.allApplications !== undefined) {
     throw new Error(
-      'teeEnforced contained "allApplications [600]" tag (AndroidKey)',
+      'teeEnforced contained "allApplications [600]" tag (Android Key)',
     );
   }
 
@@ -121,21 +132,37 @@ export async function verifyAttestationAndroidKey(
       });
     } catch (err) {
       const _err = err as Error;
-      throw new Error(`${_err.message} (AndroidKey)`);
+      throw new Error(`${_err.message} (Android Key)`);
     }
   } else {
+    /**
+     * Verify that x5c contains a full certificate path.
+     */
+    const x5cNoRootPEM = x5c.slice(0, -1).map(convertCertBufferToPEM);
+    const x5cRootPEM = x5c.slice(-1).map(convertCertBufferToPEM);
+
     try {
-      // Try validating the certificate path using the root certificates set via SettingsService
-      await validateCertificatePath(
-        x5c.map(convertCertBufferToPEM),
-        rootCertificates,
-      );
+      await validateCertificatePath(x5cNoRootPEM, x5cRootPEM);
     } catch (err) {
       const _err = err as Error;
-      throw new Error(`${_err.message} (AndroidKey)`);
+      throw new Error(`${_err.message} (Android Key)`);
+    }
+
+    /**
+     * Make sure the root certificate is one of the Google Hardware Attestation Root certificates
+     *
+     * https://developer.android.com/privacy-and-security/security-key-attestation#root_certificate
+     */
+    if (rootCertificates.length > 0 && rootCertificates.indexOf(x5cRootPEM[0]) < 0) {
+      throw new Error('x5c root certificate was not a known root certificate (Android Key)');
     }
   }
 
+  /**
+   * Verify that sig is a valid signature over the concatenation of authenticatorData and
+   * clientDataHash using the public key in the first certificate in x5c with the algorithm
+   * specified in alg.
+   */
   const signatureBase = isoUint8Array.concat([authData, clientDataHash]);
 
   return verifySignature({
