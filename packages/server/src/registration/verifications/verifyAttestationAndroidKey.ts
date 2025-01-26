@@ -148,6 +148,13 @@ export async function verifyAttestationAndroidKey(
       throw new Error(`${_err.message} (Android Key)`);
     }
 
+    /**
+     * Make sure the root certificate is one of the Google Hardware Attestation Root certificates
+     *
+     * https://developer.android.com/privacy-and-security/security-key-attestation#root_certificate
+     */
+    if (rootCertificates.length > 0 && rootCertificates.indexOf(x5cRootPEM[0]) < 0) {
+      throw new Error('x5c root certificate was not a known root certificate (Android Key)');
     }
   }
 
