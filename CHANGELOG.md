@@ -1,5 +1,14 @@
 # Changelog
 
+## v13.1.1
+
+**Changes:**
+
+- **[server]** `"android-key"` attestation statement verification has been modernized
+  ([#675](https://github.com/MasterKale/SimpleWebAuthn/pull/675))
+- **[server]** More TPM manufacturers are recognized while verifying `"tpm"` attestation statements
+  ([#673](https://github.com/MasterKale/SimpleWebAuthn/pull/673))
+
 ## v13.1.0
 
 **Changes:**
