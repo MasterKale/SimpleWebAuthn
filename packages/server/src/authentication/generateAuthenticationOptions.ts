@@ -56,7 +56,7 @@ export async function generateAuthenticationOptions(
     challenge: isoBase64URL.fromBuffer(_challenge),
     allowCredentials: allowCredentials?.map((cred) => {
       if (!isoBase64URL.isBase64URL(cred.id)) {
-        throw new Error(`excludeCredential id "${cred.id}" is not a valid base64url string`);
+        throw new Error(`allowCredential id "${cred.id}" is not a valid base64url string`);
       }
 
       return {
