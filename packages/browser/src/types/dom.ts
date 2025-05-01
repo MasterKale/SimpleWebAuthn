@@ -57,6 +57,11 @@ export interface AuthenticationExtensionsPRFInputs {
     evalByCredential?: Record<string, AuthenticationExtensionsPRFValues>;
 }
 
+export interface AuthenticationExtensionsPRFValues {
+    first: BufferSource;
+    second?: BufferSource;
+}
+
 export interface AuthenticationExtensionsPRFOutputs {
     enabled?: boolean;
     results?: AuthenticationExtensionsPRFValues;
