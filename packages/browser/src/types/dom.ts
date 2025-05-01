@@ -62,7 +62,6 @@ export interface AuthenticationExtensionsPRFOutputs {
     results?: AuthenticationExtensionsPRFValues;
 }
 
-
 export interface AuthenticationExtensionsClientOutputs {
     appid?: boolean;
     credProps?: CredentialPropertiesOutput;
