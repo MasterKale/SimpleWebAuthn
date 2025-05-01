@@ -50,12 +50,28 @@ export interface AuthenticationExtensionsClientInputs {
     credProps?: boolean;
     hmacCreateSecret?: boolean;
     minPinLength?: boolean;
+    prf?: AuthenticationExtensionsPRFInputs;
+}
+export interface AuthenticationExtensionsPRFInputs {
+    eval?: AuthenticationExtensionsPRFValues;
+    evalByCredential?: Record<string, AuthenticationExtensionsPRFValues>;
+}
+
+export interface AuthenticationExtensionsPRFValues {
+    first: BufferSource;
+    second?: BufferSource;
+}
+
+export interface AuthenticationExtensionsPRFOutputs {
+    enabled?: boolean;
+    results?: AuthenticationExtensionsPRFValues;
 }
 
 export interface AuthenticationExtensionsClientOutputs {
     appid?: boolean;
     credProps?: CredentialPropertiesOutput;
     hmacCreateSecret?: boolean;
+    prf?: AuthenticationExtensionsPRFOutputs;
 }
 
 export interface AuthenticatorSelectionCriteria {
