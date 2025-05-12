@@ -4,6 +4,13 @@ import { FakeTime } from '@std/testing/time';
 import { verifyRegistrationResponse } from '../../verifyRegistrationResponse.ts';
 
 Deno.test('should verify TPM response', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2018-02-01T00:00:00.000Z,
+  //   notAfter: 2025-01-31T23:59:59.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
+
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'SErwRhxIzjPowcnM3e-D-u89EQXLUe1NYewpshd7Mc0',
@@ -25,9 +32,18 @@ Deno.test('should verify TPM response', async () => {
   });
 
   assertEquals(verification.verified, true);
+
+  mockDate.restore();
 });
 
 Deno.test('should verify SHA1 TPM response', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2018-02-01T00:00:00.000Z,
+  //   notAfter: 2025-01-31T23:59:59.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
+
   /**
    * Generated on real hardware on 03/03/2020
    *
@@ -55,9 +71,18 @@ Deno.test('should verify SHA1 TPM response', async () => {
   });
 
   assertEquals(verification.verified, true);
+
+  mockDate.restore();
 });
 
 Deno.test('should verify SHA256 TPM response', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2018-02-01T00:00:00.000Z,
+  //   notAfter: 2025-01-31T23:59:59.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
+
   /**
    * Generated on real hardware on 03/03/2020
    *
@@ -85,9 +110,17 @@ Deno.test('should verify SHA256 TPM response', async () => {
   });
 
   assertEquals(verification.verified, true);
+
+  mockDate.restore();
 });
 
 Deno.test('should verify TPM response with spec-compliant tcgAtTpm SAN structure', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2020-08-27T15:12:30.000Z,
+  //   notAfter: 2025-03-21T20:29:15.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2025-03-20T00:00:42.000Z'));
   /**
    * Name [
    *   RelativeDistinguishedName [
@@ -121,6 +154,8 @@ Deno.test('should verify TPM response with spec-compliant tcgAtTpm SAN structure
   });
 
   assertEquals(verification.verified, true);
+
+  mockDate.restore();
 });
 
 Deno.test('should verify TPM response with non-spec-compliant tcgAtTpm SAN structure', async () => {

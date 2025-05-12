@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertFalse, assertObjectMatch, assertRejects } from '@std/assert';
 import { returnsNext, stub } from '@std/testing/mock';
+import { FakeTime } from '@std/testing/time';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse.ts';
 import type { RegistrationResponseJSON } from '../types/index.ts';
@@ -608,6 +609,13 @@ Deno.test(
 );
 
 Deno.test('should validate TPM RSA response (SHA256)', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2018-02-01T00:00:00.000Z,
+  //   notAfter: 2025-01-31T23:59:59.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
+
   const expectedChallenge = '3a07cf85-e7b6-447f-8270-b25433f6018e';
   const verification = await verifyRegistrationResponse({
     response: {
@@ -647,9 +655,18 @@ Deno.test('should validate TPM RSA response (SHA256)', async () => {
     'https://dev.dontneeda.pw',
   );
   assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
+
+  mockDate.restore();
 });
 
 Deno.test('should validate TPM RSA response (SHA1)', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2018-02-01T00:00:00.000Z,
+  //   notAfter: 2025-01-31T23:59:59.000Z
+  // }
+  const mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
+
   const expectedChallenge = 'f4e8d87b-d363-47cc-ab4d-1a84647bf245';
   const verification = await verifyRegistrationResponse({
     response: {
@@ -689,6 +706,8 @@ Deno.test('should validate TPM RSA response (SHA1)', async () => {
     'https://dev.dontneeda.pw',
   );
   assertEquals(verification.registrationInfo?.rpID, 'dev.dontneeda.pw');
+
+  mockDate.restore();
 });
 
 Deno.test('should validate Android-Key response', async () => {

@@ -121,7 +121,7 @@ Deno.test('should throw error when timestamp is not within one minute of now', a
   );
 });
 
-Deno.test('should validate response with cert path completed with GlobalSign R1 root cert', async () => {
+Deno.test('should reject when a revoked certificate is found', async () => {
   const {
     aaguid,
     attStmt,
@@ -151,19 +151,22 @@ Deno.test('should validate response with cert path completed with GlobalSign R1 
   // }
   const mockDate = new FakeTime(new Date('2021-10-15T00:00:42.000Z'));
 
-  const verified = await verifyAttestationAndroidSafetyNet({
-    attStmt,
-    authData,
-    clientDataHash,
-    verifyTimestampMS: false,
-    aaguid,
-    rootCertificates,
-    credentialID,
-    credentialPublicKey,
-    rpIdHash,
-  });
-
-  assert(verified);
+  await assertRejects(
+    () =>
+      verifyAttestationAndroidSafetyNet({
+        attStmt,
+        authData,
+        clientDataHash,
+        verifyTimestampMS: false,
+        aaguid,
+        rootCertificates,
+        credentialID,
+        credentialPublicKey,
+        rpIdHash,
+      }),
+    Error,
+    'revoked certificate',
+  );
 
   mockDate.restore();
 });
