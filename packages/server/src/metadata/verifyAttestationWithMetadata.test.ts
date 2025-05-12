@@ -1,11 +1,11 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
 
 import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata.ts';
 import type { MetadataStatement } from '../metadata/mdsTypes.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 
-Deno.test('should verify attestation with metadata (android-safetynet)', async () => {
+Deno.test('should not verify attestation with revoked certificate in metadata (android-safetynet)', async () => {
   // Faking time to something that'll satisfy all of these ranges:
   // {
   //   notBefore: 2022-01-25T10:00:34.000Z,
@@ -69,13 +69,16 @@ Deno.test('should verify attestation with metadata (android-safetynet)', async (
   const credentialPublicKey =
     'pQECAyYgASFYIAKH2NrGZT-lUEA3tbBXR9owjW_7OnA1UqoL1UuKY_VCIlggpjeOH0xyBCpGDya55JLXXKrzyOieQN3dvG1pV-Qs-Gs';
 
-  const verified = await verifyAttestationWithMetadata({
-    statement: metadataStatementJSONSafetyNet,
-    credentialPublicKey: isoBase64URL.toBuffer(credentialPublicKey),
-    x5c,
-  });
-
-  assertEquals(verified, true);
+  await assertRejects(
+    () =>
+      verifyAttestationWithMetadata({
+        statement: metadataStatementJSONSafetyNet,
+        credentialPublicKey: isoBase64URL.toBuffer(credentialPublicKey),
+        x5c,
+      }),
+    Error,
+    'revoked certificate',
+  );
 
   fakedNow.restore();
 });
@@ -201,6 +204,16 @@ Deno.test('should not validate certificate path when authenticator is self-refer
 });
 
 Deno.test('should verify idmelon attestation with updated root certificate', async () => {
+  // Faking time to something that'll satisfy all of these ranges:
+  // {
+  //   notBefore: 2018-12-22T17:43:28.000Z,
+  //   notAfter: 2068-12-09T17:43:28.000Z
+  // }
+  // {
+  //   notBefore: 2022-12-14T18:41:09.000Z,
+  //   notAfter: 2072-12-01T18:41:09.000Z
+  // }
+  // const mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
   /**
    * See https://github.com/MasterKale/SimpleWebAuthn/issues/302 for more context, basically
    * IDmelon's root cert in FIDO MDS was missing an extension. I worked with IDmelon to generate a
