@@ -46,6 +46,7 @@ export type {
   PublicKeyCredentialRpEntity,
   PublicKeyCredentialType,
   PublicKeyCredentialUserEntity,
+  ResidentKeyRequirement,
   UserVerificationRequirement,
 } from './dom.ts';
 
