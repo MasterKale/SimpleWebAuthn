@@ -1,5 +1,12 @@
 # Changelog
 
+## v13.1.2
+
+**Changes**
+
+- **[browser] [server]** Exported the `ResidentKeyRequirement` type to help with type inference
+  ([#704](https://github.com/MasterKale/SimpleWebAuthn/pull/704))
+
 ## v13.1.1
 
 **Changes:**
