@@ -40,6 +40,7 @@ const types = [
   'PublicKeyCredentialParameters',
   'PublicKeyCredentialRequestOptions',
   'PublicKeyCredentialUserEntity',
+  'ResidentKeyRequirement',
   'UserVerificationRequirement',
 ];
 

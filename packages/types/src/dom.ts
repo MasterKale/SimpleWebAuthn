@@ -351,9 +351,9 @@ export interface RsaKeyGenParams extends Algorithm {
 export type AttestationConveyancePreference = "direct" | "enterprise" | "indirect" | "none";
 export type AuthenticatorTransport = "ble" | "hybrid" | "internal" | "nfc" | "usb";
 export type COSEAlgorithmIdentifier = number;
+export type ResidentKeyRequirement = "discouraged" | "preferred" | "required";
 export type UserVerificationRequirement = "discouraged" | "preferred" | "required";
 export type AuthenticatorAttachment = "cross-platform" | "platform";
-export type ResidentKeyRequirement = "discouraged" | "preferred" | "required";
 export type BufferSource = ArrayBufferView | ArrayBuffer;
 export type PublicKeyCredentialType = "public-key";
 export type AlgorithmIdentifier = Algorithm | string;
