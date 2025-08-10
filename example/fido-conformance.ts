@@ -1,6 +1,5 @@
 import fs from 'fs';
 import express from 'express';
-import fetch from 'node-fetch';
 
 import {
   AuthenticationResponseJSON,
