@@ -275,36 +275,39 @@ export async function verifyRegistrationResponse(
     throw new Error(`Unsupported Attestation Format: ${fmt}`);
   }
 
-  const toReturn: VerifiedRegistrationResponse = {
-    verified,
-  };
-
-  if (toReturn.verified) {
-    const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(
-      flags,
-    );
-
-    toReturn.registrationInfo = {
-      fmt,
-      aaguid: convertAAGUIDToString(aaguid),
-      credentialType,
-      credential: {
-        id: isoBase64URL.fromBuffer(credentialID),
-        publicKey: credentialPublicKey,
-        counter,
-        transports: response.response.transports,
-      },
-      attestationObject,
-      userVerified: flags.uv,
-      credentialDeviceType,
-      credentialBackedUp,
-      origin: clientDataJSON.origin,
-      rpID: matchedRPID,
-      authenticatorExtensionResults: extensionsData,
+  if (!verified) {
+    return {
+      verified,
     };
   }
 
-  return toReturn;
+  const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(
+    flags,
+  );
+
+  const registrationInfo = {
+    fmt,
+    aaguid: convertAAGUIDToString(aaguid),
+    credentialType,
+    credential: {
+      id: isoBase64URL.fromBuffer(credentialID),
+      publicKey: credentialPublicKey,
+      counter,
+      transports: response.response.transports,
+    },
+    attestationObject,
+    userVerified: flags.uv,
+    credentialDeviceType,
+    credentialBackedUp,
+    origin: clientDataJSON.origin,
+    rpID: matchedRPID,
+    authenticatorExtensionResults: extensionsData,
+  };
+
+  return {
+    verified,
+    registrationInfo,
+  };
 }
 
 /**
@@ -333,9 +336,9 @@ export async function verifyRegistrationResponse(
  * @param registrationInfo?.authenticatorExtensionResults The authenticator extensions returned
  * by the browser
  */
-export type VerifiedRegistrationResponse = {
-  verified: boolean;
-  registrationInfo?: {
+export type VerifiedRegistrationResponse = { verified: false; registrationInfo?: never } | {
+  verified: true;
+  registrationInfo: {
     fmt: AttestationFormat;
     aaguid: string;
     credential: WebAuthnCredential;
