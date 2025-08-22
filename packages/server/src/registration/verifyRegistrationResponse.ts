@@ -275,16 +275,15 @@ export async function verifyRegistrationResponse(
     throw new Error(`Unsupported Attestation Format: ${fmt}`);
   }
 
-  const toReturn: VerifiedRegistrationResponse = {
-    verified,
-  };
+  if (!verified) {
+    return { verified: false };
+  }
 
-  if (toReturn.verified) {
-    const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(
-      flags,
-    );
+  const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
 
-    toReturn.registrationInfo = {
+  return {
+    verified: true,
+    registrationInfo: {
       fmt,
       aaguid: convertAAGUIDToString(aaguid),
       credentialType,
@@ -301,10 +300,8 @@ export async function verifyRegistrationResponse(
       origin: clientDataJSON.origin,
       rpID: matchedRPID,
       authenticatorExtensionResults: extensionsData,
-    };
-  }
-
-  return toReturn;
+    },
+  };
 }
 
 /**
