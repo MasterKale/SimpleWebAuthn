@@ -334,8 +334,11 @@ export async function verifyRegistrationResponse(
  * by the browser
  */
 export type VerifiedRegistrationResponse = {
-  verified: boolean;
-  registrationInfo?: {
+  verified: false;
+  registrationInfo?: never;
+} | {
+  verified: true;
+  registrationInfo: {
     fmt: AttestationFormat;
     aaguid: string;
     credential: WebAuthnCredential;
