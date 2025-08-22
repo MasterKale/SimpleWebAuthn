@@ -175,7 +175,7 @@ export interface AuthenticatorAssertionResponseJSON {
  */
 export type WebAuthnCredential = {
   id: Base64URLString;
-  publicKey: Uint8Array;
+  publicKey: Uint8Array_;
   // Number of times this authenticator is expected to have been used
   counter: number;
   // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
