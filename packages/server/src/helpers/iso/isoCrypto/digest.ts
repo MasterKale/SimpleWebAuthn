@@ -1,6 +1,7 @@
-import { COSEALG } from '../../cose.ts';
+import type { COSEALG } from '../../cose.ts';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
 import { getWebCrypto } from './getWebCrypto.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 /**
  * Generate a digest of the provided data.
@@ -9,9 +10,9 @@ import { getWebCrypto } from './getWebCrypto.ts';
  * @param algorithm A COSE algorithm ID that maps to a desired SHA algorithm
  */
 export async function digest(
-  data: Uint8Array,
+  data: Uint8Array_,
   algorithm: COSEALG,
-): Promise<Uint8Array> {
+): Promise<Uint8Array_> {
   const WebCrypto = await getWebCrypto();
 
   const subtleAlgorithm = mapCoseAlgToWebCryptoAlg(algorithm);

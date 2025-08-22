@@ -1,7 +1,8 @@
 import { AsnParser, OctetString } from '@peculiar/asn1-schema';
-import { Extensions } from '@peculiar/asn1-x509';
+import type { Extensions } from '@peculiar/asn1-x509';
 
 import { isoUint8Array } from './iso/index.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Attestation Certificate Extension OID: `id-fido-gen-ce-aaguid`
@@ -16,7 +17,7 @@ const id_fido_gen_ce_aaguid = '1.3.6.1.4.1.45724.1.1.4';
  */
 export function validateExtFIDOGenCEAAGUID(
   certExtensions: Extensions | undefined,
-  aaguid: Uint8Array,
+  aaguid: Uint8Array_,
 ): boolean {
   // The certificate had no extensions so there's nothing to validate
   if (!certExtensions) {

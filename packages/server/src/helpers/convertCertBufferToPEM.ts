@@ -1,11 +1,11 @@
-import type { Base64URLString } from '../types/index.ts';
+import type { Base64URLString, Uint8Array_ } from '../types/index.ts';
 import { isoBase64URL } from './iso/index.ts';
 
 /**
  * Convert buffer to an OpenSSL-compatible PEM text format.
  */
 export function convertCertBufferToPEM(
-  certBuffer: Uint8Array | Base64URLString,
+  certBuffer: Uint8Array_ | Base64URLString,
 ): string {
   let b64cert: string;
 

@@ -1,8 +1,9 @@
-import { COSEPublicKey } from './cose.ts';
+import type { COSEPublicKey } from './cose.ts';
 import { isoCBOR } from './iso/index.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 export function decodeCredentialPublicKey(
-  publicKey: Uint8Array,
+  publicKey: Uint8Array_,
 ): COSEPublicKey {
   return _decodeCredentialPublicKeyInternals.stubThis(
     isoCBOR.decodeFirst<COSEPublicKey>(publicKey),

@@ -1,3 +1,5 @@
+import type { Uint8Array_ } from '../../types/index.ts';
+
 /**
  * A runtime-agnostic collection of methods for working with Uint8Arrays
  * @module
@@ -6,7 +8,7 @@
 /**
  * Make sure two Uint8Arrays are deeply equivalent
  */
-export function areEqual(array1: Uint8Array, array2: Uint8Array): boolean {
+export function areEqual(array1: Uint8Array_, array2: Uint8Array_): boolean {
   if (array1.length != array2.length) {
     return false;
   }
@@ -19,7 +21,7 @@ export function areEqual(array1: Uint8Array, array2: Uint8Array): boolean {
  *
  * A replacement for `Buffer.toString('hex')`
  */
-export function toHex(array: Uint8Array): string {
+export function toHex(array: Uint8Array_): string {
   const hexParts = Array.from(array, (i) => i.toString(16).padStart(2, '0'));
 
   // adce000235bcc60a648b0b25f1f05503
@@ -31,7 +33,7 @@ export function toHex(array: Uint8Array): string {
  *
  * A replacement for `Buffer.from('...', 'hex')`
  */
-export function fromHex(hex: string): Uint8Array {
+export function fromHex(hex: string): Uint8Array_ {
   if (!hex) {
     return Uint8Array.from([]);
   }
@@ -51,7 +53,7 @@ export function fromHex(hex: string): Uint8Array {
 /**
  * Combine multiple Uint8Arrays into a single Uint8Array
  */
-export function concat(arrays: Uint8Array[]): Uint8Array {
+export function concat(arrays: Uint8Array_[]): Uint8Array_ {
   let pointer = 0;
   const totalLength = arrays.reduce((prev, curr) => prev + curr.length, 0);
 
@@ -68,7 +70,7 @@ export function concat(arrays: Uint8Array[]): Uint8Array {
 /**
  * Convert bytes into a UTF-8 string
  */
-export function toUTF8String(array: Uint8Array): string {
+export function toUTF8String(array: Uint8Array_): string {
   const decoder = new globalThis.TextDecoder('utf-8');
   return decoder.decode(array);
 }
@@ -76,21 +78,21 @@ export function toUTF8String(array: Uint8Array): string {
 /**
  * Convert a UTF-8 string back into bytes
  */
-export function fromUTF8String(utf8String: string): Uint8Array {
+export function fromUTF8String(utf8String: string): Uint8Array_ {
   const encoder = new globalThis.TextEncoder();
-  return encoder.encode(utf8String);
+  return encoder.encode(utf8String) as Uint8Array_;
 }
 
 /**
  * Convert an ASCII string to Uint8Array
  */
-export function fromASCIIString(value: string): Uint8Array {
+export function fromASCIIString(value: string): Uint8Array_ {
   return Uint8Array.from(value.split('').map((x) => x.charCodeAt(0)));
 }
 
 /**
  * Prepare a DataView we can slice our way around in as we parse the bytes in a Uint8Array
  */
-export function toDataView(array: Uint8Array): DataView {
+export function toDataView(array: Uint8Array_): DataView {
   return new DataView(array.buffer, array.byteOffset, array.length);
 }

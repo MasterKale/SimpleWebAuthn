@@ -1,7 +1,7 @@
 import {
-  COSEALG,
+  type COSEALG,
   COSEKEYS,
-  COSEPublicKey,
+  type COSEPublicKey,
   isCOSECrv,
   isCOSEPublicKeyEC2,
   isCOSEPublicKeyOKP,
@@ -11,14 +11,15 @@ import { verifyEC2 } from './verifyEC2.ts';
 import { verifyRSA } from './verifyRSA.ts';
 import { verifyOKP } from './verifyOKP.ts';
 import { unwrapEC2Signature } from './unwrapEC2Signature.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 /**
  * Verify signatures with their public key. Supports EC2 and RSA public keys.
  */
 export function verify(opts: {
   cosePublicKey: COSEPublicKey;
-  signature: Uint8Array;
-  data: Uint8Array;
+  signature: Uint8Array_;
+  data: Uint8Array_;
   shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;

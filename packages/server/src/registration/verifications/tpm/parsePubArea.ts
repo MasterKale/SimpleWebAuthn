@@ -1,5 +1,6 @@
 import { TPM_ALG, TPM_ECC_CURVE } from './constants.ts';
 import { isoUint8Array } from '../../../helpers/iso/index.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 /**
  * Break apart a TPM attestation's pubArea buffer
@@ -7,7 +8,7 @@ import { isoUint8Array } from '../../../helpers/iso/index.ts';
  * See 12.2.4 TPMT_PUBLIC here:
  * https://trustedcomputinggroup.org/wp-content/uploads/TPM-Rev-2.0-Part-2-Structures-00.96-130315.pdf
  */
-export function parsePubArea(pubArea: Uint8Array): ParsedPubArea {
+export function parsePubArea(pubArea: Uint8Array_): ParsedPubArea {
   let pointer = 0;
   const dataView = isoUint8Array.toDataView(pubArea);
 
@@ -130,12 +131,12 @@ type ParsedPubArea = {
     decrypt: boolean;
     signOrEncrypt: boolean;
   };
-  authPolicy: Uint8Array;
+  authPolicy: Uint8Array_;
   parameters: {
     rsa?: RSAParameters;
     ecc?: ECCParameters;
   };
-  unique: Uint8Array;
+  unique: Uint8Array_;
 };
 
 type RSAParameters = {

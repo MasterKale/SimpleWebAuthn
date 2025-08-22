@@ -7,6 +7,7 @@ import type {
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialHint,
   PublicKeyCredentialParameters,
+  Uint8Array_,
 } from '../types/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 import { generateUserID } from '../helpers/generateUserID.ts';
@@ -86,8 +87,8 @@ export async function generateRegistrationOptions(
     rpName: string;
     rpID: string;
     userName: string;
-    userID?: Uint8Array;
-    challenge?: string | Uint8Array;
+    userID?: Uint8Array_;
+    challenge?: string | Uint8Array_;
     userDisplayName?: string;
     timeout?: number;
     attestationType?: 'direct' | 'enterprise' | 'none';

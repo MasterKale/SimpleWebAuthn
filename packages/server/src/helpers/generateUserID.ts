@@ -1,9 +1,10 @@
 import { isoCrypto } from './iso/index.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Generate a suitably random value to be used as user ID
  */
-export async function generateUserID(): Promise<Uint8Array> {
+export async function generateUserID(): Promise<Uint8Array_> {
   /**
    * WebAuthn spec says user.id has a max length of 64 bytes. I prefer how 32 random bytes look
    * after they're base64url-encoded so I'm choosing to go with that here.
@@ -20,5 +21,5 @@ export async function generateUserID(): Promise<Uint8Array> {
  * @ignore Don't include this in docs output
  */
 export const _generateUserIDInternals = {
-  stubThis: (value: Uint8Array) => value,
+  stubThis: (value: Uint8Array_) => value,
 };

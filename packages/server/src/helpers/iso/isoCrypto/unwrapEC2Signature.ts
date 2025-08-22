@@ -3,13 +3,14 @@ import { ECDSASigValue } from '@peculiar/asn1-ecc';
 
 import { COSECRV } from '../../cose.ts';
 import { isoUint8Array } from '../index.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 /**
  * In WebAuthn, EC2 signatures are wrapped in ASN.1 structure so we need to peel r and s apart.
  *
  * See https://www.w3.org/TR/webauthn-2/#sctn-signature-attestation-types
  */
-export function unwrapEC2Signature(signature: Uint8Array, crv: COSECRV): Uint8Array {
+export function unwrapEC2Signature(signature: Uint8Array_, crv: COSECRV): Uint8Array_ {
   const parsedSignature = AsnParser.parse(signature, ECDSASigValue);
   const rBytes = new Uint8Array(parsedSignature.r);
   const sBytes = new Uint8Array(parsedSignature.s);
@@ -58,7 +59,7 @@ function getSignatureComponentLength(crv: COSECRV): number {
  * See <https://www.itu.int/rec/T-REC-X.690-202102-I/en>
  * See <https://www.w3.org/TR/WebCryptoAPI/#ecdsa-operations>
  */
-function toNormalizedBytes(bytes: Uint8Array, componentLength: number): Uint8Array {
+function toNormalizedBytes(bytes: Uint8Array_, componentLength: number): Uint8Array_ {
   let normalizedBytes;
   if (bytes.length < componentLength) {
     // In case the bytes are shorter than expected, we need to pad it with leading `0`s.

@@ -11,6 +11,7 @@ import { SettingsService } from '../services/settingsService.ts';
 import { getLogger } from '../helpers/logging.ts';
 import { convertPEMToBytes } from '../helpers/convertPEMToBytes.ts';
 import { fetch } from '../helpers/fetch.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 import { parseJWT } from '../metadata/parseJWT.ts';
 import { verifyJWT } from '../metadata/verifyJWT.ts';
@@ -153,7 +154,7 @@ export class BaseMetadataService implements MetadataService {
   }
 
   async getStatement(
-    aaguid: string | Uint8Array,
+    aaguid: string | Uint8Array_,
   ): Promise<MetadataStatement | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
       return;

@@ -2,6 +2,7 @@ import type {
   COSEAlgorithmIdentifier,
   CredentialDeviceType,
   RegistrationResponseJSON,
+  Uint8Array_,
   WebAuthnCredential,
 } from '../types/index.ts';
 import {
@@ -340,7 +341,7 @@ export type VerifiedRegistrationResponse = {
     aaguid: string;
     credential: WebAuthnCredential;
     credentialType: 'public-key';
-    attestationObject: Uint8Array;
+    attestationObject: Uint8Array_;
     userVerified: boolean;
     credentialDeviceType: CredentialDeviceType;
     credentialBackedUp: boolean;
@@ -354,13 +355,13 @@ export type VerifiedRegistrationResponse = {
  * Values passed to all attestation format verifiers, from which they are free to use as they please
  */
 export type AttestationFormatVerifierOpts = {
-  aaguid: Uint8Array;
+  aaguid: Uint8Array_;
   attStmt: AttestationStatement;
-  authData: Uint8Array;
-  clientDataHash: Uint8Array;
-  credentialID: Uint8Array;
-  credentialPublicKey: Uint8Array;
+  authData: Uint8Array_;
+  clientDataHash: Uint8Array_;
+  credentialID: Uint8Array_;
+  credentialPublicKey: Uint8Array_;
   rootCertificates: string[];
-  rpIdHash: Uint8Array;
+  rpIdHash: Uint8Array_;
   verifyTimestampMS?: boolean;
 };

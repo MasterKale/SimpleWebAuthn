@@ -3,6 +3,7 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { COSEALG, COSEKEYS, isCOSEPublicKeyEC2, isCOSEPublicKeyRSA } from '../helpers/cose.ts';
 import { verifyEC2 } from '../helpers/iso/isoCrypto/verifyEC2.ts';
 import { verifyRSA } from '../helpers/iso/isoCrypto/verifyRSA.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Lightweight verification for FIDO MDS JWTs. Supports use of EC2 and RSA.
@@ -13,7 +14,7 @@ import { verifyRSA } from '../helpers/iso/isoCrypto/verifyRSA.ts';
  *
  * (Pulled from https://www.rfc-editor.org/rfc/rfc7515#section-4.1.1)
  */
-export function verifyJWT(jwt: string, leafCert: Uint8Array): Promise<boolean> {
+export function verifyJWT(jwt: string, leafCert: Uint8Array_): Promise<boolean> {
   const [header, payload, signature] = jwt.split('.');
 
   const certCOSE = convertX509PublicKeyToCOSE(leafCert);

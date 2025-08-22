@@ -1,5 +1,6 @@
 import { toHash } from './toHash.ts';
 import { isoUint8Array } from './iso/index.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Returns the unhashed RP ID
@@ -8,7 +9,7 @@ import { isoUint8Array } from './iso/index.ts';
  * Raises an `UnexpectedRPIDHash` error if no match is found
  */
 export async function matchExpectedRPID(
-  rpIDHash: Uint8Array,
+  rpIDHash: Uint8Array_,
   expectedRPIDs: string[],
 ): Promise<string> {
   try {

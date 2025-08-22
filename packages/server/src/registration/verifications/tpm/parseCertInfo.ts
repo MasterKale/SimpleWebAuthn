@@ -1,10 +1,11 @@
 import { TPM_ALG, TPM_ST } from './constants.ts';
 import { isoUint8Array } from '../../../helpers/iso/index.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 /**
  * Cut up a TPM attestation's certInfo into intelligible chunks
  */
-export function parseCertInfo(certInfo: Uint8Array): ParsedCertInfo {
+export function parseCertInfo(certInfo: Uint8Array_): ParsedCertInfo {
   let pointer = 0;
   const dataView = isoUint8Array.toDataView(certInfo);
 
@@ -75,19 +76,19 @@ export function parseCertInfo(certInfo: Uint8Array): ParsedCertInfo {
 type ParsedCertInfo = {
   magic: number;
   type: string;
-  qualifiedSigner: Uint8Array;
-  extraData: Uint8Array;
+  qualifiedSigner: Uint8Array_;
+  extraData: Uint8Array_;
   clockInfo: {
-    clock: Uint8Array;
+    clock: Uint8Array_;
     resetCount: number;
     restartCount: number;
     safe: boolean;
   };
-  firmwareVersion: Uint8Array;
+  firmwareVersion: Uint8Array_;
   attested: {
     nameAlg: string;
-    nameAlgBuffer: Uint8Array;
-    name: Uint8Array;
-    qualifiedName: Uint8Array;
+    nameAlgBuffer: Uint8Array_;
+    name: Uint8Array_;
+    qualifiedName: Uint8Array_;
   };
 };

@@ -1,13 +1,14 @@
-import { COSECRV, COSEKEYS, COSEPublicKeyOKP, isCOSEAlg } from '../../cose.ts';
+import { COSECRV, COSEKEYS, type COSEPublicKeyOKP, isCOSEAlg } from '../../cose.ts';
 import { isoBase64URL } from '../../index.ts';
-import { SubtleCryptoCrv } from './structs.ts';
+import type { SubtleCryptoCrv } from './structs.ts';
 import { importKey } from './importKey.ts';
 import { getWebCrypto } from './getWebCrypto.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 export async function verifyOKP(opts: {
   cosePublicKey: COSEPublicKeyOKP;
-  signature: Uint8Array;
-  data: Uint8Array;
+  signature: Uint8Array_;
+  data: Uint8Array_;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data } = opts;
 

@@ -3,6 +3,7 @@ import type {
   AuthenticatorTransportFuture,
   Base64URLString,
   PublicKeyCredentialRequestOptionsJSON,
+  Uint8Array_,
 } from '../types/index.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
@@ -28,7 +29,7 @@ export async function generateAuthenticationOptions(
       id: Base64URLString;
       transports?: AuthenticatorTransportFuture[];
     }[];
-    challenge?: string | Uint8Array;
+    challenge?: string | Uint8Array_;
     timeout?: number;
     userVerification?: 'required' | 'preferred' | 'discouraged';
     extensions?: AuthenticationExtensionsClientInputs;

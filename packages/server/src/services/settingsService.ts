@@ -1,5 +1,6 @@
 import type { AttestationFormat } from '../helpers/decodeAttestationObject.ts';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
 import {
@@ -23,7 +24,7 @@ interface SettingsService {
    */
   setRootCertificates(opts: {
     identifier: RootCertIdentifier;
-    certificates: (Uint8Array | string)[];
+    certificates: (Uint8Array_ | string)[];
   }): void;
 
   /**
@@ -42,7 +43,7 @@ class BaseSettingsService implements SettingsService {
 
   setRootCertificates(opts: {
     identifier: RootCertIdentifier;
-    certificates: (Uint8Array | string)[];
+    certificates: (Uint8Array_ | string)[];
   }): void {
     const { identifier, certificates } = opts;
 

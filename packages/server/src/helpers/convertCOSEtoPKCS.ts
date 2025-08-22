@@ -1,10 +1,11 @@
 import { isoCBOR, isoUint8Array } from './iso/index.ts';
-import { COSEKEYS, COSEPublicKeyEC2 } from './cose.ts';
+import { COSEKEYS, type COSEPublicKeyEC2 } from './cose.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Takes COSE-encoded public key and converts it to PKCS key
  */
-export function convertCOSEtoPKCS(cosePublicKey: Uint8Array): Uint8Array {
+export function convertCOSEtoPKCS(cosePublicKey: Uint8Array_): Uint8Array_ {
   // This is a little sloppy, I'm using COSEPublicKeyEC2 since it could have both x and y, but when
   // there's no y it means it's probably better typed as COSEPublicKeyOKP. I'll leave this for now
   // and revisit it later if it ever becomes an actual problem.

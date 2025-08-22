@@ -10,6 +10,7 @@ import {
   COSEKTY,
   isCOSEPublicKeyEC2,
 } from '../helpers/cose.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Match properties of the authenticator's attestation statement against expected values as
@@ -22,8 +23,8 @@ export async function verifyAttestationWithMetadata({
   attestationStatementAlg,
 }: {
   statement: MetadataStatement;
-  credentialPublicKey: Uint8Array;
-  x5c: Uint8Array[] | Base64URLString[];
+  credentialPublicKey: Uint8Array_;
+  x5c: Uint8Array_[] | Base64URLString[];
   attestationStatementAlg?: number;
 }): Promise<boolean> {
   const {
