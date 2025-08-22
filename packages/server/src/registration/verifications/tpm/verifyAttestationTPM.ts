@@ -4,7 +4,7 @@ import {
   ExtendedKeyUsage,
   id_ce_extKeyUsage,
   id_ce_subjectAltName,
-  Name,
+  type Name,
   SubjectAlternativeName,
 } from '@peculiar/asn1-x509';
 
@@ -26,6 +26,7 @@ import { isoUint8Array } from '../../../helpers/iso/index.ts';
 import { validateExtFIDOGenCEAAGUID } from '../../../helpers/validateExtFIDOGenCEAAGUID.ts';
 import { MetadataService } from '../../../services/metadataService.ts';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 import { TPM_ECC_CURVE_COSE_CRV_MAP, TPM_MANUFACTURERS } from './constants.ts';
 import { parseCertInfo } from './parseCertInfo.ts';
@@ -124,7 +125,7 @@ export async function verifyAttestationTPM(
       );
     }
 
-    const eBuffer = e as Uint8Array;
+    const eBuffer = e as Uint8Array_;
     // If `exponent` is equal to 0x00, then exponent is the default RSA exponent of 2^16+1 (65537)
     const pubAreaExponent = parameters.rsa.exponent || 65537;
 

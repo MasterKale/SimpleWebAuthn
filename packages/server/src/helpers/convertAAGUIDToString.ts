@@ -1,9 +1,10 @@
 import { isoUint8Array } from './iso/index.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Convert the aaguid buffer in authData into a UUID string
  */
-export function convertAAGUIDToString(aaguid: Uint8Array): string {
+export function convertAAGUIDToString(aaguid: Uint8Array_): string {
   // Raw Hex: adce000235bcc60a648b0b25f1f05503
   const hex = isoUint8Array.toHex(aaguid);
 

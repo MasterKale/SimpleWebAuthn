@@ -1,15 +1,16 @@
 import {
-  AuthenticationExtensionsAuthenticatorOutputs,
+  type AuthenticationExtensionsAuthenticatorOutputs,
   decodeAuthenticatorExtensions,
 } from './decodeAuthenticatorExtensions.ts';
 import { isoCBOR, isoUint8Array } from './iso/index.ts';
-import { COSEPublicKey } from './cose.ts';
+import type { COSEPublicKey } from './cose.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Make sense of the authData buffer contained in an Attestation
  */
 export function parseAuthenticatorData(
-  authData: Uint8Array,
+  authData: Uint8Array_,
 ): ParsedAuthenticatorData {
   if (authData.byteLength < 37) {
     throw new Error(
@@ -41,9 +42,9 @@ export function parseAuthenticatorData(
   const counter = dataView.getUint32(pointer, false);
   pointer += 4;
 
-  let aaguid: Uint8Array | undefined = undefined;
-  let credentialID: Uint8Array | undefined = undefined;
-  let credentialPublicKey: Uint8Array | undefined = undefined;
+  let aaguid: Uint8Array_ | undefined = undefined;
+  let credentialID: Uint8Array_ | undefined = undefined;
+  let credentialPublicKey: Uint8Array_ | undefined = undefined;
 
   if (flags.at) {
     aaguid = authData.slice(pointer, pointer += 16);
@@ -99,7 +100,7 @@ export function parseAuthenticatorData(
   }
 
   let extensionsData: AuthenticationExtensionsAuthenticatorOutputs | undefined = undefined;
-  let extensionsDataBuffer: Uint8Array | undefined = undefined;
+  let extensionsDataBuffer: Uint8Array_ | undefined = undefined;
 
   if (flags.ed) {
     /**
@@ -133,8 +134,8 @@ export function parseAuthenticatorData(
 }
 
 export type ParsedAuthenticatorData = {
-  rpIdHash: Uint8Array;
-  flagsBuf: Uint8Array;
+  rpIdHash: Uint8Array_;
+  flagsBuf: Uint8Array_;
   flags: {
     up: boolean;
     uv: boolean;
@@ -145,12 +146,12 @@ export type ParsedAuthenticatorData = {
     flagsInt: number;
   };
   counter: number;
-  counterBuf: Uint8Array;
-  aaguid?: Uint8Array;
-  credentialID?: Uint8Array;
-  credentialPublicKey?: Uint8Array;
+  counterBuf: Uint8Array_;
+  aaguid?: Uint8Array_;
+  credentialID?: Uint8Array_;
+  credentialPublicKey?: Uint8Array_;
   extensionsData?: AuthenticationExtensionsAuthenticatorOutputs;
-  extensionsDataBuffer?: Uint8Array;
+  extensionsDataBuffer?: Uint8Array_;
 };
 
 /**

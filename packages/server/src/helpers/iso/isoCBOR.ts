@@ -4,6 +4,8 @@
  */
 import * as tinyCbor from 'tiny-cbor';
 
+import type { Uint8Array_ } from '../../types/index.ts';
+
 /**
  * Whatever CBOR encoder is used should keep CBOR data the same length when data is re-encoded
  *
@@ -22,7 +24,7 @@ import * as tinyCbor from 'tiny-cbor';
  * @param asObject (optional) Whether to convert any CBOR Maps into JavaScript Objects. Defaults to
  * `false`
  */
-export function decodeFirst<Type>(input: Uint8Array): Type {
+export function decodeFirst<Type>(input: Uint8Array_): Type {
   // Make a copy so we don't mutate the original
   const _input = new Uint8Array(input);
   const decoded = tinyCbor.decodePartialCBOR(_input, 0) as [Type, number];
@@ -35,6 +37,6 @@ export function decodeFirst<Type>(input: Uint8Array): Type {
 /**
  * Encode data to CBOR
  */
-export function encode(input: tinyCbor.CBORType): Uint8Array {
-  return tinyCbor.encodeCBOR(input);
+export function encode(input: tinyCbor.CBORType): Uint8Array_ {
+  return tinyCbor.encodeCBOR(input) as Uint8Array_;
 }

@@ -1,9 +1,10 @@
 import { isoCrypto } from './iso/index.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Generate a suitably random value to be used as an attestation or assertion challenge
  */
-export async function generateChallenge(): Promise<Uint8Array> {
+export async function generateChallenge(): Promise<Uint8Array_> {
   /**
    * WebAuthn spec says that 16 bytes is a good minimum:
    *
@@ -24,5 +25,5 @@ export async function generateChallenge(): Promise<Uint8Array> {
  * @ignore Don't include this in docs output
  */
 export const _generateChallengeInternals = {
-  stubThis: (value: Uint8Array) => value,
+  stubThis: (value: Uint8Array_) => value,
 };

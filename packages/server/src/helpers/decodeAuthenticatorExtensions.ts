@@ -1,4 +1,5 @@
 import { isoCBOR } from './iso/index.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Convert authenticator extension data buffer to a proper object
@@ -6,7 +7,7 @@ import { isoCBOR } from './iso/index.ts';
  * @param extensionData Authenticator Extension Data buffer
  */
 export function decodeAuthenticatorExtensions(
-  extensionData: Uint8Array,
+  extensionData: Uint8Array_,
 ): AuthenticationExtensionsAuthenticatorOutputs | undefined {
   let toCBOR: Map<string, unknown>;
   try {

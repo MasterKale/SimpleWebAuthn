@@ -82,7 +82,7 @@ request new features, or to suggest changes to existing features.
 
 Install the following before proceeding:
 
-- **Deno v2.1.x**
+- **Deno v2.4.x**
 
 After pulling down the code, set up dependencies:
 

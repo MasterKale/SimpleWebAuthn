@@ -1,17 +1,18 @@
-import { COSEALG, COSEKEYS, COSEPublicKeyRSA, isCOSEAlg } from '../../cose.ts';
+import { type COSEALG, COSEKEYS, type COSEPublicKeyRSA, isCOSEAlg } from '../../cose.ts';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
 import { importKey } from './importKey.ts';
 import { isoBase64URL } from '../index.ts';
 import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName.ts';
 import { getWebCrypto } from './getWebCrypto.ts';
+import type { Uint8Array_ } from '../../../types/index.ts';
 
 /**
  * Verify a signature using an RSA public key
  */
 export async function verifyRSA(opts: {
   cosePublicKey: COSEPublicKeyRSA;
-  signature: Uint8Array;
-  data: Uint8Array;
+  signature: Uint8Array_;
+  data: Uint8Array_;
   shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;

@@ -1,6 +1,8 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 import { ECParameters, id_ecPublicKey, id_secp256r1, id_secp384r1 } from '@peculiar/asn1-ecc';
+import { id_rsaEncryption, RSAPublicKey } from '@peculiar/asn1-rsa';
+
 import {
   COSECRV,
   COSEKEYS,
@@ -9,12 +11,11 @@ import {
   COSEPublicKeyEC2,
   COSEPublicKeyRSA,
 } from './cose.ts';
-import { RSAPublicKey } from '@peculiar/asn1-rsa';
-
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 export function convertX509PublicKeyToCOSE(
-  x509Certificate: Uint8Array,
+  x509Certificate: Uint8Array_,
 ): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();
 
@@ -59,8 +60,8 @@ export function convertX509PublicKeyToCOSE(
       subjectPublicKeyInfo.subjectPublicKey,
     );
 
-    let x: Uint8Array;
-    let y: Uint8Array;
+    let x: Uint8Array_;
+    let y: Uint8Array_;
     if (subjectPublicKey[0] === 0x04) {
       // Public key is in "uncompressed form", so we can split the remaining bytes in half
       let pointer = 1;
@@ -84,7 +85,7 @@ export function convertX509PublicKeyToCOSE(
     coseEC2PubKey.set(COSEKEYS.y, y);
 
     cosePublicKey = coseEC2PubKey;
-  } else if (publicKeyAlgorithmID === '1.2.840.113549.1.1.1') {
+  } else if (publicKeyAlgorithmID === id_rsaEncryption) {
     /**
      * RSA public key
      */

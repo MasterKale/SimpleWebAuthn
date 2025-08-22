@@ -14,6 +14,7 @@ import type {
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
   PublicKeyCredentialRequestOptionsJSON,
+  Uint8Array_,
 } from '../types/index.ts';
 
 import { _browserSupportsWebAuthnInternals } from '../helpers/browserSupportsWebAuthn.ts';
@@ -41,7 +42,9 @@ const goodOpts1: PublicKeyCredentialRequestOptionsJSON = {
 
 // With UTF-8 challenge
 const goodOpts2UTF8: PublicKeyCredentialRequestOptionsJSON = {
-  challenge: bufferToBase64URLString(new TextEncoder().encode('やれやれだぜ')),
+  challenge: bufferToBase64URLString(
+    (new TextEncoder().encode('やれやれだぜ') as Uint8Array_).buffer,
+  ),
   allowCredentials: [],
   timeout: 1,
 };

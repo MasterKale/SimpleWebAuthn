@@ -2,15 +2,16 @@ import { COSEALG, COSEPublicKey } from './cose.ts';
 import { isoCrypto } from './iso/index.ts';
 import { decodeCredentialPublicKey } from './decodeCredentialPublicKey.ts';
 import { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 
 /**
  * Verify an authenticator's signature
  */
 export function verifySignature(opts: {
-  signature: Uint8Array;
-  data: Uint8Array;
-  credentialPublicKey?: Uint8Array;
-  x509Certificate?: Uint8Array;
+  signature: Uint8Array_;
+  data: Uint8Array_;
+  credentialPublicKey?: Uint8Array_;
+  x509Certificate?: Uint8Array_;
   hashAlgorithm?: COSEALG;
 }): Promise<boolean> {
   const {

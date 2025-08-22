@@ -4,7 +4,7 @@
  */
 import base64 from '@hexagon/base64';
 
-import type { Base64URLString } from '../../types/index.ts';
+import type { Base64URLString, Uint8Array_ } from '../../types/index.ts';
 
 /**
  * Decode from a Base64URL-encoded string to an ArrayBuffer. Best used when converting a
@@ -17,7 +17,7 @@ import type { Base64URLString } from '../../types/index.ts';
 export function toBuffer(
   base64urlString: string,
   from: 'base64' | 'base64url' = 'base64url',
-): Uint8Array {
+): Uint8Array_ {
   const _buffer = base64.toArrayBuffer(base64urlString, from === 'base64url');
   return new Uint8Array(_buffer);
 }
@@ -30,10 +30,10 @@ export function toBuffer(
  * @param to (optional) The encoding to use, in case it's desirable to encode to base64 instead
  */
 export function fromBuffer(
-  buffer: Uint8Array,
+  buffer: Uint8Array_,
   to: 'base64' | 'base64url' = 'base64url',
 ): string {
-  return base64.fromArrayBuffer(buffer, to === 'base64url');
+  return base64.fromArrayBuffer(buffer.buffer, to === 'base64url');
 }
 
 /**

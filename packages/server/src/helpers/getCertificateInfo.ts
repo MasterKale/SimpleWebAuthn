@@ -1,6 +1,8 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { BasicConstraints, Certificate, id_ce_basicConstraints } from '@peculiar/asn1-x509';
 
+import type { Uint8Array_ } from '../types/index.ts';
+
 export type CertificateInfo = {
   issuer: Issuer;
   subject: Subject;
@@ -40,7 +42,7 @@ const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
  * @param pemCertificate Result from call to `convertASN1toPEM(x5c[0])`
  */
 export function getCertificateInfo(
-  leafCertBuffer: Uint8Array,
+  leafCertBuffer: Uint8Array_,
 ): CertificateInfo {
   const x509 = AsnParser.parse(leafCertBuffer, Certificate);
   const parsedCert = x509.tbsCertificate;
