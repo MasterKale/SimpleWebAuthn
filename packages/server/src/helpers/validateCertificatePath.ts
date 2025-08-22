@@ -1,11 +1,14 @@
 import { AsnSerializer } from '@peculiar/asn1-schema';
 import type { Certificate } from '@peculiar/asn1-x509';
+import * as x509 from '@peculiar/x509';
 
 import { isCertRevoked } from './isCertRevoked.ts';
 import { verifySignature } from './verifySignature.ts';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 import { type CertificateInfo, getCertificateInfo } from './getCertificateInfo.ts';
 import { convertPEMToBytes } from './convertPEMToBytes.ts';
+import { convertCertBufferToPEM } from './convertCertBufferToPEM.ts';
+import { getWebCrypto } from './iso/isoCrypto/getWebCrypto.ts';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -64,12 +67,37 @@ async function _validatePath(x5cCertsWithTrustAnchorPEM: string[]): Promise<bool
     throw new Error('Invalid certificate path: found duplicate certificates');
   }
 
-  // Make sure no certs are revoked, and all are within their time validity window
-  for (const certificatePEM of x5cCertsWithTrustAnchorPEM) {
-    const certInfo = getCertificateInfo(convertPEMToBytes(certificatePEM));
-    await assertCertNotRevoked(certInfo.parsedCertificate);
-    assertCertIsWithinValidTimeWindow(certInfo, certificatePEM);
+  // TODO: Build cert chain (includes signature verification)
+  const leafCertPEM = x5cCertsWithTrustAnchorPEM[0];
+  const leafCertParsed = new x509.X509Certificate(leafCertPEM);
+  const intermediateAndAnchorCertsPEM = x5cCertsWithTrustAnchorPEM.slice(1);
+  const intermediateAndAnchorCertsParsed = intermediateAndAnchorCertsPEM.map((certPEM) =>
+    new x509.X509Certificate(certPEM)
+  );
+
+  const crypto = await getWebCrypto();
+  const builder = new x509.X509ChainBuilder({ certificates: intermediateAndAnchorCertsParsed });
+  const chain = await builder.build(leafCertParsed, crypto);
+
+  for (const cert of chain) {
+    // TODO: Check certs are all within valid time window
+    assertCertIsWithinValidTimeWindow(
+      cert.notBefore,
+      cert.notAfter,
+      convertCertBufferToPEM(new Uint8Array(cert.rawData)),
+    );
+
+    // TODO: Check certs are not revoked
+    const extCRL = cert.getExtensions(x509.CRLDistributionPointsExtension);
+    console.log(extCRL);
   }
+
+  // Make sure no certs are revoked, and all are within their time validity window
+  // for (const certificatePEM of x5cCertsWithTrustAnchorPEM) {
+  //   const certInfo = getCertificateInfo(convertPEMToBytes(certificatePEM));
+  //   await assertCertNotRevoked(certInfo.parsedCertificate);
+  //   assertCertIsWithinValidTimeWindow(certInfo.notBefore, certInfo.notAfter, certificatePEM);
+  // }
 
   // Make sure each x5c cert is issued by the next certificate in the chain
   for (let i = 0; i < (x5cCertsWithTrustAnchorPEM.length - 1); i += 1) {
@@ -115,11 +143,13 @@ async function assertCertNotRevoked(certificate: Certificate): Promise<void> {
  * @param certInfo Parsed cert information
  * @param certPEM PEM-formatted certificate, for error reporting
  */
-function assertCertIsWithinValidTimeWindow(certInfo: CertificateInfo, certPEM: string): void {
-  const { notBefore, notAfter } = certInfo;
-
+function assertCertIsWithinValidTimeWindow(
+  certNotBefore: Date,
+  certNotAfter: Date,
+  certPEM: string,
+): void {
   const now = new Date(Date.now());
-  if (notBefore > now || notAfter < now) {
+  if (certNotBefore > now || certNotAfter < now) {
     throw new CertificateNotYetValidOrExpired(
       `Certificate is not yet valid or expired: ${certPEM}`,
     );
