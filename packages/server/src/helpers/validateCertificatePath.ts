@@ -153,7 +153,6 @@ async function assertCertNotRevoked(certificate: X509Certificate): Promise<void>
  * Require the cert to be within its notBefore and notAfter time window
  */
 function assertCertIsWithinValidTimeWindow(certNotBefore: Date, certNotAfter: Date): void {
-  // console.log({ notBefore: certNotBefore, notAfter: certNotAfter });
   const now = new Date(Date.now());
   if (certNotBefore > now || certNotAfter < now) {
     throw new Error('Certificate is not yet valid or expired');

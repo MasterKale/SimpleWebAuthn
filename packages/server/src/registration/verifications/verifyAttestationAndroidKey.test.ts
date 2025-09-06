@@ -122,9 +122,9 @@ Deno.test('should verify Android Keystore response from a Pixel 8a in January 20
 Deno.test({
   name: 'should verify Android Keystore response from a Samsung Galaxy S9+ running Android 10',
   /**
-   * Verifying a SHA256 hash with a non-P-256 public key, or vice-versa with SHA385 and P-256,
-   * isn't supported till Deno v2.2.0. In Deno v2.1, this test will error out with this
-   * "Not implemented" error so I'm choosing to ignore this in older Deno runtimes:
+   * Verifying a SHA256 hash with a P-384 public key, or vice-versa with SHA384 and P-256,
+   * isn't supported till Deno v2.2.0. In Deno v2.1, this test will error out with a
+   * "Not implemented" error so I'm ignoring this test in older Deno runtimes:
    *
    * https://github.com/denoland/deno/blob/v2.1/ext/crypto/00_crypto.js#L1318-L1326
    */
