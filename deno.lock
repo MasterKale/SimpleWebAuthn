@@ -26,6 +26,7 @@
     "jsr:@std/path@^1.0.7": "1.0.8",
     "jsr:@std/path@^1.0.8": "1.0.8",
     "jsr:@std/path@~0.225.2": "0.225.2",
+    "jsr:@std/semver@^1.0.5": "1.0.5",
     "jsr:@std/testing@^1.0.4": "1.0.4",
     "jsr:@ts-morph/bootstrap@0.24": "0.24.0",
     "jsr:@ts-morph/common@0.24": "0.24.0",
@@ -155,6 +156,9 @@
     },
     "@std/path@1.0.8": {
       "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
+    },
+    "@std/semver@1.0.5": {
+      "integrity": "529f79e83705714c105ad0ba55bec0f9da0f24d2f726b6cc1c15e505cc2c0624"
     },
     "@std/testing@1.0.4": {
       "integrity": "ca1368d720b183f572d40c469bb9faf09643ddd77b54f8b44d36ae6b94940576",
@@ -1878,6 +1882,7 @@
       "jsr:@deno/dnt@~0.41.3",
       "jsr:@std/assert@^1.0.7",
       "jsr:@std/path@^1.0.8",
+      "jsr:@std/semver@^1.0.5",
       "jsr:@std/testing@^1.0.4",
       "npm:@babel/preset-env@^7.26.0",
       "npm:@rollup/plugin-babel@^6.0.4",

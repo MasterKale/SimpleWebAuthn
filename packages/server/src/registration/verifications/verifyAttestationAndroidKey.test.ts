@@ -1,5 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
+import { lessThan, parse } from '@std/semver';
 
 import { SettingsService } from '../../services/settingsService.ts';
 import { verifyRegistrationResponse } from '../verifyRegistrationResponse.ts';
@@ -118,7 +119,17 @@ Deno.test('should verify Android Keystore response from a Pixel 8a in January 20
   mockDate.restore();
 });
 
-Deno.test('should verify Android Keystore response from a Samsung Galaxy S9+ running Android 10', async () => {
+Deno.test({
+  name: 'should verify Android Keystore response from a Samsung Galaxy S9+ running Android 10',
+  /**
+   * Verifying a SHA256 hash with a non-P-256 public key, or vice-versa with SHA385 and P-256,
+   * isn't supported till Deno v2.2.0. In Deno v2.1, this test will error out with this
+   * "Not implemented" error so I'm choosing to ignore this in older Deno runtimes:
+   *
+   * https://github.com/denoland/deno/blob/v2.1/ext/crypto/00_crypto.js#L1318-L1326
+   */
+  ignore: lessThan(parse(Deno.version.deno), parse('2.2.0')),
+}, async () => {
   SettingsService.setRootCertificates({
     identifier: 'android-key',
     certificates: [Google_Hardware_Attestation_Root_1],
