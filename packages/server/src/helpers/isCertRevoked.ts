@@ -1,16 +1,11 @@
-import { AsnParser } from '@peculiar/asn1-schema';
 import {
-  AuthorityKeyIdentifier,
-  Certificate,
-  CertificateList,
-  CRLDistributionPoints,
-  id_ce_authorityKeyIdentifier,
-  id_ce_cRLDistributionPoints,
-  id_ce_subjectKeyIdentifier,
-  SubjectKeyIdentifier,
-} from '@peculiar/asn1-x509';
+  AuthorityKeyIdentifierExtension,
+  CRLDistributionPointsExtension,
+  SubjectKeyIdentifierExtension,
+  type X509Certificate,
+  X509Crl,
+} from '@peculiar/x509';
 
-import { isoUint8Array } from './iso/index.ts';
 import { fetch } from './fetch.ts';
 
 /**
@@ -30,51 +25,39 @@ const cacheRevokedCerts: { [certAuthorityKeyID: string]: CAAuthorityInfo } = {};
  *
  * CRL certificate structure referenced from https://tools.ietf.org/html/rfc5280#page-117
  */
-export async function isCertRevoked(cert: Certificate): Promise<boolean> {
-  const { extensions } = cert.tbsCertificate;
+export async function isCertRevoked(cert: X509Certificate): Promise<boolean> {
+  const { extensions } = cert;
 
   if (!extensions) {
     return false;
   }
 
-  let extAuthorityKeyID: AuthorityKeyIdentifier | undefined;
-  let extSubjectKeyID: SubjectKeyIdentifier | undefined;
-  let extCRLDistributionPoints: CRLDistributionPoints | undefined;
+  let extAuthorityKeyID: AuthorityKeyIdentifierExtension | undefined;
+  let extSubjectKeyID: SubjectKeyIdentifierExtension | undefined;
+  let extCRLDistributionPoints: CRLDistributionPointsExtension | undefined;
 
   extensions.forEach((ext) => {
-    if (ext.extnID === id_ce_authorityKeyIdentifier) {
-      extAuthorityKeyID = AsnParser.parse(
-        ext.extnValue,
-        AuthorityKeyIdentifier,
-      );
-    } else if (ext.extnID === id_ce_subjectKeyIdentifier) {
-      extSubjectKeyID = AsnParser.parse(ext.extnValue, SubjectKeyIdentifier);
-    } else if (ext.extnID === id_ce_cRLDistributionPoints) {
-      extCRLDistributionPoints = AsnParser.parse(
-        ext.extnValue,
-        CRLDistributionPoints,
-      );
+    if (ext instanceof AuthorityKeyIdentifierExtension) {
+      extAuthorityKeyID = ext;
+    } else if (ext instanceof SubjectKeyIdentifierExtension) {
+      extSubjectKeyID = ext;
+    } else if (ext instanceof CRLDistributionPointsExtension) {
+      extCRLDistributionPoints = ext;
     }
   });
 
   // Check to see if we've got cached info for the cert's CA
   let keyIdentifier: string | undefined = undefined;
 
-  if (extAuthorityKeyID && extAuthorityKeyID.keyIdentifier) {
-    keyIdentifier = isoUint8Array.toHex(
-      new Uint8Array(extAuthorityKeyID.keyIdentifier.buffer),
-    );
+  if (extAuthorityKeyID && extAuthorityKeyID.keyId) {
+    keyIdentifier = extAuthorityKeyID.keyId;
   } else if (extSubjectKeyID) {
     /**
      * We might be dealing with a self-signed root certificate. Check the
      * Subject key Identifier extension next.
      */
-    keyIdentifier = isoUint8Array.toHex(new Uint8Array(extSubjectKeyID.buffer));
+    keyIdentifier = extSubjectKeyID.keyId;
   }
-
-  const certSerialHex = isoUint8Array.toHex(
-    new Uint8Array(cert.tbsCertificate.serialNumber),
-  );
 
   if (keyIdentifier) {
     const cached = cacheRevokedCerts[keyIdentifier];
@@ -82,12 +65,12 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
       const now = new Date();
       // If there's a nextUpdate then make sure we're before it
       if (!cached.nextUpdate || cached.nextUpdate > now) {
-        return cached.revokedCerts.indexOf(certSerialHex) >= 0;
+        return cached.revokedCerts.indexOf(cert.serialNumber) >= 0;
       }
     }
   }
 
-  const crlURL = extCRLDistributionPoints?.[0].distributionPoint?.fullName?.[0]
+  const crlURL = extCRLDistributionPoints?.distributionPoints?.[0].distributionPoint?.fullName?.[0]
     .uniformResourceIdentifier;
 
   // If no URL is provided then we have nothing to check
@@ -104,9 +87,9 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
     return false;
   }
 
-  let data: CertificateList;
+  let data: X509Crl;
   try {
-    data = AsnParser.parse(certListBytes, CertificateList);
+    data = new X509Crl(certListBytes);
   } catch (_err) {
     // Something was malformed with the CRL, so pass
     return false;
@@ -118,18 +101,16 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
   };
 
   // nextUpdate
-  if (data.tbsCertList.nextUpdate) {
-    newCached.nextUpdate = data.tbsCertList.nextUpdate.getTime();
+  if (data.nextUpdate) {
+    newCached.nextUpdate = data.nextUpdate;
   }
 
   // revokedCertificates
-  const revokedCerts = data.tbsCertList.revokedCertificates;
+  const revokedCerts = data.entries;
 
   if (revokedCerts) {
     for (const cert of revokedCerts) {
-      const revokedHex = isoUint8Array.toHex(
-        new Uint8Array(cert.userCertificate),
-      );
+      const revokedHex = cert.serialNumber;
       newCached.revokedCerts.push(revokedHex);
     }
 
@@ -138,7 +119,7 @@ export async function isCertRevoked(cert: Certificate): Promise<boolean> {
       cacheRevokedCerts[keyIdentifier] = newCached;
     }
 
-    return newCached.revokedCerts.indexOf(certSerialHex) >= 0;
+    return newCached.revokedCerts.indexOf(cert.serialNumber) >= 0;
   }
 
   return false;

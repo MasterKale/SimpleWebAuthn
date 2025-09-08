@@ -250,7 +250,8 @@ export class BaseMetadataService implements MetadataService {
       // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
       // chain certificates is revoked"
       throw new Error(
-        `BLOB certificate path could not be validated: ${_error.message}`,
+        'BLOB certificate path could not be validated',
+        { cause: _error },
       );
     }
 

@@ -132,7 +132,7 @@ export async function verifyAttestationAndroidKey(
       });
     } catch (err) {
       const _err = err as Error;
-      throw new Error(`${_err.message} (Android Key)`);
+      throw new Error(`${_err.message} (Android Key)`, { cause: _err });
     }
   } else {
     /**
@@ -145,7 +145,7 @@ export async function verifyAttestationAndroidKey(
       await validateCertificatePath(x5cNoRootPEM, x5cRootPEM);
     } catch (err) {
       const _err = err as Error;
-      throw new Error(`${_err.message} (Android Key)`);
+      throw new Error(`${_err.message} (Android Key)`, { cause: _err });
     }
 
     /**

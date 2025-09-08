@@ -12,7 +12,7 @@
         "test"
       ]
     },
-    "test": "deno test -A src/",
+    "test": "deno test -A src/ --trace-leaks",
     "test:watch": "deno test -A --watch src/",
     "docs:serve": {
       "command": "deno run -A jsr:@std/http/file-server --host 127.0.0.1 docs/",
@@ -36,6 +36,7 @@
     "lineWidth": 100
   },
   "imports": {
+    "@peculiar/x509": "npm:@peculiar/x509@^1.13.0",
     "tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
     "@hexagon/base64": "npm:@hexagon/base64@^1.1.27",
     "@levischuck/tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
