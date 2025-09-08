@@ -58,13 +58,14 @@ export async function validateCertificatePath(
     try {
       await assertCertNotRevoked(cert);
     } catch (_err) {
-      //
+      // Continue processing the other certs
       continue;
     }
 
     try {
       assertCertIsWithinValidTimeWindow(cert.notBefore, cert.notAfter);
     } catch (_err) {
+      // Continue processing the other certs
       continue;
     }
 
@@ -124,7 +125,7 @@ export async function validateCertificatePath(
       if (err instanceof InvalidSubjectAndIssuer) {
         invalidSubjectAndIssuerError = true;
       } else {
-        throw err;
+        throw new Error('Unexpected error while validating certificate path', { cause: err });
       }
     }
   }
