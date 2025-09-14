@@ -48,6 +48,7 @@ export type VerifyRegistrationResponseOpts = Parameters<typeof verifyRegistratio
  * @param requireUserPresence **(Optional)** - Enforce user presence by the authenticator (or skip it during auto registration) Defaults to `true`
  * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
  * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to all supported algorithm IDs
+ * @param attestationSafetyNetEnforceCTSCheck **(Optional)** - Require that an Android device's system integrity has not been tampered with if it uses SafetyNet attestation. Defaults to `true`
  */
 export async function verifyRegistrationResponse(
   options: {
@@ -59,6 +60,7 @@ export async function verifyRegistrationResponse(
     requireUserPresence?: boolean;
     requireUserVerification?: boolean;
     supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
+    attestationSafetyNetEnforceCTSCheck?: boolean;
   },
 ): Promise<VerifiedRegistrationResponse> {
   const {
@@ -70,6 +72,7 @@ export async function verifyRegistrationResponse(
     requireUserPresence = true,
     requireUserVerification = true,
     supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
+    attestationSafetyNetEnforceCTSCheck = true,
   } = options;
   const { id, rawId, type: credentialType, response: attestationResponse } = response;
 
@@ -248,6 +251,7 @@ export async function verifyRegistrationResponse(
     credentialPublicKey,
     rootCertificates,
     rpIdHash,
+    attestationSafetyNetEnforceCTSCheck,
   };
 
   /**
@@ -364,4 +368,5 @@ export type AttestationFormatVerifierOpts = {
   rootCertificates: string[];
   rpIdHash: Uint8Array_;
   verifyTimestampMS?: boolean;
+  attestationSafetyNetEnforceCTSCheck?: boolean;
 };
