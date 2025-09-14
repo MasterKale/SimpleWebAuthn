@@ -23,6 +23,7 @@ export async function verifyAttestationAndroidSafetyNet(
     rootCertificates,
     verifyTimestampMS = true,
     credentialPublicKey,
+    attestationSafetyNetEnforceCTSCheck,
   } = options;
   const alg = attStmt.get('alg');
   const response = attStmt.get('response');
@@ -82,7 +83,7 @@ export async function verifyAttestationAndroidSafetyNet(
     throw new Error('Could not verify payload nonce (SafetyNet)');
   }
 
-  if (!ctsProfileMatch) {
+  if (attestationSafetyNetEnforceCTSCheck && !ctsProfileMatch) {
     throw new Error('Could not verify device integrity (SafetyNet)');
   }
   /**
