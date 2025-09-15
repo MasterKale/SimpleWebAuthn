@@ -1,5 +1,25 @@
 # Changelog
 
+## v13.2.0
+
+**Changes**
+
+- **[server]** The return value from `verifyRegistrationResponse()` has been defined more strictly
+  to communicate that `registrationInfo` will only ever be present if `verified` is `true`
+  ([#715](https://github.com/MasterKale/SimpleWebAuthn/pull/715))
+- **[server]** `verifyRegistrationResponse()` can now verify attestations containing SHA256 hashes
+  by using EC public keys with the P-384 curve
+  ([#721](https://github.com/MasterKale/SimpleWebAuthn/pull/721))
+- **[server]** The Android SafetyNet "CTS profile match" system integrity check can now be disabled
+  by setting `attestationSafetyNetEnforceCTSCheck: false` when calling
+  `verifyRegistrationResponse()`. This check remains enforced by default
+  ([#722](https://github.com/MasterKale/SimpleWebAuthn/pull/722))
+- **[browser] [server]** These libraries now have better support in Deno 2.2+ projects which use
+  [generic typing for `Uint8Array` via TypeScript 5.7](https://typescriptdocs.com/release-notes/TypeScript%205.7.html#typedarrays-are-now-generic-over-arraybufferlike).
+  SimpleWebAuthn values of type `Uint8Array_` are equivalent to `Uint8Array` in Deno 2.1 and
+  earlier, and `Uint8Array<ArrayBuffer>` in Deno 2.2 and later.
+  ([#717](https://github.com/MasterKale/SimpleWebAuthn/pull/717))
+
 ## v13.1.2
 
 **Changes**
