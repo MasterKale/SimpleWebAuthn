@@ -1,5 +1,13 @@
 # Changelog
 
+## v13.2.1
+
+**Changes:**
+
+- **[server]** `generateRegistrationOptions()` will now correctly encoded the `userID` argument to
+  base64url when it is an instance of Node's `Buffer`
+  ([#724](https://github.com/MasterKale/SimpleWebAuthn/pull/724))
+
 ## v13.2.0
 
 **Changes**
