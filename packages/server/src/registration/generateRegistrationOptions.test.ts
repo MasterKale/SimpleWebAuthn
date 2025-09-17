@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { returnsNext, stub } from '@std/testing/mock';
+import { Buffer } from 'node:buffer';
 
 import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
 import { _generateChallengeInternals } from '../helpers/generateChallenge.ts';
@@ -385,4 +386,17 @@ Deno.test('should map "remoteDevice" authenticator preference to hint and attach
 
   assertEquals(options.hints, ['hybrid']);
   assertEquals(options.authenticatorSelection?.authenticatorAttachment, 'cross-platform');
+});
+
+Deno.test('should generate a reasonable user.id when passed a Node Buffer', async () => {
+  const options = await generateRegistrationOptions({
+    rpID: 'not.real',
+    rpName: 'SimpleWebAuthn',
+    userName: 'usernameHere',
+    // @ts-ignore: Intentionally using a Node Buffer (which is a Uint8Array subclass)
+    userID: Buffer.from('someUserID', 'utf-8'),
+  });
+
+  assertEquals(options.user.id, 'c29tZVVzZXJJRA');
+  assertEquals(isoBase64URL.toUTF8String(options.user.id), 'someUserID');
 });
