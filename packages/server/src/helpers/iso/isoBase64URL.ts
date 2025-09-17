@@ -33,7 +33,12 @@ export function fromBuffer(
   buffer: Uint8Array_,
   to: 'base64' | 'base64url' = 'base64url',
 ): string {
-  return base64.fromArrayBuffer(buffer.buffer, to === 'base64url');
+  /**
+   * Gracefully handle Uint8Array subclass types, like Node's Buffer, that can have a large
+   * ArrayBuffer backing it.
+   */
+  const _normalized = new Uint8Array(buffer);
+  return base64.fromArrayBuffer(_normalized.buffer, to === 'base64url');
 }
 
 /**
