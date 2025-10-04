@@ -1,4 +1,4 @@
-name: Publish to JSR and NPM?
+name: Publish @simplewebauthn/server
 
 on:
   workflow_dispatch:
