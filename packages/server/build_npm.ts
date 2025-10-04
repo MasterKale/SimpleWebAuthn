@@ -73,4 +73,4 @@ await build({
 
 Deno.copyFileSync('LICENSE.md', `${outDir}/LICENSE.md`);
 Deno.copyFileSync('README.md', `${outDir}/README.md`);
-Deno.copyFileSync('.npmrc', `${outDir}/.npmrc`);
+// Deno.copyFileSync('.npmrc', `${outDir}/.npmrc`);

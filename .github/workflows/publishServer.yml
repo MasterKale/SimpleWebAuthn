@@ -53,6 +53,10 @@ jobs:
       - name: Install dependencies
         run: deno install
 
+      # Configure npm authentication
+      - name: Configure npm authentication
+        run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+
       # Publish to JSR and NPM
       - name: Publish to JSR and NPM
         run: deno task publish:server
