@@ -1,0 +1,62 @@
+name: Publish @simplewebauthn/browser
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR and NPM
+
+    env:
+      NODE_VERSION: '22.x'
+      DENO_VERSION: 'v2.4.x'
+
+    steps:
+      - uses: actions/checkout@v5
+
+      # Install Node
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Upgrade NPM
+        # Trusted Publishing requires at least npm 11.5.1
+        run: npm install -g npm@^11.5.1
+
+      - name: Confirm installed Node and NPM versions
+        run: 'echo "Node: $(node -v)" && echo "NPM: $(npm -v)"'
+
+      # Install Deno
+      - name: Setup Deno ${{ env.DENO_VERSION }}
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+      - name: Confirm installed Deno version
+        run: deno -V
+
+      # Set up caching for quicker installs
+      - name: Get DENO_DIR store directory
+        shell: bash
+        # Expecting "DENO_DIR location: /Users/matt/Library/Caches/deno" somewhere in `deno info`
+        run: |
+          echo "DENO_DIR=$(deno info | grep "DENO_DIR" | awk '{print $3}')" >> $GITHUB_ENV
+      - name: Setup Deno cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-dir-${{ hashFiles('**/deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-dir-
+
+      # Install deps
+      - name: Install dependencies
+        run: deno install
+
+      # Publish to JSR and NPM
+      - name: Publish to JSR and NPM
+        run: deno task publish:browser
