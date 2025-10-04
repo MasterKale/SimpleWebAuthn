@@ -1,6 +1,6 @@
 {
   "name": "@simplewebauthn/server",
-  "version": "13.2.2-publishtest5",
+  "version": "13.2.1",
   "exports": {
     ".": "./src/index.ts",
     "./helpers": "./src/helpers/index.ts"
@@ -23,7 +23,7 @@
     "docs:html": "deno doc --html src/index.ts",
     "docs:lint": "deno doc --lint src/index.ts",
     "publish": {
-      "command": "deno task publish:npm",
+      "command": "deno task publish:jsr && deno task publish:npm",
       "dependencies": [
         "build"
       ]
