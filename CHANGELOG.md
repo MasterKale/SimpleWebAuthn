@@ -1,5 +1,18 @@
 # Changelog
 
+## v13.2.2
+
+**Changes**
+
+- **[browser] [server]** In the spirit of contributing to
+  [increased software supply chain transparency](https://docs.npmjs.com/trusted-publishers), both
+  libraries are now published via GitHub Actions workflows. Package listings on
+  [JSR](https://jsr.io/@simplewebauthn/server) and
+  [NPM](https://www.npmjs.com/package/@simplewebauthn/server) feature build transparency logs at the
+  bottom of their respective pages ([#725](https://github.com/MasterKale/SimpleWebAuthn/pull/725),
+  [#726](https://github.com/MasterKale/SimpleWebAuthn/pull/726),
+  [#727](https://github.com/MasterKale/SimpleWebAuthn/pull/727))
+
 ## v13.2.1
 
 **Changes:**
