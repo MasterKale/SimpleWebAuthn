@@ -24,8 +24,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
-      - name: Confirm installed Node version
-        run: node -v
+      - name: Upgrade NPM
+        # Trusted Publishing requires at least npm 11.5.1
+        run: npm install -g npm@^11.5.1
+
+      - name: Confirm installed Node and NPM versions
+        run: 'echo "Node: $(node -v)" && echo "NPM: $(npm -v)"'
 
       # Install Deno
       - name: Setup Deno ${{ env.DENO_VERSION }}
