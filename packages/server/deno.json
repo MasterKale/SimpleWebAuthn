@@ -29,7 +29,7 @@
       ]
     },
     "publish:jsr": "deno publish",
-    "publish:npm": "(cd npm; npm publish --tag publishtest)"
+    "publish:npm": "(cd npm; npm publish)"
   },
   "fmt": {
     "singleQuote": true,
