@@ -55,6 +55,6 @@ jobs:
 
       # Publish to JSR and NPM
       - name: Publish to JSR and NPM
-        run: 'deno task publish:server'
+        run: deno task publish:server
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
