@@ -1,5 +1,11 @@
 # Changelog
 
+## v13.2.2-publishtest2
+
+**Changes:**
+
+- **[server]** Testing automated publishing to JSR and NPM via GitHub Actions (take 2)
+
 ## v13.2.2-publishtest1
 
 **Changes:**
