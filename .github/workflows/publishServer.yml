@@ -9,7 +9,7 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write # The OIDC ID token is used for authentication with JSR.
+      id-token: write # The OIDC ID token is used for authentication with JSR and NPM
 
     env:
       NODE_VERSION: '22.x'
@@ -53,12 +53,6 @@ jobs:
       - name: Install dependencies
         run: deno install
 
-      # Configure npm authentication
-      - name: Configure npm authentication
-        run: npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-
       # Publish to JSR and NPM
       - name: Publish to JSR and NPM
         run: deno task publish:server
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
