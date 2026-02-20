@@ -125,6 +125,32 @@ describe('Method: getCachedStatements()', () => {
     assertEquals(statements.length, 1);
     assertEquals(statements[0], localStatement);
   });
+
+  it('should return an array value that can be fed back into initialize()', async () => {
+    let _service = new BaseMetadataService();
+
+    // Pretend we loaded some statements from MDS
+    await _service.initialize({
+      mdsServers: [],
+      statements: [localStatement],
+    });
+
+    const cachedStatements = _service.getCachedStatements();
+
+    _service = new BaseMetadataService();
+
+    // Feed the cached statements back into another initialization
+    await _service.initialize({
+      mdsServers: [],
+      statements: cachedStatements,
+    });
+
+    // Make sure MetadataService is fine with this
+    assertEquals(
+      await _service.getStatement(localStatementAAGUID),
+      localStatement,
+    );
+  });
 });
 
 const localStatementAAGUID = '91dfead7-959e-4475-ad26-9b0d482be089';
