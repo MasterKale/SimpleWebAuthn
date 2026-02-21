@@ -20,7 +20,7 @@ await build({
   },
   // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
   typeCheck: false,
-  // TODO: Re-enable if https://github.com/denoland/dnt/issues/430 can get resolved
+  // Don't test the NPM build afterwards because @std/assert isn't available
   test: false,
   // package.json values
   package: {
