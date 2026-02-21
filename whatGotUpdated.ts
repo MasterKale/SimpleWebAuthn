@@ -26,7 +26,7 @@ const changedPackages = getChangedWorkspacePackages(changedFiles, workspaceDirs)
 if (changedPackages.length < 1) {
   console.log('✅ No workspace packages have been updated since the last version tag');
 } else {
-  console.log('The following workspace packages need new versions published:');
+  console.log('📦 The following workspace packages need new versions published:');
 
   for (const matched of changedPackages) {
     // Read current versions from corresponding deno.json files
@@ -38,7 +38,7 @@ if (changedPackages.length < 1) {
     // Output package names and their current versions to consider incrementing
     const formattedMatched = `@simplewebauthn/${matched.split('/')[1]}`;
     console.log(
-      `📦 ${formattedMatched} (current version: ${packageDenoJSON.version} @ ${packageDenoJSONPath})`,
+      `\x1B[1m${formattedMatched}\x1B[m (current version: ${packageDenoJSON.version} @ ${packageDenoJSONPath})`,
     );
   }
 }
@@ -107,6 +107,8 @@ function getChangedWorkspacePackages(changedFiles: string[], workspaceDirs: stri
     for (const workspace of workspaceDirs) {
       // Check if a package's source code has been modified
       if (file.startsWith(`${workspace}/src`)) {
+        matchedPackages.add(workspace);
+      } else if (file === `${workspace}/deno.json`) {
         matchedPackages.add(workspace);
       }
     }
