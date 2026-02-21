@@ -36,15 +36,15 @@
     "lineWidth": 100
   },
   "imports": {
-    "@peculiar/x509": "npm:@peculiar/x509@^1.13.0",
     "tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
     "@hexagon/base64": "npm:@hexagon/base64@^1.1.27",
     "@levischuck/tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
-    "@peculiar/asn1-android": "npm:@peculiar/asn1-android@^2.3.10",
-    "@peculiar/asn1-ecc": "npm:@peculiar/asn1-ecc@^2.3.8",
-    "@peculiar/asn1-rsa": "npm:@peculiar/asn1-rsa@^2.3.8",
-    "@peculiar/asn1-schema": "npm:@peculiar/asn1-schema@^2.3.8",
-    "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.3.8"
+    "@peculiar/asn1-android": "npm:@peculiar/asn1-android@^2.6.0",
+    "@peculiar/asn1-ecc": "npm:@peculiar/asn1-ecc@^2.6.1",
+    "@peculiar/asn1-rsa": "npm:@peculiar/asn1-rsa@^2.6.1",
+    "@peculiar/asn1-schema": "npm:@peculiar/asn1-schema@^2.6.0",
+    "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.6.1",
+    "@peculiar/x509": "npm:@peculiar/x509@^1.14.3"
   },
   "publish": {
     "include": [
