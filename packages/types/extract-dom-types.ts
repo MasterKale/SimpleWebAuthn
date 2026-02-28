@@ -19,7 +19,7 @@ import {
   SyntaxKind,
   TypeAliasDeclaration,
 } from 'ts-morph';
-import { version } from 'typescript';
+import { version as npmVersion } from 'typescript';
 
 // List of types we directly reference from the dom lib. Only interface and type
 // alias identifiers are valid, since other syntax types (class, function, var)
@@ -48,7 +48,7 @@ const types = [
 const denoDir = new DenoDir();
 const domSourcePath = join(
   denoDir.root,
-  `npm/registry.npmjs.org/typescript/${version}/lib/lib.dom.d.ts`,
+  `npm/registry.npmjs.org/typescript/${npmVersion}/lib/lib.dom.d.ts`,
 );
 
 // Check that the file exists
@@ -100,7 +100,7 @@ const outputSourceFile = project.createSourceFile(`src/dom.ts`, undefined, {
 outputSourceFile.addStatements([
   `// deno-fmt-ignore-file`,
   `/**`,
-  ` * Generated from typescript@${version}`,
+  ` * Generated from typescript@${npmVersion}`,
   ` * To regenerate, run the following command from the package root:`,
   ` * deno task extract-dom-types`,
   ` */`,
