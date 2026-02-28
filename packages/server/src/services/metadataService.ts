@@ -70,6 +70,10 @@ interface MetadataService {
    * BLOB download.
    */
   getStatement(aaguid: string | Uint8Array): Promise<MetadataStatement | undefined>;
+  /**
+   * Return all currently cached MDS metadata statements.
+   */
+  getCachedStatements(): MetadataStatement[];
 }
 
 /**
@@ -214,6 +218,25 @@ export class BaseMetadataService implements MetadataService {
     }
 
     return entry.metadataStatement;
+  }
+
+  getCachedStatements(): MetadataStatement[] {
+    if (this.state === SERVICE_STATE.DISABLED) {
+      throw new Error(
+        'MetadataService has not been initialized. Call `await MetadataService.initialize()` before calling this method.',
+      );
+    }
+
+    const toReturn: MetadataStatement[] = [];
+
+    const cachedStatements = Object.values(this.statementCache);
+    cachedStatements.forEach((statement) => {
+      if (statement.entry.metadataStatement) {
+        toReturn.push(statement.entry.metadataStatement);
+      }
+    });
+
+    return toReturn;
   }
 
   /**

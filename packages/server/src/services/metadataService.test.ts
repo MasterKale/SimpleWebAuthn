@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { assertSpyCallArg, assertSpyCalls, type Stub, stub } from '@std/testing/mock';
 
@@ -92,6 +92,64 @@ describe('Method: getStatement()', () => {
     const statement = await MetadataService.getStatement('not-a-real-aaguid');
 
     assertEquals(statement, undefined);
+  });
+});
+
+describe('Method: getCachedStatements()', () => {
+  beforeEach(() => {
+    mockFetch = stub(_fetchInternals, 'stubThis');
+  });
+
+  afterEach(() => {
+    mockFetch.restore();
+  });
+
+  it('should throw when MetadataService is not initialized', () => {
+    const _service = new BaseMetadataService();
+    assertThrows(
+      () => _service.getCachedStatements(),
+      'MetadataService has not been initialized',
+    );
+  });
+
+  it('should return cached statements', async () => {
+    const _service = new BaseMetadataService();
+
+    await _service.initialize({
+      mdsServers: [],
+      statements: [localStatement],
+    });
+
+    const statements = _service.getCachedStatements();
+
+    assertEquals(statements.length, 1);
+    assertEquals(statements[0], localStatement);
+  });
+
+  it('should return an array value that can be fed back into initialize()', async () => {
+    let _service = new BaseMetadataService();
+
+    // Pretend we loaded some statements from MDS
+    await _service.initialize({
+      mdsServers: [],
+      statements: [localStatement],
+    });
+
+    const cachedStatements = _service.getCachedStatements();
+
+    _service = new BaseMetadataService();
+
+    // Feed the cached statements back into another initialization
+    await _service.initialize({
+      mdsServers: [],
+      statements: cachedStatements,
+    });
+
+    // Make sure MetadataService is fine with this
+    assertEquals(
+      await _service.getStatement(localStatementAAGUID),
+      localStatement,
+    );
   });
 });
 
