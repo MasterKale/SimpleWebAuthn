@@ -56,5 +56,5 @@ Navigate to https://github.com/MasterKale/SimpleWebAuthn/actions/workflows/publi
 
 #### Need to publish @simplewebauthn/server?
 
-Navigate to https://github.com/MasterKale/SimpleWebAuthn/actions/workflows/publicServer.yml and
+Navigate to https://github.com/MasterKale/SimpleWebAuthn/actions/workflows/publishServer.yml and
 **Run workflow** against **master**.
