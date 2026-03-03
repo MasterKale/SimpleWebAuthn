@@ -1,4 +1,5 @@
 import { assert, assertFalse } from '@std/assert';
+import { lessThan, parse } from '@std/semver';
 
 import { verifyJWT } from './verifyJWT.ts';
 import { convertPEMToBytes } from '../helpers/convertPEMToBytes.ts';
@@ -18,20 +19,13 @@ Deno.test('should fail to verify a JWT with a bad signature', async () => {
   assertFalse(verified);
 });
 
-/**
- * TODO (Aug 2023): This test has to be ignored for now because Deno doesn't
- * support signature verification if the key curve and hash algorithm
- * aren't one of two supported combinations. In this test the key curve is
- * P-384 and the hash alg is SHA-256...
- *
- * See https://deno.land/x/deno@v2.0.4/ext/crypto/00_crypto.js?source#L1317
- *
- * I raised an issue about this here:
- * https://github.com/denoland/deno/issues/20198
- */
 Deno.test(
   'should fail to verify when leaf cert contains unexpected public key',
-  { ignore: true },
+  /**
+   * Deno v2.1 and earlier couldn't handle a key curve of P-384 using a hash alg of SHA-256
+   * See https://github.com/denoland/deno/issues/20198
+   */
+  { ignore: lessThan(parse(Deno.version.deno), parse('2.2.0')) },
   async () => {
     const verified = await verifyJWT(
       blob,
