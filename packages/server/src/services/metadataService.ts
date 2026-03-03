@@ -109,6 +109,9 @@ export class BaseMetadataService implements MetadataService {
       verificationMode?: VerificationMode;
     } = {},
   ): Promise<void> {
+    // Reset statement cache
+    this.statementCache = {};
+
     const { mdsServers = [defaultURLMDS], statements, mdsBlobs, verificationMode } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
