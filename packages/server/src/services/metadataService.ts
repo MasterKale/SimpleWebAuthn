@@ -125,7 +125,7 @@ export class BaseMetadataService implements MetadataService {
               statusReports: [],
               timeOfLastStatusChange: '1970-01-01',
             },
-            url: '',
+            url: NonRefreshingMDS.url,
           };
 
           statementsAdded += 1;
