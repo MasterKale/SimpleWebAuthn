@@ -22,6 +22,14 @@ type CachedMDS = {
   no: number;
   nextUpdate: Date;
 };
+/**
+ * An instance of `CachedMDS` that will not trigger attempts to refresh the associated entry's blob
+ */
+const NonRefreshingMDS: CachedMDS = {
+  url: '',
+  no: 0,
+  nextUpdate: new Date(0),
+} as const;
 
 type CachedBLOBEntry = {
   entry: MetadataBLOBPayloadEntry;
