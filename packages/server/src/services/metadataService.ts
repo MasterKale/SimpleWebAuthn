@@ -227,14 +227,24 @@ export class BaseMetadataService implements MetadataService {
   /**
    * Download and process the latest BLOB from MDS
    */
-  private async downloadBlob(mds: CachedMDS) {
-    const { url, no } = mds;
+  private async downloadBlob(cachedMDS: CachedMDS) {
+    const { url } = cachedMDS;
+
     // Get latest "BLOB" (FIDO's terminology, not mine)
     const resp = await fetch(url);
     const data = await resp.text();
 
+    return data;
+  }
+
+  /**
+   * Verify and process the MDS metadata blob
+   */
+  private async verifyBlob(blob: string, cachedMDS: CachedMDS) {
+    const { url, no } = cachedMDS;
+
     // Parse the JWT
-    const parsedJWT = parseJWT<MDSJWTHeader, MDSJWTPayload>(data);
+    const parsedJWT = parseJWT<MDSJWTHeader, MDSJWTPayload>(blob);
     const header = parsedJWT[0];
     const payload = parsedJWT[1];
 
@@ -242,7 +252,7 @@ export class BaseMetadataService implements MetadataService {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
       // number of the last BLOB cached locally."
       throw new Error(
-        `Latest BLOB no. "${payload.no}" is not greater than previous ${no}`,
+        `Latest BLOB no. ${payload.no} is not greater than previous no. ${no}`,
       );
     }
 
@@ -265,7 +275,7 @@ export class BaseMetadataService implements MetadataService {
 
     // Verify the BLOB JWT signature
     const leafCert = headerCertsPEM[0];
-    const verified = await verifyJWT(data, convertPEMToBytes(leafCert));
+    const verified = await verifyJWT(blob, convertPEMToBytes(leafCert));
 
     if (!verified) {
       // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
@@ -280,20 +290,38 @@ export class BaseMetadataService implements MetadataService {
       }
     }
 
-    // Remember info about the server so we can refresh later
+    // Convert the nextUpdate property into a Date so we can determine when to re-download
     const [year, month, day] = payload.nextUpdate.split('-');
-    this.mdsCache[url] = {
-      ...mds,
-      // Store the payload `no` to make sure we're getting the next BLOB in the sequence
-      no: payload.no,
-      // Convert the nextUpdate property into a Date so we can determine when to re-download
-      nextUpdate: new Date(
-        parseInt(year, 10),
-        // Months need to be zero-indexed
-        parseInt(month, 10) - 1,
-        parseInt(day, 10),
-      ),
-    };
+    const nextUpdate = new Date(
+      parseInt(year, 10),
+      // Months need to be zero-indexed
+      parseInt(month, 10) - 1,
+      parseInt(day, 10),
+    );
+
+    if (url) {
+      // Remember info about the server so we can refresh later
+      this.mdsCache[url] = {
+        ...cachedMDS,
+        // Store the payload `no` to make sure we're getting the next BLOB in the sequence
+        no: payload.no,
+        // Remember when we need to refresh this blob
+        nextUpdate,
+      };
+    } else {
+      /**
+       * This blob will not be refreshed, but we should still alert if the blob's `nextUpdate` is
+       * in the past
+       */
+      if (nextUpdate < new Date()) {
+        // TODO (Feb 2026): It'd be more actionable for devs if a specific error was raised here,
+        // then this message was logged higher up when it can include the array index of the stale
+        // blob.
+        log(
+          `⚠️ This blob (serial: ${payload.no}) contains stale data as of ${nextUpdate.toISOString()}. Please consider refreshing it.`,
+        );
+      }
+    }
   }
 
   /**
