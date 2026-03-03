@@ -67,6 +67,8 @@ interface MetadataService {
    * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
    * @param opts.statements An array of local metadata statements. Statements will be loaded but
    * not refreshed
+   * @param opts.mdsBlobs An array of local MDS blob JWTs. Entries in each blob will be loaded but
+   * not refreshed
    * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
    * `"strict"` which throws errors during registration response verification when an
    * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
@@ -75,6 +77,7 @@ interface MetadataService {
   initialize(opts?: {
     mdsServers?: string[];
     statements?: MetadataStatement[];
+    mdsBlobs?: string[];
     verificationMode?: VerificationMode;
   }): Promise<void>;
   /**
@@ -102,10 +105,11 @@ export class BaseMetadataService implements MetadataService {
     opts: {
       mdsServers?: string[];
       statements?: MetadataStatement[];
+      mdsBlobs?: string[];
       verificationMode?: VerificationMode;
     } = {},
   ): Promise<void> {
-    const { mdsServers = [defaultURLMDS], statements, verificationMode } = opts;
+    const { mdsServers = [defaultURLMDS], statements, mdsBlobs, verificationMode } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
 
@@ -133,6 +137,16 @@ export class BaseMetadataService implements MetadataService {
       });
 
       log(`Cached ${statementsAdded} local statements`);
+    }
+
+    /**
+     * Next, if cached MDS blobs are provided, verify each JWT and then add their entries into the
+     * cache. Blobs loaded in this way will not be refreshed when a stale entry within is detected.
+     */
+    if (mdsBlobs?.length) {
+      for (const blob of mdsBlobs) {
+        await this.verifyBlob(blob, NonRefreshingMDS);
+      }
     }
 
     /**
