@@ -1,5 +1,13 @@
 # Changelog
 
+## v13.2.3
+
+**Changes**
+
+- **[server]** Dependencies have been updated to fix a `"Cannot get schema"` error that may occur
+  when verifying responses after upgrading to v13.2.0+
+  ([#747](https://github.com/MasterKale/SimpleWebAuthn/pull/747))
+
 ## v13.2.2
 
 **Changes**

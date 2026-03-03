@@ -6,6 +6,7 @@
  */
 import { DenoDir } from '@deno/cache-dir';
 import { join } from '@std/path';
+import { lessThan, parse } from '@std/semver';
 // n.b. ts-morph is a sibling devDependency of typescript, so that the module
 // loader will resolve our project's typescript package, not the transient
 // dependency of ts-morph. We only want to reference our typescript dependency
@@ -19,7 +20,19 @@ import {
   SyntaxKind,
   TypeAliasDeclaration,
 } from 'ts-morph';
-import { version } from 'typescript';
+import { version as npmVersion } from 'typescript';
+
+// Warn if the NPM "typescript" package is behind Deno's bundled TypeScript
+const denoTSVersion = Deno.version.typescript;
+const npmTS = parse(npmVersion);
+const denoTS = parse(denoTSVersion);
+
+// Compare only major.minor (ignore patch) by zeroing it out before comparing
+if (lessThan({ ...npmTS, patch: 0 }, { ...denoTS, patch: 0 })) {
+  console.warn(
+    `⚠️ Types Mismatch: Extracting types from TypeScript ${npmVersion}, but Deno v${Deno.version.deno} is using TypeScript ${denoTSVersion}`,
+  );
+}
 
 // List of types we directly reference from the dom lib. Only interface and type
 // alias identifiers are valid, since other syntax types (class, function, var)
@@ -48,7 +61,7 @@ const types = [
 const denoDir = new DenoDir();
 const domSourcePath = join(
   denoDir.root,
-  `npm/registry.npmjs.org/typescript/${version}/lib/lib.dom.d.ts`,
+  `npm/registry.npmjs.org/typescript/${npmVersion}/lib/lib.dom.d.ts`,
 );
 
 // Check that the file exists
@@ -100,7 +113,7 @@ const outputSourceFile = project.createSourceFile(`src/dom.ts`, undefined, {
 outputSourceFile.addStatements([
   `// deno-fmt-ignore-file`,
   `/**`,
-  ` * Generated from typescript@${version}`,
+  ` * Generated from typescript@${npmVersion}`,
   ` * To regenerate, run the following command from the package root:`,
   ` * deno task extract-dom-types`,
   ` */`,
