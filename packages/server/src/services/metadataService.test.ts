@@ -1,11 +1,15 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { assertSpyCallArg, assertSpyCalls, type Stub, stub } from '@std/testing/mock';
+import { FakeTime } from '@std/testing/time';
 
 import { _fetchInternals } from '../helpers/fetch.ts';
 
 import { BaseMetadataService, MetadataService } from './metadataService.ts';
 import type { MetadataStatement } from '../metadata/mdsTypes.ts';
+import { blob as testBlob, blobRootCert as testBlobRootCert } from '../metadata/verifyJWT.test.ts';
+import { SettingsService } from './settingsService.ts';
+import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
 
 let mockFetch: Stub;
 
@@ -51,6 +55,25 @@ describe('Method: initialize()', () => {
     const statement = await MetadataService.getStatement(localStatementAAGUID);
 
     assertEquals(statement, localStatement);
+  });
+
+  it('should load local MDS blob', async () => {
+    const fakedNow = new FakeTime(new Date('2026-03-03T00:00:00.000Z'));
+
+    SettingsService.setRootCertificates({ identifier: 'mds', certificates: [testBlobRootCert] });
+
+    await MetadataService.initialize({ mdsServers: [], mdsBlobs: [testBlob] });
+
+    // @ts-ignore: Quick and dirty check that all statements loaded
+    assertEquals(Object.keys(MetadataService.statementCache).length, 100);
+
+    // Reset default MDS root cert
+    SettingsService.setRootCertificates({
+      identifier: 'mds',
+      certificates: [GlobalSign_Root_CA_R3],
+    });
+
+    fakedNow.restore();
   });
 });
 
