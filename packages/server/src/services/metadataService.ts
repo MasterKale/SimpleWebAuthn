@@ -352,7 +352,7 @@ export class BaseMetadataService implements MetadataService {
         // then this message was logged higher up when it can include the array index of the stale
         // blob.
         log(
-          `⚠️ This blob (serial: ${payload.no}) contains stale data as of ${nextUpdate.toISOString()}. Please consider refreshing it.`,
+          `⚠️ This MDS blob (serial: ${payload.no}) contains stale data as of ${nextUpdate.toISOString()}. Please consider re-initializing MetadataService with a newer MDS blob.`,
         );
       }
     }
