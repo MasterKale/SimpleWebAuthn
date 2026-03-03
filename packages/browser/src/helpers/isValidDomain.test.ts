@@ -5,7 +5,7 @@ Deno.test('should handle localhost', () => {
   assert(isValidDomain('localhost'));
 });
 
-Deno.test('should handle standard ASCII domains and w/subdomains', () => {
+Deno.test('should handle standard ASCII domains and labels', () => {
   assert(isValidDomain('example.com'));
   assert(isValidDomain('my-site.io'));
   assert(isValidDomain('sub.example.co.uk'));
