@@ -147,11 +147,14 @@ export class BaseMetadataService implements MetadataService {
 
       for (const url of mdsServers) {
         try {
-          await this.downloadBlob({
+          const cachedMDS: CachedMDS = {
             url,
             no: 0,
             nextUpdate: new Date(0),
-          });
+          };
+
+          const blob = await this.downloadBlob(cachedMDS);
+          await this.verifyBlob(blob, cachedMDS);
         } catch (err) {
           // Notify of the error and move on
           log(`Could not download BLOB from ${url}:`, err);
@@ -212,7 +215,8 @@ export class BaseMetadataService implements MetadataService {
       if (now > mds.nextUpdate) {
         try {
           this.setState(SERVICE_STATE.REFRESHING);
-          await this.downloadBlob(mds);
+          const blob = await this.downloadBlob(mds);
+          await this.verifyBlob(blob, mds);
         } finally {
           this.setState(SERVICE_STATE.READY);
         }
