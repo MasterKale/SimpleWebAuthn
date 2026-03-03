@@ -24,7 +24,7 @@ export type VerifyAuthenticationResponseOpts = Parameters<typeof verifyAuthentic
  *
  * **Options:**
  *
- * @param response - Response returned by **@simplewebauthn/browser**'s `startAssertion()`
+ * @param response - Response returned by **@simplewebauthn/browser**'s `startAuthentication()`
  * @param expectedChallenge - The base64url-encoded `options.challenge` returned by `generateAuthenticationOptions()`
  * @param expectedOrigin - Website URL (or array of URLs) that the registration should have occurred on
  * @param expectedRPID - RP ID (or array of IDs) that was specified in the registration options
