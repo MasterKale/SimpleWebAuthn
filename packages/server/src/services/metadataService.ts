@@ -1,20 +1,9 @@
-import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
-import type {
-  MDSJWTHeader,
-  MDSJWTPayload,
-  MetadataBLOBPayloadEntry,
-  MetadataStatement,
-} from '../metadata/mdsTypes.ts';
-import { SettingsService } from '../services/settingsService.ts';
+import type { MetadataBLOBPayloadEntry, MetadataStatement } from '../metadata/mdsTypes.ts';
+import { verifyAndExtractBlobStatements } from '../metadata/verifyAndExtractBlobStatements.ts';
 import { getLogger } from '../helpers/logging.ts';
-import { convertPEMToBytes } from '../helpers/convertPEMToBytes.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
-
-import { parseJWT } from '../metadata/parseJWT.ts';
-import { verifyJWT } from '../metadata/verifyJWT.ts';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -277,10 +266,7 @@ export class BaseMetadataService implements MetadataService {
   private async verifyBlob(blob: string, cachedMDS: CachedMDS) {
     const { url, no } = cachedMDS;
 
-    // Parse the JWT
-    const parsedJWT = parseJWT<MDSJWTHeader, MDSJWTPayload>(blob);
-    const header = parsedJWT[0];
-    const payload = parsedJWT[1];
+    const { payload, parsedNextUpdate } = await verifyAndExtractBlobStatements(blob);
 
     if (payload.no <= no) {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
@@ -288,32 +274,6 @@ export class BaseMetadataService implements MetadataService {
       throw new Error(
         `Latest BLOB no. ${payload.no} is not greater than previous no. ${no}`,
       );
-    }
-
-    const headerCertsPEM = header.x5c.map(convertCertBufferToPEM);
-    try {
-      // Validate the certificate chain
-      const rootCerts = SettingsService.getRootCertificates({
-        identifier: 'mds',
-      });
-      await validateCertificatePath(headerCertsPEM, rootCerts);
-    } catch (error) {
-      const _error: Error = error as Error;
-      // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
-      // chain certificates is revoked"
-      throw new Error(
-        'BLOB certificate path could not be validated',
-        { cause: _error },
-      );
-    }
-
-    // Verify the BLOB JWT signature
-    const leafCert = headerCertsPEM[0];
-    const verified = await verifyJWT(blob, convertPEMToBytes(leafCert));
-
-    if (!verified) {
-      // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
-      throw new Error('BLOB signature could not be verified');
     }
 
     // Cache statements for FIDO2 devices
@@ -324,15 +284,6 @@ export class BaseMetadataService implements MetadataService {
       }
     }
 
-    // Convert the nextUpdate property into a Date so we can determine when to re-download
-    const [year, month, day] = payload.nextUpdate.split('-');
-    const nextUpdate = new Date(
-      parseInt(year, 10),
-      // Months need to be zero-indexed
-      parseInt(month, 10) - 1,
-      parseInt(day, 10),
-    );
-
     if (url) {
       // Remember info about the server so we can refresh later
       this.mdsCache[url] = {
@@ -340,19 +291,19 @@ export class BaseMetadataService implements MetadataService {
         // Store the payload `no` to make sure we're getting the next BLOB in the sequence
         no: payload.no,
         // Remember when we need to refresh this blob
-        nextUpdate,
+        nextUpdate: parsedNextUpdate,
       };
     } else {
       /**
        * This blob will not be refreshed, but we should still alert if the blob's `nextUpdate` is
        * in the past
        */
-      if (nextUpdate < new Date()) {
+      if (parsedNextUpdate < new Date()) {
         // TODO (Feb 2026): It'd be more actionable for devs if a specific error was raised here,
         // then this message was logged higher up when it can include the array index of the stale
         // blob.
         log(
-          `⚠️ This MDS blob (serial: ${payload.no}) contains stale data as of ${nextUpdate.toISOString()}. Please consider re-initializing MetadataService with a newer MDS blob.`,
+          `⚠️ This MDS blob (serial: ${payload.no}) contains stale data as of ${parsedNextUpdate.toISOString()}. Please consider re-initializing MetadataService with a newer MDS blob.`,
         );
       }
     }
@@ -416,3 +367,5 @@ export class BaseMetadataService implements MetadataService {
  * https://fidoalliance.org/metadata/
  */
 export const MetadataService: MetadataService = new BaseMetadataService();
+// Re-exporting this to help MetadataService support more use cases
+export { verifyAndExtractBlobStatements } from '../metadata/verifyAndExtractBlobStatements.ts';
