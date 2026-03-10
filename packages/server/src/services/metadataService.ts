@@ -1,6 +1,6 @@
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import type { MetadataBLOBPayloadEntry, MetadataStatement } from '../metadata/mdsTypes.ts';
-import { verifyAndExtractBlobStatements } from '../metadata/verifyAndExtractBlobStatements.ts';
+import { verifyMDSBlob } from '../metadata/verifyMDSBlob.ts';
 import { getLogger } from '../helpers/logging.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
@@ -252,7 +252,7 @@ export class BaseMetadataService implements MetadataService {
   private async verifyBlob(blob: string, cachedMDS: CachedMDS) {
     const { url, no } = cachedMDS;
 
-    const { payload, parsedNextUpdate } = await verifyAndExtractBlobStatements(blob);
+    const { payload, parsedNextUpdate } = await verifyMDSBlob(blob);
 
     if (payload.no <= no) {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
@@ -354,4 +354,4 @@ export class BaseMetadataService implements MetadataService {
  */
 export const MetadataService: MetadataService = new BaseMetadataService();
 // Re-exporting this to help MetadataService support more use cases
-export { verifyAndExtractBlobStatements } from '../metadata/verifyAndExtractBlobStatements.ts';
+export { verifyMDSBlob } from '../metadata/verifyMDSBlob.ts';
