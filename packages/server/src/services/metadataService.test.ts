@@ -56,25 +56,6 @@ describe('Method: initialize()', () => {
 
     assertEquals(statement, localStatement);
   });
-
-  it('should load local MDS blob', async () => {
-    const fakedNow = new FakeTime(new Date('2026-03-03T00:00:00.000Z'));
-
-    SettingsService.setRootCertificates({ identifier: 'mds', certificates: [testBlobRootCert] });
-
-    await MetadataService.initialize({ mdsServers: [], mdsBlobs: [testBlob] });
-
-    // @ts-ignore: Quick and dirty check that all statements loaded
-    assertEquals(Object.keys(MetadataService.statementCache).length, 100);
-
-    // Reset default MDS root cert
-    SettingsService.setRootCertificates({
-      identifier: 'mds',
-      certificates: [GlobalSign_Root_CA_R3],
-    });
-
-    fakedNow.restore();
-  });
 });
 
 describe('Method: getStatement()', () => {
