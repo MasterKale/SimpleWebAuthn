@@ -1,15 +1,11 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { assertSpyCallArg, assertSpyCalls, type Stub, stub } from '@std/testing/mock';
-import { FakeTime } from '@std/testing/time';
 
 import { _fetchInternals } from '../helpers/fetch.ts';
 
 import { BaseMetadataService, MetadataService } from './metadataService.ts';
 import type { MetadataStatement } from '../metadata/mdsTypes.ts';
-import { blob as testBlob, blobRootCert as testBlobRootCert } from '../metadata/verifyJWT.test.ts';
-import { SettingsService } from './settingsService.ts';
-import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
 
 let mockFetch: Stub;
 
