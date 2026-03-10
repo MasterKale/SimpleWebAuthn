@@ -1,20 +1,9 @@
-import { validateCertificatePath } from '../helpers/validateCertificatePath.ts';
-import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
-import type {
-  MDSJWTHeader,
-  MDSJWTPayload,
-  MetadataBLOBPayloadEntry,
-  MetadataStatement,
-} from '../metadata/mdsTypes.ts';
-import { SettingsService } from '../services/settingsService.ts';
+import type { MetadataBLOBPayloadEntry, MetadataStatement } from '../metadata/mdsTypes.ts';
+import { verifyMDSBlob } from '../metadata/verifyMDSBlob.ts';
 import { getLogger } from '../helpers/logging.ts';
-import { convertPEMToBytes } from '../helpers/convertPEMToBytes.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
-
-import { parseJWT } from '../metadata/parseJWT.ts';
-import { verifyJWT } from '../metadata/verifyJWT.ts';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -22,10 +11,23 @@ type CachedMDS = {
   no: number;
   nextUpdate: Date;
 };
+/**
+ * An instance of `CachedMDS` that will not trigger attempts to refresh the associated entry's blob
+ */
+const NonRefreshingMDS: CachedMDS = {
+  url: '',
+  no: 0,
+  nextUpdate: new Date(0),
+} as const;
 
 type CachedBLOBEntry = {
+  /** The entry in the MDS blob */
   entry: MetadataBLOBPayloadEntry;
-  url: string;
+  /**
+   * The MDS server the blob containing this entry was downloaded from. An empty URL will skip
+   * attempts to refresh this entry
+   */
+  url: CachedMDS['url'];
 };
 
 const defaultURLMDS = 'https://mds.fidoalliance.org/'; // v3
@@ -52,7 +54,8 @@ interface MetadataService {
    *
    * @param opts.mdsServers An array of URLs to FIDO Alliance Metadata Service
    * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
-   * @param opts.statements An array of local metadata statements
+   * @param opts.statements An array of local metadata statements. Statements will be loaded but
+   * not refreshed
    * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
    * `"strict"` which throws errors during registration response verification when an
    * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
@@ -91,11 +94,17 @@ export class BaseMetadataService implements MetadataService {
       verificationMode?: VerificationMode;
     } = {},
   ): Promise<void> {
+    // Reset statement cache
+    this.statementCache = {};
+
     const { mdsServers = [defaultURLMDS], statements, verificationMode } = opts;
 
     this.setState(SERVICE_STATE.REFRESHING);
 
-    // If metadata statements are provided, load them into the cache first
+    /**
+     * If metadata statements are provided, load them into the cache first. These statements will
+     * not be refreshed when a stale one is detected.
+     */
     if (statements?.length) {
       let statementsAdded = 0;
 
@@ -108,7 +117,7 @@ export class BaseMetadataService implements MetadataService {
               statusReports: [],
               timeOfLastStatusChange: '1970-01-01',
             },
-            url: '',
+            url: NonRefreshingMDS.url,
           };
 
           statementsAdded += 1;
@@ -118,7 +127,11 @@ export class BaseMetadataService implements MetadataService {
       log(`Cached ${statementsAdded} local statements`);
     }
 
-    // If MDS servers are provided, then process them and add their statements to the cache
+    /**
+     * If MDS servers are provided, then download blobs from them, verify them, and then add their
+     * entries to the cache. Blobs loaded in this way will be refreshed when a stale entry within is
+     * detected.
+     */
     if (mdsServers?.length) {
       // Get a current count so we know how many new statements we've added from MDS servers
       const currentCacheCount = Object.keys(this.statementCache).length;
@@ -126,11 +139,14 @@ export class BaseMetadataService implements MetadataService {
 
       for (const url of mdsServers) {
         try {
-          await this.downloadBlob({
+          const cachedMDS: CachedMDS = {
             url,
             no: 0,
             nextUpdate: new Date(0),
-          });
+          };
+
+          const blob = await this.downloadBlob(cachedMDS);
+          await this.verifyBlob(blob, cachedMDS);
         } catch (err) {
           // Notify of the error and move on
           log(`Could not download BLOB from ${url}:`, err);
@@ -191,7 +207,8 @@ export class BaseMetadataService implements MetadataService {
       if (now > mds.nextUpdate) {
         try {
           this.setState(SERVICE_STATE.REFRESHING);
-          await this.downloadBlob(mds);
+          const blob = await this.downloadBlob(mds);
+          await this.verifyBlob(blob, mds);
         } finally {
           this.setState(SERVICE_STATE.READY);
         }
@@ -219,49 +236,30 @@ export class BaseMetadataService implements MetadataService {
   /**
    * Download and process the latest BLOB from MDS
    */
-  private async downloadBlob(mds: CachedMDS) {
-    const { url, no } = mds;
+  private async downloadBlob(cachedMDS: CachedMDS) {
+    const { url } = cachedMDS;
+
     // Get latest "BLOB" (FIDO's terminology, not mine)
     const resp = await fetch(url);
     const data = await resp.text();
 
-    // Parse the JWT
-    const parsedJWT = parseJWT<MDSJWTHeader, MDSJWTPayload>(data);
-    const header = parsedJWT[0];
-    const payload = parsedJWT[1];
+    return data;
+  }
+
+  /**
+   * Verify and process the MDS metadata blob
+   */
+  private async verifyBlob(blob: string, cachedMDS: CachedMDS) {
+    const { url, no } = cachedMDS;
+
+    const { payload, parsedNextUpdate } = await verifyMDSBlob(blob);
 
     if (payload.no <= no) {
       // From FIDO MDS docs: "also ignore the file if its number (no) is less or equal to the
       // number of the last BLOB cached locally."
       throw new Error(
-        `Latest BLOB no. "${payload.no}" is not greater than previous ${no}`,
+        `Latest BLOB no. ${payload.no} is not greater than previous no. ${no}`,
       );
-    }
-
-    const headerCertsPEM = header.x5c.map(convertCertBufferToPEM);
-    try {
-      // Validate the certificate chain
-      const rootCerts = SettingsService.getRootCertificates({
-        identifier: 'mds',
-      });
-      await validateCertificatePath(headerCertsPEM, rootCerts);
-    } catch (error) {
-      const _error: Error = error as Error;
-      // From FIDO MDS docs: "ignore the file if the chain cannot be verified or if one of the
-      // chain certificates is revoked"
-      throw new Error(
-        'BLOB certificate path could not be validated',
-        { cause: _error },
-      );
-    }
-
-    // Verify the BLOB JWT signature
-    const leafCert = headerCertsPEM[0];
-    const verified = await verifyJWT(data, convertPEMToBytes(leafCert));
-
-    if (!verified) {
-      // From FIDO MDS docs: "The FIDO Server SHOULD ignore the file if the signature is invalid."
-      throw new Error('BLOB signature could not be verified');
     }
 
     // Cache statements for FIDO2 devices
@@ -272,20 +270,29 @@ export class BaseMetadataService implements MetadataService {
       }
     }
 
-    // Remember info about the server so we can refresh later
-    const [year, month, day] = payload.nextUpdate.split('-');
-    this.mdsCache[url] = {
-      ...mds,
-      // Store the payload `no` to make sure we're getting the next BLOB in the sequence
-      no: payload.no,
-      // Convert the nextUpdate property into a Date so we can determine when to re-download
-      nextUpdate: new Date(
-        parseInt(year, 10),
-        // Months need to be zero-indexed
-        parseInt(month, 10) - 1,
-        parseInt(day, 10),
-      ),
-    };
+    if (url) {
+      // Remember info about the server so we can refresh later
+      this.mdsCache[url] = {
+        ...cachedMDS,
+        // Store the payload `no` to make sure we're getting the next BLOB in the sequence
+        no: payload.no,
+        // Remember when we need to refresh this blob
+        nextUpdate: parsedNextUpdate,
+      };
+    } else {
+      /**
+       * This blob will not be refreshed, but we should still alert if the blob's `nextUpdate` is
+       * in the past
+       */
+      if (parsedNextUpdate < new Date()) {
+        // TODO (Feb 2026): It'd be more actionable for devs if a specific error was raised here,
+        // then this message was logged higher up when it can include the array index of the stale
+        // blob.
+        log(
+          `⚠️ This MDS blob (serial: ${payload.no}) contains stale data as of ${parsedNextUpdate.toISOString()}. Please consider re-initializing MetadataService with a newer MDS blob.`,
+        );
+      }
+    }
   }
 
   /**
