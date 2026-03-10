@@ -1,5 +1,17 @@
 # Changelog
 
+## v13.3.0
+
+**Changes:**
+
+- **[browser]** `startRegistration()` and `startAuthentication()` will recognize punycode domains
+  when trying to identify why an error occurred
+  ([#750](https://github.com/MasterKale/SimpleWebAuthn/pull/750))
+- **[server]** A new `verifyMDSBlob()` helper method has been added to verify and extract metadata
+  statements from FIDO MDS blobs. See
+  [the docs here](https://simplewebauthn.dev/docs/advanced/server/metadata-service#verifymdsblob)
+  for more info ([#752](https://github.com/MasterKale/SimpleWebAuthn/pull/752))
+
 ## v13.2.3
 
 **Changes**
