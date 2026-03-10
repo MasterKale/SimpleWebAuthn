@@ -353,5 +353,3 @@ export class BaseMetadataService implements MetadataService {
  * https://fidoalliance.org/metadata/
  */
 export const MetadataService: MetadataService = new BaseMetadataService();
-// Re-exporting this to help MetadataService support more use cases
-export { verifyMDSBlob } from '../metadata/verifyMDSBlob.ts';
