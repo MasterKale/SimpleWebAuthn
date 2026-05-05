@@ -42,6 +42,7 @@ export async function verifyAuthenticationResponse(
     expectedRPID: string | string[];
     credential: WebAuthnCredential;
     expectedType?: string | string[];
+    expectedTopOrigin?: string | string[];
     requireUserVerification?: boolean;
     advancedFIDOConfig?: {
       userVerification?: UserVerificationRequirement;
@@ -54,6 +55,7 @@ export async function verifyAuthenticationResponse(
     expectedOrigin,
     expectedRPID,
     expectedType,
+    expectedTopOrigin,
     credential,
     requireUserVerification = true,
     advancedFIDOConfig,
@@ -87,7 +89,7 @@ export async function verifyAuthenticationResponse(
 
   const clientDataJSON = decodeClientDataJSON(assertionResponse.clientDataJSON);
 
-  const { type, origin, challenge, tokenBinding } = clientDataJSON;
+  const { type, origin, challenge, tokenBinding, crossOrigin, topOrigin } = clientDataJSON;
 
   // Make sure we're handling an authentication
   if (Array.isArray(expectedType)) {
@@ -118,6 +120,31 @@ export async function verifyAuthenticationResponse(
     throw new Error(
       `Unexpected authentication response challenge "${challenge}", expected "${expectedChallenge}"`,
     );
+  }
+
+  // Check that the authentication response is within an expected iframe
+  if (crossOrigin) {
+    // TODO: Since Safari doesn't support `topOrigin` as of May 2026, only check this when `topOrigin` is available for now.
+    if (topOrigin) {
+      if (Array.isArray(expectedTopOrigin)) {
+        if (!expectedTopOrigin.includes(topOrigin)) {
+          const joinedExpectedTopOrigin = expectedTopOrigin.join(', ');
+          throw new Error(
+            `Unexpected cross-origin authentication within "${topOrigin}", expected one of: ${joinedExpectedTopOrigin}`,
+          );
+        }
+      } else {
+        if (topOrigin !== expectedTopOrigin) {
+          throw new Error(
+            `Unexpected cross-origin authentication within "${topOrigin}", expected: ${expectedTopOrigin}`,
+          );
+        }
+      }
+    // } else {
+    //   throw new Error(
+    //     'Invalid cross-origin authentication response - missing topOrigin',
+    //   );
+    }
   }
 
   // Check that the origin is our site
