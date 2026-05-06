@@ -578,35 +578,68 @@ Deno.test('should return user verified flag after successful auth', async () => 
   assertFalse(verification.authenticationInfo?.userVerified);
 });
 
-// Deno.test('should throw when crossOrigin is true but topOrigin is missing', async () => {
-//   const mockDecodeClientData = stub(
-//     _decodeClientDataJSONInternals,
-//     'stubThis',
-//     returnsNext([
-//       {
-//         type: 'webauthn.get',
-//         origin: assertionOrigin,
-//         challenge: assertionChallenge,
-//         crossOrigin: true,
-//       },
-//     ]),
-//   );
-// 
-//   await assertRejects(
-//     () =>
-//       verifyAuthenticationResponse({
-//         response: assertionResponse,
-//         expectedChallenge: assertionChallenge,
-//         expectedOrigin: assertionOrigin,
-//         expectedRPID: 'dev.dontneeda.pw',
-//         credential,
-//       }),
-//     Error,
-//     'Invalid cross-origin authentication response - missing topOrigin',
-//   );
-// 
-//   mockDecodeClientData.restore();
-// });
+Deno.test('should throw when crossOrigin is true, topOrigin is missing, and expectedTopOrigin is not specified', async () => {
+  const mockDecodeClientData = stub(
+    _decodeClientDataJSONInternals,
+    'stubThis',
+    returnsNext([
+      {
+        type: 'webauthn.get',
+        origin: assertionOrigin,
+        challenge: assertionChallenge,
+        crossOrigin: true,
+      },
+    ]),
+  );
+
+  try {
+    await assertRejects(
+      () =>
+        verifyAuthenticationResponse({
+          response: assertionResponse,
+          expectedChallenge: assertionChallenge,
+          expectedOrigin: assertionOrigin,
+          expectedRPID: 'dev.dontneeda.pw',
+          credential,
+        }),
+      Error,
+      'Unexpected cross-origin request',
+    );
+  } finally {
+    mockDecodeClientData.restore();
+  }
+});
+
+Deno.test('should verify when crossOrigin is true, topOrigin is missing, but expectedTopOrigin is specified (Safari workaround)', async () => {
+  const mockDecodeClientData = stub(
+    _decodeClientDataJSONInternals,
+    'stubThis',
+    returnsNext([
+      {
+        type: 'webauthn.get',
+        origin: assertionOrigin,
+        challenge: assertionChallenge,
+        crossOrigin: true,
+      },
+    ]),
+  );
+
+  try {
+    const verification = await verifyAuthenticationResponse({
+      response: assertionResponse,
+      expectedChallenge: assertionChallenge,
+      expectedOrigin: assertionOrigin,
+      expectedRPID: 'dev.dontneeda.pw',
+      expectedTopOrigin: 'https://top.origin.com',
+      credential,
+      requireUserVerification: false,
+    });
+
+    assertEquals(verification.verified, true);
+  } finally {
+    mockDecodeClientData.restore();
+  }
+});
 
 Deno.test('should verify when crossOrigin is true and topOrigin matches expectedTopOrigin (string)', async () => {
   const mockDecodeClientData = stub(
