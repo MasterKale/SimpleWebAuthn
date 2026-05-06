@@ -140,10 +140,11 @@ export async function verifyAuthenticationResponse(
           );
         }
       }
-    // } else {
-    //   throw new Error(
-    //     'Invalid cross-origin authentication response - missing topOrigin',
-    //   );
+    } else if (!expectedTopOrigin) {
+      // If `expectedTopOrigin` is not set, this is an unexpected cross-origin request.
+      throw new Error(
+        'Unexpected cross-origin request',
+      );
     }
   }
 
