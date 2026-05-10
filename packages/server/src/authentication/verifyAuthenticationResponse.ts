@@ -130,7 +130,7 @@ export async function verifyAuthenticationResponse(
         if (!expectedTopOrigin.includes(topOrigin)) {
           const joinedExpectedTopOrigin = expectedTopOrigin.join(', ');
           throw new Error(
-            `Unexpected cross-origin authentication within "${topOrigin}", expected one of: ${joinedExpectedTopOrigin}`,
+            `Unexpected cross-origin authentication response origin "${topOrigin}", expected one of: ${joinedExpectedTopOrigin}`,
           );
         }
       } else {
