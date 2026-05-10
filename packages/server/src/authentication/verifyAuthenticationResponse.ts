@@ -143,7 +143,7 @@ export async function verifyAuthenticationResponse(
     } else if (!expectedTopOrigin) {
       // If `expectedTopOrigin` is not set, this is an unexpected cross-origin request.
       throw new Error(
-        'Unexpected cross-origin request',
+        'Unexpected cross-origin authentication response',
       );
     }
   }
