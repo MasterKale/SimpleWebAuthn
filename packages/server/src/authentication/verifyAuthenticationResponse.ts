@@ -146,6 +146,11 @@ export async function verifyAuthenticationResponse(
         'Unexpected cross-origin authentication response',
       );
     }
+  } else if (topOrigin) {
+    // If `topOrigin` is set despite `crossOrigin` being false, this is an unexpected request.
+    throw new Error(
+      'Unexpected top origin without cross origin request',
+    );
   }
 
   // Check that the origin is our site
