@@ -603,7 +603,7 @@ Deno.test('should throw when crossOrigin is true, topOrigin is missing, and expe
           credential,
         }),
       Error,
-      'Unexpected cross-origin request',
+      'Unexpected cross-origin authentication response',
     );
   } finally {
     mockDecodeClientData.restore();
@@ -766,7 +766,7 @@ Deno.test('should throw when crossOrigin is true and topOrigin does not match an
           credential,
         }),
       Error,
-      'Unexpected cross-origin authentication within "https://wrong.top.origin.com", expected one of: https://top.origin.com, https://other.origin.com',
+      'Unexpected cross-origin authentication response origin "https://wrong.top.origin.com", expected one of: https://top.origin.com, https://other.origin.com',
     );
   } finally {
     mockDecodeClientData.restore();
@@ -806,7 +806,7 @@ Deno.test('should throw when crossOrigin is true but expectedTopOrigin is not sp
   }
 });
 
-Deno.test('should NOT check topOrigin when crossOrigin is false', async () => {
+Deno.test('should throw when topOrigin is set despite crossOrigin being false', async () => {
   const mockDecodeClientData = stub(
     _decodeClientDataJSONInternals,
     'stubThis',
@@ -822,16 +822,19 @@ Deno.test('should NOT check topOrigin when crossOrigin is false', async () => {
   );
 
   try {
-    const verification = await verifyAuthenticationResponse({
-      response: assertionResponse,
-      expectedChallenge: assertionChallenge,
-      expectedOrigin: assertionOrigin,
-      expectedRPID: 'dev.dontneeda.pw',
-      credential,
-      requireUserVerification: false,
-    });
-
-    assertEquals(verification.verified, true);
+    await assertRejects(
+      () =>
+        verifyAuthenticationResponse({
+          response: assertionResponse,
+          expectedChallenge: assertionChallenge,
+          expectedOrigin: assertionOrigin,
+          expectedRPID: 'dev.dontneeda.pw',
+          credential,
+          requireUserVerification: false,
+        }),
+      Error,
+      'Unexpected top origin without cross origin request',
+    );
   } finally {
     mockDecodeClientData.restore();
   }
