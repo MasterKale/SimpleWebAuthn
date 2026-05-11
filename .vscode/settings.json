@@ -1,12 +1,13 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
   "deno.path": "/Users/matt/.dvm/bin/deno",
   "deno.enable": true,
   "deno.config": "./deno.json",
   "deno.disablePaths": [
     "./scratchenv",
-    "./example"
+    "./example",
+    "./cov_profile"
   ],
   "editor.rulers": [
     100
