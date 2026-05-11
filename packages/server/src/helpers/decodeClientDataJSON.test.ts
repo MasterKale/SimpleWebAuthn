@@ -15,3 +15,18 @@ Deno.test('should convert base64url-encoded attestation clientDataJSON to JSON',
     },
   );
 });
+
+Deno.test('should convert base64url-encoded clientDataJSON with crossOrigin and topOrigin to JSON', () => {
+  assertEquals(
+    decodeClientDataJSON(
+      'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiY2hhbGxlbmdlIiwib3JpZ2luIjoiaHR0cHM6Ly9vcmlnaW4uY29tIiwiY3Jvc3NPcmlnaW4iOnRydWUsInRvcE9yaWdpbiI6Imh0dHBzOi8vdG9wLm9yaWdpbi5jb20ifQ',
+    ),
+    {
+      type: 'webauthn.get',
+      challenge: 'challenge',
+      origin: 'https://origin.com',
+      crossOrigin: true,
+      topOrigin: 'https://top.origin.com',
+    },
+  );
+});

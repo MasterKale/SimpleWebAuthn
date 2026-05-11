@@ -16,6 +16,7 @@ export type ClientDataJSON = {
   challenge: string;
   origin: string;
   crossOrigin?: boolean;
+  topOrigin?: string;
   tokenBinding?: {
     id?: string;
     status: 'present' | 'supported' | 'not-supported';
