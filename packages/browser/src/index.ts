@@ -5,6 +5,7 @@ export * from './helpers/platformAuthenticatorIsAvailable.ts';
 export * from './helpers/browserSupportsWebAuthnAutofill.ts';
 export * from './helpers/base64URLStringToBuffer.ts';
 export * from './helpers/bufferToBase64URLString.ts';
+export * from './helpers/getBrowserCapabilities.ts';
 export * from './helpers/webAuthnAbortService.ts';
 export * from './helpers/webAuthnError.ts';
 export * from './types/index.ts';
