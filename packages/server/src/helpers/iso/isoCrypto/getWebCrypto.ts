@@ -38,8 +38,8 @@ export function getWebCrypto(): Promise<Crypto> {
        *
        * `getRandomValues<T extends ArrayBufferView | null>(array: T): T;`
        *
-       * Casting to `as unknown as Crypto` here (using this project's DOM types extracted from the
-       * older version of TypeScript helps bridge the gap.
+       * Casting to `as unknown as Crypto` here (using this project's `Crypto` types extracted from
+       * DOM types in an older, minimum-supported-Deno version of TypeScript) helps bridge the gap.
        */
       webCrypto = _globalThisCrypto as unknown as Crypto;
       return resolve(webCrypto);
