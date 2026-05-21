@@ -29,7 +29,19 @@ export function getWebCrypto(): Promise<Crypto> {
     const _globalThisCrypto = _getWebCryptoInternals.stubThisGlobalThisCrypto();
 
     if (_globalThisCrypto) {
-      webCrypto = _globalThisCrypto;
+      /**
+       * In Deno v2.7.x, TypeScript 5.9 defines `Crypto.getRandomValues()` as the following type:
+       *
+       * `getRandomValues<T extends ArrayBufferView>(array: T): T;`
+       *
+       * However in earlier versions of TypeScript, `Crypto.getRandomValues()` is defined as such:
+       *
+       * `getRandomValues<T extends ArrayBufferView | null>(array: T): T;`
+       *
+       * Casting to `as unknown as Crypto` here (using this project's `Crypto` types extracted from
+       * DOM types in an older, minimum-supported-Deno version of TypeScript) helps bridge the gap.
+       */
+      webCrypto = _globalThisCrypto as unknown as Crypto;
       return resolve(webCrypto);
     }
 

@@ -1,5 +1,6 @@
 import { isValidDomain } from './isValidDomain.ts';
 import { WebAuthnError } from './webAuthnError.ts';
+import type { CredentialRequestOptions } from '../types/index.ts';
 
 /**
  * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.get()`

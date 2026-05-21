@@ -1,5 +1,7 @@
 import type {
   AuthenticatorTransportFuture,
+  CredentialCreationOptions,
+  PublicKeyCredentialCreationOptions,
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationCredential,
   RegistrationResponseJSON,
@@ -76,7 +78,7 @@ export async function startRegistration(
   // Wait for the user to complete attestation
   let credential;
   try {
-    credential = (await navigator.credentials.create(createOptions)) as RegistrationCredential;
+    credential = (await navigator.credentials.create(createOptions as globalThis.CredentialCreationOptions)) as RegistrationCredential;
   } catch (err) {
     throw identifyRegistrationError({ error: err as Error, options: createOptions });
   }

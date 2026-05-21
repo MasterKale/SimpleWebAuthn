@@ -5,8 +5,8 @@
 [![JSR](https://jsr.io/badges/@simplewebauthn/server?style=for-the-badge)](https://jsr.io/@simplewebauthn/server)
 
 - [Installation](#installation)
-  - [Node LTS 20.x and higher](#node-lts-20x-and-higher)
-  - [Deno v1.43 and higher](#deno-v143-and-higher)
+  - [Node LTS 22.x and higher](#node-lts-22x-and-higher)
+  - [Deno v2.4.x and higher](#deno-v24x-and-higher)
 - [Documentation](#documentation)
 - [Supported Attestation Formats](#supported-attestation-formats)
 
@@ -15,17 +15,21 @@
 This package can be installed from **[NPM](https://www.npmjs.com/package/@simplewebauthn/server)**
 and **[JSR](https://jsr.io/@simplewebauthn/server)**:
 
-### Node LTS 20.x and higher
+### Node LTS 22.x and higher
 
 ```sh
 npm install @simplewebauthn/server
 ```
 
-### Deno v1.43 and higher
+> NOTE: This project will aim to support Node LTS releases through their Active and Maintenance windows as tracked on [the Node.js Releases page](https://nodejs.org/en/about/previous-releases).
+
+### Deno v2.4.x and higher
 
 ```sh
 deno add jsr:@simplewebauthn/server
 ```
+
+> NOTE: [Deno no longer has LTS releases to track after April 30, 2026](https://docs.deno.com/runtime/fundamentals/stability_and_releases/#long-term-support-(lts)). This project will aim to support Deno minor releases for up to one year after their release.
 
 ## Documentation
 

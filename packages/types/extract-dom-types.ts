@@ -46,6 +46,8 @@ const types = [
   'AuthenticationExtensionsClientOutputs',
   'AuthenticatorSelectionCriteria',
   'COSEAlgorithmIdentifier',
+  'CredentialCreationOptions',
+  'CredentialRequestOptions',
   'Crypto',
   'PublicKeyCredential',
   'PublicKeyCredentialCreationOptions',

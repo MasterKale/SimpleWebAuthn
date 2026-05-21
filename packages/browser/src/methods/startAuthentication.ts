@@ -1,6 +1,8 @@
 import type {
   AuthenticationCredential,
   AuthenticationResponseJSON,
+  CredentialRequestOptions,
+  PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRequestOptionsJSON,
 } from '../types/index.ts';
 import { bufferToBase64URLString } from '../helpers/bufferToBase64URLString.ts';
@@ -103,7 +105,7 @@ export async function startAuthentication(
   // Wait for the user to complete assertion
   let credential;
   try {
-    credential = (await navigator.credentials.get(getOptions)) as AuthenticationCredential;
+    credential = (await navigator.credentials.get(getOptions as globalThis.CredentialRequestOptions)) as AuthenticationCredential;
   } catch (err) {
     throw identifyAuthenticationError({ error: err as Error, options: getOptions });
   }

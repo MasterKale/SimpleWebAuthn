@@ -23,8 +23,8 @@ incorporate WebAuthn into a website. The following packages are maintained here:
 ## Installation
 
 SimpleWebAuthn can be installed from **[NPM](https://www.npmjs.com/search?q=%40simplewebauthn)** and
-**[JSR](https://jsr.io/@simplewebauthn)** in **Node LTS 20.x and higher**, **Deno v1.43 and higher**
-projects, and other compatible runtimes (Cloudflare Workers, Bun, etc...)
+**[JSR](https://jsr.io/@simplewebauthn)** in **Node LTS 22.x and higher**, **Deno v2.4.x and
+higher** projects, and other compatible runtimes (Cloudflare Workers, Bun, etc...)
 
 See the packages' READMEs for more specific installation information.
 
