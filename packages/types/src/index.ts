@@ -248,6 +248,8 @@ export interface PublicKeyCredentialFuture extends PublicKeyCredential {
   ): PublicKeyCredentialRequestOptions;
   // See https://w3c.github.io/webauthn/#dom-publickeycredential-tojson
   toJSON(): PublicKeyCredentialJSON;
+  // See https://w3c.github.io/webauthn/#sctn-getClientCapabilities
+  getClientCapabilities?(): Promise<PublicKeyCredentialClientCapabilities>;
 }
 
 /**
@@ -285,6 +287,27 @@ export type AttestationFormat =
   | 'tpm'
   | 'apple'
   | 'none';
+
+/**
+ * Typing specific to the PublicKeyCredential.getClientCapabilities() method that's being wrapped
+ * above. A capability with an `undefined` value does not mean the feature is unsupported. It may
+ * simply be that the browser has chosen not to divulge its support for the capability as a more
+ * specific determination may be factored into e.g. ad-tech's browser fingerprinting that violates
+ * user privacy against the goals of the browser.
+ *
+ * See https://w3c.github.io/webauthn/#typedefdef-publickeycredentialclientcapabilities
+ */
+type PublicKeyCredentialClientCapabilities = {
+  conditionalCreate?: boolean;
+  conditionalGet?: boolean;
+  hybridTransport?: boolean;
+  passkeyPlatformAuthenticator?: boolean;
+  userVerifyingPlatformAuthenticator?: boolean;
+  relatedOrigins?: boolean;
+  signalAllAcceptedCredentials?: boolean;
+  signalCurrentUserDetails?: boolean;
+  signalUnknownCredential?: boolean;
+};
 
 /**
  * Equivalent to `Uint8Array` before TypeScript 5.7, and `Uint8Array<ArrayBuffer>` in TypeScript 5.7

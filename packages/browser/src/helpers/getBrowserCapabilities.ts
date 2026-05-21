@@ -121,25 +121,6 @@ export type BrowserCapabilities = {
 };
 
 /**
- * Typing specific to the PublicKeyCredential.getClientCapabilities() method that's being wrapped
- * above. A capability with an `undefined` value does not mean the feature is unsupported. It may
- * simply be that the browser has chosen not to divulge its support for the capability as a more
- * specific determination may be factored into e.g. ad-tech's browser fingerprinting that violates
- * user privacy against the goals of the browser.
- */
-type PublicKeyCredentialClientCapabilities = {
-  conditionalCreate?: boolean;
-  conditionalGet?: boolean;
-  hybridTransport?: boolean;
-  passkeyPlatformAuthenticator?: boolean;
-  userVerifyingPlatformAuthenticator?: boolean;
-  relatedOrigins?: boolean;
-  signalAllAcceptedCredentials?: boolean;
-  signalCurrentUserDetails?: boolean;
-  signalUnknownCredential?: boolean;
-};
-
-/**
  * Map the tri-state booleans in `PublicKeyCredential.getClientCapablities()` to more descriptive
  * values instead.
  */
