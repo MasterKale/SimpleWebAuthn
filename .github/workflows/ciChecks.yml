@@ -7,7 +7,6 @@ on:
   push:
     branches: [master, beta]
   pull_request:
-    branches: [master, beta]
 
 jobs:
   unit_tests:
