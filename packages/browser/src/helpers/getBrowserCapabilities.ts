@@ -1,3 +1,5 @@
+import type { PublicKeyCredentialClientCapabilities } from '../types/index.ts';
+
 /**
  * A helper method that wraps WebAuthn's
  * [`PublicKeyCredential.getClientCapabilities()`](https://w3c.github.io/webauthn/#sctn-getClientCapabilities)

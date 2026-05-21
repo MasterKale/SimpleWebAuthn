@@ -289,15 +289,16 @@ export type AttestationFormat =
   | 'none';
 
 /**
- * Typing specific to the PublicKeyCredential.getClientCapabilities() method that's being wrapped
- * above. A capability with an `undefined` value does not mean the feature is unsupported. It may
+ * More specific values available from `PublicKeyCredential.getClientCapabilities()`.
+ *
+ * A capability with an `undefined` value does not mean the feature is unsupported. It may
  * simply be that the browser has chosen not to divulge its support for the capability as a more
  * specific determination may be factored into e.g. ad-tech's browser fingerprinting that violates
  * user privacy against the goals of the browser.
  *
  * See https://w3c.github.io/webauthn/#typedefdef-publickeycredentialclientcapabilities
  */
-type PublicKeyCredentialClientCapabilities = {
+export type PublicKeyCredentialClientCapabilities = {
   conditionalCreate?: boolean;
   conditionalGet?: boolean;
   hybridTransport?: boolean;
