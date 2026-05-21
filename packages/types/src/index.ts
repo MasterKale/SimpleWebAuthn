@@ -27,6 +27,8 @@ export type {
   AuthenticatorSelectionCriteria,
   AuthenticatorTransport,
   COSEAlgorithmIdentifier,
+  CredentialCreationOptions,
+  CredentialRequestOptions,
   Crypto,
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
@@ -245,7 +247,7 @@ export interface PublicKeyCredentialFuture extends PublicKeyCredential {
     options: PublicKeyCredentialRequestOptionsJSON,
   ): PublicKeyCredentialRequestOptions;
   // See https://w3c.github.io/webauthn/#dom-publickeycredential-tojson
-  toJSON?(): PublicKeyCredentialJSON;
+  toJSON(): PublicKeyCredentialJSON;
 }
 
 /**
