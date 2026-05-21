@@ -15,8 +15,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20, 22]
-        deno-version: ['v2.1.x', 'v2.4.x']
+        node-version: [22, 24, 26]
+        deno-version: ['v2.4.x', 'v2.5.x', 'v2.6.x', 'v2.7.x']
 
     steps:
       - uses: actions/checkout@v4

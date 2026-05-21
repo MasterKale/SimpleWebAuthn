@@ -7,8 +7,8 @@
 ![Browser Support](https://img.shields.io/badge/Browser-ES5-brightgreen?style=for-the-badge&logo=Mozilla+Firefox)
 
 - [Installation](#installation)
-  - [Node LTS 20.x and higher](#node-lts-20x-and-higher)
-  - [Deno v1.43 and higher](#deno-v143-and-higher)
+  - [Node LTS 22.x and higher](#node-lts-22x-and-higher)
+  - [Deno v2.4.x and higher](#deno-v24x-and-higher)
   - [UMD](#umd)
     - [ES2021](#es2021)
     - [ES5](#es5)
@@ -19,17 +19,21 @@
 This package can be installed from **[NPM](https://www.npmjs.com/package/@simplewebauthn/browser)**
 and **[JSR](https://jsr.io/@simplewebauthn/browser)**:
 
-### Node LTS 20.x and higher
+### Node LTS 22.x and higher
 
 ```sh
 npm install @simplewebauthn/browser
 ```
 
-### Deno v1.43 and higher
+> NOTE: This project will aim to support Node LTS releases through their Active and Maintenance windows as tracked on [the Node.js Releases page](https://nodejs.org/en/about/previous-releases).
+
+### Deno v2.4.x and higher
 
 ```sh
 deno add jsr:@simplewebauthn/browser
 ```
+
+> NOTE: [Deno no longer has LTS releases to track after April 30, 2026](https://docs.deno.com/runtime/fundamentals/stability_and_releases/#long-term-support-(lts)). This project will aim to support Deno minor releases for up to one year after their release.
 
 ### UMD
 
