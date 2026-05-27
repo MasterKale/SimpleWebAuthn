@@ -148,6 +148,7 @@ export async function verifyAttestationAndroidSafetyNet(
     signature: signatureBuffer,
     data: signatureBaseBuffer,
     x509Certificate: leafCertBuffer,
+    hashAlgorithm: alg,
   });
   /**
    * END Verify Signature
