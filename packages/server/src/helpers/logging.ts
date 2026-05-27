@@ -1,20 +1,22 @@
-// const defaultLogger = debug('SimpleWebAuthn');
-
 /**
- * Generate an instance of a `debug` logger that extends off of the "simplewebauthn" namespace for
- * consistent naming.
+ * A basic logging interface that enables projects to capture logging output from SimpleWebAuthn
+ * using whatever logging method is appropriate for the project.
  *
- * See https://www.npmjs.com/package/debug for information on how to control logging output when
- * using @simplewebauthn/server
+ * For example, a project using `console` statements to capture logs can use the following
+ * implementation of this interface:
  *
- * Example:
- *
- * ```
- * const log = getLogger('mds');
- * log('hello'); // simplewebauthn:mds hello +0ms
+ * ```ts
+ * const ConsoleLogger: SimpleWebAuthnLogger = {
+ *   debug(message: string, ...args: unknown[]) { console.debug(message, ...args); },
+ *   info(message: string, ...args: unknown[]) { console.info(message, ...args); },
+ *   warn(message: string, ...args: unknown[]) { console.warn(message, ...args); },
+ *   error(message: string, ...args: unknown[]) { console.error(message, ...args); },
+ * };
  * ```
  */
-export function getLogger(_name: string): (message: string, ..._rest: unknown[]) => void {
-  // This is a noop for now while I search for a better debug logger technique
-  return (_message, ..._rest) => {};
+export interface SimpleWebAuthnLogger {
+  debug: (message: string, ...args: unknown[]) => void;
+  info: (message: string, ...args: unknown[]) => void;
+  warn: (message: string, ...args: unknown[]) => void;
+  error: (message: string, ...args: unknown[]) => void;
 }
