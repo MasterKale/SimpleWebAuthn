@@ -15,3 +15,4 @@ export * from './verifySignature.ts';
 export * from './iso/index.ts';
 export * from '../metadata/verifyMDSBlob.ts';
 export * as cose from './cose.ts';
+export { type SimpleWebAuthnLogger } from './logging.ts';
