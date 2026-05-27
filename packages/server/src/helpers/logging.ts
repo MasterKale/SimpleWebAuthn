@@ -20,3 +20,14 @@ export interface SimpleWebAuthnLogger {
   warn: (message: string, ...args: unknown[]) => void;
   error: (message: string, ...args: unknown[]) => void;
 }
+
+/**
+ * A logger instance that doesn't do anything. Useful as a default argument when no custom instance
+ * of the `SimpleWebAuthnLogger` interface is specified.
+ */
+export const DefaultNoopLogger: SimpleWebAuthnLogger = {
+  debug() {},
+  info() {},
+  warn() {},
+  error() {},
+};
