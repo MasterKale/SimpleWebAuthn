@@ -157,6 +157,7 @@ export async function verifyAttestationPacked(
       signature: sig,
       data: signatureBase,
       x509Certificate: x5c[0],
+      hashAlgorithm: alg,
     });
   } else {
     verified = await verifySignature({
