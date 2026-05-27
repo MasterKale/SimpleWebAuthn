@@ -1,5 +1,12 @@
 # Changelog
 
+## v13.3.1
+
+**Changes:**
+
+- **[server]** Fixed an issue with `verifyRegistrationResponse()` failing to verify some Packed and
+  SafetyNet statements ([#767](https://github.com/MasterKale/SimpleWebAuthn/pull/767))
+
 ## v13.3.0
 
 **Changes:**
