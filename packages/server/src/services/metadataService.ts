@@ -1,7 +1,11 @@
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import type { MetadataBLOBPayloadEntry, MetadataStatement } from '../metadata/mdsTypes.ts';
 import { verifyMDSBlob } from '../metadata/verifyMDSBlob.ts';
-import { DefaultNoopLogger, type SimpleWebAuthnLogger } from '../helpers/logging.ts';
+import {
+  buildLoggerAllMethods,
+  DefaultNoopLogger,
+  type SimpleWebAuthnLogger,
+} from '../helpers/logging.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
 
@@ -85,7 +89,7 @@ export class BaseMetadataService implements MetadataService {
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
   private verificationMode: VerificationMode = 'strict';
-  private logger: SimpleWebAuthnLogger = DefaultNoopLogger;
+  private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
 
   async initialize(
     opts: {
@@ -105,7 +109,7 @@ export class BaseMetadataService implements MetadataService {
       logger = DefaultNoopLogger,
     } = opts;
 
-    this.logger = logger;
+    this.logger = buildLoggerAllMethods(logger);
 
     this.setState(SERVICE_STATE.REFRESHING);
 
