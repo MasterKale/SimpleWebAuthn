@@ -124,33 +124,46 @@ export async function verifyAuthenticationResponse(
 
   // Check that the authentication response is within an expected iframe
   if (crossOrigin) {
-    // TODO: Since Safari doesn't support `topOrigin` as of May 2026, only check this when `topOrigin` is available for now.
+    /**
+     * TODO: Since Safari doesn't support `topOrigin` as of May 2026, only check this when
+     * `topOrigin` is available for now.
+     */
     if (topOrigin) {
+      if (!expectedTopOrigin) {
+        /**
+         * If `expectedTopOrigin` is not set, this should be considered an unexpected cross-origin
+         * request. Reject the response while helping the RP understand how they need to update this
+         * method call if they want to support verification of such WebAuthn authentication requests.
+         */
+        throw new Error(
+          `Detected cross-origin authentication response from top origin of "${topOrigin}", but a value for \`expectedTopOrigin\` was not specified when calling \`verifyAuthenticationResponse()\``,
+        );
+      }
+      
       if (Array.isArray(expectedTopOrigin)) {
         if (!expectedTopOrigin.includes(topOrigin)) {
           const joinedExpectedTopOrigin = expectedTopOrigin.join(', ');
           throw new Error(
-            `Unexpected cross-origin authentication response origin "${topOrigin}", expected one of: ${joinedExpectedTopOrigin}`,
+            `Unexpected cross-origin authentication response top origin of "${topOrigin}", expected one of: ${joinedExpectedTopOrigin}`,
           );
         }
       } else {
         if (topOrigin !== expectedTopOrigin) {
           throw new Error(
-            `Unexpected cross-origin authentication within "${topOrigin}", expected: ${expectedTopOrigin}`,
+            `Unexpected cross-origin authentication response top origin of "${topOrigin}", expected: ${expectedTopOrigin}`,
           );
         }
       }
-    } else if (!expectedTopOrigin) {
-      // If `expectedTopOrigin` is not set, this is an unexpected cross-origin request.
-      throw new Error(
-        'Unexpected cross-origin authentication response',
-      );
     }
-  } else if (topOrigin) {
-    // If `topOrigin` is set despite `crossOrigin` being false, this is an unexpected request.
-    throw new Error(
-      'Unexpected top origin without cross origin request',
-    );
+  } else {
+    if (topOrigin) {
+      /**
+       * If `topOrigin` is set despite `crossOrigin` being false, this is an unexpected request.
+       * 
+       * See https://w3c.github.io/webauthn/#dom-collectedclientdata-toporigin.
+       */
+      throw new Error(`Unexpected top origin of "${topOrigin}" within a non-cross-origin authentication response. This error should be reported to the browser vendor as a WebAuthn specification violation with a link to https://w3c.github.io/webauthn/#dom-collectedclientdata-toporigin`);
+    }
   }
 
   // Check that the origin is our site
