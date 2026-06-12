@@ -76,9 +76,9 @@ export async function validateCertificatePath(
     throw new Error('No specified trust anchor was valid for verifying x5c');
   }
 
-  // Try to verify x5c with each trust anchor
+  // Try to verify x5c with each valid trust anchor
   let invalidSubjectAndIssuerError = false;
-  for (const anchor of trustAnchorsParsed) {
+  for (const anchor of validTrustAnchors) {
     try {
       const x5cWithTrustAnchor = x5cCertsParsed.concat([anchor]);
 
