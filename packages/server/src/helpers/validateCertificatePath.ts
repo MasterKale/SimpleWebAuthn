@@ -81,8 +81,9 @@ export async function validateCertificatePath(
   for (const anchor of validTrustAnchors) {
     try {
       const x5cWithTrustAnchor = x5cCertsParsed.concat([anchor]);
+      const numUniqueCerts = new Set(x5cWithTrustAnchor.map((cert) => cert.toString('pem'))).size;
 
-      if (new Set(x5cWithTrustAnchor).size !== x5cWithTrustAnchor.length) {
+      if (numUniqueCerts !== x5cWithTrustAnchor.length) {
         throw new Error('Invalid certificate path: found duplicate certificates');
       }
 
