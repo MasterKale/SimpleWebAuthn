@@ -113,8 +113,15 @@ export async function validateCertificatePath(
             throw new InvalidSubjectAndIssuer();
           }
 
-          // Don't process anything else after a root cert
-          break;
+          /**
+           * Only allow a self-signed certificate to be the last certificate in the chain
+           * (i.e. the trust anchor when the trust anchor is a root cert). This helps ensure
+           * that the certificate(s) in x5c chains to the anchor, rather than terminate early if
+           * there happens to be a self-signed certificate in a malicious x5c.
+           */
+          if (!issuer.equal(anchor)) {
+            throw new SelfSignedRootInX5C();
+          }
         }
       }
 
@@ -124,7 +131,11 @@ export async function validateCertificatePath(
       break;
     } catch (err) {
       if (err instanceof InvalidSubjectAndIssuer) {
+        // Don't throw yet so we can try another trust anchort
         invalidSubjectAndIssuerError = true;
+      } else if (err instanceof SelfSignedRootInX5C) {
+        // Immediately throw here because the problem is in x5c regardless of trust anchor
+        throw err;
       } else {
         throw new Error('Unexpected error while validating certificate path', { cause: err });
       }
@@ -167,5 +178,14 @@ class InvalidSubjectAndIssuer extends Error {
     const message = 'Subject issuer did not match issuer subject';
     super(message);
     this.name = 'InvalidSubjectAndIssuer';
+  }
+}
+
+class SelfSignedRootInX5C extends Error {
+  constructor() {
+    const message =
+      'x5c contained a self-signed certificate. Only trust anchors can be self-signed';
+    super(message);
+    this.name = 'SelfSignedRootInX5C';
   }
 }
