@@ -81,10 +81,12 @@ Deno.test('should reject x5c containing self-signed root certificate', async () 
   await assertRejects(
     () =>
       validateCertificatePath(
+        // x5c
         [maliciousLeafCert.toString(), maliciousSelfSignedRootCert.toString()],
+        // trust anchors
         [realTrustAnchorCert.toString()],
       ),
     Error,
-    'x5c contained a self-signed certificate',
+    'x5c could not be chained to any specified trust anchor',
   );
 });
