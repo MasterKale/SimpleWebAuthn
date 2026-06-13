@@ -130,3 +130,56 @@ Deno.test('should raise on not-yet-valid trust anchor certificate', async () => 
     'No specified trust anchor was valid',
   );
 });
+
+Deno.test('should raise on expired leaf certificate', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-06-08'));
+
+  const notBefore = new Date('2026-06-07');
+  const notAfter = new Date('2026-06-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter: new Date('2026-06-07'), // <-- earlier than _fakedNow
+    chainsToCertificate: rootCert.certificate,
+    chainsToPrivateKey: rootCert.keys.privateKey,
+  });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert.toString()],
+        [rootCert.certificate.toString()],
+      ),
+    Error,
+    'certificate out of validity period in x5c',
+  );
+});
+
+Deno.test('should raise on expired trust anchor certificate', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-06-08'));
+
+  const notBefore = new Date('2026-06-07');
+  const notAfter = new Date('2026-06-09');
+
+  const rootCert = await generateRootCert({
+    notBefore,
+    notAfter: new Date('2026-06-07'), // <-- earlier than _fakedNow
+  });
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter,
+    chainsToCertificate: rootCert.certificate,
+    chainsToPrivateKey: rootCert.keys.privateKey,
+  });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert.toString()],
+        [rootCert.certificate.toString()],
+      ),
+    Error,
+    'No specified trust anchor was valid',
+  );
+});
