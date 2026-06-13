@@ -4,20 +4,20 @@ import { FakeTime } from '@std/testing/time';
 import { validateCertificatePath } from './validateCertificatePath.ts';
 import { generateLeafCert, generateRootCert } from './tests/x509Utils.ts';
 
-/**
- * This test generates X.509 certificates to ensure that the following hypothetical/malicious
- * certificate chain in x5c will be rejected:
- *
- * [
- *   x5c[0] (maliciousLeaf, signed by maliciousRoot)
- *   x5c[1] (maliciousRoot, self-signed root cert)
- *   realTrustAnchor
- * ]
- *
- * The certs don't chain back to realTrustAnchor and so that attestation statement should be
- * rejected.
- */
 Deno.test('should reject x5c containing self-signed root certificate', async () => {
+  /**
+   * This test generates X.509 certificates to ensure that the following hypothetical/malicious
+   * certificate chain in x5c will be rejected:
+   *
+   * [
+   *   x5c[0] (maliciousLeaf, signed by maliciousRoot)
+   *   x5c[1] (maliciousRoot, self-signed root cert)
+   *   realTrustAnchor
+   * ]
+   *
+   * The certs don't chain back to realTrustAnchor and so that attestation statement should be
+   * rejected.
+   */
   using _fakedNow = new FakeTime(new Date('2026-06-08'));
 
   const notBefore = new Date('2026-06-07');
