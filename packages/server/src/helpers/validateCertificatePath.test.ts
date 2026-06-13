@@ -183,3 +183,30 @@ Deno.test('should raise on expired trust anchor certificate', async () => {
     'No specified trust anchor was valid',
   );
 });
+
+Deno.test('should raise when x5c does not chain to trust anchor', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-06-08'));
+
+  const notBefore = new Date('2026-06-07');
+  const notAfter = new Date('2026-06-09');
+
+  const rootCert1 = await generateRootCert({ notBefore, notAfter });
+  const leafCert1 = await generateLeafCert({
+    notBefore,
+    notAfter,
+    chainsToCertificate: rootCert1.certificate,
+    chainsToPrivateKey: rootCert1.keys.privateKey,
+  });
+
+  const rootCert2 = await generateRootCert({ notBefore, notAfter });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert1.toString()],
+        [rootCert2.certificate.toString()],
+      ),
+    Error,
+    'x5c could not be chained',
+  );
+});
