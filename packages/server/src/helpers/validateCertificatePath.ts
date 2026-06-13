@@ -96,13 +96,13 @@ export async function validateCertificatePath(
       // Cert chain should be, from index 0: leaf cert -> ...intermediates -> trust anchor
       const chain = await chainBuilder.build(x5cLeafCert);
 
-      // We got a chain back but it didn't contain (all of the certs in x5c) + (the trust anchor)
+      // Check if the chain contains (all of the certs in x5c) + (the trust anchor)
       if (chain.length < numUniqueCerts) {
         throw new InvalidX5CChain();
       }
 
-      // x5c did not chain to the trust anchor
-      if (chain[chain.length - 1] !== anchor) {
+      // Check if the chain is to the trust anchor
+      if (chain[chain.length - 1].subject !== anchor.subject) {
         throw new InvalidX5CChain();
       }
 
