@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { assertSpyCall, spy } from '@std/testing/mock';
+import { assertSpyCallArg, spy } from '@std/testing/mock';
 
 import { buildLoggerAllMethods } from './logging.ts';
 
@@ -19,5 +19,5 @@ Deno.test('should use provided logger methods', () => {
   logger.debug('SimpleWebAuthn');
 
   assertEquals(logger.debug, _debugSpy);
-  assertSpyCall(_debugSpy, 0, { args: ['SimpleWebAuthn'], returned: undefined });
+  assertSpyCallArg(_debugSpy, 0, 0, 'SimpleWebAuthn');
 });
