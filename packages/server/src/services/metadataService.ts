@@ -1,7 +1,11 @@
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import type { MetadataBLOBPayloadEntry, MetadataStatement } from '../metadata/mdsTypes.ts';
 import { verifyMDSBlob } from '../metadata/verifyMDSBlob.ts';
-import { getLogger } from '../helpers/logging.ts';
+import {
+  buildLoggerAllMethods,
+  DefaultNoopLogger,
+  type SimpleWebAuthnLogger,
+} from '../helpers/logging.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
 
@@ -44,8 +48,6 @@ enum SERVICE_STATE {
  */
 export type VerificationMode = 'permissive' | 'strict';
 
-const log = getLogger('MetadataService');
-
 interface MetadataService {
   /**
    * Prepare the service to handle remote MDS servers and/or cache local metadata statements.
@@ -65,6 +67,7 @@ interface MetadataService {
     mdsServers?: string[];
     statements?: MetadataStatement[];
     verificationMode?: VerificationMode;
+    logger?: SimpleWebAuthnLogger;
   }): Promise<void>;
   /**
    * Get a metadata statement for a given AAGUID.
@@ -86,18 +89,27 @@ export class BaseMetadataService implements MetadataService {
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
   private verificationMode: VerificationMode = 'strict';
+  private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
 
   async initialize(
     opts: {
       mdsServers?: string[];
       statements?: MetadataStatement[];
       verificationMode?: VerificationMode;
+      logger?: SimpleWebAuthnLogger;
     } = {},
   ): Promise<void> {
     // Reset statement cache
     this.statementCache = {};
 
-    const { mdsServers = [defaultURLMDS], statements, verificationMode } = opts;
+    const {
+      mdsServers = [defaultURLMDS],
+      statements,
+      verificationMode,
+      logger = DefaultNoopLogger,
+    } = opts;
+
+    this.logger = buildLoggerAllMethods(logger);
 
     this.setState(SERVICE_STATE.REFRESHING);
 
@@ -124,7 +136,7 @@ export class BaseMetadataService implements MetadataService {
         }
       });
 
-      log(`Cached ${statementsAdded} local statements`);
+      this.logger.info(`Cached ${statementsAdded} local statements`);
     }
 
     /**
@@ -149,7 +161,7 @@ export class BaseMetadataService implements MetadataService {
           await this.verifyBlob(blob, cachedMDS);
         } catch (err) {
           // Notify of the error and move on
-          log(`Could not download BLOB from ${url}:`, err);
+          this.logger.error(`Could not download BLOB from ${url}:`, err);
           numServers -= 1;
         }
       }
@@ -157,7 +169,7 @@ export class BaseMetadataService implements MetadataService {
       // Calculate the difference to get the total number of new statements we successfully added
       const newCacheCount = Object.keys(this.statementCache).length;
       const cacheDiff = newCacheCount - currentCacheCount;
-      log(
+      this.logger.info(
         `Cached ${cacheDiff} statements from ${numServers} metadata server(s)`,
       );
     }
@@ -288,7 +300,7 @@ export class BaseMetadataService implements MetadataService {
         // TODO (Feb 2026): It'd be more actionable for devs if a specific error was raised here,
         // then this message was logged higher up when it can include the array index of the stale
         // blob.
-        log(
+        this.logger.warn(
           `⚠️ This MDS blob (serial: ${payload.no}) contains stale data as of ${parsedNextUpdate.toISOString()}. Please consider re-initializing MetadataService with a newer MDS blob.`,
         );
       }
@@ -337,11 +349,11 @@ export class BaseMetadataService implements MetadataService {
     this.state = newState;
 
     if (newState === SERVICE_STATE.DISABLED) {
-      log('MetadataService is DISABLED');
+      this.logger.debug('MetadataService is DISABLED');
     } else if (newState === SERVICE_STATE.REFRESHING) {
-      log('MetadataService is REFRESHING');
+      this.logger.debug('MetadataService is REFRESHING');
     } else if (newState === SERVICE_STATE.READY) {
-      log('MetadataService is READY');
+      this.logger.debug('MetadataService is READY');
     }
   }
 }
