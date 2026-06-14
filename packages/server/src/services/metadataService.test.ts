@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
-import { assertSpyCallArg, assertSpyCalls, type Stub, stub } from '@std/testing/mock';
+import { assertSpyCallArg, assertSpyCalls, spy, type Stub, stub } from '@std/testing/mock';
 
 import { _fetchInternals } from '../helpers/fetch.ts';
 
@@ -92,6 +92,25 @@ describe('Method: getStatement()', () => {
     const statement = await MetadataService.getStatement('not-a-real-aaguid');
 
     assertEquals(statement, undefined);
+  });
+});
+
+describe('Behavior: logging', () => {
+  it('should use provided logger', async () => {
+    const _debugSpy = spy();
+
+    await MetadataService.initialize({
+      mdsServers: [],
+      statements: [],
+      logger: { debug: _debugSpy },
+    });
+
+    /**
+     * NOTE TO FUTURE SELF: As of June 2026 the content of the logging is less important here than
+     * the fact that the service used the provided logger to communicate internal goings on.
+     */
+    assertSpyCallArg(_debugSpy, 0, 0, 'MetadataService is REFRESHING');
+    assertSpyCallArg(_debugSpy, 1, 0, 'MetadataService is READY');
   });
 });
 
