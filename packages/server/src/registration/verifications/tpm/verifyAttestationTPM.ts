@@ -28,9 +28,10 @@ import { MetadataService } from '../../../services/metadataService.ts';
 import { verifyAttestationWithMetadata } from '../../../metadata/verifyAttestationWithMetadata.ts';
 import type { Uint8Array_ } from '../../../types/index.ts';
 
-import { TPM_ECC_CURVE_COSE_CRV_MAP, TPM_MANUFACTURERS } from './constants.ts';
+import { TPM_ECC_CURVE_COSE_CRV_MAP } from './constants.ts';
 import { parseCertInfo } from './parseCertInfo.ts';
 import { parsePubArea } from './parsePubArea.ts';
+import { getTPMManufacturerInfo } from './isValidTPMManufacturerID.ts';
 
 export async function verifyAttestationTPM(
   options: AttestationFormatVerifierOpts,
@@ -325,7 +326,7 @@ export async function verifyAttestationTPM(
   }
 
   // Check that tcpaTpmManufacturer (2.23.133.2.1) field is set to a valid manufacturer ID.
-  if (!TPM_MANUFACTURERS[tcgAtTpmManufacturer]) {
+  if (!getTPMManufacturerInfo(tcgAtTpmManufacturer)) {
     throw new Error(
       `Could not match TPM manufacturer "${tcgAtTpmManufacturer}" (TPM)`,
     );
