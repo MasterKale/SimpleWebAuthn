@@ -90,7 +90,7 @@ export const TPM_ECC_CURVE: { [key: number]: string } = {
   0x0020: 'TPM_ECC_SM2_P256',
 };
 
-type ManufacturerInfo = {
+export type ManufacturerInfo = {
   name: string;
   id: string;
 };
