@@ -3,7 +3,6 @@
   "editor.formatOnSave": true,
   "deno.path": "/Users/matt/.dvm/bin/deno",
   "deno.enable": true,
-  "deno.config": "./deno.json",
   "deno.disablePaths": [
     "./scratchenv",
     "./example",
