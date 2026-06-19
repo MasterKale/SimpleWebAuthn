@@ -113,8 +113,7 @@ export const TPM_MANUFACTURERS: { [key: string]: ManufacturerInfo } = {
   'id:48504900': { name: 'HPI', id: 'HPI' },
   'id:48504500': { name: 'HPE', id: 'HPE' },
   'id:48495349': { name: 'Huawei', id: 'HISI' },
-  'id:49424d00': { name: 'IBM', id: 'IBM' },
-  'id:49424D00': { name: 'IBM', id: 'IBM' }, // Same ID for IBM as above, except the "D" is capitalized as per TPM spec
+  'id:49424D00': { name: 'IBM', id: 'IBM' }, // IBM is "id:49424d00" in the TPM spec. It's been normalized here
   'id:49465800': { name: 'Infineon', id: 'IFX' },
   'id:494E5443': { name: 'Intel', id: 'INTC' },
   'id:4C454E00': { name: 'Lenovo', id: 'LEN' },
