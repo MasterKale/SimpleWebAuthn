@@ -74,7 +74,7 @@ export async function validateCertificatePath(
   }
 
   // Try to verify x5c with each valid trust anchor
-  let invalidX5CChain = false;
+  let invalidCertificateChain = true;
   for (const anchor of validTrustAnchors) {
     try {
       const x5cWithTrustAnchor = x5cCertsParsed.concat([anchor]);
@@ -98,31 +98,28 @@ export async function validateCertificatePath(
 
       // Check if the chain contains (all of the certs in x5c) + (the trust anchor)
       if (chain.length < numUniqueCerts) {
-        throw new InvalidX5CChain();
+        // Invalid cert chain, try the next trust anchor
+        continue;
       }
 
       // Check if the chain is to the trust anchor
       if (chain[chain.length - 1].subject !== anchor.subject) {
-        throw new InvalidX5CChain();
+        // Invalid cert chain, try the next trust anchor
+        continue;
       }
 
       // If we successfully validated a path then there's no need to continue. Reset any existing
       // errors that were thrown by earlier trust anchors
-      invalidX5CChain = false;
+      invalidCertificateChain = false;
       break;
     } catch (err) {
-      if (err instanceof InvalidX5CChain) {
-        // Don't throw yet so we can try another trust anchor
-        invalidX5CChain = true;
-      } else {
-        throw new Error('Unexpected error while validating certificate path', { cause: err });
-      }
+      throw new Error('Unexpected error while validating certificate path', { cause: err });
     }
   }
 
   // We tried multiple trust anchors and none of them worked
-  if (invalidX5CChain) {
-    throw new InvalidX5CChain();
+  if (invalidCertificateChain) {
+    throw new InvalidCertificatePath();
   }
 
   return true;
@@ -150,7 +147,7 @@ function assertCertIsWithinValidTimeWindow(certNotBefore: Date, certNotAfter: Da
   }
 }
 
-class InvalidX5CChain extends Error {
+class InvalidCertificatePath extends Error {
   constructor() {
     const message = 'x5c could not be chained to any specified trust anchor';
     super(message);
