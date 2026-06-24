@@ -1,7 +1,6 @@
-import { X509Certificate } from '@peculiar/x509';
+import { X509Certificate, X509ChainBuilder } from '@peculiar/x509';
 
 import { isCertRevoked } from './isCertRevoked.ts';
-import { getWebCrypto } from './iso/isoCrypto/getWebCrypto.ts';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -16,8 +15,6 @@ export async function validateCertificatePath(
     // We have no trust anchors to chain back to, so skip path validation
     return true;
   }
-
-  const WebCrypto = await getWebCrypto();
 
   // Prepare to work with x5c certs
   const x5cCertsParsed = x5cCertsPEM.map((certPEM) => new X509Certificate(certPEM));
@@ -76,63 +73,53 @@ export async function validateCertificatePath(
     throw new Error('No specified trust anchor was valid for verifying x5c');
   }
 
-  // Try to verify x5c with each trust anchor
-  let invalidSubjectAndIssuerError = false;
-  for (const anchor of trustAnchorsParsed) {
+  // Try to verify x5c with each valid trust anchor
+  let invalidCertificateChain = true;
+  for (const anchor of validTrustAnchors) {
     try {
       const x5cWithTrustAnchor = x5cCertsParsed.concat([anchor]);
+      const numUniqueCerts = new Set(x5cWithTrustAnchor.map((cert) => cert.toString('pem'))).size;
 
-      if (new Set(x5cWithTrustAnchor).size !== x5cWithTrustAnchor.length) {
+      if (numUniqueCerts !== x5cWithTrustAnchor.length) {
         throw new Error('Invalid certificate path: found duplicate certificates');
       }
 
-      // Check signatures, and notBefore and notAfter
-      for (let i = 0; i < x5cWithTrustAnchor.length - 1; i++) {
-        const subject = x5cWithTrustAnchor[i];
-        const issuer = x5cWithTrustAnchor[i + 1];
+      // Break apart x5c to try and build a valid cert chain
+      const x5cLeafCert = x5cCertsParsed[0];
+      let x5cIntermediates: X509Certificate[] = [];
+      if (x5cCertsParsed.length > 1) {
+        x5cIntermediates = x5cCertsParsed.slice(1);
+      }
 
-        // Leaf or intermediate cert, make sure the next cert in the chain signed it
-        const issuerSignedSubject = await subject.verify(
-          { publicKey: issuer.publicKey, signatureOnly: true },
-          WebCrypto,
-        );
+      // Order of certs doesn't matter here but for readability
+      const chainBuilder = new X509ChainBuilder({ certificates: [...x5cIntermediates, anchor] });
+      // Cert chain should be, from index 0: leaf cert -> ...intermediates -> trust anchor
+      const chain = await chainBuilder.build(x5cLeafCert);
 
-        if (!issuerSignedSubject) {
-          throw new InvalidSubjectAndIssuer();
-        }
+      // Check if the chain contains (all of the certs in x5c) + (the trust anchor)
+      if (chain.length < numUniqueCerts) {
+        // Invalid cert chain, try the next trust anchor
+        continue;
+      }
 
-        if (issuer.subject === issuer.issuer) {
-          // Root cert detected, make sure it signed itself
-          const issuerSignedIssuer = await issuer.verify(
-            { publicKey: issuer.publicKey, signatureOnly: true },
-            WebCrypto,
-          );
-
-          if (!issuerSignedIssuer) {
-            throw new InvalidSubjectAndIssuer();
-          }
-
-          // Don't process anything else after a root cert
-          break;
-        }
+      // Check if the chain is to the trust anchor
+      if (chain[chain.length - 1].subject !== anchor.subject) {
+        // Invalid cert chain, try the next trust anchor
+        continue;
       }
 
       // If we successfully validated a path then there's no need to continue. Reset any existing
       // errors that were thrown by earlier trust anchors
-      invalidSubjectAndIssuerError = false;
+      invalidCertificateChain = false;
       break;
     } catch (err) {
-      if (err instanceof InvalidSubjectAndIssuer) {
-        invalidSubjectAndIssuerError = true;
-      } else {
-        throw new Error('Unexpected error while validating certificate path', { cause: err });
-      }
+      throw new Error('Unexpected error while validating certificate path', { cause: err });
     }
   }
 
   // We tried multiple trust anchors and none of them worked
-  if (invalidSubjectAndIssuerError) {
-    throw new InvalidSubjectAndIssuer();
+  if (invalidCertificateChain) {
+    throw new InvalidCertificatePath();
   }
 
   return true;
@@ -160,11 +147,10 @@ function assertCertIsWithinValidTimeWindow(certNotBefore: Date, certNotAfter: Da
   }
 }
 
-// Custom errors to help pass on certain errors
-class InvalidSubjectAndIssuer extends Error {
+class InvalidCertificatePath extends Error {
   constructor() {
-    const message = 'Subject issuer did not match issuer subject';
+    const message = 'x5c could not be chained to any specified trust anchor';
     super(message);
-    this.name = 'InvalidSubjectAndIssuer';
+    this.name = 'InvalidX5CChain';
   }
 }
