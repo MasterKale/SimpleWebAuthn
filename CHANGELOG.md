@@ -1,5 +1,17 @@
 # Changelog
 
+## v13.3.2
+
+This update fixes a CVSS v4 Low (2.0) security vulnerability identified in
+**@simplewebauthn/server**. See the security advisory linked below for more information.
+
+**Changes:**
+
+- **[server]** Fixed an issue with `verifyRegistrationResponse()` allowing a maliciously-crafted
+  attestation statement's `x5c` to contain a self-signed "root certificate" instead of chaining back
+  to an RP-specified trust anchor
+  ([GHSA-6hxq-p678-4hr2](https://github.com/MasterKale/SimpleWebAuthn/security/advisories/GHSA-6hxq-p678-4hr2))
+
 ## v13.3.1
 
 **Changes:**
