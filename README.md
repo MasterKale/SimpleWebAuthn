@@ -28,6 +28,17 @@ higher** projects, and other compatible runtimes (Cloudflare Workers, Bun, etc..
 
 See the packages' READMEs for more specific installation information.
 
+### Supported Versions Strategy <!-- omit in toc -->
+
+SimpleWebAuthn actively supports the following runtimes, targeting versions using the guidelines
+below:
+
+**Node:** LTS releases in Active and Maintenance mode, as per
+https://nodejs.org/en/about/previous-releases.
+
+**Deno:** SemVer minor releases (e.g. `2.4.x`) for up to one year after their release, as per
+https://github.com/denoland/deno/releases.
+
 ## Documentation
 
 In-depth documentation for this project is available at https://simplewebauthn.dev/docs
