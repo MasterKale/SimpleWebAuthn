@@ -15,7 +15,7 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 export type GenerateRegistrationOptionsOpts = Parameters<typeof generateRegistrationOptions>[0];
 
 /**
- * Supported crypto algo identifiers
+ * Supported crypto algo identifiers.
  * See https://w3c.github.io/webauthn/#sctn-alg-identifier
  * and https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  */
@@ -32,6 +32,12 @@ export const supportedCOSEAlgorithmIdentifiers: COSEAlgorithmIdentifier[] = [
   -38,
   // RSASSA-PSS w/ SHA-512
   -39,
+  // ML-DSA-44
+  -48,
+  // ML-DSA-65
+  -49,
+  // ML-DSA-87
+  -50,
   // RSASSA-PKCS1-v1_5 w/ SHA-256
   -257,
   // RSASSA-PKCS1-v1_5 w/ SHA-384
