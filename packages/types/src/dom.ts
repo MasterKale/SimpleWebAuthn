@@ -128,6 +128,12 @@ export interface PublicKeyCredentialDescriptor {
     type: PublicKeyCredentialType;
 }
 
+export interface PublicKeyCredentialDescriptorJSON {
+    id: Base64URLString;
+    transports?: string[];
+    type: string;
+}
+
 export interface PublicKeyCredentialParameters {
     alg: COSEAlgorithmIdentifier;
     type: PublicKeyCredentialType;

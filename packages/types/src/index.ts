@@ -11,6 +11,7 @@ import type {
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialDescriptor,
+  PublicKeyCredentialDescriptorJSON,
   PublicKeyCredentialParameters,
   PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRpEntity,
@@ -35,6 +36,7 @@ export type {
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialDescriptor,
+  PublicKeyCredentialDescriptorJSON,
   PublicKeyCredentialParameters,
   PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRpEntity,
@@ -79,15 +81,6 @@ export interface PublicKeyCredentialRequestOptionsJSON {
   userVerification?: UserVerificationRequirement;
   hints?: PublicKeyCredentialHint[];
   extensions?: AuthenticationExtensionsClientInputs;
-}
-
-/**
- * https://w3c.github.io/webauthn/#dictdef-publickeycredentialdescriptorjson
- */
-export interface PublicKeyCredentialDescriptorJSON {
-  id: Base64URLString;
-  type: PublicKeyCredentialType;
-  transports?: AuthenticatorTransportFuture[];
 }
 
 /**

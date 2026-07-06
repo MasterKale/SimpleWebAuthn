@@ -53,6 +53,7 @@ const types = [
   'PublicKeyCredential',
   'PublicKeyCredentialCreationOptions',
   'PublicKeyCredentialDescriptor',
+  'PublicKeyCredentialDescriptorJSON',
   'PublicKeyCredentialParameters',
   'PublicKeyCredentialRequestOptions',
   'PublicKeyCredentialUserEntity',
