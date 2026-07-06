@@ -6,6 +6,7 @@ import type {
   AuthenticatorAttachment,
   AuthenticatorAttestationResponse,
   AuthenticatorSelectionCriteria,
+  Base64URLString,
   COSEAlgorithmIdentifier,
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
@@ -26,6 +27,7 @@ export type {
   AuthenticatorAttestationResponse,
   AuthenticatorSelectionCriteria,
   AuthenticatorTransport,
+  Base64URLString,
   COSEAlgorithmIdentifier,
   CredentialCreationOptions,
   CredentialRequestOptions,
@@ -183,11 +185,6 @@ export type WebAuthnCredential = {
   // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
   transports?: AuthenticatorTransportFuture[];
 };
-
-/**
- * An attempt to communicate that this isn't just any string, but a Base64URL-encoded string
- */
-export type Base64URLString = string;
 
 /**
  * AuthenticatorAttestationResponse in TypeScript's DOM lib is outdated (up through v3.9.7).
