@@ -1,5 +1,4 @@
 import type {
-  AuthenticatorTransportFuture,
   CredentialCreationOptions,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialCreationOptionsJSON,
@@ -90,7 +89,7 @@ export async function startRegistration(
   const { id, rawId, response, type } = credential;
 
   // Continue to play it safe with `getTransports()` for now, even when L3 types say it's required
-  let transports: AuthenticatorTransportFuture[] | undefined = undefined;
+  let transports: string[] | undefined = undefined;
   if (typeof response.getTransports === 'function') {
     transports = response.getTransports();
   }

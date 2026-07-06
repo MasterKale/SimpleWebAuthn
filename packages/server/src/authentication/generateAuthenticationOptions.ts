@@ -1,6 +1,5 @@
 import type {
   AuthenticationExtensionsClientInputs,
-  AuthenticatorTransportFuture,
   Base64URLString,
   PublicKeyCredentialRequestOptionsJSON,
   Uint8Array_,
@@ -27,7 +26,7 @@ export async function generateAuthenticationOptions(
     rpID: string;
     allowCredentials?: {
       id: Base64URLString;
-      transports?: AuthenticatorTransportFuture[];
+      transports?: string[];
     }[];
     challenge?: string | Uint8Array_;
     timeout?: number;

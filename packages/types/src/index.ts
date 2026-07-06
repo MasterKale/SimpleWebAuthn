@@ -148,7 +148,7 @@ export interface AuthenticatorAttestationResponseJSON {
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
   authenticatorData?: Base64URLString;
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
-  transports?: AuthenticatorTransportFuture[];
+  transports?: string[];
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
   publicKeyAlgorithm?: COSEAlgorithmIdentifier;
   publicKey?: Base64URLString;
@@ -175,8 +175,8 @@ export type WebAuthnCredential = {
   publicKey: Uint8Array_;
   // Number of times this authenticator is expected to have been used
   counter: number;
-  // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
-  transports?: AuthenticatorTransportFuture[];
+  // From browser's `startRegistration()` -> RegistrationCredential.response.transports (API L2 and up)
+  transports?: string[];
 };
 
 /**
