@@ -105,7 +105,10 @@ export async function startAuthentication(
   // Wait for the user to complete assertion
   let credential;
   try {
-    credential = (await navigator.credentials.get(getOptions)) as AuthenticationCredential;
+    credential = (await navigator.credentials.get(
+      // TODO: Newer versions of Deno require this casting, revisit once we're using Deno 2.6+
+      getOptions as globalThis.CredentialRequestOptions,
+    )) as AuthenticationCredential;
   } catch (err) {
     throw identifyAuthenticationError({ error: err as Error, options: getOptions });
   }

@@ -77,7 +77,10 @@ export async function startRegistration(
   // Wait for the user to complete attestation
   let credential;
   try {
-    credential = (await navigator.credentials.create(createOptions)) as RegistrationCredential;
+    credential = (await navigator.credentials.create(
+      // TODO: Newer versions of Deno require this casting, revisit once we're using Deno 2.6+
+      createOptions as globalThis.CredentialCreationOptions,
+    )) as RegistrationCredential;
   } catch (err) {
     throw identifyRegistrationError({ error: err as Error, options: createOptions });
   }
