@@ -105,7 +105,7 @@ export async function startAuthentication(
   // Wait for the user to complete assertion
   let credential;
   try {
-    credential = (await navigator.credentials.get(getOptions as globalThis.CredentialRequestOptions)) as AuthenticationCredential;
+    credential = (await navigator.credentials.get(getOptions)) as AuthenticationCredential;
   } catch (err) {
     throw identifyAuthenticationError({ error: err as Error, options: getOptions });
   }
