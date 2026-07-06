@@ -16,11 +16,11 @@ jobs:
       DENO_VERSION: 'v2.4.x'
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # Install Node
       - name: Setup Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
@@ -46,7 +46,7 @@ jobs:
         run: |
           echo "DENO_DIR=$(deno info | grep "DENO_DIR" | awk '{print $3}')" >> $GITHUB_ENV
       - name: Setup Deno cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-dir-${{ hashFiles('**/deno.lock') }}

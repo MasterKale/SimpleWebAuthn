@@ -18,11 +18,11 @@ jobs:
         deno-version: ['v2.4.x', 'v2.5.x', 'v2.6.x', 'v2.7.x', 'v2.8.x']
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Install Node
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - name: Confirm installed Node version
@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "DENO_DIR=$(deno info | grep "DENO_DIR" | awk '{print $3}')" >> $GITHUB_ENV
       - name: Setup Deno cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-dir-${{ hashFiles('**/deno.lock') }}
