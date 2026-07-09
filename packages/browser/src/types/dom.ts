@@ -136,6 +136,12 @@ export interface PublicKeyCredentialDescriptor {
     type: PublicKeyCredentialType;
 }
 
+export interface PublicKeyCredentialDescriptorJSON {
+    id: Base64URLString;
+    transports?: string[];
+    type: string;
+}
+
 export interface PublicKeyCredentialParameters {
     alg: COSEAlgorithmIdentifier;
     type: PublicKeyCredentialType;
@@ -592,6 +598,7 @@ export interface RsaKeyGenParams extends Algorithm {
 
 export type AttestationConveyancePreference = "direct" | "enterprise" | "indirect" | "none";
 export type AuthenticatorTransport = "ble" | "hybrid" | "internal" | "nfc" | "usb";
+export type Base64URLString = string;
 export type COSEAlgorithmIdentifier = number;
 export type ResidentKeyRequirement = "discouraged" | "preferred" | "required";
 export type UserVerificationRequirement = "discouraged" | "preferred" | "required";

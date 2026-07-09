@@ -16,10 +16,11 @@ import type {
   AuthenticatorAttachment,
   AuthenticatorAttestationResponse,
   AuthenticatorSelectionCriteria,
+  Base64URLString,
   COSEAlgorithmIdentifier,
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
-  PublicKeyCredentialDescriptor,
+  PublicKeyCredentialDescriptorJSON,
   PublicKeyCredentialParameters,
   PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRpEntity,
@@ -36,6 +37,7 @@ export type {
   AuthenticatorAttestationResponse,
   AuthenticatorSelectionCriteria,
   AuthenticatorTransport,
+  Base64URLString,
   COSEAlgorithmIdentifier,
   CredentialCreationOptions,
   CredentialRequestOptions,
@@ -43,6 +45,7 @@ export type {
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialDescriptor,
+  PublicKeyCredentialDescriptorJSON,
   PublicKeyCredentialParameters,
   PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRpEntity,
@@ -90,15 +93,6 @@ export interface PublicKeyCredentialRequestOptionsJSON {
 }
 
 /**
- * https://w3c.github.io/webauthn/#dictdef-publickeycredentialdescriptorjson
- */
-export interface PublicKeyCredentialDescriptorJSON {
-  id: Base64URLString;
-  type: PublicKeyCredentialType;
-  transports?: AuthenticatorTransportFuture[];
-}
-
-/**
  * https://w3c.github.io/webauthn/#dictdef-publickeycredentialuserentityjson
  */
 export interface PublicKeyCredentialUserEntityJSON {
@@ -111,7 +105,7 @@ export interface PublicKeyCredentialUserEntityJSON {
  * The value returned from navigator.credentials.create()
  */
 export interface RegistrationCredential extends PublicKeyCredentialFuture {
-  response: AuthenticatorAttestationResponseFuture;
+  response: AuthenticatorAttestationResponse;
 }
 
 /**
@@ -163,7 +157,7 @@ export interface AuthenticatorAttestationResponseJSON {
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
   authenticatorData?: Base64URLString;
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
-  transports?: AuthenticatorTransportFuture[];
+  transports?: string[];
   // Optional in L2, but becomes required in L3. Play it safe until L3 becomes Recommendation
   publicKeyAlgorithm?: COSEAlgorithmIdentifier;
   publicKey?: Base64URLString;
@@ -190,51 +184,9 @@ export type WebAuthnCredential = {
   publicKey: Uint8Array_;
   // Number of times this authenticator is expected to have been used
   counter: number;
-  // From browser's `startRegistration()` -> RegistrationCredentialJSON.transports (API L2 and up)
-  transports?: AuthenticatorTransportFuture[];
+  // From browser's `startRegistration()` -> RegistrationCredential.response.transports (API L2 and up)
+  transports?: string[];
 };
-
-/**
- * An attempt to communicate that this isn't just any string, but a Base64URL-encoded string
- */
-export type Base64URLString = string;
-
-/**
- * AuthenticatorAttestationResponse in TypeScript's DOM lib is outdated (up through v3.9.7).
- * Maintain an augmented version here so we can implement additional properties as the WebAuthn
- * spec evolves.
- *
- * See https://www.w3.org/TR/webauthn-2/#iface-authenticatorattestationresponse
- *
- * Properties marked optional are not supported in all browsers.
- */
-export interface AuthenticatorAttestationResponseFuture extends AuthenticatorAttestationResponse {
-  getTransports(): AuthenticatorTransportFuture[];
-}
-
-/**
- * A super class of TypeScript's `AuthenticatorTransport` that includes support for the latest
- * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
- * know about it (sometime after 4.6.3)
- */
-export type AuthenticatorTransportFuture =
-  | 'ble'
-  | 'cable'
-  | 'hybrid'
-  | 'internal'
-  | 'nfc'
-  | 'smart-card'
-  | 'usb';
-
-/**
- * A super class of TypeScript's `PublicKeyCredentialDescriptor` that knows about the latest
- * transports. Should eventually be replaced by TypeScript's when TypeScript gets updated to
- * know about it (sometime after 4.6.3)
- */
-export interface PublicKeyCredentialDescriptorFuture
-  extends Omit<PublicKeyCredentialDescriptor, 'transports'> {
-  transports?: AuthenticatorTransportFuture[];
-}
 
 /** */
 export type PublicKeyCredentialJSON =

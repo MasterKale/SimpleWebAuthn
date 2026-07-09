@@ -1,7 +1,6 @@
 import type {
   AuthenticationExtensionsClientInputs,
   AuthenticatorSelectionCriteria,
-  AuthenticatorTransportFuture,
   Base64URLString,
   COSEAlgorithmIdentifier,
   PublicKeyCredentialCreationOptionsJSON,
@@ -94,7 +93,7 @@ export async function generateRegistrationOptions(
     attestationType?: 'direct' | 'enterprise' | 'none';
     excludeCredentials?: {
       id: Base64URLString;
-      transports?: AuthenticatorTransportFuture[];
+      transports?: string[];
     }[];
     authenticatorSelection?: AuthenticatorSelectionCriteria;
     extensions?: AuthenticationExtensionsClientInputs;
