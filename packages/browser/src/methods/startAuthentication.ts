@@ -20,12 +20,14 @@ export type StartAuthenticationOpts = Parameters<typeof startAuthentication>[0];
  * @param optionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions()`
  * @param useBrowserAutofill (Optional) Initialize conditional UI to enable logging in via browser autofill prompts. Defaults to `false`.
  * @param verifyBrowserAutofillInput (Optional) Ensure a suitable `<input>` element is present when `useBrowserAutofill` is `true`. Defaults to `true`.
+ * @param useImmediateUIMode (Optional) Initialize immediate UI to enable logging in via the browser immediate UI. Defaults to `false`.
  */
 export async function startAuthentication(
   options: {
     optionsJSON: PublicKeyCredentialRequestOptionsJSON;
     useBrowserAutofill?: boolean;
     verifyBrowserAutofillInput?: boolean;
+    useImmediateUIMode?: boolean;
   },
 ): Promise<AuthenticationResponseJSON> {
   // @ts-ignore: Intentionally check for old call structure to warn about improper API call
@@ -42,7 +44,14 @@ export async function startAuthentication(
     optionsJSON,
     useBrowserAutofill = false,
     verifyBrowserAutofillInput = true,
+    useImmediateUIMode = false,
   } = options;
+
+  if (useImmediateUIMode && useBrowserAutofill) {
+    throw new Error(
+      'startAuthentication() was called with both `useImmediateUiMode` and `useBrowserAutofill` set to true. These options are mutually exclusive.',
+    );
+  }
 
   if (!browserSupportsWebAuthn()) {
     throw new Error('WebAuthn is not supported in this browser');
@@ -92,6 +101,18 @@ export async function startAuthentication(
     // typescript@4.6.3
     getOptions.mediation = 'conditional' as CredentialMediationRequirement;
     // Conditional UI requires an empty allow list
+    publicKey.allowCredentials = [];
+  }
+
+  /**
+   * Set up the page to prompt the user to select a credential for authentication via the browser's
+   * immediate UI mechanism.
+   */
+  if (useImmediateUIMode) {
+    // @ts-ignore: `uiMode` is not yet in TypeScript's DOM lib
+    getOptions.uiMode = 'immediate';
+
+    // Immediate UI requires an empty allow list
     publicKey.allowCredentials = [];
   }
 
