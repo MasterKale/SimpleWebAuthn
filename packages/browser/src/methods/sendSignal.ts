@@ -41,7 +41,7 @@ function _callSignalAllAcceptedCredentials(
 
   return globalPublicKeyCredential.signalAllAcceptedCredentials({
     rpId: opts.rpID,
-    userId: opts.userId,
+    userId: opts.userID,
     allAcceptedCredentialIds: opts.allAcceptedCredentialIds,
   });
 }
@@ -62,7 +62,7 @@ type SignalAllAcceptedCredentialsOpts = {
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
   /** The base64url-encoded value used for `userID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
-  userId: Base64URLString;
+  userID: Base64URLString;
   /** An array of base64url-encoded credential IDs for all credentials the user may use to authenticate */
   allAcceptedCredentialIds: Base64URLString[];
 };
@@ -83,7 +83,7 @@ type SignalCurrentUserDetailsOpts = {
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
   /** The base64url-encoded value used for `userID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
-  userId: Base64URLString;
+  userID: Base64URLString;
   /** The primary account name, like an email address, username, etc... */
   userName: string;
   /** An optional, longer user identifier, like a full name, account differentiator, etc... Defaults to `""` */
