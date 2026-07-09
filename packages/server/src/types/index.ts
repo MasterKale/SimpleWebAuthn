@@ -212,6 +212,12 @@ export interface PublicKeyCredentialFuture extends PublicKeyCredential {
   toJSON(): PublicKeyCredentialJSON;
   // See https://w3c.github.io/webauthn/#sctn-getClientCapabilities
   getClientCapabilities?(): Promise<PublicKeyCredentialClientCapabilities>;
+  // See https://w3c.github.io/webauthn/#sctn-signalUnknownCredential
+  signalUnknownCredential(options: UnknownCredentialOptions): Promise<undefined>;
+  // See https://w3c.github.io/webauthn/#sctn-signalAllAcceptedCredentials
+  signalAllAcceptedCredentials(options: AllAcceptedCredentialsOptions): Promise<undefined>;
+  // See https://w3c.github.io/webauthn/#sctn-signalCurrentUserDetails
+  signalCurrentUserDetails(options: CurrentUserDetailsOptions): Promise<undefined>;
 }
 
 /**
@@ -287,3 +293,58 @@ export type PublicKeyCredentialClientCapabilities = {
  * https://github.com/denoland/std/blob/b5a5fe4f96b91c1fe8dba5cc0270092dd11d3287/bytes/_types.ts#L11
  */
 export type Uint8Array_ = ReturnType<Uint8Array['slice']>;
+
+/**
+ * Options for `PublicKeyCredential.signalUnknownCredential()`. This signal communicates that the
+ * credential that the user just tried to register, or to authenticate with, was not one that the
+ * Relying Party recognizes. The authenticator responsible for the credential can hide or delete
+ * the credential so that the user does not see it in the future as an option to sign in with.
+ *
+ * It is a good idea for a Relying Party to send this signal immediately after the use of an
+ * unrecognized credential. For example, after rejecting the output from `startRegistration()` due
+ * to unsatisfied RP-specific authenticator registration policy; or after rejecting the output from
+ * `startAuthentication()` because the user deleted the passkey from their RP-specific user
+ * settings.
+ *
+ * See https://w3c.github.io/webauthn/#sctn-signalUnknownCredential for more info.
+ */
+type UnknownCredentialOptions = {
+  rpId: string;
+  credentialId: Base64URLString;
+};
+
+/**
+ * Options for `PublicKeyCredential.signalAllAcceptedCredentials()`. This signal communicates the
+ * current list of passkeys the Relying Party will recognize for use by the **authenticated** user
+ * on the next login. Authenticators that have a passkey for (rpId + userId), but the passkey ID is
+ * not found in allAcceptedCredentialIds, may choose to hide or delete the passkey because it will
+ * not be accepted for use by the Relying Party.
+ *
+ * It is a good idea for a Relying Party to periodically send this signal, for example after every
+ * successful authentication.
+ *
+ * See https://w3c.github.io/webauthn/#sctn-signalAllAcceptedCredentials for more info.
+ */
+type AllAcceptedCredentialsOptions = {
+  rpId: string;
+  userId: Base64URLString;
+  allAcceptedCredentialIds: Base64URLString[];
+};
+
+/**
+ * Options for `PublicKeyCredential.signalCurrentUserDetails()`. This signal that communicates a
+ * change in the **authenticated** user's name and/or display name. This can help browsers and
+ * platforms display the most up-to-date information about the user during a passkey authentication
+ * instead of always showing whatever value was set at the time of registration.
+ *
+ * It is a good idea for a Relying Party to periodically send this signal, for example after every
+ * successful authentication and immediately after the user name and/or display name is changed.
+ *
+ * See https://w3c.github.io/webauthn/#sctn-signalCurrentUserDetails for more info.
+ */
+type CurrentUserDetailsOptions = {
+  rpId: string;
+  userId: Base64URLString;
+  name: string;
+  displayName: string;
+};
