@@ -47,6 +47,28 @@ function _callSignalAllAcceptedCredentials(
 }
 
 /**
+ * A signal that communicates that the credential that the user just tried to register, or to
+ * authenticate with, was not one that the Relying Party recognizes. The authenticator responsible
+ * for the credential can hide or delete the credential so that the user does not see it in the
+ * future as an option to sign in with.
+ *
+ * It is a good idea for a Relying Party to send this signal immediately after the use of an
+ * unrecognized credential. For example, after rejecting the output from `startRegistration()` due
+ * to unsatisfied RP-specific authenticator registration policy; or after rejecting the output from
+ * `startAuthentication()` because the user deleted the passkey from their RP-specific user
+ * settings.
+ *
+ * See https://w3c.github.io/webauthn/#sctn-signalUnknownCredential for more info.
+ */
+export type SignalUnknownCredentialOpts = {
+  signalName: 'signalUnknownCredential';
+  /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
+  rpID: string;
+  /** The credential ID that the Relying Party didn't recognize for use */
+  credentialID: Base64URLString;
+};
+
+/**
  * A signal that communicates the current list of passkeys the Relying Party will recognize for use
  * by the **authenticated** user on the next login. Authenticators that have a passkey for
  * (rpId + userId), but the passkey ID is not found in allAcceptedCredentialIds, may choose to hide
@@ -57,7 +79,7 @@ function _callSignalAllAcceptedCredentials(
  *
  * See https://w3c.github.io/webauthn/#sctn-signalAllAcceptedCredentials for more info.
  */
-type SignalAllAcceptedCredentialsOpts = {
+export type SignalAllAcceptedCredentialsOpts = {
   signalName: 'signalAllAcceptedCredentials';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
@@ -78,7 +100,7 @@ type SignalAllAcceptedCredentialsOpts = {
  *
  * See https://w3c.github.io/webauthn/#sctn-signalCurrentUserDetails for more info.
  */
-type SignalCurrentUserDetailsOpts = {
+export type SignalCurrentUserDetailsOpts = {
   signalName: 'signalCurrentUserDetails';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
@@ -88,26 +110,4 @@ type SignalCurrentUserDetailsOpts = {
   userName: string;
   /** An optional, longer user identifier, like a full name, account differentiator, etc... Defaults to `""` */
   userDisplayName?: string;
-};
-
-/**
- * A signal that communicates that the credential that the user just tried to register, or to
- * authenticate with, was not one that the Relying Party recognizes. The authenticator responsible
- * for the credential can hide or delete the credential so that the user does not see it in the
- * future as an option to sign in with.
- *
- * It is a good idea for a Relying Party to send this signal immediately after the use of an
- * unrecognized credential. For example, after rejecting the output from `startRegistration()` due
- * to unsatisfied RP-specific authenticator registration policy; or after rejecting the output from
- * `startAuthentication()` because the user deleted the passkey from their RP-specific user
- * settings.
- *
- * See https://w3c.github.io/webauthn/#sctn-signalUnknownCredential for more info.
- */
-type SignalUnknownCredentialOpts = {
-  signalName: 'signalUnknownCredential';
-  /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
-  rpID: string;
-  /** The credential ID that the Relying Party didn't recognize for use */
-  credentialID: Base64URLString;
 };
