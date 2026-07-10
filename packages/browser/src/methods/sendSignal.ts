@@ -1,4 +1,5 @@
 import type { Base64URLString, PublicKeyCredentialFuture } from '../types/index.ts';
+import { identifySignalError } from '../helpers/identifySignalError.ts';
 
 /**
  * Broadcast a passkey state change on the server to the browser to enlist the browser's help
@@ -12,7 +13,7 @@ import type { Base64URLString, PublicKeyCredentialFuture } from '../types/index.
  * signal option types for guidance on how often a signal may need to be resent for maximum
  * efficacy.
  */
-export async function sendSignal(
+export function sendSignal(
   opts:
     | SignalAllAcceptedCredentialsOpts
     | SignalCurrentUserDetailsOpts
@@ -20,21 +21,43 @@ export async function sendSignal(
 ): Promise<undefined> {
   const { signalName } = opts;
 
-  if (signalName === 'signalAllAcceptedCredentials') {
-    return _callSignalAllAcceptedCredentials(opts);
-  } else if (signalName) {
+  try {
+    if (signalName === 'signalUnknownCredential') {
+      return _callSignalUnknownCredential(opts);
+    } else if (signalName === 'signalAllAcceptedCredentials') {
+      return _callSignalAllAcceptedCredentials(opts);
+    } else if (signalName === 'signalCurrentUserDetails') {
+      return _callSignalCurrentUserDetails(opts);
+    }
+  } catch (err) {
+    throw identifySignalError({ error: err as Error, options: opts });
   }
-  return new Promise((resolve, _) => {
-    resolve(undefined);
+
+  // @ts-ignore: this should never happen, but just in case
+  throw new Error(`Received unrecognized signalName "${opts.signalName}"`);
+}
+
+/**
+ * Wrapper for PublicKeyCredential.signalUnknownCredential()
+ */
+function _callSignalUnknownCredential(opts: SignalUnknownCredentialOpts) {
+  const globalPublicKeyCredential = globalThis
+    .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
+
+  if (typeof globalPublicKeyCredential.signalUnknownCredential !== 'function') {
+    throw new Error('This browser does not support PublicKeyCredential.signalUnknownCredential()');
+  }
+
+  return globalPublicKeyCredential.signalUnknownCredential({
+    rpId: opts.rpID,
+    credentialId: opts.credentialID,
   });
 }
 
 /**
  * Wrapper for PublicKeyCredential.signalAllAcceptedCredentials()
  */
-function _callSignalAllAcceptedCredentials(
-  opts: SignalAllAcceptedCredentialsOpts,
-): Promise<undefined> {
+function _callSignalAllAcceptedCredentials(opts: SignalAllAcceptedCredentialsOpts) {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
@@ -47,7 +70,28 @@ function _callSignalAllAcceptedCredentials(
   return globalPublicKeyCredential.signalAllAcceptedCredentials({
     rpId: opts.rpID,
     userId: opts.userID,
-    allAcceptedCredentialIds: opts.allAcceptedCredentialIds,
+    allAcceptedCredentialIds: opts.allAcceptedCredentialIDs,
+  });
+}
+
+/**
+ * Wrapper for PublicKeyCredential.signalAllAcceptedCredentials()
+ */
+function _callSignalCurrentUserDetails(opts: SignalCurrentUserDetailsOpts) {
+  const globalPublicKeyCredential = globalThis
+    .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
+
+  if (typeof globalPublicKeyCredential.signalCurrentUserDetails !== 'function') {
+    throw new Error(
+      'This browser does not support PublicKeyCredential.signalCurrentUserDetails()',
+    );
+  }
+
+  return globalPublicKeyCredential.signalCurrentUserDetails({
+    rpId: opts.rpID,
+    userId: opts.userID,
+    name: opts.userName,
+    displayName: opts.userDisplayName ?? '',
   });
 }
 
@@ -91,7 +135,7 @@ export type SignalAllAcceptedCredentialsOpts = {
   /** The base64url-encoded value used for `userID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   userID: Base64URLString;
   /** An array of base64url-encoded credential IDs for all credentials the user may use to authenticate */
-  allAcceptedCredentialIds: Base64URLString[];
+  allAcceptedCredentialIDs: Base64URLString[];
 };
 
 /**
