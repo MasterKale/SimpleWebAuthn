@@ -1,5 +1,6 @@
 export * from './methods/startRegistration.ts';
 export * from './methods/startAuthentication.ts';
+export * from './methods/sendSignal.ts';
 export * from './helpers/browserSupportsWebAuthn.ts';
 export * from './helpers/browserSupportsPasskeys.ts';
 export * from './helpers/platformAuthenticatorIsAvailable.ts';
