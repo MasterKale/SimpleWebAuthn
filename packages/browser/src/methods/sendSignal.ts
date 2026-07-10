@@ -29,6 +29,9 @@ export async function sendSignal(
   });
 }
 
+/**
+ * Wrapper for PublicKeyCredential.signalAllAcceptedCredentials()
+ */
 function _callSignalAllAcceptedCredentials(
   opts: SignalAllAcceptedCredentialsOpts,
 ): Promise<undefined> {
@@ -36,7 +39,9 @@ function _callSignalAllAcceptedCredentials(
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
   if (typeof globalPublicKeyCredential.signalAllAcceptedCredentials !== 'function') {
-    throw new Error('');
+    throw new Error(
+      'This browser does not support PublicKeyCredential.signalAllAcceptedCredentials()',
+    );
   }
 
   return globalPublicKeyCredential.signalAllAcceptedCredentials({
