@@ -15,9 +15,9 @@ import { identifySignalError } from '../helpers/identifySignalError.ts';
  */
 export function sendSignal(
   opts:
+    | SignalUnknownCredentialOpts
     | SignalAllAcceptedCredentialsOpts
-    | SignalCurrentUserDetailsOpts
-    | SignalUnknownCredentialOpts,
+    | SignalCurrentUserDetailsOpts,
 ): Promise<undefined> {
   const { signalName } = opts;
 
