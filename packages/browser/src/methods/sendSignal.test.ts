@@ -214,7 +214,7 @@ describe('Method: sendSignal()', () => {
       throw SecurityError;
     });
 
-    // @ts-ignore: Setting up globalThis.location.hostname
+    // @ts-ignore: Setting up globalThis.location.hostname to be an invalid domain
     globalThis.location = { hostname: 'localhost2' } as unknown;
     // @ts-ignore: Set up PublicKeyCredential
     globalThis.PublicKeyCredential = () => {};
@@ -241,7 +241,7 @@ describe('Method: sendSignal()', () => {
       throw SecurityError;
     });
 
-    // @ts-ignore: Setting up globalThis.location.hostname
+    // @ts-ignore: Setting up globalThis.location.hostname to be a valid domain
     globalThis.location = { hostname: 'localhost' } as unknown;
     // @ts-ignore: Set up PublicKeyCredential
     globalThis.PublicKeyCredential = () => {};
@@ -269,8 +269,6 @@ describe('Method: sendSignal()', () => {
       throw ConstraintError;
     });
 
-    // @ts-ignore: Setting up globalThis.location.hostname
-    globalThis.location = { hostname: 'localhost' } as unknown;
     // @ts-ignore: Set up PublicKeyCredential
     globalThis.PublicKeyCredential = () => {};
     // @ts-ignore: Set up signalUnknownCredential
