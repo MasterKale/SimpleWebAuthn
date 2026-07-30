@@ -205,7 +205,7 @@ describe('Method: sendSignal()', () => {
     });
   });
 
-  it('should identify invalid RP ID for domain when sending signal', async () => {
+  it('should identify invalid RP ID for domain when sending any signal', async () => {
     /**
      * I'm just testing one of the signals for now, this error is not specific to any of them
      */
@@ -232,7 +232,7 @@ describe('Method: sendSignal()', () => {
     assertEquals(rejected.cause, SecurityError);
   });
 
-  it('should identify missing Related Origins support', async () => {
+  it('should identify missing Related Origins support when sending any signal', async () => {
     /**
      * I'm just testing one of the signals for now, this error is not specific to any of them
      */
@@ -259,7 +259,7 @@ describe('Method: sendSignal()', () => {
     assertEquals(rejected.cause, SecurityError);
   });
 
-  it('should default to passing through original error', async () => {
+  it('should default to passing through original error when sending any signal', async () => {
     /**
      * I'm just testing one of the signals for now, this error is not specific to any of them
      */
