@@ -1,14 +1,6 @@
-/// <reference lib="DOM" />
-import {
-  assert,
-  assertEquals,
-  assertExists,
-  assertInstanceOf,
-  assertRejects,
-  assertStringIncludes,
-} from '@std/assert';
-import { assertSpyCall, assertSpyCalls, type Spy, spy, stub } from '@std/testing/mock';
-import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
+import { assertEquals, assertRejects } from '@std/assert';
+import { assertSpyCall, assertSpyCalls, type Spy, spy } from '@std/testing/mock';
+import { beforeEach, describe, it } from '@std/testing/bdd';
 
 import { generateCustomError } from '../helpers/__jest__/generateCustomError.ts';
 import type { Base64URLString } from '../types/index.ts';
