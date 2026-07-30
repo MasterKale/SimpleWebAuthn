@@ -24,7 +24,7 @@ export function identifySignalError({ error, options }: {
     if (!isValidDomain(effectiveDomain)) {
       // https://w3c.github.io/webauthn/#sctn-signal-methods-async-rp-id-validation (Step 1)
       return new WebAuthnError({
-        message: `${globalThis.location.hostname} is an invalid domain`,
+        message: `"${globalThis.location.hostname}" is an invalid domain`,
         code: 'ERROR_INVALID_DOMAIN',
         cause: error,
       });
@@ -33,7 +33,7 @@ export function identifySignalError({ error, options }: {
     // https://w3c.github.io/webauthn/#sctn-signal-methods-async-rp-id-validation (Step 3)
     return new WebAuthnError({
       message:
-        `The browser does not support Related Origins to enable signals for RP ID ${options.rpID} on this domain`,
+        `The browser does not support Related Origins to enable signals for RP ID "${options.rpID}" on domain "${globalThis.location.hostname}"`,
       code: 'ERROR_INVALID_RP_ID',
       cause: error,
     });
