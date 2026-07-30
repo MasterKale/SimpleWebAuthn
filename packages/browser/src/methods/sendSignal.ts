@@ -21,16 +21,12 @@ export async function sendSignal(
 ): Promise<undefined> {
   const { signalName } = opts;
 
-  try {
-    if (signalName === 'unknownCredential') {
-      return _callSignalUnknownCredential(opts);
-    } else if (signalName === 'allAcceptedCredentials') {
-      return _callSignalAllAcceptedCredentials(opts);
-    } else if (signalName === 'currentUserDetails') {
-      return _callSignalCurrentUserDetails(opts);
-    }
-  } catch (err) {
-    throw identifySignalError({ error: err as Error, options: opts });
+  if (signalName === 'unknownCredential') {
+    return _callSignalUnknownCredential(opts);
+  } else if (signalName === 'allAcceptedCredentials') {
+    return _callSignalAllAcceptedCredentials(opts);
+  } else if (signalName === 'currentUserDetails') {
+    return _callSignalCurrentUserDetails(opts);
   }
 
   // @ts-ignore: this should never happen, but just in case
@@ -40,7 +36,7 @@ export async function sendSignal(
 /**
  * Wrapper for PublicKeyCredential.signalUnknownCredential()
  */
-function _callSignalUnknownCredential(opts: SendSignalUnknownCredentialOpts) {
+async function _callSignalUnknownCredential(opts: SendSignalUnknownCredentialOpts) {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
@@ -48,16 +44,22 @@ function _callSignalUnknownCredential(opts: SendSignalUnknownCredentialOpts) {
     throw new Error('This browser does not support PublicKeyCredential.signalUnknownCredential()');
   }
 
-  return globalPublicKeyCredential.signalUnknownCredential({
-    rpId: opts.rpID,
-    credentialId: opts.credentialID,
-  });
+  try {
+    await globalPublicKeyCredential.signalUnknownCredential({
+      rpId: opts.rpID,
+      credentialId: opts.credentialID,
+    });
+  } catch (err) {
+    throw identifySignalError({ error: err as Error, options: opts });
+  }
+
+  return undefined;
 }
 
 /**
  * Wrapper for PublicKeyCredential.signalAllAcceptedCredentials()
  */
-function _callSignalAllAcceptedCredentials(opts: SendSignalAllAcceptedCredentialsOpts) {
+async function _callSignalAllAcceptedCredentials(opts: SendSignalAllAcceptedCredentialsOpts) {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
@@ -67,17 +69,23 @@ function _callSignalAllAcceptedCredentials(opts: SendSignalAllAcceptedCredential
     );
   }
 
-  return globalPublicKeyCredential.signalAllAcceptedCredentials({
-    rpId: opts.rpID,
-    userId: opts.userID,
-    allAcceptedCredentialIds: opts.allAcceptedCredentialIDs,
-  });
+  try {
+    await globalPublicKeyCredential.signalAllAcceptedCredentials({
+      rpId: opts.rpID,
+      userId: opts.userID,
+      allAcceptedCredentialIds: opts.allAcceptedCredentialIDs,
+    });
+  } catch (err) {
+    throw identifySignalError({ error: err as Error, options: opts });
+  }
+
+  return undefined;
 }
 
 /**
  * Wrapper for PublicKeyCredential.signalAllAcceptedCredentials()
  */
-function _callSignalCurrentUserDetails(opts: SendSignalCurrentUserDetailsOpts) {
+async function _callSignalCurrentUserDetails(opts: SendSignalCurrentUserDetailsOpts) {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
@@ -87,12 +95,18 @@ function _callSignalCurrentUserDetails(opts: SendSignalCurrentUserDetailsOpts) {
     );
   }
 
-  return globalPublicKeyCredential.signalCurrentUserDetails({
-    rpId: opts.rpID,
-    userId: opts.userID,
-    name: opts.userName,
-    displayName: opts.userDisplayName ?? '',
-  });
+  try {
+    await globalPublicKeyCredential.signalCurrentUserDetails({
+      rpId: opts.rpID,
+      userId: opts.userID,
+      name: opts.userName,
+      displayName: opts.userDisplayName ?? '',
+    });
+  } catch (err) {
+    throw identifySignalError({ error: err as Error, options: opts });
+  }
+
+  return undefined;
 }
 
 /**
