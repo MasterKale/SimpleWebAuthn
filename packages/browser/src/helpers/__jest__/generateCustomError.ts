@@ -8,6 +8,7 @@ type WebAuthnErrorName =
   | 'NotAllowedError'
   | 'NotSupportedError'
   | 'SecurityError'
+  | 'TypeError'
   | 'UnknownError';
 
 export function generateCustomError(
