@@ -13,7 +13,7 @@ import { identifySignalError } from '../helpers/identifySignalError.ts';
  * signal option types for guidance on how often a signal may need to be resent for maximum
  * efficacy.
  */
-export function sendSignal(
+export async function sendSignal(
   opts:
     | SendSignalUnknownCredentialOpts
     | SendSignalAllAcceptedCredentialsOpts
