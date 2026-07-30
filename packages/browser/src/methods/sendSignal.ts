@@ -22,11 +22,11 @@ export function sendSignal(
   const { signalName } = opts;
 
   try {
-    if (signalName === 'signalUnknownCredential') {
+    if (signalName === 'unknownCredential') {
       return _callSignalUnknownCredential(opts);
-    } else if (signalName === 'signalAllAcceptedCredentials') {
+    } else if (signalName === 'allAcceptedCredentials') {
       return _callSignalAllAcceptedCredentials(opts);
-    } else if (signalName === 'signalCurrentUserDetails') {
+    } else if (signalName === 'currentUserDetails') {
       return _callSignalCurrentUserDetails(opts);
     }
   } catch (err) {
@@ -110,7 +110,7 @@ function _callSignalCurrentUserDetails(opts: SignalCurrentUserDetailsOpts) {
  * See https://w3c.github.io/webauthn/#sctn-signalUnknownCredential for more info.
  */
 export type SignalUnknownCredentialOpts = {
-  signalName: 'signalUnknownCredential';
+  signalName: 'unknownCredential';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
   /** The credential ID that the Relying Party didn't recognize for use */
@@ -129,7 +129,7 @@ export type SignalUnknownCredentialOpts = {
  * See https://w3c.github.io/webauthn/#sctn-signalAllAcceptedCredentials for more info.
  */
 export type SignalAllAcceptedCredentialsOpts = {
-  signalName: 'signalAllAcceptedCredentials';
+  signalName: 'allAcceptedCredentials';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
   /** The base64url-encoded value used for `userID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
@@ -150,7 +150,7 @@ export type SignalAllAcceptedCredentialsOpts = {
  * See https://w3c.github.io/webauthn/#sctn-signalCurrentUserDetails for more info.
  */
 export type SignalCurrentUserDetailsOpts = {
-  signalName: 'signalCurrentUserDetails';
+  signalName: 'currentUserDetails';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
   /** The base64url-encoded value used for `userID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */

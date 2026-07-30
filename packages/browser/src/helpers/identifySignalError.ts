@@ -42,7 +42,7 @@ export function identifySignalError({ error, options }: {
   /**
    * Signal-specific error conditions
    */
-  if (options.signalName === 'signalUnknownCredential') {
+  if (options.signalName === 'unknownCredential') {
     if (error.name === 'TypeError') {
       // https://w3c.github.io/webauthn/#sctn-signalUnknownCredential (Step 1)
       return new WebAuthnError({
@@ -51,7 +51,7 @@ export function identifySignalError({ error, options }: {
         cause: error,
       });
     }
-  } else if (options.signalName === 'signalAllAcceptedCredentials') {
+  } else if (options.signalName === 'allAcceptedCredentials') {
     if (error.name === 'TypeError') {
       // https://w3c.github.io/webauthn/#sctn-signalAllAcceptedCredentials (Step 1)
       // https://w3c.github.io/webauthn/#sctn-signalAllAcceptedCredentials (Step 2)
@@ -61,7 +61,7 @@ export function identifySignalError({ error, options }: {
         cause: error,
       });
     }
-  } else if (options.signalName === 'signalCurrentUserDetails') {
+  } else if (options.signalName === 'currentUserDetails') {
     if (error.name === 'TypeError') {
       // https://w3c.github.io/webauthn/#sctn-signalCurrentUserDetails
       return new WebAuthnError({
