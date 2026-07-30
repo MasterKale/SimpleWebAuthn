@@ -1,9 +1,9 @@
 import { isValidDomain } from './isValidDomain.ts';
 import { WebAuthnError } from './webAuthnError.ts';
 import type {
-  SignalAllAcceptedCredentialsOpts,
-  SignalCurrentUserDetailsOpts,
-  SignalUnknownCredentialOpts,
+  SendSignalAllAcceptedCredentialsOpts,
+  SendSignalCurrentUserDetailsOpts,
+  SendSignalUnknownCredentialOpts,
 } from '../methods/sendSignal.ts';
 
 /**
@@ -12,9 +12,9 @@ import type {
 export function identifySignalError({ error, options }: {
   error: Error;
   options:
-    | SignalUnknownCredentialOpts
-    | SignalAllAcceptedCredentialsOpts
-    | SignalCurrentUserDetailsOpts;
+    | SendSignalUnknownCredentialOpts
+    | SendSignalAllAcceptedCredentialsOpts
+    | SendSignalCurrentUserDetailsOpts;
 }): WebAuthnError {
   /**
    * General Signal API error conditions

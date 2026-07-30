@@ -15,9 +15,9 @@ import { identifySignalError } from '../helpers/identifySignalError.ts';
  */
 export function sendSignal(
   opts:
-    | SignalUnknownCredentialOpts
-    | SignalAllAcceptedCredentialsOpts
-    | SignalCurrentUserDetailsOpts,
+    | SendSignalUnknownCredentialOpts
+    | SendSignalAllAcceptedCredentialsOpts
+    | SendSignalCurrentUserDetailsOpts,
 ): Promise<undefined> {
   const { signalName } = opts;
 
@@ -40,7 +40,7 @@ export function sendSignal(
 /**
  * Wrapper for PublicKeyCredential.signalUnknownCredential()
  */
-function _callSignalUnknownCredential(opts: SignalUnknownCredentialOpts) {
+function _callSignalUnknownCredential(opts: SendSignalUnknownCredentialOpts) {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
@@ -57,7 +57,7 @@ function _callSignalUnknownCredential(opts: SignalUnknownCredentialOpts) {
 /**
  * Wrapper for PublicKeyCredential.signalAllAcceptedCredentials()
  */
-function _callSignalAllAcceptedCredentials(opts: SignalAllAcceptedCredentialsOpts) {
+function _callSignalAllAcceptedCredentials(opts: SendSignalAllAcceptedCredentialsOpts) {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
@@ -77,7 +77,7 @@ function _callSignalAllAcceptedCredentials(opts: SignalAllAcceptedCredentialsOpt
 /**
  * Wrapper for PublicKeyCredential.signalAllAcceptedCredentials()
  */
-function _callSignalCurrentUserDetails(opts: SignalCurrentUserDetailsOpts) {
+function _callSignalCurrentUserDetails(opts: SendSignalCurrentUserDetailsOpts) {
   const globalPublicKeyCredential = globalThis
     .PublicKeyCredential as unknown as PublicKeyCredentialFuture;
 
@@ -109,7 +109,7 @@ function _callSignalCurrentUserDetails(opts: SignalCurrentUserDetailsOpts) {
  *
  * See https://w3c.github.io/webauthn/#sctn-signalUnknownCredential for more info.
  */
-export type SignalUnknownCredentialOpts = {
+export type SendSignalUnknownCredentialOpts = {
   signalName: 'unknownCredential';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
@@ -128,7 +128,7 @@ export type SignalUnknownCredentialOpts = {
  *
  * See https://w3c.github.io/webauthn/#sctn-signalAllAcceptedCredentials for more info.
  */
-export type SignalAllAcceptedCredentialsOpts = {
+export type SendSignalAllAcceptedCredentialsOpts = {
   signalName: 'allAcceptedCredentials';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
@@ -149,7 +149,7 @@ export type SignalAllAcceptedCredentialsOpts = {
  *
  * See https://w3c.github.io/webauthn/#sctn-signalCurrentUserDetails for more info.
  */
-export type SignalCurrentUserDetailsOpts = {
+export type SendSignalCurrentUserDetailsOpts = {
   signalName: 'currentUserDetails';
   /** The same value used for `rpID` when calling \@simplewebauthn/server's `generateRegistrationOptions()` */
   rpID: string;
