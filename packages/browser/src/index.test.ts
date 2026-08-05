@@ -42,3 +42,7 @@ Deno.test('should export method `getBrowserCapabilities`', () => {
 Deno.test('should export method `browserSupportsPasskeys`', () => {
   assert(index.browserSupportsPasskeys);
 });
+
+Deno.test('should export method `sendSignal`', () => {
+  assert(index.sendSignal);
+});

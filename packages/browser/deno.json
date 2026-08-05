@@ -44,5 +44,12 @@
       "./src/**/__jest__",
       "./npm"
     ]
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "require-await"
+      ]
+    }
   }
 }
