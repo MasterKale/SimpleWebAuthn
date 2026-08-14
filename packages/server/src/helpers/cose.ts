@@ -63,6 +63,16 @@ export type COSEPublicKeyRSA = COSEPublicKey & {
 };
 
 /**
+ * Values specific for AKP (ML-DSA) public keys
+ */
+export type COSEPublicKeyAKP = COSEPublicKey & {
+  // Getters
+  get(key: COSEKEYS.pub): Uint8Array_ | undefined;
+  // Setters
+  set(key: COSEKEYS.pub, value: Uint8Array_): void;
+};
+
+/**
  * A type guard for determining if a COSE public key is an OKP key pair
  */
 export function isCOSEPublicKeyOKP(
@@ -93,6 +103,16 @@ export function isCOSEPublicKeyRSA(
 }
 
 /**
+ * A type guard for determining if a COSE public key is an AKP key pair
+ */
+export function isCOSEPublicKeyAKP(
+  cosePublicKey: COSEPublicKey,
+): cosePublicKey is COSEPublicKeyAKP {
+  const kty = cosePublicKey.get(COSEKEYS.kty);
+  return isCOSEKty(kty) && kty === COSEKTY.AKP;
+}
+
+/**
  * COSE Keys
  *
  * https://www.iana.org/assignments/cose/cose.xhtml#key-common-parameters
@@ -106,6 +126,7 @@ export enum COSEKEYS {
   y = -3,
   n = -1,
   e = -2,
+  pub = -1,
 }
 
 /**
@@ -117,6 +138,7 @@ export enum COSEKTY {
   OKP = 1,
   EC2 = 2,
   RSA = 3,
+  AKP = 7,
 }
 
 export function isCOSEKty(kty: number | undefined): kty is COSEKTY {
@@ -154,6 +176,9 @@ export enum COSEALG {
   PS384 = -38,
   PS512 = -39,
   ES256K = -47,
+  ML_DSA_44 = -48,
+  ML_DSA_65 = -49,
+  ML_DSA_87 = -50,
   RS256 = -257,
   RS384 = -258,
   RS512 = -259,
