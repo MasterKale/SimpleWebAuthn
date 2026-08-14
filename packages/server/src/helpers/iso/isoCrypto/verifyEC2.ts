@@ -1,6 +1,6 @@
 import { type COSEALG, COSECRV, COSEKEYS, type COSEPublicKeyEC2 } from '../../cose.ts';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
-import { importKey } from './importKey.ts';
+import { importJWKKey } from './importJWKKey.ts';
 import { isoBase64URL } from '../index.ts';
 import type { SubtleCryptoCrv } from './structs.ts';
 import { getWebCrypto } from './getWebCrypto.ts';
@@ -71,10 +71,7 @@ export async function verifyEC2(opts: {
     namedCurve: _crv,
   };
 
-  const key = await importKey({
-    keyData,
-    algorithm: keyAlgorithm,
-  });
+  const key = await importJWKKey({ keyData, algorithm: keyAlgorithm });
 
   // Determine which SHA algorithm to use for signature verification
   let subtleAlg = mapCoseAlgToWebCryptoAlg(alg);
