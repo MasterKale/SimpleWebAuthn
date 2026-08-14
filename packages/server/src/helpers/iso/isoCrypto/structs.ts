@@ -3,5 +3,8 @@ export type SubtleCryptoCrv = 'P-256' | 'P-384' | 'P-521' | 'Ed25519';
 export type SubtleCryptoKeyAlgName =
   | 'ECDSA'
   | 'Ed25519'
+  | 'ML-DSA-44'
+  | 'ML-DSA-65'
+  | 'ML-DSA-87'
   | 'RSASSA-PKCS1-v1_5'
   | 'RSA-PSS';
