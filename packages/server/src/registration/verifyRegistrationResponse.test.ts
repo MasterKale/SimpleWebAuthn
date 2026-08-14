@@ -1108,7 +1108,8 @@ Deno.test('should skip CTS check when enforcement option is false', async () => 
   mockDate.restore();
 });
 
-Deno.test('should verify ML-DSA-44 response', async () => {
+Deno.test('should verify ML-DSA-44 registration response', async () => {
+  /** TODO: Replace this test with one that has an actual attestation statement (when I can publicly do so) */
   const verification = await verifyRegistrationResponse({
     response: {
       id: '-EM9FDFIdFVeqWdTycRjoZVN2ZS4vnVE-MBpg7k0pl4jpuqj4GnMCW3Wqlm2WWI2PQ',
@@ -1131,7 +1132,8 @@ Deno.test('should verify ML-DSA-44 response', async () => {
   assert(verification.verified);
 });
 
-Deno.test('should verify ML-DSA-65 response', async () => {
+Deno.test('should verify ML-DSA-65 registration response', async () => {
+  /** TODO: Replace this test with one that has an actual attestation statement (when I can publicly do so) */
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'S903soghFo9Bmu9i4Styf5hLEPFkxu_Ma8Nm65BiZdBt1pGqF4dB2cth6wknrCMk6A',
@@ -1154,7 +1156,8 @@ Deno.test('should verify ML-DSA-65 response', async () => {
   assert(verification.verified);
 });
 
-Deno.test('should verify ML-DSA-87 response', async () => {
+Deno.test('should verify ML-DSA-87 registration response', async () => {
+  /** TODO: Replace this test with one that has an actual attestation statement (when I can publicly do so) */
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'OsaaaMgQ7ihU9iAzryPBOLK3PYsghC98pX4ZaDzXzY1NsiXgH-afxzClNy3oRPK1YA',
