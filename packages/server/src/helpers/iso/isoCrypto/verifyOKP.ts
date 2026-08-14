@@ -1,7 +1,7 @@
 import { COSECRV, COSEKEYS, type COSEPublicKeyOKP, isCOSEAlg } from '../../cose.ts';
 import { isoBase64URL } from '../../index.ts';
 import type { SubtleCryptoCrv } from './structs.ts';
-import { importKey } from './importKey.ts';
+import { importJWKKey } from './importJWKKey.ts';
 import { getWebCrypto } from './getWebCrypto.ts';
 import type { Uint8Array_ } from '../../../types/index.ts';
 
@@ -56,10 +56,7 @@ export async function verifyOKP(opts: {
     namedCurve: _crv,
   };
 
-  const key = await importKey({
-    keyData,
-    algorithm: keyAlgorithm,
-  });
+  const key = await importJWKKey({ keyData, algorithm: keyAlgorithm });
 
   const verifyAlgorithm: AlgorithmIdentifier = {
     name: _crv,

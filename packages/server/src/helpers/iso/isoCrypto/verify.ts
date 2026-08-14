@@ -3,10 +3,12 @@ import {
   COSEKEYS,
   type COSEPublicKey,
   isCOSECrv,
+  isCOSEPublicKeyAKP,
   isCOSEPublicKeyEC2,
   isCOSEPublicKeyOKP,
   isCOSEPublicKeyRSA,
 } from '../../cose.ts';
+import { verifyAKP } from './verifyAKP.ts';
 import { verifyEC2 } from './verifyEC2.ts';
 import { verifyRSA } from './verifyRSA.ts';
 import { verifyOKP } from './verifyOKP.ts';
@@ -40,6 +42,8 @@ export function verify(opts: {
     return verifyRSA({ cosePublicKey, signature, data, shaHashOverride });
   } else if (isCOSEPublicKeyOKP(cosePublicKey)) {
     return verifyOKP({ cosePublicKey, signature, data });
+  } else if (isCOSEPublicKeyAKP(cosePublicKey)) {
+    return verifyAKP({ cosePublicKey, signature, data });
   }
 
   const kty = cosePublicKey.get(COSEKEYS.kty);
