@@ -1,7 +1,6 @@
 {
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
-  "deno.path": "/Users/matt/.dvm/bin/deno",
   "deno.enable": true,
   "deno.disablePaths": [
     "./scratchenv",
