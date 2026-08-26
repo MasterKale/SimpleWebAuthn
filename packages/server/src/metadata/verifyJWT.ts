@@ -1,6 +1,7 @@
 import { convertX509PublicKeyToCOSE } from '../helpers/convertX509PublicKeyToCOSE.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { COSEALG, COSEKEYS, isCOSEPublicKeyEC2, isCOSEPublicKeyRSA } from '../helpers/cose.ts';
+import { mapJWSAlgToCOSEAlg } from '../helpers/mapJWSAlgToCOSEAlg.ts';
 import { verifyEC2 } from '../helpers/iso/isoCrypto/verifyEC2.ts';
 import { verifyRSA } from '../helpers/iso/isoCrypto/verifyRSA.ts';
 import type { Uint8Array_ } from '../types/index.ts';
@@ -21,18 +22,24 @@ export function verifyJWT(jwt: string, leafCert: Uint8Array_): Promise<boolean> 
   const data = isoUint8Array.fromUTF8String(`${header}.${payload}`);
   const signatureBytes = isoBase64URL.toBuffer(signature);
 
+  // We just need the `alg` from the header, so only partially define the shape of it
+  const headerJSON: { alg: string } = JSON.parse(isoBase64URL.toUTF8String(header));
+
+  const jwtHeaderHashAlgCOSE = mapJWSAlgToCOSEAlg(headerJSON.alg);
+
   if (isCOSEPublicKeyEC2(certCOSE)) {
     return verifyEC2({
       data,
       signature: signatureBytes,
       cosePublicKey: certCOSE,
-      shaHashOverride: COSEALG.ES256,
+      shaHashOverride: jwtHeaderHashAlgCOSE,
     });
   } else if (isCOSEPublicKeyRSA(certCOSE)) {
     return verifyRSA({
       data,
       signature: signatureBytes,
       cosePublicKey: certCOSE,
+      shaHashOverride: jwtHeaderHashAlgCOSE,
     });
   }
 
