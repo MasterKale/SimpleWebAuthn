@@ -1,5 +1,14 @@
 # Changelog
 
+## v13.3.3
+
+**Changes:**
+
+- **[server]** Updated MDS blob signature verification to support more algorithms
+  ([#788](https://github.com/MasterKale/SimpleWebAuthn/pull/788))
+- **[server]** Updated `MetadataService` to know about the new FIDO MDS blob trust anchor
+  certificate ([#789](https://github.com/MasterKale/SimpleWebAuthn/pull/789))
+
 ## v13.3.2
 
 This update fixes a CVSS v4 Low (2.0) security vulnerability identified in

@@ -10,7 +10,7 @@ import {
   Google_Hardware_Attestation_Root_4,
 } from './defaultRootCerts/android-key.ts';
 import { Apple_WebAuthn_Root_CA } from './defaultRootCerts/apple.ts';
-import { GlobalSign_Root_CA_R3 } from './defaultRootCerts/mds.ts';
+import { GlobalSign_Root_CA_R3, GlobalSign_Root_R46 } from './defaultRootCerts/mds.ts';
 
 export type RootCertIdentifier = AttestationFormat | 'mds';
 
@@ -104,5 +104,8 @@ SettingsService.setRootCertificates({
 
 SettingsService.setRootCertificates({
   identifier: 'mds',
-  certificates: [GlobalSign_Root_CA_R3],
+  certificates: [
+    GlobalSign_Root_CA_R3,
+    GlobalSign_Root_R46,
+  ],
 });
