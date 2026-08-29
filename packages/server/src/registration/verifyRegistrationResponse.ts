@@ -1,5 +1,4 @@
 import type {
-  COSEAlgorithmIdentifier,
   CredentialDeviceType,
   RegistrationResponseJSON,
   Uint8Array_,
@@ -15,14 +14,14 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
-import { COSEKEYS } from '../helpers/cose.ts';
+import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
 
-import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions.ts';
+import { defaultSupportedAlgorithmIDs } from './generateRegistrationOptions.ts';
 import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F.ts';
 import { verifyAttestationPacked } from './verifications/verifyAttestationPacked.ts';
 import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet.ts';
@@ -59,7 +58,7 @@ export async function verifyRegistrationResponse(
     expectedType?: string | string[];
     requireUserPresence?: boolean;
     requireUserVerification?: boolean;
-    supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
+    supportedAlgorithmIDs?: COSEALG[];
     attestationSafetyNetEnforceCTSCheck?: boolean;
   },
 ): Promise<VerifiedRegistrationResponse> {
@@ -71,7 +70,7 @@ export async function verifyRegistrationResponse(
     expectedType,
     requireUserPresence = true,
     requireUserVerification = true,
-    supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
+    supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
     attestationSafetyNetEnforceCTSCheck = true,
   } = options;
   const { id, rawId, type: credentialType, response: attestationResponse } = response;
