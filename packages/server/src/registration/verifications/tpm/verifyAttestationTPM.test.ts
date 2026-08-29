@@ -2,6 +2,7 @@ import { assertEquals, assertRejects } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
 
 import { verifyRegistrationResponse } from '../../verifyRegistrationResponse.ts';
+import { COSEALG } from '../../../helpers/cose.ts';
 
 Deno.test('should verify TPM response', async () => {
   // Faking time to something that'll satisfy all of these ranges:
@@ -68,6 +69,7 @@ Deno.test('should verify SHA1 TPM response', async () => {
     expectedOrigin: 'https://localhost:44329',
     expectedRPID: 'localhost',
     requireUserVerification: false,
+    supportedAlgorithmIDs: [COSEALG.RS1],
   });
 
   assertEquals(verification.verified, true);
