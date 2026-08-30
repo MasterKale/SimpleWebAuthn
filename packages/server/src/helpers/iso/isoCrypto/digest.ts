@@ -1,5 +1,5 @@
 import type { COSEALG } from '../../cose.ts';
-import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
+import { mapCoseAlgToWebCryptoHashAlgName } from './mapCoseAlgToWebCryptoHashAlgName.ts';
 import { getWebCrypto } from './getWebCrypto.ts';
 import type { Uint8Array_ } from '../../../types/index.ts';
 
@@ -15,7 +15,7 @@ export async function digest(
 ): Promise<Uint8Array_> {
   const WebCrypto = await getWebCrypto();
 
-  const subtleAlgorithm = mapCoseAlgToWebCryptoAlg(algorithm);
+  const subtleAlgorithm = mapCoseAlgToWebCryptoHashAlgName(algorithm);
 
   const hashed = await WebCrypto.subtle.digest(subtleAlgorithm, data);
 
