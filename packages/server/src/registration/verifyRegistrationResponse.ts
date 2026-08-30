@@ -1,5 +1,4 @@
 import type {
-  COSEAlgorithmIdentifier,
   CredentialDeviceType,
   RegistrationResponseJSON,
   Uint8Array_,
@@ -22,7 +21,7 @@ import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
 
-import { supportedCOSEAlgorithmIdentifiers } from './generateRegistrationOptions.ts';
+import { defaultSupportedAlgorithmIDs } from './generateRegistrationOptions.ts';
 import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F.ts';
 import { verifyAttestationPacked } from './verifications/verifyAttestationPacked.ts';
 import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet.ts';
@@ -47,7 +46,7 @@ export type VerifyRegistrationResponseOpts = Parameters<typeof verifyRegistratio
  * @param expectedType **(Optional)** - The response type expected ('webauthn.create')
  * @param requireUserPresence **(Optional)** - Enforce user presence by the authenticator (or skip it during auto registration) Defaults to `true`
  * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
- * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to all supported algorithm IDs
+ * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers indicating supported public key algorithms. Import `COSEALG` from \@simplewebauthn/server/helpers for suitable values. Should be the same value that was specified for this same argument when calling `generateRegistrationOptions()`. Defaults to `[COSEALG.EdDSA, COSEALG.ES256, COSEALG.RS256]`
  * @param attestationSafetyNetEnforceCTSCheck **(Optional)** - Require that an Android device's system integrity has not been tampered with if it uses SafetyNet attestation. Defaults to `true`
  */
 export async function verifyRegistrationResponse(
@@ -59,7 +58,7 @@ export async function verifyRegistrationResponse(
     expectedType?: string | string[];
     requireUserPresence?: boolean;
     requireUserVerification?: boolean;
-    supportedAlgorithmIDs?: COSEAlgorithmIdentifier[];
+    supportedAlgorithmIDs?: number[];
     attestationSafetyNetEnforceCTSCheck?: boolean;
   },
 ): Promise<VerifiedRegistrationResponse> {
@@ -71,7 +70,7 @@ export async function verifyRegistrationResponse(
     expectedType,
     requireUserPresence = true,
     requireUserVerification = true,
-    supportedAlgorithmIDs = supportedCOSEAlgorithmIdentifiers,
+    supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
     attestationSafetyNetEnforceCTSCheck = true,
   } = options;
   const { id, rawId, type: credentialType, response: attestationResponse } = response;

@@ -17,7 +17,7 @@ import { _decodeCredentialPublicKeyInternals } from '../helpers/decodeCredential
 import { _verifySignatureInternals } from '../helpers/verifySignature.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
-import { COSEKEYS } from '../helpers/cose.ts';
+import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
 import { SettingsService } from '../services/settingsService.ts';
 
 /**
@@ -673,6 +673,7 @@ Deno.test('should validate TPM RSA response (SHA1)', async () => {
     expectedOrigin: 'https://dev.dontneeda.pw',
     expectedRPID: 'dev.dontneeda.pw',
     requireUserVerification: false,
+    supportedAlgorithmIDs: [COSEALG.RS1],
   });
 
   assert(verification.verified);
@@ -1018,6 +1019,7 @@ Deno.test('should verify Packed attestation with RSA-PSS SHA-256 public key', as
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
     requireUserVerification: false,
+    supportedAlgorithmIDs: [COSEALG.PS256],
   });
 
   assert(verification.verified);
@@ -1042,6 +1044,7 @@ Deno.test('should verify Packed attestation with RSA-PSS SHA-384 public key', as
     expectedOrigin: 'http://localhost:8000',
     expectedRPID: 'localhost',
     requireUserVerification: false,
+    supportedAlgorithmIDs: [COSEALG.PS384],
   });
 
   assert(verification.verified);
@@ -1127,6 +1130,7 @@ Deno.test('should verify ML-DSA-44 registration response', async () => {
       '4l8disV6VitGCg_EJvCNx7V92QLtBn_RYq9tTBEZ7j4B5hZI9kijJ2InLxQNRYVlgLROF3nfj80Yi7MPhXQwjw',
     expectedOrigin: 'https://webauthn.io',
     expectedRPID: 'webauthn.io',
+    supportedAlgorithmIDs: [COSEALG.ML_DSA_44],
   });
 
   assert(verification.verified);
@@ -1151,6 +1155,7 @@ Deno.test('should verify ML-DSA-65 registration response', async () => {
       'rQM3_HtwB63gl8EoLqrM4iPCmQ3siW9U7Rutnw9qGMZT8lWAETIaZcFEw6j2Qw40fDGZW4QrbisBjoRbeXidLw',
     expectedOrigin: 'https://webauthn.io',
     expectedRPID: 'webauthn.io',
+    supportedAlgorithmIDs: [COSEALG.ML_DSA_65],
   });
 
   assert(verification.verified);
@@ -1175,6 +1180,7 @@ Deno.test('should verify ML-DSA-87 registration response', async () => {
       'JsGsBtHMYXARUIoR1rHvam63XDdRDzaLKbndrscpgU0qKFpJA0xeuv__ufk_5mgjIabEZneO9V32YWyMshWmEA',
     expectedOrigin: 'https://webauthn.io',
     expectedRPID: 'webauthn.io',
+    supportedAlgorithmIDs: [COSEALG.ML_DSA_87],
   });
 
   assert(verification.verified);
