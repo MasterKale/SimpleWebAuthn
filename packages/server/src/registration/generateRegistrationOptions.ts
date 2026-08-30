@@ -54,7 +54,7 @@ export const defaultSupportedAlgorithmIDs: COSEALG[] = [
  * @param excludeCredentials **(Optional)** - Authenticators registered by the user so the user can't register the same credential multiple times. Defaults to `[]`
  * @param authenticatorSelection **(Optional)** - Advanced criteria for restricting the types of authenticators that may be used. Defaults to `{ residentKey: 'preferred', userVerification: 'preferred' }`
  * @param extensions **(Optional)** - Additional plugins the authenticator or browser should use during attestation
- * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to `[-8, -7, -257]`
+ * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers indicating supported public key algorithms. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to `[-8, -7, -257]` (EdDSA, ES256, and RS256).
  * @param preferredAuthenticatorType **(Optional)** - Encourage the browser to prompt the user to register a specific type of authenticator
  */
 export async function generateRegistrationOptions(
@@ -73,7 +73,7 @@ export async function generateRegistrationOptions(
     }[];
     authenticatorSelection?: AuthenticatorSelectionCriteria;
     extensions?: AuthenticationExtensionsClientInputs;
-    supportedAlgorithmIDs?: COSEALG[];
+    supportedAlgorithmIDs?: number[];
     preferredAuthenticatorType?: 'securityKey' | 'localDevice' | 'remoteDevice';
   },
 ): Promise<PublicKeyCredentialCreationOptionsJSON> {

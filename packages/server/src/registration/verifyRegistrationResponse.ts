@@ -14,7 +14,7 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
-import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
+import { COSEKEYS } from '../helpers/cose.ts';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
@@ -46,7 +46,7 @@ export type VerifyRegistrationResponseOpts = Parameters<typeof verifyRegistratio
  * @param expectedType **(Optional)** - The response type expected ('webauthn.create')
  * @param requireUserPresence **(Optional)** - Enforce user presence by the authenticator (or skip it during auto registration) Defaults to `true`
  * @param requireUserVerification **(Optional)** - Enforce user verification by the authenticator (via PIN, fingerprint, etc...) Defaults to `true`
- * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers supported for attestation by this RP. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to all supported algorithm IDs
+ * @param supportedAlgorithmIDs **(Optional)** - Array of numeric COSE algorithm identifiers indicating supported public key algorithms. See https://www.iana.org/assignments/cose/cose.xhtml#algorithms. Defaults to `[-8, -7, -257]` (EdDSA, ES256, and RS256).
  * @param attestationSafetyNetEnforceCTSCheck **(Optional)** - Require that an Android device's system integrity has not been tampered with if it uses SafetyNet attestation. Defaults to `true`
  */
 export async function verifyRegistrationResponse(
@@ -58,7 +58,7 @@ export async function verifyRegistrationResponse(
     expectedType?: string | string[];
     requireUserPresence?: boolean;
     requireUserVerification?: boolean;
-    supportedAlgorithmIDs?: COSEALG[];
+    supportedAlgorithmIDs?: number[];
     attestationSafetyNetEnforceCTSCheck?: boolean;
   },
 ): Promise<VerifiedRegistrationResponse> {
