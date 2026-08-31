@@ -1,4 +1,4 @@
-import { SubtleCryptoAlg } from './structs.ts';
+import type { SubtleCryptoAlg } from './structs.ts';
 import { COSEALG } from '../../cose.ts';
 
 /**
