@@ -48,7 +48,6 @@ class BaseSettingsService implements SettingsService {
   constructor() {
     this.pemCertificates = new Map();
     this._runtimeSupportsPQC = runtimeSupportsWebCryptoKeyAlg('ML-DSA-44');
-    console.log({ runtimeSupportsPQC: this._runtimeSupportsPQC });
   }
 
   setRootCertificates(opts: {
