@@ -9,6 +9,7 @@
  */
 // BEGIN CODEGEN
 import type {
+  AlgorithmIdentifier,
   AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
@@ -18,6 +19,7 @@ import type {
   AuthenticatorSelectionCriteria,
   Base64URLString,
   COSEAlgorithmIdentifier,
+  KeyUsage,
   PublicKeyCredential,
   PublicKeyCredentialCreationOptions,
   PublicKeyCredentialDescriptorJSON,
@@ -25,10 +27,12 @@ import type {
   PublicKeyCredentialRequestOptions,
   PublicKeyCredentialRpEntity,
   PublicKeyCredentialType,
+  SubtleCrypto,
   UserVerificationRequirement,
 } from './dom.ts';
 
 export type {
+  AlgorithmIdentifier,
   AttestationConveyancePreference,
   AuthenticationExtensionsClientInputs,
   AuthenticationExtensionsClientOutputs,
@@ -420,3 +424,11 @@ export type SendSignalCurrentUserDetailsOpts = {
   /** An optional, longer user identifier, like a full name, account differentiator, etc... Defaults to `""` */
   userDisplayName?: string;
 };
+
+/**
+ * A super class of TypeScript's `SubtleCrypto` that knows about upcoming features
+ */
+export interface SubtleCryptoFuture extends SubtleCrypto {
+  /** https://wicg.github.io/webcrypto-modern-algos/#SubtleCrypto-method-supports */
+  supports(operation: KeyUsage, algorithm: AlgorithmIdentifier, length?: number): boolean;
+}

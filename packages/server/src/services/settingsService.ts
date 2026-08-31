@@ -1,6 +1,7 @@
 import type { AttestationFormat } from '../helpers/decodeAttestationObject.ts';
 import { convertCertBufferToPEM } from '../helpers/convertCertBufferToPEM.ts';
 import type { Uint8Array_ } from '../types/index.ts';
+import { runtimeSupportsWebCryptoKeyAlg } from '../helpers/iso/isoCrypto/runtimeSupportsWebCryptoKeyAlg.ts';
 
 import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
 import {
@@ -31,14 +32,22 @@ interface SettingsService {
    * Get any registered root certificates for the specified attestation format
    */
   getRootCertificates(opts: { identifier: RootCertIdentifier }): string[];
+
+  /**
+   * Get the runtime's ability to support PQC algorithms by detecting support for ML-DSA-44
+   */
+  runtimeSupportsPQC(): boolean;
 }
 
 class BaseSettingsService implements SettingsService {
   // Certificates are stored as PEM-formatted strings
   private pemCertificates: Map<RootCertIdentifier, string[]>;
+  // Track whether the runtime supports PQC algorithms
+  private _runtimeSupportsPQC = false;
 
   constructor() {
     this.pemCertificates = new Map();
+    this._runtimeSupportsPQC = runtimeSupportsWebCryptoKeyAlg('ML-DSA-44');
   }
 
   setRootCertificates(opts: {
@@ -62,6 +71,10 @@ class BaseSettingsService implements SettingsService {
   getRootCertificates(opts: { identifier: RootCertIdentifier }): string[] {
     const { identifier } = opts;
     return this.pemCertificates.get(identifier) ?? [];
+  }
+
+  runtimeSupportsPQC() {
+    return this._runtimeSupportsPQC;
   }
 }
 

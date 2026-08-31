@@ -7,6 +7,7 @@ import type {
   PublicKeyCredentialParameters,
   Uint8Array_,
 } from '../types/index.ts';
+import { SettingsService } from '../services/settingsService.ts';
 import { generateChallenge } from '../helpers/generateChallenge.ts';
 import { generateUserID } from '../helpers/generateUserID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
@@ -32,11 +33,15 @@ const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
  *   - https://www.iana.org/assignments/cose/cose.xhtml#algorithms
  *   - https://w3c.github.io/webauthn/#dom-publickeycredentialcreationoptions-pubkeycredparams
  */
-export const defaultSupportedAlgorithmIDs: COSEALG[] = [
+export let defaultSupportedAlgorithmIDs: COSEALG[] = [
   COSEALG.EdDSA,
   COSEALG.ES256,
   COSEALG.RS256,
 ];
+
+if (SettingsService.runtimeSupportsPQC()) {
+  defaultSupportedAlgorithmIDs = [COSEALG.ML_DSA_44, ...defaultSupportedAlgorithmIDs];
+}
 
 /**
  * Prepare a value to pass into navigator.credentials.create(...) for authenticator registration
