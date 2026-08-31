@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { returnsNext, stub } from '@std/testing/mock';
 import { Buffer } from 'node:buffer';
+import { greaterOrEqual, lessThan, parse } from '@std/semver';
 
 import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
 import { _generateChallengeInternals } from '../helpers/generateChallenge.ts';
@@ -27,40 +28,68 @@ Deno.test('should generate credential request options suitable for sending via J
     attestationType,
   });
 
-  assertEquals(
-    options,
-    {
-      // Challenge, base64url-encoded
-      challenge: 'dG90YWxseXJhbmRvbXZhbHVl',
-      rp: {
-        name: rpName,
-        id: rpID,
-      },
-      user: {
-        id: isoBase64URL.fromBuffer(userID),
-        name: userName,
-        displayName: userDisplayName,
-      },
-      pubKeyCredParams: [
-        { alg: -8, type: 'public-key' },
-        { alg: -7, type: 'public-key' },
-        { alg: -257, type: 'public-key' },
-      ],
-      timeout,
-      attestation: attestationType,
-      excludeCredentials: [],
-      authenticatorSelection: {
-        requireResidentKey: false,
-        residentKey: 'preferred',
-        userVerification: 'preferred',
-      },
-      extensions: {
-        credProps: true,
-      },
-      hints: [],
-    },
-  );
+  assertEquals(options.challenge, 'dG90YWxseXJhbmRvbXZhbHVl');
+  assertEquals(options.rp, {
+    name: rpName,
+    id: rpID,
+  });
+  assertEquals(options.user, {
+    id: isoBase64URL.fromBuffer(userID),
+    name: userName,
+    displayName: userDisplayName,
+  });
+  assertEquals(options.timeout, timeout);
+  assertEquals(options.attestation, attestationType);
+  assertEquals(options.excludeCredentials, []);
+  assertEquals(options.authenticatorSelection, {
+    requireResidentKey: false,
+    residentKey: 'preferred',
+    userVerification: 'preferred',
+  });
+  assertEquals(options.extensions, {
+    credProps: true,
+  });
+  assertEquals(options.hints, []);
+  // I'm not checking pubKeyCredParams here because that gets tested in tests below that also check
+  // for inclusion of ML-DSA-44 in runtimes that support PQC
 });
+
+Deno.test(
+  'should add ML-DSA-44 to pubKeyCredParams when runtime supports PQC',
+  { ignore: lessThan(parse(Deno.version.deno), parse('2.8.2')) },
+  async () => {
+    const options = await generateRegistrationOptions({
+      rpID: 'not.real',
+      rpName: 'SimpleWebAuthn',
+      userName: 'usernameHere',
+    });
+
+    assertEquals(options.pubKeyCredParams, [
+      { alg: -48, type: 'public-key' },
+      { alg: -8, type: 'public-key' },
+      { alg: -7, type: 'public-key' },
+      { alg: -257, type: 'public-key' },
+    ]);
+  },
+);
+
+Deno.test(
+  'should not add ML-DSA-44 to pubKeyCredParams when runtime does not support PQC',
+  { ignore: greaterOrEqual(parse(Deno.version.deno), parse('2.8.2')) },
+  async () => {
+    const options = await generateRegistrationOptions({
+      rpID: 'not.real',
+      rpName: 'SimpleWebAuthn',
+      userName: 'usernameHere',
+    });
+
+    assertEquals(options.pubKeyCredParams, [
+      { alg: -8, type: 'public-key' },
+      { alg: -7, type: 'public-key' },
+      { alg: -257, type: 'public-key' },
+    ]);
+  },
+);
 
 Deno.test('should map excluded credential IDs if specified', async () => {
   const options = await generateRegistrationOptions({
@@ -309,17 +338,6 @@ Deno.test('should set requireResidentKey to false if residentKey if set to disco
 
   assertEquals(options.authenticatorSelection?.requireResidentKey, false);
   assertEquals(options.authenticatorSelection?.residentKey, 'discouraged');
-});
-
-Deno.test('should prefer Ed25519 in pubKeyCredParams', async () => {
-  const options = await generateRegistrationOptions({
-    rpName: 'SimpleWebAuthn',
-    rpID: 'not.real',
-    challenge: 'totallyrandomvalue',
-    userName: 'usernameHere',
-  });
-
-  assertEquals(options.pubKeyCredParams[0].alg, -8);
 });
 
 Deno.test('should raise if string is specified for userID', async () => {
