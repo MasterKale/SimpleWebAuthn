@@ -204,7 +204,7 @@ Deno.test('should raise when x5c does not chain to trust anchor', async () => {
   );
 });
 
-Deno.test('should build valid path from partial list of x5c entries and anchor', async () => {
+Deno.test('should validate path from partial list of x5c entries to anchor', async () => {
   using _fakedNow = new FakeTime(new Date('2026-08-30'));
 
   const notBefore = new Date('2026-08-29');
