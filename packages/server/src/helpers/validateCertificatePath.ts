@@ -93,17 +93,37 @@ export async function validateCertificatePath(
 
       // Order of certs doesn't matter here but for readability
       const chainBuilder = new X509ChainBuilder({ certificates: [...x5cIntermediates, anchor] });
-      // Cert chain should be, from index 0: leaf cert -> ...intermediates -> trust anchor
+      // Attempt to build a certificate path
       const chain = await chainBuilder.build(x5cLeafCert);
 
-      // Check if the chain contains (all of the certs in x5c) + (the trust anchor)
-      if (chain.length < numUniqueCerts) {
-        // Invalid cert chain, try the next trust anchor
-        continue;
+      /**
+       * The cert chain must chain to the anchor. Usually this is as simple as asserting that the
+       * final cert in the chain is the anchor cert. However there's an odd scenario where an
+       * intermediate certificate can chain to an anchor cert's public key, but not actually to the
+       * anchor cert because e.g. the chain builder stopped at a cross-signed cert for the anchor
+       * and not the anchor cert itself.
+       *
+       * So here we're going to check for that. In the simplest case we'll be fine with the last
+       * cert in the chain being byte-equivalent to the current anchor cert. If not, then move a
+       * cert up the chain and explicitly check that it was signed by the anchor cert. This also
+       * future-proofs this logic from the internals of whatever future X.509 library might be used
+       * to build the cert path.
+       */
+      const lastCert = chain[chain.length - 1];
+      const lastCertEqualsAnchor: boolean = lastCert.equal(anchor);
+
+      let certBeforeLastSignedByAnchor = false;
+      if (!lastCertEqualsAnchor && chain.length > 1) {
+        const certBeforeLast = chain[chain.length - 2];
+        certBeforeLastSignedByAnchor = await certBeforeLast.verify({
+          publicKey: anchor.publicKey,
+          signatureOnly: true,
+        });
       }
 
-      // Check if the chain is to the trust anchor
-      if (chain[chain.length - 1].subject !== anchor.subject) {
+      const chainReachesAnchor = lastCertEqualsAnchor || certBeforeLastSignedByAnchor;
+
+      if (!chainReachesAnchor) {
         // Invalid cert chain, try the next trust anchor
         continue;
       }
