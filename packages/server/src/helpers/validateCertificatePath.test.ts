@@ -2,7 +2,7 @@ import { assert, assertRejects } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
 
 import { validateCertificatePath } from './validateCertificatePath.ts';
-import { generateLeafCert, generateRootCert } from './tests/x509Utils.ts';
+import { generateIntermediateCert, generateLeafCert, generateRootCert } from './tests/x509Utils.ts';
 
 Deno.test('should reject x5c containing self-signed root certificate', async () => {
   /**
@@ -202,4 +202,57 @@ Deno.test('should raise when x5c does not chain to trust anchor', async () => {
     Error,
     'x5c could not be chained',
   );
+});
+
+Deno.test('should build valid path from partial list of x5c entries and anchor', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-08-30'));
+
+  const notBefore = new Date('2026-08-29');
+  const notAfter = new Date('2026-08-31');
+
+  /**
+   * The cert chain being crafted here:
+   *
+   * leaf cert
+   * v
+   * intermediate cert
+   * v
+   * r46 CA cert
+   * v
+   * cross-sign cert
+   * v
+   * r3 CA cert
+   */
+
+  const rootCert3 = await generateRootCert({ notBefore, notAfter });
+  const rootCert46 = await generateRootCert({ notBefore, notAfter });
+
+  const crossSignCertR46ToR3 = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    subject: rootCert46,
+    issuer: rootCert3,
+  });
+
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert46,
+  });
+
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter,
+    issuer: intermediateCert,
+  });
+
+  const x5c = [
+    leafCert.certificate.toString(),
+    intermediateCert.certificate.toString(),
+    crossSignCertR46ToR3.certificate.toString(),
+  ];
+
+  // Ensure that both root certs can form a valid chain from x5c
+  assert(await validateCertificatePath(x5c, [rootCert46.certificate.toString()]));
+  assert(await validateCertificatePath(x5c, [rootCert3.certificate.toString()]));
 });
