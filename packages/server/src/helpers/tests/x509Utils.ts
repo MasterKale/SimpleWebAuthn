@@ -47,10 +47,7 @@ export async function generateRootCert(opts: {
     ],
   });
 
-  return {
-    certificate,
-    keys,
-  };
+  return { certificate, keys };
 }
 
 /**
@@ -71,7 +68,7 @@ export async function generateLeafCert(opts: {
   keyAlgorithm?: EcKeyGenParams;
   /** The algorithm used for generating a signature over the certificate */
   signingAlgorithm?: Algorithm | EcdsaParams;
-}): Promise<x509.X509Certificate> {
+}): Promise<{ certificate: x509.X509Certificate; keys: CryptoKeyPair }> {
   const {
     notBefore,
     notAfter,
@@ -100,5 +97,5 @@ export async function generateLeafCert(opts: {
     ],
   });
 
-  return certificate;
+  return { certificate, keys };
 }

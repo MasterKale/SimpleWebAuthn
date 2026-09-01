@@ -47,7 +47,7 @@ Deno.test('should reject x5c containing self-signed root certificate', async () 
     () =>
       validateCertificatePath(
         // x5c
-        [maliciousLeafCert.toString(), maliciousRoot.certificate.toString()],
+        [maliciousLeafCert.certificate.toString(), maliciousRoot.certificate.toString()],
         // trust anchors
         [realTrustAnchor.certificate.toString()],
       ),
@@ -71,7 +71,7 @@ Deno.test('should validate valid certificate chain', async () => {
   });
 
   const validated = await validateCertificatePath(
-    [leafCert.toString()],
+    [leafCert.certificate.toString()],
     [rootCert.certificate.toString()],
   );
 
@@ -95,7 +95,7 @@ Deno.test('should raise on not-yet-valid leaf certificate', async () => {
   await assertRejects(
     () =>
       validateCertificatePath(
-        [leafCert.toString()],
+        [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
     Error,
@@ -123,7 +123,7 @@ Deno.test('should raise on not-yet-valid trust anchor certificate', async () => 
   await assertRejects(
     () =>
       validateCertificatePath(
-        [leafCert.toString()],
+        [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
     Error,
@@ -148,7 +148,7 @@ Deno.test('should raise on expired leaf certificate', async () => {
   await assertRejects(
     () =>
       validateCertificatePath(
-        [leafCert.toString()],
+        [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
     Error,
@@ -176,7 +176,7 @@ Deno.test('should raise on expired trust anchor certificate', async () => {
   await assertRejects(
     () =>
       validateCertificatePath(
-        [leafCert.toString()],
+        [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
     Error,
@@ -203,7 +203,7 @@ Deno.test('should raise when x5c does not chain to trust anchor', async () => {
   await assertRejects(
     () =>
       validateCertificatePath(
-        [leafCert1.toString()],
+        [leafCert1.certificate.toString()],
         [rootCert2.certificate.toString()],
       ),
     Error,
