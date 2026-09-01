@@ -41,7 +41,7 @@ export async function generateRootCert(opts: {
     signingAlgorithm,
     keys: keys,
     extensions: [
-      // Critical: Tell the world this is a CA and can sign things
+      // Critical: Tell the world this is a CA cert that can sign other certs
       new x509.BasicConstraintsExtension(true, undefined, true),
       new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true),
     ],
