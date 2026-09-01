@@ -33,8 +33,7 @@ Deno.test('should reject x5c containing self-signed root certificate', async () 
     subject: 'CN=Malicious Unit Test Leaf Cert',
     notBefore,
     notAfter,
-    chainsToCertificate: maliciousRoot.certificate,
-    chainsToPrivateKey: maliciousRoot.keys.privateKey,
+    issuer: maliciousRoot,
   });
 
   const realTrustAnchor = await generateRootCert({
@@ -66,8 +65,7 @@ Deno.test('should validate valid certificate chain', async () => {
   const leafCert = await generateLeafCert({
     notBefore,
     notAfter,
-    chainsToCertificate: rootCert.certificate,
-    chainsToPrivateKey: rootCert.keys.privateKey,
+    issuer: rootCert,
   });
 
   const validated = await validateCertificatePath(
@@ -88,8 +86,7 @@ Deno.test('should raise on not-yet-valid leaf certificate', async () => {
   const leafCert = await generateLeafCert({
     notBefore: new Date('2026-06-09'), // <-- later than _fakedNow
     notAfter,
-    chainsToCertificate: rootCert.certificate,
-    chainsToPrivateKey: rootCert.keys.privateKey,
+    issuer: rootCert,
   });
 
   await assertRejects(
@@ -116,8 +113,7 @@ Deno.test('should raise on not-yet-valid trust anchor certificate', async () => 
   const leafCert = await generateLeafCert({
     notBefore,
     notAfter,
-    chainsToCertificate: rootCert.certificate,
-    chainsToPrivateKey: rootCert.keys.privateKey,
+    issuer: rootCert,
   });
 
   await assertRejects(
@@ -141,8 +137,7 @@ Deno.test('should raise on expired leaf certificate', async () => {
   const leafCert = await generateLeafCert({
     notBefore,
     notAfter: new Date('2026-06-07'), // <-- earlier than _fakedNow
-    chainsToCertificate: rootCert.certificate,
-    chainsToPrivateKey: rootCert.keys.privateKey,
+    issuer: rootCert,
   });
 
   await assertRejects(
@@ -169,8 +164,7 @@ Deno.test('should raise on expired trust anchor certificate', async () => {
   const leafCert = await generateLeafCert({
     notBefore,
     notAfter,
-    chainsToCertificate: rootCert.certificate,
-    chainsToPrivateKey: rootCert.keys.privateKey,
+    issuer: rootCert,
   });
 
   await assertRejects(
@@ -194,8 +188,7 @@ Deno.test('should raise when x5c does not chain to trust anchor', async () => {
   const leafCert1 = await generateLeafCert({
     notBefore,
     notAfter,
-    chainsToCertificate: rootCert1.certificate,
-    chainsToPrivateKey: rootCert1.keys.privateKey,
+    issuer: rootCert1,
   });
 
   const rootCert2 = await generateRootCert({ notBefore, notAfter });

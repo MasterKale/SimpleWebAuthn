@@ -113,10 +113,8 @@ export async function generateLeafCert(opts: {
   notBefore: Date;
   /** After when the cert should not be valid */
   notAfter: Date;
-  /** The certificate that this certificate will chain to */
-  chainsToCertificate: x509.X509Certificate;
-  /** The private key of the `chainsToCertificate` certificate */
-  chainsToPrivateKey: CryptoKey;
+  /** The certificate (and its keys) that this certificate will chain to */
+  issuer: { certificate: x509.X509Certificate; keys: CryptoKeyPair };
   /** The Subject for this certificate */
   subject?: string;
   /** The algorithm used for the certificate's keypair */
@@ -127,8 +125,7 @@ export async function generateLeafCert(opts: {
   const {
     notBefore,
     notAfter,
-    chainsToCertificate,
-    chainsToPrivateKey,
+    issuer,
     subject = 'CN=SimpleWebAuthn Unit Test Leaf Cert',
     keyAlgorithm = defaultKeyAlgorithm,
     signingAlgorithm = defaultSigningAlgorithm,
@@ -141,12 +138,12 @@ export async function generateLeafCert(opts: {
     subject,
     notBefore,
     notAfter,
-    issuer: chainsToCertificate.subject,
-    signingKey: chainsToPrivateKey,
+    issuer: issuer.certificate.subject,
+    signingKey: issuer.keys.privateKey,
     signingAlgorithm,
     publicKey: keys.publicKey,
     extensions: [
-      // Explicitly state this is an end-entity (not a CA)
+      // Explicitly state this is an end-entity and thus cannot sign other certs
       new x509.BasicConstraintsExtension(false, undefined, true),
       new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
     ],
