@@ -37,6 +37,7 @@
     "npm:@peculiar/asn1-ecc@^2.6.1": "2.9.4",
     "npm:@peculiar/asn1-rsa@^2.6.1": "2.9.4",
     "npm:@peculiar/asn1-schema@^2.6.0": "2.9.4",
+    "npm:@peculiar/asn1-x509-post-quantum@^2.9.4": "2.9.4",
     "npm:@peculiar/asn1-x509@^2.6.1": "2.9.4",
     "npm:@peculiar/x509@2": "2.0.0",
     "npm:@rollup/plugin-babel@^6.0.4": "6.0.4_@babel+core@7.26.0_rollup@4.27.3",
@@ -1005,6 +1006,16 @@
         "tslib@2.8.1"
       ]
     },
+    "@peculiar/asn1-asym-key@2.9.4": {
+      "integrity": "sha512-s7SJfjcXlR3MYMngDTeMLCy3VjGaIxeEy905CQ0j09pDbeYhNBvBGA7r7cAvCZYkVFo9kVg9RAki0K2iUz7SGQ==",
+      "dependencies": [
+        "@peculiar/asn1-pkcs8",
+        "@peculiar/asn1-schema",
+        "@peculiar/asn1-x509",
+        "asn1js",
+        "tslib@2.8.1"
+      ]
+    },
     "@peculiar/asn1-cms@2.9.4": {
       "integrity": "sha512-cben7oxmQsUGZqotus7yt0srYdncOT6RNWcTQ77T2RFOXejYVYkXadrfePdRcrVpO9K95IRLKKglG2k38jKXuw==",
       "dependencies": [
@@ -1086,6 +1097,16 @@
     "@peculiar/asn1-x509-attr@2.9.4": {
       "integrity": "sha512-ehQXbpQaQYycgu8OrvigwSPTFfVRcu0ECNYCWw+yzBp02Lw5paRqzzhUpfOgO2K38+WfFZuEz/0RPtam5g0OMg==",
       "dependencies": [
+        "@peculiar/asn1-schema",
+        "@peculiar/asn1-x509",
+        "asn1js",
+        "tslib@2.8.1"
+      ]
+    },
+    "@peculiar/asn1-x509-post-quantum@2.9.4": {
+      "integrity": "sha512-GD0k7BY3dsEIeai7C7bVRPddj/PzZu+sTawRPRxdHKbdy1f9b58WQyk0eFJdr28GShyLVTU8poyi4+bTAZfEtQ==",
+      "dependencies": [
+        "@peculiar/asn1-asym-key",
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
         "asn1js",
@@ -1938,6 +1959,7 @@
           "npm:@peculiar/asn1-ecc@^2.6.1",
           "npm:@peculiar/asn1-rsa@^2.6.1",
           "npm:@peculiar/asn1-schema@^2.6.0",
+          "npm:@peculiar/asn1-x509-post-quantum@^2.9.4",
           "npm:@peculiar/asn1-x509@^2.6.1",
           "npm:@peculiar/x509@2",
           "npm:reflect-metadata@~0.2.2"

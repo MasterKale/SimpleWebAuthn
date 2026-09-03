@@ -36,6 +36,7 @@
     "lineWidth": 100
   },
   "imports": {
+    "@peculiar/asn1-x509-post-quantum": "npm:@peculiar/asn1-x509-post-quantum@^2.9.4",
     "reflect-metadata": "npm:reflect-metadata@^0.2.2",
     "tiny-cbor": "npm:@levischuck/tiny-cbor@^0.2.2",
     "@hexagon/base64": "npm:@hexagon/base64@^1.1.27",
