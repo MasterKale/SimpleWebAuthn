@@ -33,18 +33,19 @@
     "npm:@babel/preset-env@^7.26.0": "7.26.0_@babel+core@7.26.0",
     "npm:@hexagon/base64@^1.1.27": "1.1.28",
     "npm:@levischuck/tiny-cbor@~0.2.2": "0.2.2",
-    "npm:@peculiar/asn1-android@^2.6.0": "2.6.0",
-    "npm:@peculiar/asn1-ecc@^2.6.1": "2.6.1",
-    "npm:@peculiar/asn1-rsa@^2.6.1": "2.6.1",
-    "npm:@peculiar/asn1-schema@^2.6.0": "2.6.0",
-    "npm:@peculiar/asn1-x509@^2.6.1": "2.6.1",
-    "npm:@peculiar/x509@^1.14.3": "1.14.3",
+    "npm:@peculiar/asn1-android@^2.6.0": "2.9.4",
+    "npm:@peculiar/asn1-ecc@^2.6.1": "2.9.4",
+    "npm:@peculiar/asn1-rsa@^2.6.1": "2.9.4",
+    "npm:@peculiar/asn1-schema@^2.6.0": "2.9.4",
+    "npm:@peculiar/asn1-x509@^2.6.1": "2.9.4",
+    "npm:@peculiar/x509@2": "2.0.0",
     "npm:@rollup/plugin-babel@^6.0.4": "6.0.4_@babel+core@7.26.0_rollup@4.27.3",
     "npm:@rollup/plugin-node-resolve@^15.3.0": "15.3.0_rollup@4.27.3",
     "npm:@rollup/plugin-replace@^6.0.1": "6.0.1_rollup@4.27.3",
     "npm:@rollup/plugin-terser@~0.4.4": "0.4.4_rollup@4.27.3",
     "npm:@types/node@*": "24.2.0",
     "npm:jsdom@^25.0.1": "25.0.1",
+    "npm:reflect-metadata@~0.2.2": "0.2.2",
     "npm:rollup-plugin-version-injector@^1.3.3": "1.3.3",
     "npm:rollup@^4.27.3": "4.27.3",
     "npm:ts-morph@24": "24.0.0",
@@ -996,16 +997,16 @@
     "@levischuck/tiny-cbor@0.2.2": {
       "integrity": "sha512-f5CnPw997Y2GQ8FAvtuVVC19FX8mwNNC+1XJcIi16n/LTJifKO6QBgGLgN3YEmqtGMk17SKSuoWES3imJVxAVw=="
     },
-    "@peculiar/asn1-android@2.6.0": {
-      "integrity": "sha512-cBRCKtYPF7vJGN76/yG8VbxRcHLPF3HnkoHhKOZeHpoVtbMYfY9ROKtH3DtYUY9m8uI1Mh47PRhHf2hSK3xcSQ==",
+    "@peculiar/asn1-android@2.9.4": {
+      "integrity": "sha512-SYHm4SoWSI0nRCoos6jpGusIqhPH9bbGBqv7ohlZ+H6BunrDzzQPk2ePgDuEUzV82OdvbLgtW4twUDwhU9P3YQ==",
       "dependencies": [
         "@peculiar/asn1-schema",
         "asn1js",
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-cms@2.6.1": {
-      "integrity": "sha512-vdG4fBF6Lkirkcl53q6eOdn3XYKt+kJTG59edgRZORlg/3atWWEReRCx5rYE1ZzTTX6vLK5zDMjHh7vbrcXGtw==",
+    "@peculiar/asn1-cms@2.9.4": {
+      "integrity": "sha512-cben7oxmQsUGZqotus7yt0srYdncOT6RNWcTQ77T2RFOXejYVYkXadrfePdRcrVpO9K95IRLKKglG2k38jKXuw==",
       "dependencies": [
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
@@ -1014,8 +1015,8 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-csr@2.6.1": {
-      "integrity": "sha512-WRWnKfIocHyzFYQTka8O/tXCiBquAPSrRjXbOkHbO4qdmS6loffCEGs+rby6WxxGdJCuunnhS2duHURhjyio6w==",
+    "@peculiar/asn1-csr@2.9.4": {
+      "integrity": "sha512-xd4YN4vpRjkDAQWVfZZkeu12IEND7DOpkqaHSIHxZl1uggUNa9Ju0QxY2jHvDAS9pP0zhRBytg8ifsnGo3V0jw==",
       "dependencies": [
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
@@ -1023,8 +1024,8 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-ecc@2.6.1": {
-      "integrity": "sha512-+Vqw8WFxrtDIN5ehUdvlN2m73exS2JVG0UAyfVB31gIfor3zWEAQPD+K9ydCxaj3MLen9k0JhKpu9LqviuCE1g==",
+    "@peculiar/asn1-ecc@2.9.4": {
+      "integrity": "sha512-JJXefFshRAuVAjWQo/39bkg1ywc1VaiO44S8RRC+Ykvf/u2KDmYffoDb0ZBPCR5uJy4AGKQhl8mX+Q8ShcWaXQ==",
       "dependencies": [
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
@@ -1032,8 +1033,8 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-pfx@2.6.1": {
-      "integrity": "sha512-nB5jVQy3MAAWvq0KY0R2JUZG8bO/bTLpnwyOzXyEh/e54ynGTatAR+csOnXkkVD9AFZ2uL8Z7EV918+qB1qDvw==",
+    "@peculiar/asn1-pfx@2.9.4": {
+      "integrity": "sha512-khuGzHTzNzk4GDlIBEILyIs6Lce0yn0ZBdoI9v93kmNncfZRhD+AQ5ODFqdhvoE8cMJF/JMTQ8yA+t1D14kqCw==",
       "dependencies": [
         "@peculiar/asn1-cms",
         "@peculiar/asn1-pkcs8",
@@ -1043,8 +1044,8 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-pkcs8@2.6.1": {
-      "integrity": "sha512-JB5iQ9Izn5yGMw3ZG4Nw3Xn/hb/G38GYF3lf7WmJb8JZUydhVGEjK/ZlFSWhnlB7K/4oqEs8HnfFIKklhR58Tw==",
+    "@peculiar/asn1-pkcs8@2.9.4": {
+      "integrity": "sha512-duRdotlUx9eDZe6QrQpQKl61RbWykCHBCkKayP8V8XdEFwlKHZ8qGGDMyS6Pye7OX7nLFttTTpRkJeet78ckwQ==",
       "dependencies": [
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
@@ -1052,8 +1053,8 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-pkcs9@2.6.1": {
-      "integrity": "sha512-5EV8nZoMSxeWmcxWmmcolg22ojZRgJg+Y9MX2fnE2bGRo5KQLqV5IL9kdSQDZxlHz95tHvIq9F//bvL1OeNILw==",
+    "@peculiar/asn1-pkcs9@2.9.4": {
+      "integrity": "sha512-kaL4cNxBpdQE2dKlyZBqz4ygCrwffO+8wfoxTEqM1Z8RadvCeELBRzcv0dzM8aY9azHMwODO5nxU65zXmhToOQ==",
       "dependencies": [
         "@peculiar/asn1-cms",
         "@peculiar/asn1-pfx",
@@ -1065,8 +1066,8 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-rsa@2.6.1": {
-      "integrity": "sha512-1nVMEh46SElUt5CB3RUTV4EG/z7iYc7EoaDY5ECwganibQPkZ/Y2eMsTKB/LeyrUJ+W/tKoD9WUqIy8vB+CEdA==",
+    "@peculiar/asn1-rsa@2.9.4": {
+      "integrity": "sha512-pZ96eD1PptovcWQ/GSmuNFXd/7EQJNlKfDaNCyE2rx3W0v6QFelkzquVqRSRyyDXXCYD69ZXJDzZ8GhIiQzKoA==",
       "dependencies": [
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
@@ -1074,16 +1075,16 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-schema@2.6.0": {
-      "integrity": "sha512-xNLYLBFTBKkCzEZIw842BxytQQATQv+lDTCEMZ8C196iJcJJMBUZxrhSTxLaohMyKK8QlzRNTRkUmanucnDSqg==",
+    "@peculiar/asn1-schema@2.9.4": {
+      "integrity": "sha512-GjzePcT9Iw8NzeOPf73iNS9xM+TBhd/FilAfP+RQGkTMQJTVWtytN3JHJACCjf/ABNau5S7mS3g+DcuxmRgYEg==",
       "dependencies": [
+        "@peculiar/utils",
         "asn1js",
-        "pvtsutils",
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-x509-attr@2.6.1": {
-      "integrity": "sha512-tlW6cxoHwgcQghnJwv3YS+9OO1737zgPogZ+CgWRUK4roEwIPzRH4JEiG770xe5HX2ATfCpmX60gurfWIF9dcQ==",
+    "@peculiar/asn1-x509-attr@2.9.4": {
+      "integrity": "sha512-ehQXbpQaQYycgu8OrvigwSPTFfVRcu0ECNYCWw+yzBp02Lw5paRqzzhUpfOgO2K38+WfFZuEz/0RPtam5g0OMg==",
       "dependencies": [
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
@@ -1091,17 +1092,23 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/asn1-x509@2.6.1": {
-      "integrity": "sha512-O9jT5F1A2+t3r7C4VT7LYGXqkGLK7Kj1xFpz7U0isPrubwU5PbDoyYtx6MiGst29yq7pXN5vZbQFKRCP+lLZlA==",
+    "@peculiar/asn1-x509@2.9.4": {
+      "integrity": "sha512-CxhBo/RdEbMMob7T31ZdQjGuoyRFLVwrDzTn25bihzBasRg9kRm/0IxIPvhgQtcK/9dNcO1XQL2fuPugwELL0Q==",
       "dependencies": [
         "@peculiar/asn1-schema",
+        "@peculiar/utils",
         "asn1js",
-        "pvtsutils",
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/x509@1.14.3": {
-      "integrity": "sha512-C2Xj8FZ0uHWeCXXqX5B4/gVFQmtSkiuOolzAgutjTfseNOHT3pUjljDZsTSxXFGgio54bCzVFqmEOUrIVk8RDA==",
+    "@peculiar/utils@2.0.3": {
+      "integrity": "sha512-+oL3HPFRIZ1St2K50lWCXiioIgSoxzz7R1J3uF6neO2yl1sgmpgY6XXJH4BdpoDkMWznQTeYF6oWNDZLCdQ4eQ==",
+      "dependencies": [
+        "tslib@2.8.1"
+      ]
+    },
+    "@peculiar/x509@2.0.0": {
+      "integrity": "sha512-r10lkuy6BNfRmyYdRAfgu6dq0HOmyIV2OLhXWE3gDEPBdX1b8miztJVyX/UxWhLwemNyDP3CLZHpDxDwSY0xaA==",
       "dependencies": [
         "@peculiar/asn1-cms",
         "@peculiar/asn1-csr",
@@ -1111,7 +1118,6 @@
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
         "pvtsutils",
-        "reflect-metadata",
         "tslib@2.8.1",
         "tsyringe"
       ]
@@ -1303,8 +1309,8 @@
         "color-convert"
       ]
     },
-    "asn1js@3.0.7": {
-      "integrity": "sha512-uLvq6KJu04qoQM6gvBfKFjlh6Gl0vOKQuR5cJMDHQkmwfMOQeN3F3SHCv9SNYSL+CRoHvOGFfllDlVz03GQjvQ==",
+    "asn1js@3.0.10": {
+      "integrity": "sha512-S2s3aOytiKdFRdulw2qPE51MzjzVOisppcVv7jVFR+Kw0kxwvFrDcYA0h7Ndqbmj0HkMIXYWaoj7fli8kgx1eg==",
       "dependencies": [
         "pvtsutils",
         "pvutils",
@@ -1629,8 +1635,8 @@
         "tslib@2.8.1"
       ]
     },
-    "pvutils@1.1.5": {
-      "integrity": "sha512-KTqnxsgGiQ6ZAzZCVlJH5eOjSnvlyEgx1m8bkRJfOhmGRqfo5KLvmAlACQkrjEtOQ4B7wF9TdSLIs9O90MX9xA=="
+    "pvutils@1.2.0": {
+      "integrity": "sha512-BbubeCEyTuQjVMakvJQ/Sxbc93F2pwmbsxONT/ZRrwU7Ua38d8unYTwXpTVLAKJ4BDuH9IGztCjQcd/N/39Dvg=="
     },
     "randombytes@2.1.0": {
       "integrity": "sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==",
@@ -1933,7 +1939,8 @@
           "npm:@peculiar/asn1-rsa@^2.6.1",
           "npm:@peculiar/asn1-schema@^2.6.0",
           "npm:@peculiar/asn1-x509@^2.6.1",
-          "npm:@peculiar/x509@^1.14.3"
+          "npm:@peculiar/x509@2",
+          "npm:reflect-metadata@~0.2.2"
         ]
       }
     }
