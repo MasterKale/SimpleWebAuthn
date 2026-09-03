@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { X509Certificate, X509ChainBuilder } from '@peculiar/x509';
 
 import { isCertRevoked } from './isCertRevoked.ts';

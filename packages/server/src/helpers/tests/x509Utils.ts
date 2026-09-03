@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import * as x509 from '@peculiar/x509';
 
 import { getWebCrypto } from '../iso/isoCrypto/getWebCrypto.ts';
