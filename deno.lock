@@ -39,7 +39,7 @@
     "npm:@peculiar/asn1-schema@^2.6.0": "2.9.4",
     "npm:@peculiar/asn1-x509-post-quantum@^2.9.4": "2.9.4",
     "npm:@peculiar/asn1-x509@^2.6.1": "2.9.4",
-    "npm:@peculiar/x509@2": "2.0.0",
+    "npm:@peculiar/x509@^2.1.0": "2.1.0",
     "npm:@rollup/plugin-babel@^6.0.4": "6.0.4_@babel+core@7.26.0_rollup@4.27.3",
     "npm:@rollup/plugin-node-resolve@^15.3.0": "15.3.0_rollup@4.27.3",
     "npm:@rollup/plugin-replace@^6.0.1": "6.0.1_rollup@4.27.3",
@@ -1128,8 +1128,8 @@
         "tslib@2.8.1"
       ]
     },
-    "@peculiar/x509@2.0.0": {
-      "integrity": "sha512-r10lkuy6BNfRmyYdRAfgu6dq0HOmyIV2OLhXWE3gDEPBdX1b8miztJVyX/UxWhLwemNyDP3CLZHpDxDwSY0xaA==",
+    "@peculiar/x509@2.1.0": {
+      "integrity": "sha512-IYbg1R03CSQGWwl24kGyqrdVtixNSbRaDvBg1r5wyYjTP+VwPQkka1BzTgU5+vxiuwqg04OxdvdJ1xYYFIdUSA==",
       "dependencies": [
         "@peculiar/asn1-cms",
         "@peculiar/asn1-csr",
@@ -1138,6 +1138,7 @@
         "@peculiar/asn1-rsa",
         "@peculiar/asn1-schema",
         "@peculiar/asn1-x509",
+        "@peculiar/asn1-x509-post-quantum",
         "pvtsutils",
         "tslib@2.8.1",
         "tsyringe"
@@ -1961,7 +1962,7 @@
           "npm:@peculiar/asn1-schema@^2.6.0",
           "npm:@peculiar/asn1-x509-post-quantum@^2.9.4",
           "npm:@peculiar/asn1-x509@^2.6.1",
-          "npm:@peculiar/x509@2",
+          "npm:@peculiar/x509@^2.1.0",
           "npm:reflect-metadata@~0.2.2"
         ]
       }
