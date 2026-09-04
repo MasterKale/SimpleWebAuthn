@@ -300,16 +300,14 @@ export async function verifyAuthenticationResponse(
     throw new PQCNotSupportedError(pubKeyAlg);
   }
 
-  const verified = await verifySignature({
-    signature,
-    data: signatureBase,
-    credentialPublicKey: credential.publicKey,
-  });
-
   const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
 
   const toReturn: VerifiedAuthenticationResponse = {
-    verified,
+    verified: await verifySignature({
+      signature,
+      data: signatureBase,
+      credentialPublicKey: credential.publicKey,
+    }),
     authenticationInfo: {
       newCounter: counter,
       credentialID: credential.id,
