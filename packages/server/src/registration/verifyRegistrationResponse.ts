@@ -4,6 +4,7 @@ import type {
   Uint8Array_,
   WebAuthnCredential,
 } from '../types/index.ts';
+import { PQCNotSupportedError } from '../errors/index.ts';
 import {
   type AttestationFormat,
   type AttestationStatement,
@@ -14,7 +15,7 @@ import { decodeClientDataJSON } from '../helpers/decodeClientDataJSON.ts';
 import { parseAuthenticatorData } from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
-import { COSEKEYS } from '../helpers/cose.ts';
+import { COSEKEYS, isPQCCOSEAlg } from '../helpers/cose.ts';
 import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
@@ -248,6 +249,19 @@ export async function verifyRegistrationResponse(
     rpIdHash,
     attestationSafetyNetEnforceCTSCheck,
   };
+
+  /**
+   * If the runtime doesn't support PQC passkeys then terminate here at the first sign of a PQC
+   * algorithm so that downstream issues that arise due to lack of PQC support won't get masked as
+   * unexpected behavior.
+   *
+   * I'm choosing to raise here even if attestation is "none" because it feels weird to allow an RP
+   * to parse a registration response w/o attestation only to encounter failure when trying to auth
+   * with the PQC passkey and the runtime doesn't support PQC.
+   */
+  if (isPQCCOSEAlg(pubKeyAlg) && !SettingsService.runtimeSupportsPQC()) {
+    throw new PQCNotSupportedError(pubKeyAlg);
+  }
 
   /**
    * Verification can only be performed when attestation = 'direct'

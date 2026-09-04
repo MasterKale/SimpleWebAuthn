@@ -3,6 +3,7 @@ import { isoBase64URL } from '../../index.ts';
 import { importJWKKey } from './importJWKKey.ts';
 import { getWebCrypto } from './getWebCrypto.ts';
 import { mapCoseAlgToWebCryptoKeyAlgName } from './mapCoseAlgToWebCryptoKeyAlgName.ts';
+import { PQCNotSupportedError } from '../../../errors/index.ts';
 import type { Base64URLString, Uint8Array_ } from '../../../types/index.ts';
 
 /** AKP, a.k.a ML-DSA */
@@ -50,10 +51,7 @@ export async function verifyAKP(opts: {
   } catch (err) {
     const _err = err as Error;
     if (_err.name === 'NotSupportedError') {
-      throw new Error(
-        `This runtime's WebCrypto.subtle does not support use of ${webCryptoAlg}. See the \`cause\` property of this error for more info`,
-        { cause: err },
-      );
+      throw new PQCNotSupportedError(alg);
     } else {
       throw err;
     }

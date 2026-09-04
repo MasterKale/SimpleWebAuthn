@@ -188,3 +188,7 @@ export enum COSEALG {
 export function isCOSEAlg(alg: number | undefined): alg is COSEALG {
   return Object.values(COSEALG).indexOf(alg as COSEALG) >= 0;
 }
+
+export function isPQCCOSEAlg(alg: COSEALG): boolean {
+  return [COSEALG.ML_DSA_44, COSEALG.ML_DSA_65, COSEALG.ML_DSA_87].indexOf(alg) >= 0;
+}
