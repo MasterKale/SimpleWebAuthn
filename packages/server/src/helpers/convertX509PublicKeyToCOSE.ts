@@ -5,6 +5,7 @@ import { id_ml_dsa_44, id_ml_dsa_65, id_ml_dsa_87 } from '@peculiar/asn1-x509-po
 import { id_rsaEncryption, RSAPublicKey } from '@peculiar/asn1-rsa';
 
 import {
+  COSEALG,
   COSECRV,
   COSEKEYS,
   COSEKTY,
@@ -27,9 +28,8 @@ export function convertX509PublicKeyToCOSE(
   const x509 = AsnParser.parse(x509Certificate, Certificate);
 
   const { tbsCertificate } = x509;
-  const { subjectPublicKeyInfo, signature: _tbsSignature } = tbsCertificate;
+  const { subjectPublicKeyInfo } = tbsCertificate;
 
-  const signatureAlgorithm = _tbsSignature.algorithm;
   const publicKeyAlgorithmID = subjectPublicKeyInfo.algorithm.algorithm;
 
   if (publicKeyAlgorithmID === id_ecPublicKey) {
@@ -45,12 +45,15 @@ export function convertX509PublicKeyToCOSE(
       ECParameters,
     );
 
-    let crv = -999;
+    let alg: COSEALG;
+    let crv: number;
     const { namedCurve } = ecParameters;
 
     if (namedCurve === id_secp256r1) {
+      alg = COSEALG.ES256;
       crv = COSECRV.P256;
     } else if (namedCurve === id_secp384r1) {
+      alg = COSEALG.ES384;
       crv = COSECRV.P384;
     } else {
       throw new Error(
@@ -58,9 +61,7 @@ export function convertX509PublicKeyToCOSE(
       );
     }
 
-    const subjectPublicKey = new Uint8Array(
-      subjectPublicKeyInfo.subjectPublicKey,
-    );
+    const subjectPublicKey = new Uint8Array(subjectPublicKeyInfo.subjectPublicKey);
 
     let x: Uint8Array_;
     let y: Uint8Array_;
@@ -78,10 +79,7 @@ export function convertX509PublicKeyToCOSE(
 
     const coseEC2PubKey: COSEPublicKeyEC2 = new Map();
     coseEC2PubKey.set(COSEKEYS.kty, COSEKTY.EC2);
-    coseEC2PubKey.set(
-      COSEKEYS.alg,
-      mapX509SignatureAlgToCOSEAlg(signatureAlgorithm),
-    );
+    coseEC2PubKey.set(COSEKEYS.alg, alg);
     coseEC2PubKey.set(COSEKEYS.crv, crv);
     coseEC2PubKey.set(COSEKEYS.x, x);
     coseEC2PubKey.set(COSEKEYS.y, y);
@@ -98,10 +96,13 @@ export function convertX509PublicKeyToCOSE(
 
     const coseRSAPubKey: COSEPublicKeyRSA = new Map();
     coseRSAPubKey.set(COSEKEYS.kty, COSEKTY.RSA);
-    coseRSAPubKey.set(
-      COSEKEYS.alg,
-      mapX509SignatureAlgToCOSEAlg(signatureAlgorithm),
-    );
+    /**
+     * The algorithm ID is too ambiguous to know what this alg should really be. But practically
+     * speaking `shaHashOverride` is always specified when verifying signatures with RSA public keys
+     * which ultimately overrides this sensible default. Using RS256 also gets the correct WebCrypto
+     * alg name later on in verifyRSA.ts
+     */
+    coseRSAPubKey.set(COSEKEYS.alg, COSEALG.RS256);
     coseRSAPubKey.set(COSEKEYS.n, new Uint8Array(rsaPublicKey.modulus));
     coseRSAPubKey.set(COSEKEYS.e, new Uint8Array(rsaPublicKey.publicExponent));
 
