@@ -149,7 +149,7 @@ export async function verifyAttestationPacked(
         );
       } catch (err) {
         const _err = err as Error;
-        throw new Error(`${_err.message} (Packed|Full)`);
+        throw new Error(`${_err.message} (Packed|Full)`, { cause: _err });
       }
     }
 
