@@ -13,6 +13,10 @@ import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
 import type { AuthenticationExtensionsAuthenticatorOutputs } from '../helpers/decodeAuthenticatorExtensions.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
+import { COSEKEYS, isPQCCOSEAlg } from '../helpers/cose.ts';
+import { SettingsService } from '../services/settingsService.ts';
+import { PQCNotSupportedError } from '../errors/index.ts';
 
 /**
  * Configurable options when calling `verifyAuthenticationResponse()`
@@ -139,7 +143,7 @@ export async function verifyAuthenticationResponse(
           `Detected cross-origin authentication response from top origin of "${topOrigin}", but a value for \`expectedTopOrigin\` was not specified when calling \`verifyAuthenticationResponse()\``,
         );
       }
-      
+
       if (Array.isArray(expectedTopOrigin)) {
         if (!expectedTopOrigin.includes(topOrigin)) {
           const joinedExpectedTopOrigin = expectedTopOrigin.join(', ');
@@ -159,10 +163,12 @@ export async function verifyAuthenticationResponse(
     if (topOrigin) {
       /**
        * If `topOrigin` is set despite `crossOrigin` being false, this is an unexpected request.
-       * 
+       *
        * See https://w3c.github.io/webauthn/#dom-collectedclientdata-toporigin.
        */
-      throw new Error(`Unexpected top origin of "${topOrigin}" within a non-cross-origin authentication response. This error should be reported to the browser vendor as a WebAuthn specification violation with a link to https://w3c.github.io/webauthn/#dom-collectedclientdata-toporigin`);
+      throw new Error(
+        `Unexpected top origin of "${topOrigin}" within a non-cross-origin authentication response. This error should be reported to the browser vendor as a WebAuthn specification violation with a link to https://w3c.github.io/webauthn/#dom-collectedclientdata-toporigin`,
+      );
     }
   }
 
@@ -283,14 +289,27 @@ export async function verifyAuthenticationResponse(
     );
   }
 
+  const decodedPublicKey = decodeCredentialPublicKey(credential.publicKey);
+  const pubKeyAlg = decodedPublicKey.get(COSEKEYS.alg);
+
+  if (typeof pubKeyAlg !== 'number') {
+    throw new Error('Credential public key was missing numeric alg');
+  }
+
+  if (isPQCCOSEAlg(pubKeyAlg) && !SettingsService.runtimeSupportsPQC()) {
+    throw new PQCNotSupportedError(pubKeyAlg);
+  }
+
+  const verified = await verifySignature({
+    signature,
+    data: signatureBase,
+    credentialPublicKey: credential.publicKey,
+  });
+
   const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
 
   const toReturn: VerifiedAuthenticationResponse = {
-    verified: await verifySignature({
-      signature,
-      data: signatureBase,
-      credentialPublicKey: credential.publicKey,
-    }),
+    verified,
     authenticationInfo: {
       newCounter: counter,
       credentialID: credential.id,
