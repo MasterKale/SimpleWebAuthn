@@ -20,7 +20,7 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
 import { denoSupportsPQC } from '../helpers/tests/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
-import { PQCNotSupportedError } from '../errors/index.ts';
+import { SimpleWebAuthnError } from '../errors/index.ts';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -1141,10 +1141,12 @@ Deno.test('should verify ML-DSA-44 registration response', async () => {
     assert(verification.verified);
   } else {
     // Test no-PQC path
-    await assertRejects(
+    const error = await assertRejects(
       () => verifyRegistrationResponse(options),
-      PQCNotSupportedError,
+      SimpleWebAuthnError,
     );
+
+    assertEquals(error.code, 'RUNTIME_NO_PQC_SUPPORT');
   }
 });
 
@@ -1176,10 +1178,12 @@ Deno.test('should verify ML-DSA-65 registration response', async () => {
     assert(verification.verified);
   } else {
     // Test no-PQC path
-    await assertRejects(
+    const error = await assertRejects(
       () => verifyRegistrationResponse(options),
-      PQCNotSupportedError,
+      SimpleWebAuthnError,
     );
+
+    assertEquals(error.code, 'RUNTIME_NO_PQC_SUPPORT');
   }
 });
 
@@ -1211,10 +1215,12 @@ Deno.test('should verify ML-DSA-87 registration response', async () => {
     assert(verification.verified);
   } else {
     // Test no-PQC path
-    await assertRejects(
+    const error = await assertRejects(
       () => verifyRegistrationResponse(options),
-      PQCNotSupportedError,
+      SimpleWebAuthnError,
     );
+
+    assertEquals(error.code, 'RUNTIME_NO_PQC_SUPPORT');
   }
 });
 
