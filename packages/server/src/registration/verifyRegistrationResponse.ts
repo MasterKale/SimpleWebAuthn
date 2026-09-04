@@ -234,6 +234,19 @@ export async function verifyRegistrationResponse(
     );
   }
 
+  /**
+   * If the runtime doesn't support PQC passkeys then terminate here at the first sign of a PQC
+   * algorithm so that downstream issues that arise due to lack of PQC support won't get masked as
+   * unexpected behavior.
+   *
+   * I'm choosing to raise here even if attestation is "none" because it feels weird to allow an RP
+   * to parse a registration response w/o attestation only to encounter failure when trying to auth
+   * with the PQC passkey and the runtime doesn't support PQC.
+   */
+  if (isPQCCOSEAlg(pubKeyAlg) && !SettingsService.runtimeSupportsPQC()) {
+    throw new PQCNotSupportedError(pubKeyAlg);
+  }
+
   const clientDataHash = await toHash(isoBase64URL.toBuffer(attestationResponse.clientDataJSON));
   const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
 
@@ -249,19 +262,6 @@ export async function verifyRegistrationResponse(
     rpIdHash,
     attestationSafetyNetEnforceCTSCheck,
   };
-
-  /**
-   * If the runtime doesn't support PQC passkeys then terminate here at the first sign of a PQC
-   * algorithm so that downstream issues that arise due to lack of PQC support won't get masked as
-   * unexpected behavior.
-   *
-   * I'm choosing to raise here even if attestation is "none" because it feels weird to allow an RP
-   * to parse a registration response w/o attestation only to encounter failure when trying to auth
-   * with the PQC passkey and the runtime doesn't support PQC.
-   */
-  if (isPQCCOSEAlg(pubKeyAlg) && !SettingsService.runtimeSupportsPQC()) {
-    throw new PQCNotSupportedError(pubKeyAlg);
-  }
 
   /**
    * Verification can only be performed when attestation = 'direct'
