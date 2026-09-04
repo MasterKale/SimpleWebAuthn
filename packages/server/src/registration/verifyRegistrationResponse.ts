@@ -219,17 +219,17 @@ export async function verifyRegistrationResponse(
   }
 
   const decodedPublicKey = decodeCredentialPublicKey(credentialPublicKey);
-  const alg = decodedPublicKey.get(COSEKEYS.alg);
+  const pubKeyAlg = decodedPublicKey.get(COSEKEYS.alg);
 
-  if (typeof alg !== 'number') {
+  if (typeof pubKeyAlg !== 'number') {
     throw new Error('Credential public key was missing numeric alg');
   }
 
   // Make sure the key algorithm is one we specified within the registration options
-  if (!supportedAlgorithmIDs.includes(alg as number)) {
+  if (!supportedAlgorithmIDs.includes(pubKeyAlg as number)) {
     const supported = supportedAlgorithmIDs.join(', ');
     throw new Error(
-      `Unexpected public key alg "${alg}", expected one of "${supported}"`,
+      `Unexpected public key alg "${pubKeyAlg}", expected one of "${supported}"`,
     );
   }
 
