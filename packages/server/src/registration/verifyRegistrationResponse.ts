@@ -233,12 +233,8 @@ export async function verifyRegistrationResponse(
     );
   }
 
-  const clientDataHash = await toHash(
-    isoBase64URL.toBuffer(attestationResponse.clientDataJSON),
-  );
-  const rootCertificates = SettingsService.getRootCertificates({
-    identifier: fmt,
-  });
+  const clientDataHash = await toHash(isoBase64URL.toBuffer(attestationResponse.clientDataJSON));
+  const rootCertificates = SettingsService.getRootCertificates({ identifier: fmt });
 
   // Prepare arguments to pass to the relevant verification method
   const verifierOpts: AttestationFormatVerifierOpts = {
