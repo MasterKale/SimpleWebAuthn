@@ -6,3 +6,4 @@ export * from './services/metadataService.ts';
 export * from './services/settingsService.ts';
 export * from './metadata/mdsTypes.ts';
 export * from './types/index.ts';
+export * from './errors/index.ts';
