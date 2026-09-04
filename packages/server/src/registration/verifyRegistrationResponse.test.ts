@@ -18,7 +18,9 @@ import { _verifySignatureInternals } from '../helpers/verifySignature.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
+import { denoSupportsPQC } from '../helpers/tests/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
+import { PQCNotSupportedError } from '../errors/index.ts';
 
 /**
  * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
@@ -1113,7 +1115,7 @@ Deno.test('should skip CTS check when enforcement option is false', async () => 
 
 Deno.test('should verify ML-DSA-44 registration response', async () => {
   /** TODO: Replace this test with one that has an actual attestation statement (when I can publicly do so) */
-  const verification = await verifyRegistrationResponse({
+  const options: Parameters<typeof verifyRegistrationResponse>[0] = {
     response: {
       id: '-EM9FDFIdFVeqWdTycRjoZVN2ZS4vnVE-MBpg7k0pl4jpuqj4GnMCW3Wqlm2WWI2PQ',
       rawId: '-EM9FDFIdFVeqWdTycRjoZVN2ZS4vnVE-MBpg7k0pl4jpuqj4GnMCW3Wqlm2WWI2PQ',
@@ -1131,14 +1133,26 @@ Deno.test('should verify ML-DSA-44 registration response', async () => {
     expectedOrigin: 'https://webauthn.io',
     expectedRPID: 'webauthn.io',
     supportedAlgorithmIDs: [COSEALG.ML_DSA_44],
-  });
+  };
 
-  assert(verification.verified);
+  if (denoSupportsPQC) {
+    // Test happy path
+    const verification = await verifyRegistrationResponse(options);
+    assert(verification.verified);
+  } else {
+    // Test no-PQC path
+    await assertRejects(
+      async () => {
+        await verifyRegistrationResponse(options);
+      },
+      PQCNotSupportedError,
+    );
+  }
 });
 
 Deno.test('should verify ML-DSA-65 registration response', async () => {
   /** TODO: Replace this test with one that has an actual attestation statement (when I can publicly do so) */
-  const verification = await verifyRegistrationResponse({
+  const options: Parameters<typeof verifyRegistrationResponse>[0] = {
     response: {
       id: 'S903soghFo9Bmu9i4Styf5hLEPFkxu_Ma8Nm65BiZdBt1pGqF4dB2cth6wknrCMk6A',
       rawId: 'S903soghFo9Bmu9i4Styf5hLEPFkxu_Ma8Nm65BiZdBt1pGqF4dB2cth6wknrCMk6A',
@@ -1156,14 +1170,26 @@ Deno.test('should verify ML-DSA-65 registration response', async () => {
     expectedOrigin: 'https://webauthn.io',
     expectedRPID: 'webauthn.io',
     supportedAlgorithmIDs: [COSEALG.ML_DSA_65],
-  });
+  };
 
-  assert(verification.verified);
+  if (denoSupportsPQC) {
+    // Test happy path
+    const verification = await verifyRegistrationResponse(options);
+    assert(verification.verified);
+  } else {
+    // Test no-PQC path
+    await assertRejects(
+      async () => {
+        await verifyRegistrationResponse(options);
+      },
+      PQCNotSupportedError,
+    );
+  }
 });
 
 Deno.test('should verify ML-DSA-87 registration response', async () => {
   /** TODO: Replace this test with one that has an actual attestation statement (when I can publicly do so) */
-  const verification = await verifyRegistrationResponse({
+  const options: Parameters<typeof verifyRegistrationResponse>[0] = {
     response: {
       id: 'OsaaaMgQ7ihU9iAzryPBOLK3PYsghC98pX4ZaDzXzY1NsiXgH-afxzClNy3oRPK1YA',
       rawId: 'OsaaaMgQ7ihU9iAzryPBOLK3PYsghC98pX4ZaDzXzY1NsiXgH-afxzClNy3oRPK1YA',
@@ -1181,9 +1207,21 @@ Deno.test('should verify ML-DSA-87 registration response', async () => {
     expectedOrigin: 'https://webauthn.io',
     expectedRPID: 'webauthn.io',
     supportedAlgorithmIDs: [COSEALG.ML_DSA_87],
-  });
+  };
 
-  assert(verification.verified);
+  if (denoSupportsPQC) {
+    // Test happy path
+    const verification = await verifyRegistrationResponse(options);
+    assert(verification.verified);
+  } else {
+    // Test no-PQC path
+    await assertRejects(
+      async () => {
+        await verifyRegistrationResponse(options);
+      },
+      PQCNotSupportedError,
+    );
+  }
 });
 
 /**

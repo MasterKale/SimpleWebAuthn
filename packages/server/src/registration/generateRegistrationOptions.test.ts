@@ -1,11 +1,11 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { returnsNext, stub } from '@std/testing/mock';
 import { Buffer } from 'node:buffer';
-import { greaterOrEqual, lessThan, parse } from '@std/semver';
 
 import { generateRegistrationOptions } from './generateRegistrationOptions.ts';
 import { _generateChallengeInternals } from '../helpers/generateChallenge.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/index.ts';
+import { denoSupportsPQC } from '../helpers/tests/index.ts';
 
 Deno.test('should generate credential request options suitable for sending via JSON', async () => {
   const rpName = 'SimpleWebAuthn';
@@ -56,7 +56,7 @@ Deno.test('should generate credential request options suitable for sending via J
 
 Deno.test(
   'should add ML-DSA-44 to pubKeyCredParams when runtime supports PQC',
-  { ignore: lessThan(parse(Deno.version.deno), parse('2.8.2')) },
+  { ignore: !denoSupportsPQC },
   async () => {
     const options = await generateRegistrationOptions({
       rpID: 'not.real',
@@ -75,7 +75,7 @@ Deno.test(
 
 Deno.test(
   'should not add ML-DSA-44 to pubKeyCredParams when runtime does not support PQC',
-  { ignore: greaterOrEqual(parse(Deno.version.deno), parse('2.8.2')) },
+  { ignore: denoSupportsPQC },
   async () => {
     const options = await generateRegistrationOptions({
       rpID: 'not.real',

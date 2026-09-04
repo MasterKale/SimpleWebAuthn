@@ -19,6 +19,7 @@ import {
 } from '../helpers/parseAuthenticatorData.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
+import { denoSupportsPQC } from '../helpers/tests/index.ts';
 
 Deno.test('should verify an assertion response', async () => {
   const verification = await verifyAuthenticationResponse({
@@ -844,7 +845,7 @@ Deno.test(
   /**
    * ML-DSA is only supported in Deno v2.8.2+
    */
-  { ignore: lessThan(parse(Deno.version.deno), parse('2.8.2')) },
+  { ignore: !denoSupportsPQC },
   async () => {
     const verification = await verifyAuthenticationResponse({
       response: {
@@ -883,7 +884,7 @@ Deno.test(
 //   /**
 //    * ML-DSA is only supported in Deno v2.8.2+
 //    */
-//   { ignore: lessThan(parse(Deno.version.deno), parse('2.8.2')) },
+//   { ignore: !runtimeIsDenoWithPQCSupport },
 //   async () => {
 //   const verification = await verifyAuthenticationResponse({});
 
@@ -895,7 +896,7 @@ Deno.test(
 //   /**
 //    * ML-DSA is only supported in Deno v2.8.2+
 //    */
-//   { ignore: lessThan(parse(Deno.version.deno), parse('2.8.2')) },
+//   { ignore: !runtimeIsDenoWithPQCSupport },
 //   async () => {
 //   const verification = await verifyAuthenticationResponse({});
 
