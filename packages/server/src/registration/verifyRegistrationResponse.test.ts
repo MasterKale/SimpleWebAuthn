@@ -1142,9 +1142,7 @@ Deno.test('should verify ML-DSA-44 registration response', async () => {
   } else {
     // Test no-PQC path
     await assertRejects(
-      async () => {
-        await verifyRegistrationResponse(options);
-      },
+      () => verifyRegistrationResponse(options),
       PQCNotSupportedError,
     );
   }
@@ -1179,9 +1177,7 @@ Deno.test('should verify ML-DSA-65 registration response', async () => {
   } else {
     // Test no-PQC path
     await assertRejects(
-      async () => {
-        await verifyRegistrationResponse(options);
-      },
+      () => verifyRegistrationResponse(options),
       PQCNotSupportedError,
     );
   }
@@ -1216,9 +1212,7 @@ Deno.test('should verify ML-DSA-87 registration response', async () => {
   } else {
     // Test no-PQC path
     await assertRejects(
-      async () => {
-        await verifyRegistrationResponse(options);
-      },
+      () => verifyRegistrationResponse(options),
       PQCNotSupportedError,
     );
   }
