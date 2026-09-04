@@ -1,15 +1,17 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 import { ECParameters, id_ecPublicKey, id_secp256r1, id_secp384r1 } from '@peculiar/asn1-ecc';
+import { id_ml_dsa_44, id_ml_dsa_65, id_ml_dsa_87 } from '@peculiar/asn1-x509-post-quantum';
 import { id_rsaEncryption, RSAPublicKey } from '@peculiar/asn1-rsa';
 
 import {
   COSECRV,
   COSEKEYS,
   COSEKTY,
-  COSEPublicKey,
-  COSEPublicKeyEC2,
-  COSEPublicKeyRSA,
+  type COSEPublicKey,
+  type COSEPublicKeyAKP,
+  type COSEPublicKeyEC2,
+  type COSEPublicKeyRSA,
 } from './cose.ts';
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 import type { Uint8Array_ } from '../types/index.ts';
@@ -104,6 +106,13 @@ export function convertX509PublicKeyToCOSE(
     coseRSAPubKey.set(COSEKEYS.e, new Uint8Array(rsaPublicKey.publicExponent));
 
     cosePublicKey = coseRSAPubKey;
+  } else if ([id_ml_dsa_44, id_ml_dsa_65, id_ml_dsa_87].indexOf(publicKeyAlgorithmID) >= 0) {
+    const coseAKPPubKey: COSEPublicKeyAKP = new Map();
+    coseAKPPubKey.set(COSEKEYS.kty, COSEKTY.AKP);
+    coseAKPPubKey.set(COSEKEYS.alg, mapX509SignatureAlgToCOSEAlg(publicKeyAlgorithmID));
+    coseAKPPubKey.set(COSEKEYS.pub, new Uint8Array(subjectPublicKeyInfo.subjectPublicKey));
+
+    cosePublicKey = coseAKPPubKey;
   } else {
     throw new Error(
       `Certificate public key contained unexpected algorithm ID ${publicKeyAlgorithmID}`,
