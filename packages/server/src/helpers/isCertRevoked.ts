@@ -41,26 +41,6 @@ export async function isCertRevoked(
     return false;
   }
 
-  const extCRLDistributionPoints = extensions.find(
-    (ext) => ext instanceof CRLDistributionPointsExtension,
-  );
-
-  // Get all CRL URLs from within the certificate
-  const crlURLs: string[] = [];
-
-  extCRLDistributionPoints?.distributionPoints?.forEach((dPoint) => {
-    dPoint.distributionPoint?.fullName?.forEach((fullName) => {
-      if (fullName.uniformResourceIdentifier) {
-        crlURLs.push(fullName.uniformResourceIdentifier);
-      }
-    });
-  });
-
-  // If no URL(s) is provided then we have nothing to check
-  if (!(crlURLs.length > 0)) {
-    return false;
-  }
-
   // Get the issuer's key identifier for part of the cache key and to check against the
   // certificate's and CRL's AuthorityKeyIdentifier extension
   const {
@@ -81,6 +61,26 @@ export async function isCertRevoked(
     throw new Error(
       `Certificate's AuthorityKeyIdentifier did not match issuer's SubjectKeyIdentifier "${issuerKeyIdentifier}"`,
     );
+  }
+
+  const extCRLDistributionPoints = extensions.find(
+    (ext) => ext instanceof CRLDistributionPointsExtension,
+  );
+
+  // Get all CRL URLs from within the certificate
+  const crlURLs: string[] = [];
+
+  extCRLDistributionPoints?.distributionPoints?.forEach((dPoint) => {
+    dPoint.distributionPoint?.fullName?.forEach((fullName) => {
+      if (fullName.uniformResourceIdentifier) {
+        crlURLs.push(fullName.uniformResourceIdentifier);
+      }
+    });
+  });
+
+  // If no URL(s) is provided then we have nothing to check
+  if (!(crlURLs.length > 0)) {
+    return false;
   }
 
   for (const crlURL of crlURLs) {
