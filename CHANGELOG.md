@@ -2,9 +2,16 @@
 
 ## v14.0.2
 
+This update fixes a CVSS v3 Moderate (5.4 / 10) and a CVSS v3 Moderate (6.3 / 10) security
+vulnerabilities identified in @simplewebauthn/server. See the security advisory linked below for
+more information.
+
+**Changes:**
+
 - **[server]** Revamped certificate revocation logic to only cryptographically verify and process
   CRLs from certificates that chained back to an RP-chosen trust anchor
-  ([GHSA-2g3p-m8c9-hhwh](https://github.com/MasterKale/SimpleWebAuthn/security/advisories/GHSA-2g3p-m8c9-hhwh))
+  ([GHSA-2g3p-m8c9-hhwh](https://github.com/MasterKale/SimpleWebAuthn/security/advisories/GHSA-2g3p-m8c9-hhwh),
+  [GHSA-j3h4-m3m2-7p7j](https://github.com/MasterKale/SimpleWebAuthn/security/advisories/GHSA-j3h4-m3m2-7p7j))
 
 ## v14.0.1
 
