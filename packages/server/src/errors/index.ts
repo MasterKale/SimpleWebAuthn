@@ -26,4 +26,6 @@ export class PQCNotSupportedError extends SimpleWebAuthnError {
   }
 }
 
-export type SimpleWebAuthnErrorCode = 'RUNTIME_NO_PQC_SUPPORT';
+export type SimpleWebAuthnErrorCode =
+  | 'RUNTIME_NO_PQC_SUPPORT'
+  | 'CERTIFICATE_PATH_VERIFICATION_FAILED';

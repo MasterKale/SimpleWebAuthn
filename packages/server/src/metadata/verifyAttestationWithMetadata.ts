@@ -163,14 +163,7 @@ export async function verifyAttestationWithMetadata({
   }
 
   if (!authenticatorIsSelfReferencing) {
-    try {
-      await validateCertificatePath(authenticatorCerts, statementRootCerts);
-    } catch (err) {
-      const _err = err as Error;
-      throw new Error(
-        `Could not validate certificate path with any metadata root certificates: ${_err.message}`,
-      );
-    }
+    await validateCertificatePath(authenticatorCerts, statementRootCerts);
   }
 
   return true;

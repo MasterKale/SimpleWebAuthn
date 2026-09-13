@@ -1,13 +1,24 @@
 import { assert, assertRejects } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
+import { assertSpyCalls, stub } from '@std/testing/mock';
 
 import { validateCertificatePath } from './validateCertificatePath.ts';
-import { generateIntermediateCert, generateLeafCert, generateRootCert } from './tests/x509Utils.ts';
+import { _fetchInternals } from './fetch.ts';
+import {
+  generateCRL,
+  generateCRLDistributionPointsExtension,
+  generateIntermediateCert,
+  generateLeafCert,
+  generateRootCert,
+} from './tests/x509Utils.ts';
+import { SimpleWebAuthnError } from '../errors/index.ts';
+
+const CRL_URL = 'https://example.com/test.crl';
 
 Deno.test('should reject x5c containing self-signed root certificate', async () => {
   /**
    * This test generates X.509 certificates to ensure that the following hypothetical/malicious
-   * certificate chain in x5c will be rejected:
+   * certificate chain will be rejected:
    *
    * [
    *   x5c[0] (maliciousLeaf, signed by maliciousRoot)
@@ -50,7 +61,7 @@ Deno.test('should reject x5c containing self-signed root certificate', async () 
         // trust anchors
         [realTrustAnchor.certificate.toString()],
       ),
-    Error,
+    SimpleWebAuthnError,
     'x5c could not be chained to any specified trust anchor',
   );
 });
@@ -95,8 +106,8 @@ Deno.test('should raise on not-yet-valid leaf certificate', async () => {
         [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
-    Error,
-    'certificate out of validity period in x5c',
+    SimpleWebAuthnError,
+    'certificate out of validity period',
   );
 });
 
@@ -122,7 +133,7 @@ Deno.test('should raise on not-yet-valid trust anchor certificate', async () => 
         [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
-    Error,
+    SimpleWebAuthnError,
     'No specified trust anchor was valid',
   );
 });
@@ -146,8 +157,8 @@ Deno.test('should raise on expired leaf certificate', async () => {
         [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
-    Error,
-    'certificate out of validity period in x5c',
+    SimpleWebAuthnError,
+    'certificate out of validity period',
   );
 });
 
@@ -173,7 +184,7 @@ Deno.test('should raise on expired trust anchor certificate', async () => {
         [leafCert.certificate.toString()],
         [rootCert.certificate.toString()],
       ),
-    Error,
+    SimpleWebAuthnError,
     'No specified trust anchor was valid',
   );
 });
@@ -199,7 +210,7 @@ Deno.test('should raise when x5c does not chain to trust anchor', async () => {
         [leafCert1.certificate.toString()],
         [rootCert2.certificate.toString()],
       ),
-    Error,
+    SimpleWebAuthnError,
     'x5c could not be chained',
   );
 });
@@ -255,4 +266,172 @@ Deno.test('should validate path from partial list of x5c entries to anchor', asy
   // Ensure that both root certs can form a valid chain from x5c
   assert(await validateCertificatePath(x5c, [rootCert46.certificate.toString()]));
   assert(await validateCertificatePath(x5c, [rootCert3.certificate.toString()]));
+});
+
+Deno.test("should reject a chain when a certificate's CRL was not signed by its real issuer", async () => {
+  using _fakedNow = new FakeTime(new Date('2026-09-08'));
+
+  const notBefore = new Date('2026-09-07');
+  const notAfter = new Date('2026-09-09');
+
+  const legitRoot = await generateRootCert({ notBefore, notAfter });
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: legitRoot,
+  });
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter,
+    issuer: intermediateCert,
+    extensions: [generateCRLDistributionPointsExtension([CRL_URL])],
+  });
+
+  const attackerRoot = await generateRootCert({ notBefore, notAfter });
+  const attackerCRL = await generateCRL({
+    issuer: attackerRoot,
+    thisUpdate: notBefore,
+    nextUpdate: notAfter,
+    revokedSerialNumbers: [leafCert.certificate.serialNumber],
+  });
+
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.resolve(new Response(attackerCRL.rawData)),
+  );
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert.certificate.toString(), intermediateCert.certificate.toString()],
+        [legitRoot.certificate.toString()],
+      ),
+    SimpleWebAuthnError,
+  );
+});
+
+Deno.test('should reject a chain containing a genuinely revoked certificate', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-09-08'));
+
+  const notBefore = new Date('2026-09-07');
+  const notAfter = new Date('2026-09-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+  });
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter,
+    issuer: intermediateCert,
+    extensions: [generateCRLDistributionPointsExtension([CRL_URL])],
+  });
+
+  const crl = await generateCRL({
+    issuer: intermediateCert,
+    thisUpdate: notBefore,
+    nextUpdate: notAfter,
+    revokedSerialNumbers: [leafCert.certificate.serialNumber],
+  });
+
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.resolve(new Response(crl.rawData)),
+  );
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert.certificate.toString(), intermediateCert.certificate.toString()],
+        [rootCert.certificate.toString()],
+      ),
+    SimpleWebAuthnError,
+    'certificate failed',
+  );
+});
+
+Deno.test("should validate a chain when the leaf's genuine CRL does not list it", async () => {
+  using _fakedNow = new FakeTime(new Date('2026-09-08'));
+
+  const notBefore = new Date('2026-09-07');
+  const notAfter = new Date('2026-09-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+  });
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter,
+    issuer: intermediateCert,
+    extensions: [generateCRLDistributionPointsExtension([CRL_URL])],
+  });
+
+  const crl = await generateCRL({
+    issuer: intermediateCert,
+    thisUpdate: notBefore,
+    nextUpdate: notAfter,
+    revokedSerialNumbers: [],
+  });
+
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.resolve(new Response(crl.rawData)),
+  );
+
+  const validated = await validateCertificatePath(
+    [leafCert.certificate.toString(), intermediateCert.certificate.toString()],
+    [rootCert.certificate.toString()],
+  );
+
+  assert(validated);
+});
+
+Deno.test('should reject a chain with complete chain in x5c that does not chain to trust anchor', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-09-08'));
+
+  const notBefore = new Date('2026-09-07');
+  const notAfter = new Date('2026-09-09');
+
+  const attackerURL = 'https://attacker.example.com/malicious.crl';
+
+  const legitRoot = await generateRootCert({ notBefore, notAfter });
+
+  const attackerRoot = await generateRootCert({ notBefore, notAfter });
+  const attackerLeaf = await generateLeafCert({
+    notBefore,
+    notAfter,
+    issuer: attackerRoot,
+    extensions: [generateCRLDistributionPointsExtension([attackerURL])],
+  });
+  const attackerCRL = await generateCRL({
+    issuer: attackerRoot,
+    thisUpdate: notBefore,
+    nextUpdate: notAfter,
+    revokedSerialNumbers: [],
+  });
+
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.resolve(new Response(attackerCRL.rawData)),
+  );
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [attackerLeaf.certificate.toString(), attackerRoot.certificate.toString()],
+        [legitRoot.certificate.toString()],
+      ),
+    SimpleWebAuthnError,
+  );
+
+  assertSpyCalls(_mockFetch, 0);
 });

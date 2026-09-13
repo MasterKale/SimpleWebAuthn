@@ -1,7 +1,8 @@
 import 'reflect-metadata';
-import { X509Certificate, X509ChainBuilder } from '@peculiar/x509';
+import { X509Certificate, type X509Certificates, X509ChainBuilder } from '@peculiar/x509';
 
 import { isCertRevoked } from './isCertRevoked.ts';
+import { SimpleWebAuthnError } from '../errors/index.ts';
 
 /**
  * Traverse an array of PEM certificates and ensure they form a proper chain
@@ -17,51 +18,26 @@ export async function validateCertificatePath(
     return true;
   }
 
-  // Prepare to work with x5c certs
-  const x5cCertsParsed = x5cCertsPEM.map((certPEM) => new X509Certificate(certPEM));
-
-  // Check for any expired or temporally invalid certs in x5c
-  for (let i = 0; i < x5cCertsParsed.length; i++) {
-    const cert = x5cCertsParsed[i];
-    const certPEM = x5cCertsPEM[i];
-
-    try {
-      await assertCertNotRevoked(cert);
-    } catch (_err) {
-      throw new Error(`Found revoked certificate in x5c:\n${certPEM}`);
-    }
-
-    try {
-      assertCertIsWithinValidTimeWindow(cert.notBefore, cert.notAfter);
-    } catch (_err) {
-      throw new Error(`Found certificate out of validity period in x5c:\n${certPEM}`);
-    }
-  }
-
   // Prepare to work with trust anchor certs
   const trustAnchorsParsed = trustAnchorsPEM.map((certPEM) => {
     try {
       return new X509Certificate(certPEM);
     } catch (err) {
-      const _err = err as Error;
-      throw new Error(`Could not parse trust anchor certificate:\n${certPEM}`, { cause: _err });
+      throw new SimpleWebAuthnError({
+        message: `Could not parse trust anchor certificate:\n${certPEM}`,
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        cause: err as Error,
+      });
     }
   });
 
-  // Filter out any expired or temporally invalid trust anchors certs
+  // Filter out any temporally invalid trust anchors certs
   const validTrustAnchors: X509Certificate[] = [];
   for (let i = 0; i < trustAnchorsParsed.length; i++) {
     const cert = trustAnchorsParsed[i];
 
     try {
-      await assertCertNotRevoked(cert);
-    } catch (_err) {
-      // Continue processing the other certs
-      continue;
-    }
-
-    try {
-      assertCertIsWithinValidTimeWindow(cert.notBefore, cert.notAfter);
+      assertCertIsWithinValidTimeWindow(cert);
     } catch (_err) {
       // Continue processing the other certs
       continue;
@@ -71,25 +47,35 @@ export async function validateCertificatePath(
   }
 
   if (validTrustAnchors.length === 0) {
-    throw new Error('No specified trust anchor was valid for verifying x5c');
+    throw new SimpleWebAuthnError({
+      message: 'No specified trust anchor was valid for verifying x5c',
+      code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+    });
+  }
+
+  // Prepare to work with x5c certs
+  const x5cCertsParsed = x5cCertsPEM.map((certPEM) => new X509Certificate(certPEM));
+
+  // Break apart x5c into leaf + intermediates
+  const x5cLeafCert = x5cCertsParsed[0];
+  let x5cIntermediates: X509Certificate[] = [];
+  if (x5cCertsParsed.length > 1) {
+    x5cIntermediates = x5cCertsParsed.slice(1);
   }
 
   // Try to verify x5c with each valid trust anchor
   let invalidCertificateChain = true;
+  let validatedChain: X509Certificates | undefined = undefined;
   for (const anchor of validTrustAnchors) {
     try {
       const x5cWithTrustAnchor = x5cCertsParsed.concat([anchor]);
       const numUniqueCerts = new Set(x5cWithTrustAnchor.map((cert) => cert.toString('pem'))).size;
 
       if (numUniqueCerts !== x5cWithTrustAnchor.length) {
-        throw new Error('Invalid certificate path: found duplicate certificates');
-      }
-
-      // Break apart x5c to try and build a valid cert chain
-      const x5cLeafCert = x5cCertsParsed[0];
-      let x5cIntermediates: X509Certificate[] = [];
-      if (x5cCertsParsed.length > 1) {
-        x5cIntermediates = x5cCertsParsed.slice(1);
+        throw new SimpleWebAuthnError({
+          message: 'Invalid certificate path: found duplicate certificates',
+          code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        });
       }
 
       // Order of certs doesn't matter here but for readability
@@ -129,18 +115,77 @@ export async function validateCertificatePath(
         continue;
       }
 
-      // If we successfully validated a path then there's no need to continue. Reset any existing
-      // errors that were thrown by earlier trust anchors
+      if (certBeforeLastSignedByAnchor) {
+        /**
+         * Swap out the last cert in the chain with the anchor that we've already verified
+         * chains to the second-to-last certificate. This makes it easier to verify the chain
+         * as a standard certificate chain.
+         */
+        chain[chain.length - 1] = anchor;
+      }
+
+      // We successfully validated a chain so there's no need to continue
       invalidCertificateChain = false;
+      validatedChain = chain;
       break;
     } catch (err) {
-      throw new Error('Unexpected error while validating certificate path', { cause: err });
+      throw new SimpleWebAuthnError({
+        message: 'Unexpected error while validating certificate path',
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        cause: err as Error,
+      });
     }
+  }
+
+  if (validatedChain) {
+    // Check for any temporally invalid or expired certs in the chain
+    for (let i = 0; i < validatedChain.length; i++) {
+      const cert = validatedChain[i];
+
+      try {
+        assertCertIsWithinValidTimeWindow(cert);
+      } catch (_err) {
+        throw new SimpleWebAuthnError({
+          message: `Found certificate out of validity period:\n${cert.toString()}`,
+          code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        });
+      }
+
+      /**
+       * Checking revocation is very expensive so do it only at the end when we're certain a cert
+       * is otherwise valid
+       */
+      let issuerCert: X509Certificate | undefined = undefined;
+      if (i < validatedChain.length - 1) {
+        // Issuer cert is simply the next cert in the chain
+        issuerCert = validatedChain[i + 1];
+      } else {
+        // `cert` is the anchor. Only try to verify its revocation status if it's a root certificate
+        if (await cert.isSelfSigned()) {
+          issuerCert = cert;
+        }
+      }
+
+      try {
+        await assertCertNotRevoked(cert, issuerCert);
+      } catch (err) {
+        throw new SimpleWebAuthnError({
+          message: `The following certificate failed revocation status check\n${cert.toString()}`,
+          code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+          cause: err as Error,
+        });
+      }
+    }
+  } else {
+    invalidCertificateChain = true;
   }
 
   // We tried multiple trust anchors and none of them worked
   if (invalidCertificateChain) {
-    throw new InvalidCertificatePath();
+    throw new SimpleWebAuthnError({
+      message: 'x5c could not be chained to any specified trust anchor',
+      code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+    });
   }
 
   return true;
@@ -148,10 +193,15 @@ export async function validateCertificatePath(
 
 /**
  * Check if the certificate is revoked or not. If it is, raise an error
+ *
+ * @throws Error - Wrap this in a SimpleWebAuthnError so RPs can identify issues here
  */
-async function assertCertNotRevoked(certificate: X509Certificate): Promise<void> {
+async function assertCertNotRevoked(
+  certificate: X509Certificate,
+  issuerCert?: X509Certificate,
+): Promise<void> {
   // Check for certificate revocation
-  const subjectCertRevoked = await isCertRevoked(certificate);
+  const subjectCertRevoked = await isCertRevoked(certificate, issuerCert);
 
   if (subjectCertRevoked) {
     throw new Error('Found revoked certificate in certificate path');
@@ -161,17 +211,10 @@ async function assertCertNotRevoked(certificate: X509Certificate): Promise<void>
 /**
  * Require the cert to be within its notBefore and notAfter time window
  */
-function assertCertIsWithinValidTimeWindow(certNotBefore: Date, certNotAfter: Date): void {
+function assertCertIsWithinValidTimeWindow(certificate: X509Certificate): void {
+  const { notBefore: certNotBefore, notAfter: certNotAfter } = certificate;
   const now = new Date(Date.now());
   if (certNotBefore > now || certNotAfter < now) {
     throw new Error('Certificate is not yet valid or expired');
-  }
-}
-
-class InvalidCertificatePath extends Error {
-  constructor() {
-    const message = 'x5c could not be chained to any specified trust anchor';
-    super(message);
-    this.name = 'InvalidX5CChain';
   }
 }

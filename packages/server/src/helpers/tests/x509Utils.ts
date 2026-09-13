@@ -44,7 +44,10 @@ export async function generateRootCert(opts: {
     extensions: [
       // Critical: Tell the world this is a CA cert that can sign other certs
       new x509.BasicConstraintsExtension(true, undefined, true),
-      new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true),
+      new x509.KeyUsagesExtension(
+        x509.KeyUsageFlags.keyCertSign | x509.KeyUsageFlags.cRLSign,
+        true,
+      ),
     ],
   });
 
@@ -54,22 +57,22 @@ export async function generateRootCert(opts: {
 /**
  * Generate a cert that is signed by another cert and can sign other certs to form a chain
  */
-export async function generateIntermediateCert(
-  opts: {
-    /** Before when the cert should not be valid */
-    notBefore: Date;
-    /** After when the cert should not be valid */
-    notAfter: Date;
-    /** The certificate (and its keys) that this certificate will chain to */
-    issuer: { certificate: x509.X509Certificate; keys: CryptoKeyPair };
-    /** The optional subject for this certificate */
-    subject?: { certificate: x509.X509Certificate; keys: CryptoKeyPair };
-    /** The algorithm used for the certificate's keypair */
-    keyAlgorithm?: EcKeyGenParams;
-    /** The algorithm used for generating a signature over the certificate */
-    signingAlgorithm?: Algorithm | EcdsaParams;
-  },
-): Promise<{ certificate: x509.X509Certificate; keys: CryptoKeyPair }> {
+export async function generateIntermediateCert(opts: {
+  /** Before when the cert should not be valid */
+  notBefore: Date;
+  /** After when the cert should not be valid */
+  notAfter: Date;
+  /** The certificate (and its keys) that this certificate will chain to */
+  issuer: { certificate: x509.X509Certificate; keys: CryptoKeyPair };
+  /** The optional subject for this certificate */
+  subject?: { certificate: x509.X509Certificate; keys: CryptoKeyPair };
+  /** The algorithm used for the certificate's keypair */
+  keyAlgorithm?: EcKeyGenParams;
+  /** The algorithm used for generating a signature over the certificate */
+  signingAlgorithm?: Algorithm | EcdsaParams;
+  /** Additional certificate extensions (e.g. AuthorityKeyIdentifier, CRLDistributionPoints) */
+  extensions?: x509.Extension[];
+}): Promise<{ certificate: x509.X509Certificate; keys: CryptoKeyPair }> {
   const {
     notBefore,
     notAfter,
@@ -77,6 +80,7 @@ export async function generateIntermediateCert(
     subject,
     keyAlgorithm = defaultKeyAlgorithm,
     signingAlgorithm = defaultSigningAlgorithm,
+    extensions = [],
   } = opts;
 
   const webCrypto = await getWebCrypto();
@@ -100,6 +104,7 @@ export async function generateIntermediateCert(
       // Explicitly state this cert can sign other certs
       new x509.BasicConstraintsExtension(true, undefined, true),
       new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true),
+      ...extensions,
     ],
   });
 
@@ -122,6 +127,8 @@ export async function generateLeafCert(opts: {
   keyAlgorithm?: EcKeyGenParams;
   /** The algorithm used for generating a signature over the certificate */
   signingAlgorithm?: Algorithm | EcdsaParams;
+  /** Additional certificate extensions (e.g. AuthorityKeyIdentifier, CRLDistributionPoints) */
+  extensions?: x509.Extension[];
 }): Promise<{ certificate: x509.X509Certificate; keys: CryptoKeyPair }> {
   const {
     notBefore,
@@ -130,6 +137,7 @@ export async function generateLeafCert(opts: {
     subject = 'CN=SimpleWebAuthn Unit Test Leaf Cert',
     keyAlgorithm = defaultKeyAlgorithm,
     signingAlgorithm = defaultSigningAlgorithm,
+    extensions = [],
   } = opts;
   const webCrypto = await getWebCrypto();
 
@@ -147,8 +155,51 @@ export async function generateLeafCert(opts: {
       // Explicitly state this is an end-entity and thus cannot sign other certs
       new x509.BasicConstraintsExtension(false, undefined, true),
       new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
+      ...extensions,
     ],
   });
 
   return { certificate, keys };
+}
+
+/**
+ * Build a CRLDistributionPoints extension
+ */
+export function generateCRLDistributionPointsExtension(
+  urls: string[],
+): x509.CRLDistributionPointsExtension {
+  return new x509.CRLDistributionPointsExtension(urls);
+}
+
+/**
+ * Generate a signed X.509 CRL (Certificate Revocation List)
+ */
+export function generateCRL(opts: {
+  /** The certificate (and its keys) that will sign this CRL */
+  issuer: { certificate: x509.X509Certificate; keys: CryptoKeyPair };
+  /** When the CRL was published */
+  thisUpdate?: Date;
+  /** When the next CRL update is expected */
+  nextUpdate?: Date;
+  /** Hex-formatted serial numbers of certs to list as revoked */
+  revokedSerialNumbers?: string[];
+  /** The algorithm used for generating a signature over the CRL */
+  signingAlgorithm?: Algorithm | EcdsaParams;
+}): Promise<x509.X509Crl> {
+  const {
+    issuer,
+    thisUpdate,
+    nextUpdate,
+    revokedSerialNumbers,
+    signingAlgorithm = defaultSigningAlgorithm,
+  } = opts;
+
+  return x509.X509CrlGenerator.create({
+    issuer: issuer.certificate.subject,
+    thisUpdate,
+    nextUpdate,
+    signingAlgorithm,
+    signingKey: issuer.keys.privateKey,
+    entries: revokedSerialNumbers?.map((serialNumber) => ({ serialNumber })),
+  });
 }

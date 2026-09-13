@@ -149,7 +149,7 @@ Deno.test('should reject when a revoked certificate is found', async () => {
   //   notBefore: 1998-09-01T12:00:00.000Z,
   //   notAfter: 2028-01-28T12:00:00.000Z
   // }
-  const mockDate = new FakeTime(new Date('2021-10-15T00:00:42.000Z'));
+  using _mockDate = new FakeTime(new Date('2021-10-15T00:00:42.000Z'));
 
   await assertRejects(
     () =>
@@ -165,10 +165,8 @@ Deno.test('should reject when a revoked certificate is found', async () => {
         rpIdHash,
       }),
     Error,
-    'revoked certificate',
+    'failed revocation',
   );
-
-  mockDate.restore();
 });
 
 const attestationAndroidSafetyNet: RegistrationResponseJSON = {

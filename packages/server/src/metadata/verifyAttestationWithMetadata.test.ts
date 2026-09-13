@@ -4,6 +4,7 @@ import { FakeTime } from '@std/testing/time';
 import { verifyAttestationWithMetadata } from './verifyAttestationWithMetadata.ts';
 import type { MetadataStatement } from '../metadata/mdsTypes.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
+import { SimpleWebAuthnError } from '@simplewebauthn/server';
 
 Deno.test('should not verify attestation with revoked certificate in metadata (android-safetynet)', async () => {
   // Faking time to something that'll satisfy all of these ranges:
@@ -23,7 +24,7 @@ Deno.test('should not verify attestation with revoked certificate in metadata (a
   //   notBefore: 1998-09-01T12:00:00.000Z,
   //   notAfter: 2028-01-28T12:00:00.000Z
   // }
-  const fakedNow = new FakeTime(new Date('2022-02-01T00:00:00.000Z'));
+  using _fakedNow = new FakeTime(new Date('2022-02-01T00:00:00.000Z'));
 
   const metadataStatementJSONSafetyNet: MetadataStatement = {
     legalHeader: 'https://fidoalliance.org/metadata/metadata-statement-legal-header/',
@@ -69,18 +70,17 @@ Deno.test('should not verify attestation with revoked certificate in metadata (a
   const credentialPublicKey =
     'pQECAyYgASFYIAKH2NrGZT-lUEA3tbBXR9owjW_7OnA1UqoL1UuKY_VCIlggpjeOH0xyBCpGDya55JLXXKrzyOieQN3dvG1pV-Qs-Gs';
 
-  await assertRejects(
+  const error = await assertRejects(
     () =>
       verifyAttestationWithMetadata({
         statement: metadataStatementJSONSafetyNet,
         credentialPublicKey: isoBase64URL.toBuffer(credentialPublicKey),
         x5c,
       }),
-    Error,
-    'revoked certificate',
+    SimpleWebAuthnError,
   );
 
-  fakedNow.restore();
+  assertEquals(error.code, 'CERTIFICATE_PATH_VERIFICATION_FAILED');
 });
 
 Deno.test('should verify attestation with rsa_emsa_pkcs1_sha256_raw authenticator algorithm in metadata', async () => {
@@ -213,7 +213,7 @@ Deno.test('should verify idmelon attestation with updated root certificate', asy
   //   notBefore: 2022-12-14T18:41:09.000Z,
   //   notAfter: 2072-12-01T18:41:09.000Z
   // }
-  // const mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
+  using _mockDate = new FakeTime(new Date('2025-01-30T23:59:59.000Z'));
   /**
    * See https://github.com/MasterKale/SimpleWebAuthn/issues/302 for more context, basically
    * IDmelon's root cert in FIDO MDS was missing an extension. I worked with IDmelon to generate a

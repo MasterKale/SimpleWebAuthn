@@ -98,20 +98,38 @@ Install the following before proceeding:
 After pulling down the code, set up dependencies:
 
 ```sh
-$> deno install
+deno install
 ```
 
 To run unit tests for all workspace packages, use the `test` series of scripts:
 
 ```sh
-# Run an individual package's tests
-$> cd packages/browser/ && deno task test
-$> cd packages/server/ && deno task test
+cd packages/browser/ && deno task test
+```
+
+```sh
+cd packages/server/ && deno task test
 ```
 
 Tests can be run in watch mode with the `test:watch` series of scripts:
 
 ```sh
-$> cd packages/browser/ && deno task test:watch
-$> cd packages/server/ && deno task test:watch
+cd packages/browser/ && deno task test:watch
+```
+
+```sh
+cd packages/server/ && deno task test:watch
+```
+
+### Test Coverage <!-- omit in toc -->
+
+The following additional dependencies are needed locally to display test coverage reports:
+
+- **genhtml** (run `brew install lcov` on macOS to install this CLI tool)
+
+Then run the following command to run tests and then host a coverage report at
+http://127.0.0.1:8000:
+
+```
+deno run test:coverage
 ```
