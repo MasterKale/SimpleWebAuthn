@@ -1,5 +1,11 @@
 # Changelog
 
+## v14.0.2
+
+- **[server]** Revamped certificate revocation logic to only cryptographically verify and process
+  CRLs from certificates that chained back to an RP-chosen trust anchor
+  ([GHSA-2g3p-m8c9-hhwh](https://github.com/MasterKale/SimpleWebAuthn/security/advisories/GHSA-2g3p-m8c9-hhwh))
+
 ## v14.0.1
 
 **Changes:**
