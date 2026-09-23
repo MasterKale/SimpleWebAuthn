@@ -43,11 +43,10 @@ class BaseSettingsService implements SettingsService {
   // Certificates are stored as PEM-formatted strings
   private pemCertificates: Map<RootCertIdentifier, string[]>;
   // Track whether the runtime supports PQC algorithms
-  private _runtimeSupportsPQC = false;
+  private _runtimeSupportsPQC?: boolean;
 
   constructor() {
     this.pemCertificates = new Map();
-    this._runtimeSupportsPQC = runtimeSupportsWebCryptoKeyAlg('ML-DSA-44');
   }
 
   setRootCertificates(opts: {
@@ -74,6 +73,7 @@ class BaseSettingsService implements SettingsService {
   }
 
   runtimeSupportsPQC() {
+    this._runtimeSupportsPQC ??= runtimeSupportsWebCryptoKeyAlg('ML-DSA-44');
     return this._runtimeSupportsPQC;
   }
 }
