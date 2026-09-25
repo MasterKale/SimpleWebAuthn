@@ -28,19 +28,16 @@ const defaultAuthenticatorSelection: AuthenticatorSelectionCriteria = {
 };
 
 /**
- * Use the most commonly-supported algorithms
- * See the following:
- *   - https://www.iana.org/assignments/cose/cose.xhtml#algorithms
- *   - https://w3c.github.io/webauthn/#dom-publickeycredentialcreationoptions-pubkeycredparams
+ * Generate the default array of public key algorithms to offer during registration. Defaults to
+ * the most commonly-supported algorithms of EdDSA, ES256, and RS256. When the runtime supports
+ * PQC algorithms, ML-DSA-44 is included as the most preferred algorithm.
  */
-export let defaultSupportedAlgorithmIDs: COSEALG[] = [
-  COSEALG.EdDSA,
-  COSEALG.ES256,
-  COSEALG.RS256,
-];
+export function getDefaultSupportedAlgorithmIDs(): COSEALG[] {
+  if (SettingsService.runtimeSupportsPQC()) {
+    return [COSEALG.ML_DSA_44, COSEALG.EdDSA, COSEALG.ES256, COSEALG.RS256];
+  }
 
-if (SettingsService.runtimeSupportsPQC()) {
-  defaultSupportedAlgorithmIDs = [COSEALG.ML_DSA_44, ...defaultSupportedAlgorithmIDs];
+  return [COSEALG.EdDSA, COSEALG.ES256, COSEALG.RS256];
 }
 
 /**
@@ -94,7 +91,7 @@ export async function generateRegistrationOptions(
     excludeCredentials = [],
     authenticatorSelection = defaultAuthenticatorSelection,
     extensions,
-    supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
+    supportedAlgorithmIDs = getDefaultSupportedAlgorithmIDs(),
     preferredAuthenticatorType,
   } = options;
 

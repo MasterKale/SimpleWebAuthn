@@ -22,7 +22,7 @@ import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
 
-import { defaultSupportedAlgorithmIDs } from './generateRegistrationOptions.ts';
+import { getDefaultSupportedAlgorithmIDs } from './generateRegistrationOptions.ts';
 import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F.ts';
 import { verifyAttestationPacked } from './verifications/verifyAttestationPacked.ts';
 import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttestationAndroidSafetyNet.ts';
@@ -71,7 +71,7 @@ export async function verifyRegistrationResponse(
     expectedType,
     requireUserPresence = true,
     requireUserVerification = true,
-    supportedAlgorithmIDs = defaultSupportedAlgorithmIDs,
+    supportedAlgorithmIDs = getDefaultSupportedAlgorithmIDs(),
     attestationSafetyNetEnforceCTSCheck = true,
   } = options;
   const { id, rawId, type: credentialType, response: attestationResponse } = response;
