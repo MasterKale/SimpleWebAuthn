@@ -6,7 +6,7 @@
     "test:coverage": {
       "command": "http-server ./html_cov -a 127.0.0.1 -p 8000",
       "dependencies": [
-        // "test:coverage:html"
+        "test:coverage:html"
       ]
     },
     "test:coverage:html": {
