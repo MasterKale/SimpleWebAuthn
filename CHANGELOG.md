@@ -1,5 +1,13 @@
 # Changelog
 
+## v14.0.3
+
+**Changes:**
+
+- **[server]** PQC support is now lazily evaluated. This delays Node from emitting its PQC warnings
+  from when the Node process starts to when a method is called that checks for PQC support
+  ([#809](https://github.com/MasterKale/SimpleWebAuthn/pull/809))
+
 ## v14.0.2
 
 This update fixes a CVSS v3 Moderate (5.4 / 10) and a CVSS v3 Moderate (6.3 / 10) security
