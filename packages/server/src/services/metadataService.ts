@@ -200,7 +200,24 @@ export class BaseMetadataService implements MetadataService {
     await this.pauseUntilReady();
 
     // Try to grab a cached statement
-    const cachedStatement = this.statementCache[aaguid];
+    let cachedStatement = this.statementCache[aaguid];
+
+    // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
+    if (cachedStatement?.url) {
+      const mds = this.mdsCache[cachedStatement.url];
+      const now = new Date();
+      if (now > mds.nextUpdate) {
+        try {
+          this.setState(SERVICE_STATE.REFRESHING);
+          const blob = await this.downloadBlob(mds);
+          await this.verifyBlob(blob, mds);
+          // Refresh the cached statement in case the cache got updated just now
+          cachedStatement = this.statementCache[aaguid];
+        } finally {
+          this.setState(SERVICE_STATE.READY);
+        }
+      }
+    }
 
     if (!cachedStatement) {
       if (this.verificationMode === 'strict') {
@@ -210,21 +227,6 @@ export class BaseMetadataService implements MetadataService {
 
       // Allow registration verification to continue without using metadata
       return;
-    }
-
-    // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
-    if (cachedStatement.url) {
-      const mds = this.mdsCache[cachedStatement.url];
-      const now = new Date();
-      if (now > mds.nextUpdate) {
-        try {
-          this.setState(SERVICE_STATE.REFRESHING);
-          const blob = await this.downloadBlob(mds);
-          await this.verifyBlob(blob, mds);
-        } finally {
-          this.setState(SERVICE_STATE.READY);
-        }
-      }
     }
 
     const { entry } = cachedStatement;
