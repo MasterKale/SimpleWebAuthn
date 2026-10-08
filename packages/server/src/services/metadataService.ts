@@ -206,6 +206,38 @@ export class BaseMetadataService implements MetadataService {
       this.logger.info(`Cached ${entriesAdded} local metadata entries`);
     }
 
+    /**
+     * If Convenience MDS server URLs are provided, then download and cache the current collection
+     * of metadata from them.
+     */
+    if (convenienceMDSServers?.length) {
+      // Get a current count so we know how many new statements we've added from MDS servers
+      const currentCacheCount = Object.keys(this.convenienceMetadataCache).length;
+      let numServers = convenienceMDSServers.length;
+
+      for (const url of convenienceMDSServers) {
+        // Pull convenience metadata
+        try {
+          const payload = await this.downloadConvenienceMDS(url, 0);
+
+          if (payload) {
+            this.cacheConvenienceMDS(url, payload);
+          }
+        } catch (err) {
+          // Notify of the error and move on
+          this.logger.error(`Could not download convenience metadata from ${url}:`, err);
+          numServers -= 1;
+        }
+      }
+
+      // Calculate the total number of new metadata entries we successfully added
+      const newCacheCount = Object.keys(this.convenienceMetadataCache).length;
+      const cacheDiff = newCacheCount - currentCacheCount;
+      this.logger.info(
+        `Cached ${cacheDiff} metadata entries from ${numServers} convenience metadata server(s)`,
+      );
+    }
+
     if (verificationMode) {
       this.verificationMode = verificationMode;
     }
