@@ -329,6 +329,41 @@ export class BaseMetadataService implements MetadataService {
   }
 
   /**
+   * Download the convenience metadata, which is surprisingly just a JSON document
+   */
+  private async downloadConvenienceMDS(
+    url: string,
+    no: number,
+  ): Promise<ConvenienceMDSPayload | undefined> {
+    // Get latest convenience MDS JSON, with a query param that can short-circuit the download
+    // if we already have the latest version of metadata
+    const _url = new URL(`/?localCopySerial=${no}`, url);
+    const resp = await fetch(_url.toString());
+
+    /**
+     * We have the latest data, nothing more to do.
+     *
+     * See https://fidoalliance.org/specs/mds/fido-convenience-metadata-service-v1.0-ps-20250521.html#sctn-mds-blob-proc-rules
+     */
+    if (resp.status === 304) {
+      await resp.body?.cancel();
+      return;
+    }
+
+    /**
+     * The FIDO convenience MDS API aggressively rate-limits so be prepared for that. We'll have to
+     * try again later.
+     */
+    if (resp.status === 429) {
+      await resp.body?.cancel();
+      return;
+    }
+
+    const data: ConvenienceMDSPayload = await resp.json();
+    return data;
+  }
+
+  /**
    * Cache the AAGUID-keyed entries in a Convenience MDS payload. Returns the number of entries
    * cached (so you can `count += cacheConvenienceMDS(...)`)
    */
