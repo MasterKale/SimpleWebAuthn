@@ -16,6 +16,7 @@ import { generateLeafCert, generateRootCert } from '../helpers/tests/x509Utils.t
 import { BaseMetadataService, MetadataService } from './metadataService.ts';
 import { SettingsService } from './settingsService.ts';
 import type { MetadataStatement } from '../metadata/mdsTypes.ts';
+import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 
 let mockFetch: Stub;
 
@@ -63,6 +64,117 @@ describe('Method: initialize()', () => {
     const statement = await MetadataService.getStatement(localStatementAAGUID);
 
     assertEquals(statement, localStatement);
+  });
+
+  it('should query provided convenience MDS server URLs', async () => {
+    const convenienceMDSServers = ['https://custom-cmds1.com', 'https://custom-cmds2.com'];
+
+    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers });
+
+    assertSpyCalls(mockFetch, convenienceMDSServers.length);
+    assertSpyCallArg(mockFetch, 0, 0, 'https://custom-cmds1.com/?localCopySerial=0');
+    assertSpyCallArg(mockFetch, 1, 0, 'https://custom-cmds2.com/?localCopySerial=0');
+  });
+
+  it('should not query any convenience MDS servers on empty list of URLs', async () => {
+    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [] });
+
+    assertSpyCalls(mockFetch, 0);
+  });
+
+  it('should load local convenience payloads', async () => {
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: [],
+      conveniencePayloads: [localConveniencePayload],
+    });
+
+    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
+
+    assertEquals(metadata, localProviderMetadata);
+  });
+
+  it('should load convenience payloads without querying any servers', async () => {
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: [],
+      conveniencePayloads: [localConveniencePayload],
+    });
+
+    assertSpyCalls(mockFetch, 0);
+  });
+
+  it('should load metadata from multiple convenience payloads', async () => {
+    const otherAAGUID = '00000000-0000-0000-0000-000000000002';
+    const otherMetadata: ProviderMetadata = { friendlyNames: { en: 'Other Provider' } };
+
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: [],
+      conveniencePayloads: [
+        localConveniencePayload,
+        { no: 1, [otherAAGUID]: otherMetadata } as ConvenienceMDSPayload,
+      ],
+    });
+
+    assertEquals(
+      await MetadataService.getProviderMetadata(localStatementAAGUID),
+      localProviderMetadata,
+    );
+    assertEquals(await MetadataService.getProviderMetadata(otherAAGUID), otherMetadata);
+  });
+
+  it('should load metadata from a convenience MDS server', async () => {
+    mockFetch.restore();
+    mockFetch = stub(
+      _fetchInternals,
+      'stubThis',
+      returnsNext([
+        Promise.resolve(Response.json(localConveniencePayload)),
+      ]),
+    );
+
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: ['https://custom-cmds.com'],
+    });
+
+    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
+
+    assertEquals(metadata, localProviderMetadata);
+  });
+
+  it('should move on if a convenience MDS server cannot be reached', async () => {
+    mockFetch.restore();
+    mockFetch = stub(
+      _fetchInternals,
+      'stubThis',
+      returnsNext([
+        Promise.reject(new Error('Network down')),
+        Promise.resolve(Response.json(localConveniencePayload)),
+      ]),
+    );
+
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: ['https://broken-cmds.com', 'https://working-cmds.com'],
+    });
+
+    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
+
+    assertEquals(metadata, localProviderMetadata);
+  });
+
+  it('should cache convenience metadata from local statements', async () => {
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: [],
+      statements: [{ ...localStatement, friendlyNames: { en: 'From Statement' } }],
+    });
+
+    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
+
+    assertEquals(metadata?.friendlyNames, { en: 'From Statement' });
   });
 });
 
@@ -215,6 +327,13 @@ describe('Behavior: logging', () => {
 });
 
 const localStatementAAGUID = '91dfead7-959e-4475-ad26-9b0d482be089';
+const localProviderMetadata: ProviderMetadata = {
+  friendlyNames: { en: 'Local Provider', fr: 'Fournisseur local' },
+};
+const localConveniencePayload: ConvenienceMDSPayload = {
+  no: 1,
+  [localStatementAAGUID]: localProviderMetadata,
+} as ConvenienceMDSPayload;
 const localStatement: MetadataStatement = {
   legalHeader: 'https://fidoalliance.org/metadata/metadata-statement-legal-header/',
   description: 'Virtual FIDO2 EdDSA25519 SHA512 Conformance Testing CTAP2 Authenticator',
