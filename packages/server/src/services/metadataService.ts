@@ -84,12 +84,13 @@ interface MetadataService {
     logger?: SimpleWebAuthnLogger;
   }): Promise<void>;
   /**
-   * Get a metadata statement for a given AAGUID.
-   *
-   * This method will coordinate updating the cache as per the `nextUpdate` property in the initial
-   * BLOB download.
+   * Get additional information about the authenticator associated with the given AAGUID.
    */
   getStatement(aaguid: string | Uint8Array): Promise<MetadataStatement | undefined>;
+  /**
+   * Get localized names and icons for the credential provider associated with the given AAGUID.
+   */
+  getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined>;
 }
 
 /**
