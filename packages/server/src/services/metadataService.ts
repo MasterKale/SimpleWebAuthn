@@ -193,6 +193,19 @@ export class BaseMetadataService implements MetadataService {
       );
     }
 
+    /**
+     * If passkey provider metadata is provided, load them into the cache first.
+     */
+    if (conveniencePayloads?.length) {
+      let entriesAdded = 0;
+
+      conveniencePayloads.forEach((payload) => {
+        entriesAdded += this.cacheConvenienceMDS(NonRefreshingMDS.url, payload);
+      });
+
+      this.logger.info(`Cached ${entriesAdded} local metadata entries`);
+    }
+
     if (verificationMode) {
       this.verificationMode = verificationMode;
     }
