@@ -67,6 +67,7 @@ interface MetadataService {
    * Service-compatible servers. Defaults to the official FIDO Convenience MDS
    * @param opts.statements An array of local metadata statements. Statements will be loaded but
    * not refreshed
+   * @param opts.conveniencePayloads An array of local convenience MDS metadata. Metadata loaded in this way will be loaded but not refreshed.
    * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
    * `"strict"` which throws errors during registration response verification when an
    * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
@@ -78,6 +79,7 @@ interface MetadataService {
     mdsServers?: string[];
     convenienceMDSServers?: string[];
     statements?: MetadataStatement[];
+    conveniencePayloads?: ConvenienceMDSPayload[];
     verificationMode?: VerificationMode;
     logger?: SimpleWebAuthnLogger;
   }): Promise<void>;
@@ -109,6 +111,7 @@ export class BaseMetadataService implements MetadataService {
       mdsServers?: string[];
       convenienceMDSServers?: string[];
       statements?: MetadataStatement[];
+      conveniencePayloads?: ConvenienceMDSPayload[];
       verificationMode?: VerificationMode;
       logger?: SimpleWebAuthnLogger;
     } = {},
@@ -120,6 +123,7 @@ export class BaseMetadataService implements MetadataService {
       mdsServers = [defaultURLMDS],
       convenienceMDSServers = [defaultURLConvenienceMDS],
       statements,
+      conveniencePayloads,
       verificationMode,
       logger = DefaultNoopLogger,
     } = opts;
