@@ -8,7 +8,7 @@ import {
 } from '../helpers/logging.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
-import { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
+import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -245,9 +245,7 @@ export class BaseMetadataService implements MetadataService {
     this.setState(SERVICE_STATE.READY);
   }
 
-  async getStatement(
-    aaguid: string | Uint8Array_,
-  ): Promise<MetadataStatement | undefined> {
+  async getStatement(aaguid: string | Uint8Array_): Promise<MetadataStatement | undefined> {
     if (this.state === SERVICE_STATE.DISABLED) {
       return;
     }
@@ -325,9 +323,10 @@ export class BaseMetadataService implements MetadataService {
   }
 
   /**
-   * Verify and process the MDS metadata blob
+   * Verify and process the MDS metadata blob. Caches metadata and sets up refreshing when blobs
+   * grow stale.
    */
-  private async verifyBlob(blob: string, cachedMDS: CachedMDS) {
+  private async verifyBlob(blob: string, cachedMDS: CachedMDS): Promise<void> {
     const { url, no } = cachedMDS;
 
     const { payload, parsedNextUpdate } = await verifyMDSBlob(blob);
