@@ -65,6 +65,8 @@ interface MetadataService {
    * `"strict"` which throws errors during registration response verification when an
    * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
    * authenticators with unregistered AAGUIDs
+   * @param opts.logger An instance of `SimpleWebAuthnLogger` that allows for capturing
+   * MetadataService log output in a project-specific way
    */
   initialize(opts?: {
     mdsServers?: string[];
