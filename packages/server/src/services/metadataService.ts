@@ -35,6 +35,7 @@ type CachedBLOBEntry = {
 };
 
 const defaultURLMDS = 'https://mds.fidoalliance.org/'; // v3
+const defaultURLConvenienceMDS = 'https://c-mds.fidoalliance.org/';
 
 enum SERVICE_STATE {
   DISABLED,
@@ -56,6 +57,8 @@ interface MetadataService {
    *
    * @param opts.mdsServers An array of URLs to FIDO Alliance Metadata Service
    * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
+   * @param opts.convenienceMDSServers An array of URLs to FIDO Alliance Metadata Convenience
+   * Service-compatible servers. Defaults to the official FIDO Convenience MDS
    * @param opts.statements An array of local metadata statements. Statements will be loaded but
    * not refreshed
    * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
@@ -65,6 +68,7 @@ interface MetadataService {
    */
   initialize(opts?: {
     mdsServers?: string[];
+    convenienceMDSServers?: string[];
     statements?: MetadataStatement[];
     verificationMode?: VerificationMode;
     logger?: SimpleWebAuthnLogger;
@@ -94,6 +98,7 @@ export class BaseMetadataService implements MetadataService {
   async initialize(
     opts: {
       mdsServers?: string[];
+      convenienceMDSServers?: string[];
       statements?: MetadataStatement[];
       verificationMode?: VerificationMode;
       logger?: SimpleWebAuthnLogger;
@@ -104,6 +109,7 @@ export class BaseMetadataService implements MetadataService {
 
     const {
       mdsServers = [defaultURLMDS],
+      convenienceMDSServers = [defaultURLConvenienceMDS],
       statements,
       verificationMode,
       logger = DefaultNoopLogger,
