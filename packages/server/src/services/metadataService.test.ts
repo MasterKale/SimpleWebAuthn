@@ -28,11 +28,12 @@ describe('Method: initialize()', () => {
     mockFetch.restore();
   });
 
-  it('should default to querying MDS v3', async () => {
+  it('should default to querying MDS v3 and convenience MDS', async () => {
     await MetadataService.initialize();
 
-    assertSpyCalls(mockFetch, 1);
+    assertSpyCalls(mockFetch, 2);
     assertSpyCallArg(mockFetch, 0, 0, 'https://mds.fidoalliance.org/');
+    assertSpyCallArg(mockFetch, 1, 0, 'https://c-mds.fidoalliance.org/?localCopySerial=0');
   });
 
   it('should query provided MDS server URLs', async () => {
@@ -40,6 +41,7 @@ describe('Method: initialize()', () => {
 
     await MetadataService.initialize({
       mdsServers,
+      convenienceMDSServers: [],
     });
 
     assertSpyCalls(mockFetch, mdsServers.length);
@@ -48,7 +50,7 @@ describe('Method: initialize()', () => {
   });
 
   it('should not query any servers on empty list of URLs', async () => {
-    await MetadataService.initialize({ mdsServers: [] });
+    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [] });
 
     assertSpyCalls(mockFetch, 0);
   });
@@ -155,7 +157,7 @@ describe('Behavior: BLOB refresh', () => {
       ]),
     );
 
-    await MetadataService.initialize({ mdsServers: [mdsServerURL] });
+    await MetadataService.initialize({ mdsServers: [mdsServerURL], convenienceMDSServers: [] });
 
     assertSpyCalls(mockFetch, 1);
 
@@ -184,7 +186,7 @@ describe('Behavior: BLOB refresh', () => {
       ]),
     );
 
-    await MetadataService.initialize({ mdsServers: [mdsServerURL] });
+    await MetadataService.initialize({ mdsServers: [mdsServerURL], convenienceMDSServers: [] });
 
     const returnedStatement = await MetadataService.getStatement(refreshableAAGUID);
 
