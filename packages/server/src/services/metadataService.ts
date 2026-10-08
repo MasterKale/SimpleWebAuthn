@@ -307,6 +307,51 @@ export class BaseMetadataService implements MetadataService {
     return entry.metadataStatement;
   }
 
+  async getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined> {
+    if (this.state === SERVICE_STATE.DISABLED) {
+      return;
+    }
+
+    if (!aaguid) {
+      return;
+    }
+
+    if (aaguid instanceof Uint8Array) {
+      aaguid = convertAAGUIDToString(aaguid);
+    }
+
+    // If a cache refresh is in progress then pause this until the service is ready
+    await this.pauseUntilReady();
+
+    // Try to grab a cached statement
+    let cachedMetadata = this.convenienceMetadataCache[aaguid];
+
+    // If the metadata points to a convenience MDS API, then check the nextUpdate to see if we need
+    // to refresh it
+    if (cachedMetadata?.url) {
+      const mds = this.mdsCache[cachedMetadata.url];
+      const now = new Date();
+      if (now > mds.nextUpdate) {
+        try {
+          this.setState(SERVICE_STATE.REFRESHING);
+          const payload = await this.downloadConvenienceMDS(mds.url, mds.no);
+          if (payload) {
+            this.cacheConvenienceMDS(mds.url, payload);
+          }
+
+          // Refresh the cached metadata in case the cache got updated just now
+          cachedMetadata = this.convenienceMetadataCache[aaguid];
+        } finally {
+          this.setState(SERVICE_STATE.READY);
+        }
+      }
+    }
+
+    const { metadata } = cachedMetadata;
+
+    return metadata;
+  }
+
   /**
    * Download and process the latest BLOB from MDS
    */
