@@ -480,7 +480,7 @@ export class BaseMetadataService implements MetadataService {
       // Store the payload `no` to skip re-downloading metadata we already have
       no: payload.no,
       // Convenience MDS returns no nextUpdate, so set one that's seven days from now
-      nextUpdate: new Date(Date.now() + (100 * 60 * 60 * 24 * 7)),
+      nextUpdate: new Date(Date.now() + (1000 * 60 * 60 * 24 * 7)),
     };
 
     return entriesAdded;
