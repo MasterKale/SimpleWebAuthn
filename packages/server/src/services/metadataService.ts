@@ -329,6 +329,37 @@ export class BaseMetadataService implements MetadataService {
   }
 
   /**
+   * Cache the AAGUID-keyed entries in a Convenience MDS payload. Returns the number of entries
+   * cached (so you can `count += cacheConvenienceMDS(...)`)
+   */
+  private cacheConvenienceMDS(url: string, payload: ConvenienceMDSPayload): number {
+    let entriesAdded = 0;
+
+    // Cache entries
+    Object.keys(payload).forEach((aaguid) => {
+      // Skip the versioning property
+      if (aaguid === 'no') {
+        return;
+      }
+
+      // The rest of the keys will be AAGUIDs
+      this.cacheProviderMetadata(aaguid, payload[aaguid], url);
+      entriesAdded += 1;
+    });
+
+    // Set up convenience metadata refresh
+    this.mdsCache[url] = {
+      url,
+      // Store the payload `no` to skip re-downloading metadata we already have
+      no: payload.no,
+      // Convenience MDS returns no nextUpdate, so set one that's seven days from now
+      nextUpdate: new Date(Date.now() + (100 * 60 * 60 * 24 * 7)),
+    };
+
+    return entriesAdded;
+  }
+
+  /**
    * A helper method to pause execution until the service is ready
    */
   private pauseUntilReady(): Promise<void> {
