@@ -166,6 +166,48 @@ describe('Method: initialize()', () => {
     assertEquals(metadata, localProviderMetadata);
   });
 
+  it('should use local convenience payloads as a fallback to convenience MDS servers', async () => {
+    const serverOnlyAAGUID = '00000000-0000-0000-0000-000000000004';
+    const serverMetadata: ProviderMetadata = { friendlyNames: { en: 'From Server' } };
+
+    mockFetch.restore();
+    mockFetch = stub(
+      _fetchInternals,
+      'stubThis',
+      returnsNext([
+        Promise.resolve(Response.json({
+          no: 1,
+          [localStatementAAGUID]: serverMetadata,
+          [serverOnlyAAGUID]: serverMetadata,
+        })),
+      ]),
+    );
+
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: ['https://custom-cmds.com'],
+      conveniencePayloads: [
+        localConveniencePayload,
+        {
+          no: 1,
+          '00000000-0000-0000-0000-000000000005': localProviderMetadata,
+        } as ConvenienceMDSPayload,
+      ],
+    });
+
+    // The server wins on a shared AAGUID
+    assertEquals(
+      await MetadataService.getProviderMetadata(localStatementAAGUID),
+      serverMetadata,
+    );
+    assertEquals(await MetadataService.getProviderMetadata(serverOnlyAAGUID), serverMetadata);
+    // The local payload still fills in AAGUIDs the server doesn't know about
+    assertEquals(
+      await MetadataService.getProviderMetadata('00000000-0000-0000-0000-000000000005'),
+      localProviderMetadata,
+    );
+  });
+
   it('should cache convenience metadata from local statements', async () => {
     await MetadataService.initialize({
       mdsServers: [],

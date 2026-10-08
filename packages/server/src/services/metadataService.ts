@@ -66,8 +66,12 @@ interface MetadataService {
    * @param opts.convenienceMDSServers An array of URLs to FIDO Alliance Metadata Convenience
    * Service-compatible servers. Defaults to the official FIDO Convenience MDS
    * @param opts.statements An array of local metadata statements. Statements will be loaded but
-   * not refreshed
-   * @param opts.conveniencePayloads An array of local convenience MDS metadata. Metadata loaded in this way will be loaded but not refreshed.
+   * not refreshed. When combined with `mdsServers`, a statement for the same AAGUID downloaded
+   * from an MDS server will replace the local statement and get refreshed from then on
+   * @param opts.conveniencePayloads An array of local convenience MDS metadata. Metadata loaded in
+   * this way will be loaded but not refreshed. When combined with `convenienceMDSServers`, metadata
+   * for the same AAGUID downloaded from a convenience MDS server will replace the local metadata
+   * and get refreshed from then on
    * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
    * `"strict"` which throws errors during registration response verification when an
    * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
