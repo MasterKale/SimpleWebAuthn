@@ -142,18 +142,15 @@ export class BaseMetadataService implements MetadataService {
 
       statements.forEach((statement) => {
         // Only cache statements that are for FIDO2-compatible authenticators
-        if (statement.aaguid) {
-          this.statementCache[statement.aaguid] = {
-            entry: {
-              metadataStatement: statement,
-              statusReports: [],
-              timeOfLastStatusChange: '1970-01-01',
-            },
-            url: NonRefreshingMDS.url,
-          };
-
-          statementsAdded += 1;
-        }
+        statementsAdded += this.cacheMetadataBlobEntry(
+          NonRefreshingMDS.url,
+          {
+            aaguid: statement.aaguid,
+            metadataStatement: statement,
+            statusReports: [],
+            timeOfLastStatusChange: '1970-01-01',
+          },
+        );
       });
 
       this.logger.info(`Cached ${statementsAdded} local statements`);
@@ -342,10 +339,7 @@ export class BaseMetadataService implements MetadataService {
 
     // Cache statements for FIDO2 devices
     for (const entry of payload.entries) {
-      // Only cache entries with an `aaguid`
-      if (entry.aaguid) {
-        this.statementCache[entry.aaguid] = { entry, url };
-      }
+      this.cacheMetadataBlobEntry(url, entry);
     }
 
     if (url) {
@@ -437,6 +431,22 @@ export class BaseMetadataService implements MetadataService {
     };
 
     return entriesAdded;
+  }
+
+  /**
+   * A central place to contain logic and side effects of caching a BLOB entry. Only caches FIDO2
+   * statements (i.e. ones with `aaguid` as UAF authenticators won't have one.) Returns `1` if the
+   * statement was cached, or `0` if it wasn't (so you can `count += cacheMetadataBlobEntry(...)`)
+   */
+  private cacheMetadataBlobEntry(url: string, entry: MetadataBLOBPayloadEntry): number {
+    // Only cache entries with an `aaguid`, which will weed out UAF statements
+    if (!entry.aaguid) {
+      return 0;
+    }
+
+    this.statementCache[entry.aaguid] = { entry, url };
+
+    return 1;
   }
 
   /**
