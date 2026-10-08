@@ -446,7 +446,36 @@ export class BaseMetadataService implements MetadataService {
 
     this.statementCache[entry.aaguid] = { entry, url };
 
+    // Cache the convenience metadata contained within the fuller MetadataStatement
+    const { metadataStatement } = entry;
+    if (metadataStatement) {
+      this.cacheProviderMetadata(
+        entry.aaguid,
+        {
+          friendlyNames: metadataStatement.friendlyNames,
+          icon: metadataStatement.icon,
+          iconDark: metadataStatement.iconDark,
+          providerLogoDark: metadataStatement.providerLogoDark,
+          providerLogoLight: metadataStatement.providerLogoLight,
+        },
+        /**
+         * We didn't actually fetch this from a Convenience MDS API, so don't try to update this
+         * metadata like we did. It'll get updated the next time the regular MDS payload gets pulled
+         * down
+         */
+        NonRefreshingMDS.url,
+      );
+    }
+
     return 1;
+  }
+
+  /**
+   * Cache convenience metadata, whether pulled out of a full-fat `MetadataStatement` or retrieved
+   * directly from the Convenience MDS
+   */
+  private cacheProviderMetadata(aaguid: string, metadata: ProviderMetadata, url: string): void {
+    this.convenienceMetadataCache[aaguid] = { metadata, url };
   }
 
   /**
