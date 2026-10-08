@@ -169,9 +169,14 @@ export type MetadataStatement = {
   tcDisplayPNGCharacteristics?: DisplayPNGCharacteristicsDescriptor[];
   attestationRootCertificates: string[];
   ecdaaTrustAnchors?: EcdaaTrustAnchor[];
-  icon?: string;
   supportedExtensions?: ExtensionDescriptor[];
   authenticatorGetInfo?: AuthenticatorGetInfo;
+  // Same values as in Convenience Metadata
+  friendlyNames?: FriendlyNames;
+  icon?: DataURLPNGOrSVGString;
+  iconDark?: DataURLSVGString;
+  providerLogoLight?: DataURLSVGString;
+  providerLogoDark?: DataURLSVGString;
 };
 
 /**
@@ -314,3 +319,43 @@ export type AuthenticatorGetInfo = {
   pinProtocols?: number[];
   algorithms?: { type: 'public-key'; alg: number }[];
 };
+
+/**
+ * Localized names, typically a company's trade name for a given region.
+ *
+ * Example:
+ * ```json
+ * {
+ *   "en-US": "SimpleWebAuthn",
+ *   "ja-JP": "シンプルウェブオースン"
+ * }
+ * ```
+ *
+ * See https://fidoalliance.org/specs/mds/fido-convenience-metadata-service-v1.0-ps-20250521.html#sctn-types-fn
+ */
+export type FriendlyNames = {
+  [ietfLanguageCode: string]: string;
+};
+
+/**
+ * A `data:` URL-encoded string containing base64-encoded PNG or SVG data.
+ *
+ * Example:
+ * ```json
+ * "data:image/svg+xml;base64,..."
+ * ```
+ * ```json
+ * "data:image/png;base64,..."
+ * ```
+ */
+export type DataURLPNGOrSVGString = string;
+
+/**
+ * A `data:` URL-encoded string containing base64-encoded SVG data.
+ *
+ * Example:
+ * ```json
+ * "data:image/svg+xml;base64,..."
+ * ```
+ */
+export type DataURLSVGString = string;
