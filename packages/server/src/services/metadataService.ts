@@ -117,8 +117,10 @@ export class BaseMetadataService implements MetadataService {
       logger?: SimpleWebAuthnLogger;
     } = {},
   ): Promise<void> {
-    // Reset statement cache
+    // Reset caches
+    this.mdsCache = {};
     this.statementCache = {};
+    this.convenienceMetadataCache = {};
 
     const {
       mdsServers = [defaultURLMDS],
