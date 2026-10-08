@@ -8,6 +8,7 @@ import {
 } from '../helpers/logging.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
+import { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -31,6 +32,11 @@ type CachedBLOBEntry = {
    * The MDS server the blob containing this entry was downloaded from. An empty URL will skip
    * attempts to refresh this entry
    */
+  url: CachedMDS['url'];
+};
+
+type CachedProviderMetadata = {
+  metadata: ProviderMetadata;
   url: CachedMDS['url'];
 };
 
@@ -93,6 +99,7 @@ interface MetadataService {
 export class BaseMetadataService implements MetadataService {
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry } = {};
+  private convenienceMetadataCache: { [aaguid: string]: CachedProviderMetadata } = {};
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
   private verificationMode: VerificationMode = 'strict';
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
