@@ -278,8 +278,11 @@ describe('Method: getProviderMetadata()', () => {
     mockFetch.restore();
   });
 
-  /** Initialize with a convenience MDS server that responds with `no: 1` and `originalMetadata` */
-  async function initializeWithServer(...followUps: Promise<Response>[]) {
+  /**
+   * Initialize with a convenience MDS server that responds with `no: 1` and `originalMetadata`.
+   * `mockFetch` will be incremented by `1` after the execution of this method
+   */
+  async function _initializeWithServer(...followUps: Promise<Response>[]) {
     mockFetch.restore();
     mockFetch = stub(
       _fetchInternals,
@@ -346,7 +349,7 @@ describe('Method: getProviderMetadata()', () => {
   });
 
   it('should not refresh metadata from a current convenience MDS', async () => {
-    await initializeWithServer();
+    await _initializeWithServer();
 
     const metadata = await MetadataService.getProviderMetadata(aaguid);
 
@@ -356,7 +359,7 @@ describe('Method: getProviderMetadata()', () => {
 
   it('should return up-to-date metadata after refreshing stale convenience metadata', async () => {
     using _fakedNow = new FakeTime();
-    await initializeWithServer(
+    await _initializeWithServer(
       Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
     );
 
@@ -373,7 +376,7 @@ describe('Method: getProviderMetadata()', () => {
 
   it('should keep cached metadata when the stale convenience MDS responds with 304', async () => {
     using _fakedNow = new FakeTime();
-    await initializeWithServer(Promise.resolve(new Response(null, { status: 304 })));
+    await _initializeWithServer(Promise.resolve(new Response(null, { status: 304 })));
 
     _fakedNow.tick(eightDaysMS);
 
@@ -385,7 +388,7 @@ describe('Method: getProviderMetadata()', () => {
 
   it('should keep cached metadata when the stale convenience MDS responds with 429', async () => {
     using _fakedNow = new FakeTime();
-    await initializeWithServer(Promise.resolve(new Response(null, { status: 429 })));
+    await _initializeWithServer(Promise.resolve(new Response(null, { status: 429 })));
 
     _fakedNow.tick(eightDaysMS);
 
@@ -411,24 +414,101 @@ describe('Method: getProviderMetadata()', () => {
     assertEquals(metadata, localProviderMetadata);
   });
 
-  it('should return the service to a ready state if a refresh fails', async () => {
+  it('should keep cached metadata and remain usable if a refresh throws', async () => {
     using _fakedNow = new FakeTime();
-    await initializeWithServer(Promise.reject(new Error('Network down')));
+    await _initializeWithServer(Promise.reject(new Error('Network down')));
 
     _fakedNow.tick(eightDaysMS);
 
-    await assertRejects(() => MetadataService.getProviderMetadata(aaguid));
-
-    // A subsequent call shouldn't hang waiting for a ready state
-    mockFetch.restore();
-    mockFetch = stub(
-      _fetchInternals,
-      'stubThis',
-      returnsNext([Promise.resolve(new Response(null, { status: 304 }))]),
-    );
     const metadata = await MetadataService.getProviderMetadata(aaguid);
 
+    assertSpyCalls(mockFetch, 2);
     assertEquals(metadata, originalMetadata);
+
+    // A subsequent call shouldn't hang waiting for a ready state
+    const metadata2 = await MetadataService.getProviderMetadata(aaguid);
+    assertEquals(metadata2, originalMetadata);
+  });
+
+  it('should keep cached metadata if a refresh returns invalid JSON', async () => {
+    using _fakedNow = new FakeTime();
+    await _initializeWithServer(Promise.resolve(new Response('not json', { status: 200 })));
+
+    _fakedNow.tick(eightDaysMS);
+
+    const metadata = await MetadataService.getProviderMetadata(aaguid);
+
+    assertSpyCalls(mockFetch, 2);
+    assertEquals(metadata, originalMetadata);
+  });
+
+  it('should keep cached metadata when a convenience MDS refresh attempt gets back an HTTP 500', async () => {
+    using _fakedNow = new FakeTime();
+    await _initializeWithServer(Promise.resolve(new Response(null, { status: 500 })));
+
+    _fakedNow.tick(eightDaysMS);
+
+    const metadata = await MetadataService.getProviderMetadata(aaguid);
+
+    assertSpyCalls(mockFetch, 2);
+    assertEquals(metadata, originalMetadata);
+  });
+
+  describe('refresh delays', () => {
+    const hourMS = 1000 * 60 * 60;
+
+    /**
+     * Make a stale refresh attempt that gets `followUp`, then confirm no further requests happen
+     * until `delayHours` has passed, and that one more happens right after.
+     */
+    async function _assertDelay(followUp: Promise<Response>, delayHours: number) {
+      using _fakedNow = new FakeTime();
+      await _initializeWithServer(followUp);
+
+      _fakedNow.tick(eightDaysMS);
+      await MetadataService.getProviderMetadata(aaguid);
+      // `mockFetch` incremented from `1` to `2` because of a network request to refresh data
+      assertSpyCalls(mockFetch, 2);
+
+      // Still within the delay, so no new request
+      _fakedNow.tick((delayHours * hourMS) - 1000);
+      await MetadataService.getProviderMetadata(aaguid);
+      assertSpyCalls(mockFetch, 2);
+
+      // Delay elapsed, so another attempt is made
+      mockFetch.restore();
+      mockFetch = stub(
+        _fetchInternals,
+        'stubThis',
+        returnsNext([Promise.resolve(new Response(null, { status: 304 }))]),
+      );
+      _fakedNow.tick(2000);
+      await MetadataService.getProviderMetadata(aaguid);
+      assertSpyCalls(mockFetch, 1);
+    }
+
+    it('should wait 24 hours after an HTTP 304', async () => {
+      await _assertDelay(Promise.resolve(new Response(null, { status: 304 })), 24);
+    });
+
+    it('should wait 4 hours after an HTTP 429', async () => {
+      await _assertDelay(Promise.resolve(new Response(null, { status: 429 })), 4);
+    });
+
+    it('should wait 4 hours after an HTTP 500', async () => {
+      await _assertDelay(Promise.resolve(new Response(null, { status: 500 })), 4);
+    });
+
+    it('should wait 4 hours after a fetch error', async () => {
+      await _assertDelay(Promise.reject(new Error('Network down')), 4);
+    });
+
+    it('should wait 24 hours after a successful refresh', async () => {
+      await _assertDelay(
+        Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
+        24,
+      );
+    });
   });
 });
 
@@ -526,6 +606,7 @@ describe('Behavior: logging', () => {
 
     await MetadataService.initialize({
       mdsServers: [],
+      convenienceMDSServers: [],
       statements: [],
       logger: { debug: _debugSpy },
     });
