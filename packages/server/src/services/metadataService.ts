@@ -104,11 +104,15 @@ interface MetadataService {
  * https://fidoalliance.org/metadata/
  */
 export class BaseMetadataService implements MetadataService {
-  // Internal caches
+  /**
+   * Internal caches
+   */
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry | undefined } = {};
   private convenienceMetadataCache: { [aaguid: string]: CachedProviderMetadata | undefined } = {};
-  // Service State
+  /**
+   * Default service state and configuration
+   */
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
   private verificationMode: VerificationMode = 'strict';
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
