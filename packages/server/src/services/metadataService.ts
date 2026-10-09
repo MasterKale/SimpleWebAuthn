@@ -357,6 +357,9 @@ export class BaseMetadataService implements MetadataService {
 
           // Refresh the cached metadata in case the cache got updated just now
           cachedMetadata = this.convenienceMetadataCache[aaguid];
+        } catch (err) {
+          this.logger.error(`Could not download convenience metadata from ${mds.url}:`, err);
+          this.delayNextRefresh(mds.url, this.cmdsDefaultRetryDelayHours);
         } finally {
           this.setState(SERVICE_STATE.READY);
         }
@@ -469,6 +472,17 @@ export class BaseMetadataService implements MetadataService {
         `The Convenience MDS API at ${_url.toString()} rate-limited this request (HTTP 429)`,
       );
       // We checked too soon, wait a bit before checking again
+      this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
+      return;
+    }
+
+    if (!resp.ok) {
+      await resp.body?.cancel();
+      this.logger.warn(
+        `The Convenience MDS API at ${_url.toString()} reported an unsuccessful request (HTTP ${resp.status})`,
+      );
+      // Likely an HTTP 500 error, but anything not within HTTP 200-299. Wait a bit before trying
+      // again
       this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
       return;
     }
