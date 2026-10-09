@@ -116,6 +116,10 @@ export class BaseMetadataService implements MetadataService {
   private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
   private verificationMode: VerificationMode = 'strict';
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
+  /** How many hours to wait to refresh Convenience MDS data */
+  private readonly cmdsDefaultRefreshDelayHours = 24;
+  /** How many hours to wait to retry a _failed_ attempt to refresh Convenience MDS data */
+  private readonly cmdsDefaultRetryDelayHours = 4;
 
   async initialize(
     opts: {
@@ -447,6 +451,11 @@ export class BaseMetadataService implements MetadataService {
      */
     if (resp.status === 304) {
       await resp.body?.cancel();
+      this.logger.info(
+        `The Convenience MDS API at ${_url.toString()} reported nothing new to download (HTTP 304)`,
+      );
+      // There's nothing new to download, wait another interval before checking again
+      this.delayNextRefresh(url, this.cmdsDefaultRefreshDelayHours);
       return;
     }
 
@@ -456,6 +465,11 @@ export class BaseMetadataService implements MetadataService {
      */
     if (resp.status === 429) {
       await resp.body?.cancel();
+      this.logger.warn(
+        `The Convenience MDS API at ${_url.toString()} rate-limited this request (HTTP 429)`,
+      );
+      // We checked too soon, wait a bit before checking again
+      this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
       return;
     }
 
