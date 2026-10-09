@@ -315,7 +315,7 @@ Deno.test('should check all CRL URLs in issuer cert for revocation status', asyn
   using _mockFetch = stub(
     _fetchInternals,
     'stubThis',
-    (url: string) => {
+    (url: RequestInfo | URL) => {
       if (url === CRL_URL) {
         return Promise.resolve(new Response(crl1.rawData));
       } else {
