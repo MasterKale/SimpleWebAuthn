@@ -540,6 +540,15 @@ export class BaseMetadataService implements MetadataService {
   }
 
   /**
+   * Delay the next refresh attempt of this server by the specified number of hours
+   */
+  private delayNextRefresh(url: string, numHours: number): void {
+    this.logger.debug(`Delaying next refresh of ${url} by ${numHours} hours`);
+    const numHoursMS = 1000 * 60 * 60 * numHours;
+    this.mdsCache[url].nextUpdate = new Date(Date.now() + numHoursMS);
+  }
+
+  /**
    * A helper method to pause execution until the service is ready
    */
   private pauseUntilReady(): Promise<void> {
