@@ -398,6 +398,70 @@ describe('Method: getProviderMetadata()', () => {
     assertEquals(metadata, originalMetadata);
   });
 
+  it('should evict metadata for AAGUIDs removed from the convenience MDS on refresh', async () => {
+    using _fakedNow = new FakeTime();
+    const removedAAGUID = '00000000-0000-0000-0000-000000000004';
+    const removedMetadata: ProviderMetadata = { friendlyNames: { en: 'Removed Name' } };
+
+    mockFetch.restore();
+    mockFetch = stub(
+      _fetchInternals,
+      'stubThis',
+      returnsNext([
+        // Initial payload includes two AAGUIDs
+        Promise.resolve(
+          Response.json({ no: 1, [aaguid]: originalMetadata, [removedAAGUID]: removedMetadata }),
+        ),
+        // The refreshed payload no longer includes `removedAAGUID`
+        Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
+      ]),
+    );
+    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [cmdsURL] });
+
+    // Sanity check: the second AAGUID is cached before the refresh
+    assertEquals(await MetadataService.getProviderMetadata(removedAAGUID), removedMetadata);
+
+    _fakedNow.tick(eightDaysMS);
+
+    // Trigger the refresh via the AAGUID that's still present
+    assertEquals(await MetadataService.getProviderMetadata(aaguid), updatedMetadata);
+    assertSpyCalls(mockFetch, 2);
+
+    // The server dropped this AAGUID, so it shouldn't linger in the cache
+    assertEquals(await MetadataService.getProviderMetadata(removedAAGUID), undefined);
+  });
+
+  it('should keep local payload metadata when a convenience MDS refresh evicts entries', async () => {
+    using _fakedNow = new FakeTime();
+
+    mockFetch.restore();
+    mockFetch = stub(
+      _fetchInternals,
+      'stubThis',
+      returnsNext([
+        Promise.resolve(Response.json({ no: 1, [aaguid]: originalMetadata })),
+        Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
+      ]),
+    );
+    await MetadataService.initialize({
+      mdsServers: [],
+      convenienceMDSServers: [cmdsURL],
+      conveniencePayloads: [localConveniencePayload],
+    });
+
+    _fakedNow.tick(eightDaysMS);
+
+    // Trigger the refresh
+    assertEquals(await MetadataService.getProviderMetadata(aaguid), updatedMetadata);
+    assertSpyCalls(mockFetch, 2);
+
+    // Evicting stale entries from the server shouldn't touch entries that came from local data
+    assertEquals(
+      await MetadataService.getProviderMetadata(localStatementAAGUID),
+      localProviderMetadata,
+    );
+  });
+
   it('should not refresh metadata from local payloads', async () => {
     using _fakedNow = new FakeTime();
     await MetadataService.initialize({

@@ -498,6 +498,9 @@ export class BaseMetadataService implements MetadataService {
   private cacheConvenienceMDS(url: string, payload: ConvenienceMDSPayload): number {
     let entriesAdded = 0;
 
+    // Remove existing entries for this URL
+    this.clearCacheEntriesByURL(url);
+
     // Cache entries
     Object.keys(payload).forEach((aaguid) => {
       // Skip the versioning property
@@ -565,6 +568,23 @@ export class BaseMetadataService implements MetadataService {
    */
   private cacheProviderMetadata(aaguid: string, metadata: ProviderMetadata, url: string): void {
     this.convenienceMetadataCache[aaguid] = { metadata, url };
+  }
+
+  /**
+   * Remove cached Convenience Metadata service data by the URL. If the URL indicates data that
+   * should not be refreshed, then simply exit.
+   */
+  private clearCacheEntriesByURL(url: string): void {
+    // Do _not_ clear out entries that aren't associated with a Convenience MDS service
+    if (url === NonRefreshingMDS.url) {
+      return;
+    }
+
+    for (const [aaguid, cached] of Object.entries(this.convenienceMetadataCache)) {
+      if (cached?.url === url) {
+        delete this.convenienceMetadataCache[aaguid];
+      }
+    }
   }
 
   /**
