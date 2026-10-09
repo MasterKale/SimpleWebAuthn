@@ -445,7 +445,7 @@ export class BaseMetadataService implements MetadataService {
     // Get latest convenience MDS JSON, with a query param that can short-circuit the download
     // if we already have the latest version of metadata
     const _url = new URL(`/?localCopySerial=${no}`, url);
-    const resp = await fetch(_url.toString());
+    const resp = await fetch(_url.toString(), { signal: AbortSignal.timeout(10_000) });
 
     /**
      * We have the latest data, nothing more to do.
