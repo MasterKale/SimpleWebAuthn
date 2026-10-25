@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertFalse, assertObjectMatch, assertRejects } from '@std/assert';
-import { resolvesNext, returnsNext, stub } from '@std/testing/mock';
+import { assertSpyCall, assertSpyCalls, resolvesNext, returnsNext, stub } from '@std/testing/mock';
 import { FakeTime } from '@std/testing/time';
 
 import { verifyRegistrationResponse } from './verifyRegistrationResponse.ts';
@@ -20,6 +20,8 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
 import { denoSupportsPQC } from '../helpers/tests/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
+import { MetadataService } from '../services/metadataService.ts';
+import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 import { SimpleWebAuthnError } from '../errors/index.ts';
 
 /**
@@ -935,6 +937,48 @@ Deno.test('should return credential backup info', async () => {
     'singleDevice',
   );
   assertEquals(verification.registrationInfo?.credentialBackedUp, false);
+});
+
+Deno.test('should return passkey provider metadata for a credential AAGUID', async () => {
+  const providerMetadata: ProviderMetadata = { friendlyNames: { en: 'Test Provider' } };
+  using mockGetProviderMetadata = stub(
+    MetadataService,
+    'getProviderMetadata',
+    resolvesNext([providerMetadata]),
+  );
+
+  const verification = await verifyRegistrationResponse({
+    response: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.passkeyProviderMetadata, providerMetadata);
+  // Metadata is looked up with the same AAGUID string that's returned in `registrationInfo`
+  assertSpyCalls(mockGetProviderMetadata, 1);
+  assertSpyCall(mockGetProviderMetadata, 0, {
+    args: [verification.registrationInfo.aaguid],
+  });
+});
+
+Deno.test('should not return passkey provider metadata when none exists for the AAGUID', async () => {
+  using _mockGetProviderMetadata = stub(
+    MetadataService,
+    'getProviderMetadata',
+    resolvesNext([undefined]),
+  );
+
+  const verification = await verifyRegistrationResponse({
+    response: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.passkeyProviderMetadata, undefined);
 });
 
 Deno.test('should return authenticator extension output', async () => {

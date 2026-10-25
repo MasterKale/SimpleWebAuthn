@@ -21,6 +21,8 @@ import { parseBackupFlags } from '../helpers/parseBackupFlags.ts';
 import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
+import { MetadataService } from '../services/metadataService.ts';
+import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 
 import { getDefaultSupportedAlgorithmIDs } from './generateRegistrationOptions.ts';
 import { verifyAttestationFIDOU2F } from './verifications/verifyAttestationFIDOU2F.ts';
@@ -294,12 +296,15 @@ export async function verifyRegistrationResponse(
   }
 
   const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
+  const formattedAAGUID = convertAAGUIDToString(aaguid);
+  const providerMetadata = await MetadataService.getProviderMetadata(formattedAAGUID);
 
   return {
     verified: true,
     registrationInfo: {
       fmt,
-      aaguid: convertAAGUIDToString(aaguid),
+      aaguid: formattedAAGUID,
+      passkeyProviderMetadata: providerMetadata,
       credentialType,
       credential: {
         id: isoBase64URL.fromBuffer(credentialID),
@@ -327,6 +332,10 @@ export async function verifyRegistrationResponse(
  * **Should be kept in a DB for later reference to help prevent replay attacks!**
  * @param registrationInfo.aaguid Authenticator's Attestation GUID indicating the type of the
  * authenticator
+ * @param registrationInfo.passkeyProviderMetadata Localized names, and light and dark mode icons,
+ * for the passkey provider that manages this credential. Requires `MetadataService.initialize()`
+ * to have been called prior to calling `verifyRegistrationResponse()`, and for metadata to exist
+ * for `registrationInfo.aaguid`
  * @param registrationInfo.credentialPublicKey The credential's public key
  * @param registrationInfo.credentialID The credential's credential ID for the public key above
  * @param registrationInfo.credentialType The type of the credential returned by the browser
@@ -352,6 +361,7 @@ export type VerifiedRegistrationResponse = {
   registrationInfo: {
     fmt: AttestationFormat;
     aaguid: string;
+    passkeyProviderMetadata?: ProviderMetadata;
     credential: WebAuthnCredential;
     credentialType: 'public-key';
     attestationObject: Uint8Array_;
