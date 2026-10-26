@@ -85,6 +85,7 @@ interface MetadataService {
  * https://fidoalliance.org/metadata/
  */
 export class BaseMetadataService implements MetadataService {
+  private serviceName = 'MetadataService';
   /**
    * Internal caches
    */
@@ -93,7 +94,7 @@ export class BaseMetadataService implements MetadataService {
   /**
    * Default service state and configuration
    */
-  private state = new ServiceStateTracker('MetadataService', DefaultNoopLogger);
+  private state = new ServiceStateTracker(this.serviceName, DefaultNoopLogger);
   private verificationMode: VerificationMode = 'strict';
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
 
@@ -117,7 +118,7 @@ export class BaseMetadataService implements MetadataService {
     } = opts;
 
     this.logger = buildLoggerAllMethods(logger);
-    this.state = new ServiceStateTracker('MetadataService', this.logger);
+    this.state = new ServiceStateTracker(this.serviceName, this.logger);
 
     this.state.set(SERVICE_STATE.REFRESHING);
 
