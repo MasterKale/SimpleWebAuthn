@@ -1,3 +1,4 @@
+import { fetch } from '../helpers/fetch.ts';
 import {
   buildLoggerAllMethods,
   DefaultNoopLogger,
@@ -211,68 +212,66 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     // If a cache refresh is in progress then pause this until the service is ready
     await this.state.pauseUntilReady();
 
+    // Refresh any servers whose data is stale, whether or not this AAGUID is cached. This lets
+    // lookups of newly-registered AAGUIDs discover them
+    await this.refreshStaleServers();
+
     const cachedMetadata = this.metadataCache.getMetadata(aaguid);
 
     return cachedMetadata;
   }
 
-  async getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined> {
-    if (this.state.current === SERVICE_STATE.DISABLED) {
-      return;
-    }
+  /**
+   * Refresh every server whose `nextUpdate` has passed
+   */
+  private async refreshStaleServers(): Promise<void> {
+    const now = new Date();
+    const staleURLs = this.metadataCache.getStaleMDSServerURLs(now);
 
-    if (!aaguid) {
-      return;
-    }
-
-    if (aaguid instanceof Uint8Array) {
-      aaguid = convertAAGUIDToString(aaguid);
-    }
-
-    // If a cache refresh is in progress then pause this until the service is ready
-    await this.state.pauseUntilReady();
-
-    // Try to grab a cached metadata entry
-    let cachedMetadata = this.convenienceMetadataCache[aaguid];
-
-    // If the metadata points to a convenience MDS API, then check the nextUpdate to see if we need
-    // to refresh it
-    if (cachedMetadata?.url) {
-      const mds = this.mdsCache[cachedMetadata.url];
-      const now = new Date();
-      if (now > mds.nextUpdate) {
-        try {
-          this.state.set(SERVICE_STATE.REFRESHING);
-          const payload = await this.downloadConvenienceMDS(mds.url, mds.no);
-          if (payload) {
-            this.cacheConvenienceMDS(mds.url, payload);
-          }
-
-          // Refresh the cached metadata in case the cache got updated just now
-          cachedMetadata = this.convenienceMetadataCache[aaguid];
-        } catch (err) {
-          this.logger.error(`Could not download convenience metadata from ${mds.url}:`, err);
-          this.delayNextRefresh(mds.url, this.cmdsDefaultRetryDelayHours);
-        } finally {
-          this.state.set(SERVICE_STATE.READY);
-        }
-      }
-    }
-
-    if (!cachedMetadata) {
-      return;
-    }
-
-    const { metadata } = cachedMetadata;
-
-    return metadata;
+    await Promise.all(staleURLs.map((url) => this.refreshServer(url)));
   }
 
   /**
-   * Cache convenience metadata retrieved directly from the Convenience MDS
+   * Refresh a single server, joining the refresh already in flight if there is one. Refresh
+   * failures cause that server's refresh to be re-attempted at a later date.
    */
-  private cacheProviderMetadata(aaguid: string, metadata: ProviderMetadata, url: string): void {
-    this.convenienceMetadataCache[aaguid] = { metadata, url };
+  private serverRefreshes: { [url: string]: Promise<0 | 1> } = {};
+  private refreshServer(url: string): Promise<0 | 1> {
+    const inFlight = this.serverRefreshes[url];
+    if (inFlight) {
+      return inFlight;
+    }
+
+    this.state.set(SERVICE_STATE.REFRESHING);
+
+    const refresh = (async () => {
+      let numUpdated: 0 | 1 = 0;
+
+      try {
+        const mdsNo = this.metadataCache.getMDSServerDataVersion(url);
+        const payload = await this.downloadConvenienceMDS(url, mdsNo);
+        if (payload) {
+          this.cacheConvenienceMDS(url, payload);
+          numUpdated = 1;
+        }
+      } catch (err) {
+        this.logger.error(`Could not download convenience metadata from "${url}":`, err);
+        this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
+        numUpdated = 0;
+      } finally {
+        delete this.serverRefreshes[url];
+        // Only report ready once every refresh has finished
+        if (Object.keys(this.serverRefreshes).length === 0) {
+          this.state.set(SERVICE_STATE.READY);
+        }
+      }
+
+      return numUpdated;
+    })();
+
+    this.serverRefreshes[url] = refresh;
+
+    return refresh;
   }
 
   /**
