@@ -8,7 +8,6 @@ import {
   type Stub,
   stub,
 } from '@std/testing/mock';
-import { FakeTime } from '@std/testing/time';
 
 import { _fetchInternals } from '../helpers/fetch.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
@@ -17,7 +16,7 @@ import { generateLeafCert, generateRootCert } from '../helpers/tests/x509Utils.t
 import { BaseMetadataService, MetadataService } from './metadataService.ts';
 import { SettingsService } from './settingsService.ts';
 import type { MetadataStatement } from '../metadata/mdsTypes.ts';
-import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
+import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 
 let mockFetch: Stub;
 
@@ -30,21 +29,17 @@ describe('Method: initialize()', () => {
     mockFetch.restore();
   });
 
-  it('should default to querying MDS v3 and convenience MDS', async () => {
+  it('should default to querying MDS v3', async () => {
     await MetadataService.initialize();
 
-    assertSpyCalls(mockFetch, 2);
+    assertSpyCalls(mockFetch, 1);
     assertSpyCallArg(mockFetch, 0, 0, 'https://mds.fidoalliance.org/');
-    assertSpyCallArg(mockFetch, 1, 0, 'https://c-mds.fidoalliance.org/?localCopySerial=0');
   });
 
   it('should query provided MDS server URLs', async () => {
     const mdsServers = ['https://custom-mds1.com', 'https://custom-mds2.com'];
 
-    await MetadataService.initialize({
-      mdsServers,
-      convenienceMDSServers: [],
-    });
+    await MetadataService.initialize({ mdsServers });
 
     assertSpyCalls(mockFetch, mdsServers.length);
     assertSpyCallArg(mockFetch, 0, 0, mdsServers[0]);
@@ -52,7 +47,7 @@ describe('Method: initialize()', () => {
   });
 
   it('should not query any servers on empty list of URLs', async () => {
-    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [] });
+    await MetadataService.initialize({ mdsServers: [] });
 
     assertSpyCalls(mockFetch, 0);
   });
@@ -65,159 +60,6 @@ describe('Method: initialize()', () => {
     const statement = await MetadataService.getStatement(localStatementAAGUID);
 
     assertEquals(statement, localStatement);
-  });
-
-  it('should query provided convenience MDS server URLs', async () => {
-    const convenienceMDSServers = ['https://custom-cmds1.com', 'https://custom-cmds2.com'];
-
-    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers });
-
-    assertSpyCalls(mockFetch, convenienceMDSServers.length);
-    assertSpyCallArg(mockFetch, 0, 0, 'https://custom-cmds1.com/?localCopySerial=0');
-    assertSpyCallArg(mockFetch, 1, 0, 'https://custom-cmds2.com/?localCopySerial=0');
-  });
-
-  it('should not query any convenience MDS servers on empty list of URLs', async () => {
-    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [] });
-
-    assertSpyCalls(mockFetch, 0);
-  });
-
-  it('should load local convenience payloads', async () => {
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: [],
-      conveniencePayloads: [localConveniencePayload],
-    });
-
-    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
-
-    assertEquals(metadata, localProviderMetadata);
-  });
-
-  it('should load convenience payloads without querying any servers', async () => {
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: [],
-      conveniencePayloads: [localConveniencePayload],
-    });
-
-    assertSpyCalls(mockFetch, 0);
-  });
-
-  it('should load metadata from multiple convenience payloads', async () => {
-    const otherAAGUID = '00000000-0000-0000-0000-000000000002';
-    const otherMetadata: ProviderMetadata = { friendlyNames: { en: 'Other Provider' } };
-
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: [],
-      conveniencePayloads: [
-        localConveniencePayload,
-        { no: 1, [otherAAGUID]: otherMetadata } as ConvenienceMDSPayload,
-      ],
-    });
-
-    assertEquals(
-      await MetadataService.getProviderMetadata(localStatementAAGUID),
-      localProviderMetadata,
-    );
-    assertEquals(await MetadataService.getProviderMetadata(otherAAGUID), otherMetadata);
-  });
-
-  it('should load metadata from a convenience MDS server', async () => {
-    mockFetch.restore();
-    mockFetch = stub(
-      _fetchInternals,
-      'stubThis',
-      returnsNext([
-        Promise.resolve(Response.json(localConveniencePayload)),
-      ]),
-    );
-
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: ['https://custom-cmds.com'],
-    });
-
-    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
-
-    assertEquals(metadata, localProviderMetadata);
-  });
-
-  it('should move on if a convenience MDS server cannot be reached', async () => {
-    mockFetch.restore();
-    mockFetch = stub(
-      _fetchInternals,
-      'stubThis',
-      returnsNext([
-        Promise.reject(new Error('Network down')),
-        Promise.resolve(Response.json(localConveniencePayload)),
-      ]),
-    );
-
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: ['https://broken-cmds.com', 'https://working-cmds.com'],
-    });
-
-    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
-
-    assertEquals(metadata, localProviderMetadata);
-  });
-
-  it('should use local convenience payloads as a fallback to convenience MDS servers', async () => {
-    const serverOnlyAAGUID = '00000000-0000-0000-0000-000000000004';
-    const serverMetadata: ProviderMetadata = { friendlyNames: { en: 'From Server' } };
-
-    mockFetch.restore();
-    mockFetch = stub(
-      _fetchInternals,
-      'stubThis',
-      returnsNext([
-        Promise.resolve(Response.json({
-          no: 1,
-          [localStatementAAGUID]: serverMetadata,
-          [serverOnlyAAGUID]: serverMetadata,
-        })),
-      ]),
-    );
-
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: ['https://custom-cmds.com'],
-      conveniencePayloads: [
-        localConveniencePayload,
-        {
-          no: 1,
-          '00000000-0000-0000-0000-000000000005': localProviderMetadata,
-        } as ConvenienceMDSPayload,
-      ],
-    });
-
-    // The server wins on a shared AAGUID
-    assertEquals(
-      await MetadataService.getProviderMetadata(localStatementAAGUID),
-      serverMetadata,
-    );
-    assertEquals(await MetadataService.getProviderMetadata(serverOnlyAAGUID), serverMetadata);
-    // The local payload still fills in AAGUIDs the server doesn't know about
-    assertEquals(
-      await MetadataService.getProviderMetadata('00000000-0000-0000-0000-000000000005'),
-      localProviderMetadata,
-    );
-  });
-
-  it('should cache convenience metadata from local statements', async () => {
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: [],
-      statements: [{ ...localStatement, friendlyNames: { en: 'From Statement' } }],
-    });
-
-    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
-
-    assertEquals(metadata?.friendlyNames, { en: 'From Statement' });
   });
 });
 
@@ -263,38 +105,22 @@ describe('Method: getStatement()', () => {
 });
 
 describe('Method: getProviderMetadata()', () => {
-  const cmdsURL = 'https://cmds.example.com/';
-  const aaguid = '00000000-0000-0000-0000-000000000003';
-  const originalMetadata: ProviderMetadata = { friendlyNames: { en: 'Original Name' } };
-  const updatedMetadata: ProviderMetadata = { friendlyNames: { en: 'Updated Name' } };
-  const eightDaysMS = 1000 * 60 * 60 * 24 * 8;
-  let mockFetch: Stub;
-
-  beforeEach(() => {
-    mockFetch = stub(_fetchInternals, 'stubThis');
+  // Built lazily because `localStatement` is declared at the bottom of this file
+  const providerStatement = (): MetadataStatement => ({
+    ...localStatement,
+    friendlyNames: { en: 'Local Provider', fr: 'Fournisseur local' },
+    icon: 'data:image/png;base64,icon',
+    iconDark: 'data:image/svg+xml;base64,iconDark',
+    providerLogoLight: 'data:image/svg+xml;base64,logoLight',
+    providerLogoDark: 'data:image/svg+xml;base64,logoDark',
   });
-
-  afterEach(() => {
-    mockFetch.restore();
-  });
-
-  /**
-   * Initialize with a convenience MDS server that responds with `no: 1` and `originalMetadata`.
-   * `mockFetch` will be incremented by `1` after the execution of this method
-   */
-  async function _initializeWithServer(...followUps: Promise<Response>[]) {
-    mockFetch.restore();
-    mockFetch = stub(
-      _fetchInternals,
-      'stubThis',
-      returnsNext([
-        Promise.resolve(Response.json({ no: 1, [aaguid]: originalMetadata })),
-        ...followUps,
-      ]),
-    );
-
-    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [cmdsURL] });
-  }
+  const providerMetadata: ProviderMetadata = {
+    friendlyNames: { en: 'Local Provider', fr: 'Fournisseur local' },
+    icon: 'data:image/png;base64,icon',
+    iconDark: 'data:image/svg+xml;base64,iconDark',
+    providerLogoLight: 'data:image/svg+xml;base64,logoLight',
+    providerLogoDark: 'data:image/svg+xml;base64,logoDark',
+  };
 
   it('should return undefined if service not initialized', async () => {
     const service = new BaseMetadataService();
@@ -304,26 +130,24 @@ describe('Method: getProviderMetadata()', () => {
   });
 
   it('should return undefined if aaguid is undefined', async () => {
+    await MetadataService.initialize({ mdsServers: [], statements: [providerStatement()] });
+
     // @ts-ignore: intentionally passing a bad value
     const metadata = await MetadataService.getProviderMetadata(undefined);
 
     assertEquals(metadata, undefined);
   });
 
-  it('should return undefined for an AAGUID with no metadata', async () => {
-    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [] });
+  it('should derive provider metadata from a local statement', async () => {
+    await MetadataService.initialize({ mdsServers: [], statements: [providerStatement()] });
 
-    const metadata = await MetadataService.getProviderMetadata('not-a-real-aaguid');
+    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
 
-    assertEquals(metadata, undefined);
+    assertEquals(metadata, providerMetadata);
   });
 
   it('should accept the AAGUID as a Uint8Array', async () => {
-    await MetadataService.initialize({
-      mdsServers: [],
-      convenienceMDSServers: [],
-      conveniencePayloads: [localConveniencePayload],
-    });
+    await MetadataService.initialize({ mdsServers: [], statements: [providerStatement()] });
 
     const aaguidBytes = new Uint8Array([
       0x91,
@@ -345,234 +169,42 @@ describe('Method: getProviderMetadata()', () => {
     ]);
     const metadata = await MetadataService.getProviderMetadata(aaguidBytes);
 
-    assertEquals(metadata, localProviderMetadata);
+    assertEquals(metadata, providerMetadata);
   });
 
-  it('should not refresh metadata from a current convenience MDS', async () => {
-    await _initializeWithServer();
-
-    const metadata = await MetadataService.getProviderMetadata(aaguid);
-
-    assertSpyCalls(mockFetch, 1);
-    assertEquals(metadata, originalMetadata);
-  });
-
-  it('should return up-to-date metadata after refreshing stale convenience metadata', async () => {
-    using _fakedNow = new FakeTime();
-    await _initializeWithServer(
-      Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
-    );
-
-    _fakedNow.tick(eightDaysMS);
-
-    const metadata = await MetadataService.getProviderMetadata(aaguid);
-
-    assertSpyCalls(mockFetch, 2);
-    // Confirm a check for an updated payload using the old serial
-    assertSpyCallArg(mockFetch, 1, 0, `${cmdsURL}?localCopySerial=1`);
-    // Getting the updated metadata means the internal cache was refreshed correctly
-    assertEquals(metadata, updatedMetadata);
-  });
-
-  it('should keep cached metadata when the stale convenience MDS responds with 304', async () => {
-    using _fakedNow = new FakeTime();
-    await _initializeWithServer(Promise.resolve(new Response(null, { status: 304 })));
-
-    _fakedNow.tick(eightDaysMS);
-
-    const metadata = await MetadataService.getProviderMetadata(aaguid);
-
-    assertSpyCalls(mockFetch, 2);
-    assertEquals(metadata, originalMetadata);
-  });
-
-  it('should keep cached metadata when the stale convenience MDS responds with 429', async () => {
-    using _fakedNow = new FakeTime();
-    await _initializeWithServer(Promise.resolve(new Response(null, { status: 429 })));
-
-    _fakedNow.tick(eightDaysMS);
-
-    const metadata = await MetadataService.getProviderMetadata(aaguid);
-
-    assertSpyCalls(mockFetch, 2);
-    assertEquals(metadata, originalMetadata);
-  });
-
-  it('should evict metadata for AAGUIDs removed from the convenience MDS on refresh', async () => {
-    using _fakedNow = new FakeTime();
-    const removedAAGUID = '00000000-0000-0000-0000-000000000004';
-    const removedMetadata: ProviderMetadata = { friendlyNames: { en: 'Removed Name' } };
-
-    mockFetch.restore();
-    mockFetch = stub(
-      _fetchInternals,
-      'stubThis',
-      returnsNext([
-        // Initial payload includes two AAGUIDs
-        Promise.resolve(
-          Response.json({ no: 1, [aaguid]: originalMetadata, [removedAAGUID]: removedMetadata }),
-        ),
-        // The refreshed payload no longer includes `removedAAGUID`
-        Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
-      ]),
-    );
-    await MetadataService.initialize({ mdsServers: [], convenienceMDSServers: [cmdsURL] });
-
-    // Sanity check: the second AAGUID is cached before the refresh
-    assertEquals(await MetadataService.getProviderMetadata(removedAAGUID), removedMetadata);
-
-    _fakedNow.tick(eightDaysMS);
-
-    // Trigger the refresh via the AAGUID that's still present
-    assertEquals(await MetadataService.getProviderMetadata(aaguid), updatedMetadata);
-    assertSpyCalls(mockFetch, 2);
-
-    // The server dropped this AAGUID, so it shouldn't linger in the cache
-    assertEquals(await MetadataService.getProviderMetadata(removedAAGUID), undefined);
-  });
-
-  it('should keep local payload metadata when a convenience MDS refresh evicts entries', async () => {
-    using _fakedNow = new FakeTime();
-
-    mockFetch.restore();
-    mockFetch = stub(
-      _fetchInternals,
-      'stubThis',
-      returnsNext([
-        Promise.resolve(Response.json({ no: 1, [aaguid]: originalMetadata })),
-        Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
-      ]),
-    );
+  it('should throw for an AAGUID with no statement when verificationMode is "strict"', async () => {
     await MetadataService.initialize({
       mdsServers: [],
-      convenienceMDSServers: [cmdsURL],
-      conveniencePayloads: [localConveniencePayload],
+      statements: [providerStatement()],
+      verificationMode: 'strict',
     });
 
-    _fakedNow.tick(eightDaysMS);
-
-    // Trigger the refresh
-    assertEquals(await MetadataService.getProviderMetadata(aaguid), updatedMetadata);
-    assertSpyCalls(mockFetch, 2);
-
-    // Evicting stale entries from the server shouldn't touch entries that came from local data
-    assertEquals(
-      await MetadataService.getProviderMetadata(localStatementAAGUID),
-      localProviderMetadata,
-    );
+    await assertRejects(() => MetadataService.getProviderMetadata('not-a-real-aaguid'));
   });
 
-  it('should not refresh metadata from local payloads', async () => {
-    using _fakedNow = new FakeTime();
+  it('should return undefined for an AAGUID with no statement when verificationMode is "permissive"', async () => {
     await MetadataService.initialize({
       mdsServers: [],
-      convenienceMDSServers: [],
-      conveniencePayloads: [localConveniencePayload],
+      statements: [providerStatement()],
+      verificationMode: 'permissive',
     });
 
-    _fakedNow.tick(eightDaysMS);
+    const metadata = await MetadataService.getProviderMetadata('not-a-real-aaguid');
 
-    const metadata = await MetadataService.getProviderMetadata(localStatementAAGUID);
-
-    assertSpyCalls(mockFetch, 0);
-    assertEquals(metadata, localProviderMetadata);
+    assertEquals(metadata, undefined);
   });
 
-  it('should keep cached metadata and remain usable if a refresh throws', async () => {
-    using _fakedNow = new FakeTime();
-    await _initializeWithServer(Promise.reject(new Error('Network down')));
+  it('should not query any convenience MDS servers', async () => {
+    const mockFetch = stub(_fetchInternals, 'stubThis');
 
-    _fakedNow.tick(eightDaysMS);
+    try {
+      await MetadataService.initialize({ mdsServers: [], statements: [providerStatement()] });
+      await MetadataService.getProviderMetadata(localStatementAAGUID);
 
-    const metadata = await MetadataService.getProviderMetadata(aaguid);
-
-    assertSpyCalls(mockFetch, 2);
-    assertEquals(metadata, originalMetadata);
-
-    // A subsequent call shouldn't hang waiting for a ready state
-    const metadata2 = await MetadataService.getProviderMetadata(aaguid);
-    assertEquals(metadata2, originalMetadata);
-  });
-
-  it('should keep cached metadata if a refresh returns invalid JSON', async () => {
-    using _fakedNow = new FakeTime();
-    await _initializeWithServer(Promise.resolve(new Response('not json', { status: 200 })));
-
-    _fakedNow.tick(eightDaysMS);
-
-    const metadata = await MetadataService.getProviderMetadata(aaguid);
-
-    assertSpyCalls(mockFetch, 2);
-    assertEquals(metadata, originalMetadata);
-  });
-
-  it('should keep cached metadata when a convenience MDS refresh attempt gets back an HTTP 500', async () => {
-    using _fakedNow = new FakeTime();
-    await _initializeWithServer(Promise.resolve(new Response(null, { status: 500 })));
-
-    _fakedNow.tick(eightDaysMS);
-
-    const metadata = await MetadataService.getProviderMetadata(aaguid);
-
-    assertSpyCalls(mockFetch, 2);
-    assertEquals(metadata, originalMetadata);
-  });
-
-  describe('refresh delays', () => {
-    const hourMS = 1000 * 60 * 60;
-
-    /**
-     * Make a stale refresh attempt that gets `followUp`, then confirm no further requests happen
-     * until `delayHours` has passed, and that one more happens right after.
-     */
-    async function _assertDelay(followUp: Promise<Response>, delayHours: number) {
-      using _fakedNow = new FakeTime();
-      await _initializeWithServer(followUp);
-
-      _fakedNow.tick(eightDaysMS);
-      await MetadataService.getProviderMetadata(aaguid);
-      // `mockFetch` incremented from `1` to `2` because of a network request to refresh data
-      assertSpyCalls(mockFetch, 2);
-
-      // Still within the delay, so no new request
-      _fakedNow.tick((delayHours * hourMS) - 1000);
-      await MetadataService.getProviderMetadata(aaguid);
-      assertSpyCalls(mockFetch, 2);
-
-      // Delay elapsed, so another attempt is made
+      assertSpyCalls(mockFetch, 0);
+    } finally {
       mockFetch.restore();
-      mockFetch = stub(
-        _fetchInternals,
-        'stubThis',
-        returnsNext([Promise.resolve(new Response(null, { status: 304 }))]),
-      );
-      _fakedNow.tick(2000);
-      await MetadataService.getProviderMetadata(aaguid);
-      assertSpyCalls(mockFetch, 1);
     }
-
-    it('should wait 24 hours after an HTTP 304', async () => {
-      await _assertDelay(Promise.resolve(new Response(null, { status: 304 })), 24);
-    });
-
-    it('should wait 4 hours after an HTTP 429', async () => {
-      await _assertDelay(Promise.resolve(new Response(null, { status: 429 })), 4);
-    });
-
-    it('should wait 4 hours after an HTTP 500', async () => {
-      await _assertDelay(Promise.resolve(new Response(null, { status: 500 })), 4);
-    });
-
-    it('should wait 4 hours after a fetch error', async () => {
-      await _assertDelay(Promise.reject(new Error('Network down')), 4);
-    });
-
-    it('should wait 24 hours after a successful refresh', async () => {
-      await _assertDelay(
-        Promise.resolve(Response.json({ no: 2, [aaguid]: updatedMetadata })),
-        24,
-      );
-    });
   });
 });
 
@@ -626,7 +258,7 @@ describe('Behavior: BLOB refresh', () => {
       ]),
     );
 
-    await MetadataService.initialize({ mdsServers: [mdsServerURL], convenienceMDSServers: [] });
+    await MetadataService.initialize({ mdsServers: [mdsServerURL] });
 
     assertSpyCalls(mockFetch, 1);
 
@@ -638,6 +270,35 @@ describe('Behavior: BLOB refresh', () => {
     // ...and the statement from the newer BLOB returned
     assertEquals(statement, freshStatement);
     assertNotEquals(statement, staleStatement);
+  });
+
+  it('should return up-to-date provider metadata after refreshing a stale BLOB', async () => {
+    const staleStatement: MetadataStatement = {
+      ...localStatement,
+      aaguid: refreshableAAGUID,
+      friendlyNames: { en: 'Stale Name' },
+    };
+    const freshStatement: MetadataStatement = {
+      ...localStatement,
+      aaguid: refreshableAAGUID,
+      friendlyNames: { en: 'Fresh Name' },
+    };
+
+    mockFetch = stub(
+      _fetchInternals,
+      'stubThis',
+      returnsNext([
+        generateBLOBResponse({ no: 1, nextUpdate: '2023-01-01', statement: staleStatement }),
+        generateBLOBResponse({ no: 2, nextUpdate: '2999-01-01', statement: freshStatement }),
+      ]),
+    );
+
+    await MetadataService.initialize({ mdsServers: [mdsServerURL] });
+
+    const metadata = await MetadataService.getProviderMetadata(refreshableAAGUID);
+
+    assertSpyCalls(mockFetch, 2);
+    assertEquals(metadata?.friendlyNames, { en: 'Fresh Name' });
   });
 
   it('should not refresh a BLOB that is still current', async () => {
@@ -655,7 +316,7 @@ describe('Behavior: BLOB refresh', () => {
       ]),
     );
 
-    await MetadataService.initialize({ mdsServers: [mdsServerURL], convenienceMDSServers: [] });
+    await MetadataService.initialize({ mdsServers: [mdsServerURL] });
 
     const returnedStatement = await MetadataService.getStatement(refreshableAAGUID);
 
@@ -670,7 +331,6 @@ describe('Behavior: logging', () => {
 
     await MetadataService.initialize({
       mdsServers: [],
-      convenienceMDSServers: [],
       statements: [],
       logger: { debug: _debugSpy },
     });
@@ -685,13 +345,6 @@ describe('Behavior: logging', () => {
 });
 
 const localStatementAAGUID = '91dfead7-959e-4475-ad26-9b0d482be089';
-const localProviderMetadata: ProviderMetadata = {
-  friendlyNames: { en: 'Local Provider', fr: 'Fournisseur local' },
-};
-const localConveniencePayload: ConvenienceMDSPayload = {
-  no: 1,
-  [localStatementAAGUID]: localProviderMetadata,
-} as ConvenienceMDSPayload;
 const localStatement: MetadataStatement = {
   legalHeader: 'https://fidoalliance.org/metadata/metadata-statement-legal-header/',
   description: 'Virtual FIDO2 EdDSA25519 SHA512 Conformance Testing CTAP2 Authenticator',
