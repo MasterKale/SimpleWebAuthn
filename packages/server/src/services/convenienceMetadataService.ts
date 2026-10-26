@@ -69,7 +69,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     this.state = new ServiceStateTracker(this.serviceName, this.logger);
     this.metadataCache = new MDSCache<ProviderMetadata>();
 
-    this.logger.info(`Initializing ${this.serviceName}`);
+    this.state.set(SERVICE_STATE.REFRESHING);
 
     /**
      * If passkey provider metadata is provided, load them into the cache first.
@@ -107,6 +107,8 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
         `Cached ${cacheDiff} metadata entries from ${numServers} convenience metadata server(s)`,
       );
     }
+
+    this.state.set(SERVICE_STATE.READY);
   }
 
   /**

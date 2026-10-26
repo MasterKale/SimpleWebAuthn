@@ -25,6 +25,11 @@ export class ServiceStateTracker {
    * Set a new state and report it
    */
   set(next: SERVICE_STATE) {
+    // If we're already in this state then there's nothing to do
+    if (this.state === next) {
+      return;
+    }
+
     this.state = next;
 
     this.logger.debug(`${this.name} is ${SERVICE_STATE[this.state]}`);
