@@ -46,6 +46,7 @@ interface ConvenienceMetadataService {
 }
 
 export class BaseConvenienceMetadataService implements ConvenienceMetadataService {
+  private serviceName = 'ConvenienceMetadataService';
   /**
    * Internal caches
    */
@@ -54,7 +55,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
   /**
    * Default service state and configuration
    */
-  private state = new ServiceStateTracker('ConvenienceMetadataService', DefaultNoopLogger);
+  private state = new ServiceStateTracker(this.serviceName, DefaultNoopLogger);
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
   /** How many hours to wait to refresh Convenience MDS data */
   private readonly cmdsDefaultRefreshDelayHours = 24;
@@ -79,7 +80,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     } = opts;
 
     this.logger = buildLoggerAllMethods(logger);
-    this.state = new ServiceStateTracker('ConvenienceMetadataService', this.logger);
+    this.state = new ServiceStateTracker(this.serviceName, this.logger);
 
     this.state.set(SERVICE_STATE.REFRESHING);
 
