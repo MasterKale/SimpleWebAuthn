@@ -152,6 +152,27 @@ describe('Method: registerMDSServer()', () => {
   });
 });
 
+describe('Method: mdsServerIsRegistered()', () => {
+  it('should be false for an unregistered URL', () => {
+    assertEquals(cache.mdsServerIsRegistered(url), false);
+  });
+
+  it('should be true for a registered URL', () => {
+    cache.registerMDSServer(url, 1, new Date(0));
+
+    assertEquals(cache.mdsServerIsRegistered(url), true);
+    assertEquals(cache.mdsServerIsRegistered(otherURL), false);
+  });
+
+  it('should be false after reset()', () => {
+    cache.registerMDSServer(url, 1, new Date(0));
+
+    cache.reset();
+
+    assertEquals(cache.mdsServerIsRegistered(url), false);
+  });
+});
+
 describe('Method: getMDSServerDataVersion()', () => {
   it('should throw for an unregistered URL', () => {
     const error = assertThrows(

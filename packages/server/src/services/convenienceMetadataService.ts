@@ -95,10 +95,19 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
       let numServers = 0;
 
       for (const url of mdsServers) {
-        // Initializing the server to be able to re-use `refreshServer()` in here
-        this.metadataCache.registerMDSServer(url, 0, new Date(0));
+        try {
+          const payload = await this.downloadConvenienceMDS(url, 0);
 
-        numServers += await this.refreshServer(url);
+          // A server is only registered for refreshes once data from it has been cached. One that
+          // can't be reached, or that doesn't respond with data, is skipped so it isn't tracked
+          if (payload) {
+            this.cacheConvenienceMDS(url, payload);
+            numServers += 1;
+          }
+        } catch (err) {
+          // Notify of the error and move on
+          this.logger.error(`Could not download convenience metadata from "${url}":`, err);
+        }
       }
 
       // Calculate the total number of new metadata entries we successfully added
@@ -281,6 +290,12 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
    * Delay the next refresh attempt of this server by the specified number of hours
    */
   private delayNextRefresh(url: string, numHours: number): void {
+    // Servers that haven't been cached from yet (i.e. still initializing) aren't refreshed so
+    // there's no refresh to delay
+    if (!this.metadataCache.mdsServerIsRegistered(url)) {
+      return;
+    }
+
     this.logger.debug(`Delaying next refresh of ${url} by ${numHours} hours`);
     const numHoursMS = 1000 * 60 * 60 * numHours;
     this.metadataCache.setMDSServerNextUpdate(url, new Date(Date.now() + numHoursMS));

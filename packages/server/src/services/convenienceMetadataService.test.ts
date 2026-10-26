@@ -478,22 +478,44 @@ describe('Behavior: refreshing stale metadata', () => {
       );
     });
 
-    it('should retry a server whose initial download failed after 4 hours', async () => {
-      using time = new FakeTime();
-      stubFetch(Promise.reject(new Error('Network down')));
-      await service.initialize({ mdsServers: [cmdsURL] });
-      assertSpyCalls(mockFetch, 1);
+    describe('when a server fails its initial download', () => {
+      const failures: [string, () => Promise<Response>][] = [
+        ['cannot be reached', () => Promise.reject(new Error('Network down'))],
+        ['responds with HTTP 429', () => Promise.resolve(new Response(null, { status: 429 }))],
+        ['responds with HTTP 500', () => Promise.resolve(new Response(null, { status: 500 }))],
+        ['returns invalid JSON', () => Promise.resolve(new Response('nope', { status: 200 }))],
+      ];
 
-      // Still within the delay, so no new request
-      time.tick((4 * hourMS) - 1000);
-      assertEquals(await service.getProviderMetadata(serverAAGUID), undefined);
-      assertSpyCalls(mockFetch, 1);
+      for (const [description, failure] of failures) {
+        it(`should not track the server when it ${description}`, async () => {
+          using time = new FakeTime();
+          stubFetch(failure());
+          await service.initialize({ mdsServers: [cmdsURL], payloads: [localPayload] });
+          assertSpyCalls(mockFetch, 1);
 
-      // Delay elapsed, so the server is tried again and its data becomes available
-      stubFetch(Promise.resolve(Response.json({ no: 1, [serverAAGUID]: originalMetadata })));
-      time.tick(2000);
-      assertEquals(await service.getProviderMetadata(serverAAGUID), originalMetadata);
-      assertSpyCalls(mockFetch, 1);
+          // No data was cached from the server, so it isn't refreshed no matter how long it's been
+          time.tick(eightDaysMS);
+          assertEquals(await service.getProviderMetadata(serverAAGUID), undefined);
+          assertSpyCalls(mockFetch, 1);
+
+          // Local data is unaffected
+          assertEquals(await service.getProviderMetadata(localAAGUID), localMetadata);
+        });
+      }
+
+      it('should report HTTP failures as warnings, not errors', async () => {
+        const warnSpy = spy();
+        const errorSpy = spy();
+        stubFetch(Promise.resolve(new Response(null, { status: 500 })));
+
+        await service.initialize({
+          mdsServers: [cmdsURL],
+          logger: { warn: warnSpy, error: errorSpy },
+        });
+
+        assertSpyCalls(warnSpy, 1);
+        assertSpyCalls(errorSpy, 0);
+      });
     });
   });
 });

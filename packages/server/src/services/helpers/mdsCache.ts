@@ -97,6 +97,13 @@ export class MDSCache<MetadataType> {
   }
 
   /**
+   * Whether an MDS server has been registered for periodic refreshes
+   */
+  mdsServerIsRegistered(url: MDSServerURL): boolean {
+    return this.serverCache.has(url);
+  }
+
+  /**
    * Set the MDS server's nextUpdate
    */
   setMDSServerNextUpdate(url: MDSServerURL, newNextUpdate: Date): void {
