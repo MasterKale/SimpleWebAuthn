@@ -57,6 +57,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     } = {},
   ): Promise<void> {
     // Reset server refreshes
+    this.metadataCache.reset();
     this.serverRefreshes = {};
 
     const {
@@ -67,7 +68,6 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
 
     this.logger = buildLoggerAllMethods(logger);
     this.state = new ServiceStateTracker(this.serviceName, this.logger);
-    this.metadataCache = new MDSCache<ProviderMetadata>();
 
     this.state.set(SERVICE_STATE.REFRESHING);
 
@@ -95,6 +95,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
       let numServers = 0;
 
       for (const url of mdsServers) {
+        // Initializing the server to be able to re-use `refreshServer()` in here
         this.metadataCache.registerMDSServer(url, 0, new Date(0));
 
         numServers += await this.refreshServer(url);
@@ -234,7 +235,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
   }
 
   /**
-   * Refresh a single server, joining the refresh already in flight if there is one. Refresh
+   * Refresh a single server, subscribing to the refresh already in flight if there is one. Refresh
    * failures cause that server's refresh to be re-attempted at a later date.
    */
   private serverRefreshes: { [url: string]: Promise<0 | 1> } = {};
