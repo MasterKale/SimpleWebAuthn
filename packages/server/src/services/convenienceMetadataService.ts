@@ -117,7 +117,8 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
   ): Promise<ConvenienceMDSPayload | undefined> {
     // Get latest convenience MDS JSON, with a query param that can short-circuit the download
     // if we already have the latest version of metadata
-    const _url = new URL(`/?localCopySerial=${no}`, url);
+    const _url = new URL(url);
+    _url.searchParams.set('localCopySerial', String(no));
     const resp = await fetch(_url.toString(), { signal: AbortSignal.timeout(10_000) });
 
     /**
