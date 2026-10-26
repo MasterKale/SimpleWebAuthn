@@ -2,26 +2,19 @@ import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import {
   buildLoggerAllMethods,
   DefaultNoopLogger,
-  SimpleWebAuthnLogger,
+  type SimpleWebAuthnLogger,
 } from '../helpers/logging.ts';
-import { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
-import { Uint8Array_ } from '../types/index.ts';
+import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
+import type { Uint8Array_ } from '../types/index.ts';
 import { SERVICE_STATE, ServiceStateTracker } from './helpers/serviceStateTracker.ts';
 
-// Cached MDS APIs from which BLOBs are downloaded
+// Cached C-MDS APIs from which provider metadata entries are downloaded
 type CachedMDS = {
   url: string;
   no: number;
   nextUpdate: Date;
 };
-/**
- * An instance of `CachedMDS` that will not trigger attempts to refresh the associated entry's blob
- */
-const NonRefreshingMDS: CachedMDS = {
-  url: '',
-  no: 0,
-  nextUpdate: new Date(0),
-} as const;
+const NonRefreshingURL = '';
 
 type CachedProviderMetadata = {
   metadata: ProviderMetadata;
@@ -32,18 +25,18 @@ const defaultURLConvenienceMDS = 'https://c-mds.fidoalliance.org/';
 
 interface ConvenienceMetadataService {
   /**
-   * @param opts.convenienceMDSServers An array of URLs to FIDO Alliance Metadata Convenience
-   * Service-compatible servers. Defaults to the official FIDO Convenience MDS
-   * @param opts.conveniencePayloads An array of local convenience MDS metadata. Metadata loaded in
-   * this way will be loaded but not refreshed. When combined with `convenienceMDSServers`, metadata
+   * @param opts.mdsServers An array of URLs to FIDO Alliance Convenience Metadata
+   * Service (C-MDS)-compatible servers. Defaults to the official FIDO Convenience MDS
+   * @param opts.payloads An array of local Convenience Metadata Service payloads. Metadata loaded
+   * in this way will be loaded but not refreshed. When combined with `mdsServers`, metadata
    * for the same AAGUID downloaded from a convenience MDS server will replace the local metadata
    * and get refreshed from then on
    * @param opts.logger An instance of `SimpleWebAuthnLogger` that allows for capturing
-   * MetadataService log output in a project-specific way
+   * ConvenienceMetadataService log output in a project-specific way
    */
   initialize(opts?: {
-    convenienceMDSServers?: string[];
-    conveniencePayloads?: ConvenienceMDSPayload[];
+    mdsServers?: string[];
+    payloads?: ConvenienceMDSPayload[];
     logger?: SimpleWebAuthnLogger;
   }): Promise<void>;
   /**
@@ -70,8 +63,8 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
 
   async initialize(
     opts: {
-      convenienceMDSServers?: string[];
-      conveniencePayloads?: ConvenienceMDSPayload[];
+      mdsServers?: string[];
+      payloads?: ConvenienceMDSPayload[];
       logger?: SimpleWebAuthnLogger;
     } = {},
   ): Promise<void> {
@@ -80,8 +73,8 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     this.convenienceMetadataCache = {};
 
     const {
-      convenienceMDSServers = [defaultURLConvenienceMDS],
-      conveniencePayloads,
+      mdsServers = [defaultURLConvenienceMDS],
+      payloads,
       logger = DefaultNoopLogger,
     } = opts;
 
@@ -93,11 +86,11 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     /**
      * If passkey provider metadata is provided, load them into the cache first.
      */
-    if (conveniencePayloads?.length) {
+    if (payloads?.length) {
       let entriesAdded = 0;
 
-      conveniencePayloads.forEach((payload) => {
-        entriesAdded += this.cacheConvenienceMDS(NonRefreshingMDS.url, payload);
+      payloads.forEach((payload) => {
+        entriesAdded += this.cacheConvenienceMDS(NonRefreshingURL, payload);
       });
 
       this.logger.info(`Cached ${entriesAdded} local metadata entries`);
@@ -107,12 +100,12 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
      * If Convenience MDS server URLs are provided, then download and cache the current collection
      * of metadata from them.
      */
-    if (convenienceMDSServers?.length) {
-      // Get a current count so we know how many new statements we've added from MDS servers
+    if (mdsServers?.length) {
+      // Get a current count so we know how many new entries we've added from C-MDS servers
       const currentCacheCount = Object.keys(this.convenienceMetadataCache).length;
-      let numServers = convenienceMDSServers.length;
+      let numServers = mdsServers.length;
 
-      for (const url of convenienceMDSServers) {
+      for (const url of mdsServers) {
         // Pull convenience metadata
         try {
           const payload = await this.downloadConvenienceMDS(url, 0);
@@ -234,7 +227,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
    */
   private clearCacheEntriesByURL(url: string): void {
     // Do _not_ clear out entries that aren't associated with a Convenience MDS service
-    if (url === NonRefreshingMDS.url) {
+    if (url === NonRefreshingURL) {
       return;
     }
 
@@ -261,7 +254,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     // If a cache refresh is in progress then pause this until the service is ready
     await this.state.pauseUntilReady();
 
-    // Try to grab a cached statement
+    // Try to grab a cached metadata entry
     let cachedMetadata = this.convenienceMetadataCache[aaguid];
 
     // If the metadata points to a convenience MDS API, then check the nextUpdate to see if we need
@@ -298,8 +291,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
   }
 
   /**
-   * Cache convenience metadata, whether pulled out of a full-fat `MetadataStatement` or retrieved
-   * directly from the Convenience MDS
+   * Cache convenience metadata retrieved directly from the Convenience MDS
    */
   private cacheProviderMetadata(aaguid: string, metadata: ProviderMetadata, url: string): void {
     this.convenienceMetadataCache[aaguid] = { metadata, url };
