@@ -10,31 +10,7 @@ import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
 import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 import { SERVICE_STATE, ServiceStateTracker } from './helpers/serviceStateTracker.ts';
-
-// Cached MDS APIs from which BLOBs are downloaded
-type CachedMDS = {
-  url: string;
-  no: number;
-  nextUpdate: Date;
-};
-/**
- * An instance of `CachedMDS` that will not trigger attempts to refresh the associated entry's blob
- */
-const NonRefreshingMDS: CachedMDS = {
-  url: '',
-  no: 0,
-  nextUpdate: new Date(0),
-} as const;
-
-type CachedBLOBEntry = {
-  /** The entry in the MDS blob */
-  entry: MetadataBLOBPayloadEntry;
-  /**
-   * The MDS server the blob containing this entry was downloaded from. An empty URL will skip
-   * attempts to refresh this entry
-   */
-  url: CachedMDS['url'];
-};
+import { MDSCache, NonRefreshingURL } from './helpers/mdsCache.ts';
 
 const defaultURLMDS = 'https://mds.fidoalliance.org/'; // v3
 
@@ -89,8 +65,7 @@ export class BaseMetadataService implements MetadataService {
   /**
    * Internal caches
    */
-  private mdsCache: { [url: string]: CachedMDS } = {};
-  private statementCache: { [aaguid: string]: CachedBLOBEntry | undefined } = {};
+  private metadataCache = new MDSCache<MetadataBLOBPayloadEntry>();
   /**
    * Default service state and configuration
    */
@@ -106,9 +81,9 @@ export class BaseMetadataService implements MetadataService {
       logger?: SimpleWebAuthnLogger;
     } = {},
   ): Promise<void> {
-    // Reset caches
-    this.mdsCache = {};
-    this.statementCache = {};
+    // Reset caches and server refreshes
+    this.metadataCache.reset();
+    this.serverRefreshes = {};
 
     const {
       mdsServers = [defaultURLMDS],
@@ -132,7 +107,7 @@ export class BaseMetadataService implements MetadataService {
       statements.forEach((statement) => {
         // Only cache statements that are for FIDO2-compatible authenticators
         statementsAdded += this.cacheMetadataBlobEntry(
-          NonRefreshingMDS.url,
+          NonRefreshingURL,
           {
             aaguid: statement.aaguid,
             metadataStatement: statement,
@@ -152,28 +127,25 @@ export class BaseMetadataService implements MetadataService {
      */
     if (mdsServers?.length) {
       // Get a current count so we know how many new statements we've added from MDS servers
-      const currentCacheCount = Object.keys(this.statementCache).length;
-      let numServers = mdsServers.length;
+      const currentCacheCount = this.metadataCache.count;
+      // Track how many servers we were able to update
+      let numServers = 0;
 
       for (const url of mdsServers) {
         try {
-          const cachedMDS: CachedMDS = {
-            url,
-            no: 0,
-            nextUpdate: new Date(0),
-          };
-
-          const blob = await this.downloadBlob(cachedMDS);
-          await this.verifyBlob(blob, cachedMDS);
+          const blob = await this.downloadBlob(url);
+          // A server is only registered for refreshes once a BLOB from it has been verified. One
+          // that fails here is skipped, so it can't cause lookups of other statements to fail
+          await this.verifyBlob(blob, url, 0);
+          numServers += 1;
         } catch (err) {
           // Notify of the error and move on
           this.logger.error(`Could not download BLOB from ${url}:`, err);
-          numServers -= 1;
         }
       }
 
       // Calculate the difference to get the total number of new statements we successfully added
-      const newCacheCount = Object.keys(this.statementCache).length;
+      const newCacheCount = this.metadataCache.count;
       const cacheDiff = newCacheCount - currentCacheCount;
       this.logger.info(
         `Cached ${cacheDiff} statements from ${numServers} metadata server(s)`,
@@ -201,27 +173,14 @@ export class BaseMetadataService implements MetadataService {
     // If a cache refresh is in progress then pause this until the service is ready
     await this.state.pauseUntilReady();
 
+    // Refresh any servers whose BLOBs are stale, whether or not this AAGUID is cached. This lets
+    // lookups of newly-registered AAGUIDs discover them
+    await this.refreshStaleServers();
+
     // Try to grab a cached statement
-    let cachedStatement = this.statementCache[aaguid];
+    const entry = this.metadataCache.getMetadata(aaguid);
 
-    // If the statement points to an MDS API, check the MDS' nextUpdate to see if we need to refresh
-    if (cachedStatement?.url) {
-      const mds = this.mdsCache[cachedStatement.url];
-      const now = new Date();
-      if (now > mds.nextUpdate) {
-        try {
-          this.state.set(SERVICE_STATE.REFRESHING);
-          const blob = await this.downloadBlob(mds);
-          await this.verifyBlob(blob, mds);
-          // Refresh the cached statement in case the cache got updated just now
-          cachedStatement = this.statementCache[aaguid];
-        } finally {
-          this.state.set(SERVICE_STATE.READY);
-        }
-      }
-    }
-
-    if (!cachedStatement) {
+    if (!entry) {
       if (this.verificationMode === 'strict') {
         // FIDO conformance requires RP's to only support registered AAGUID's
         throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
@@ -230,8 +189,6 @@ export class BaseMetadataService implements MetadataService {
       // Allow registration verification to continue without using metadata
       return;
     }
-
-    const { entry } = cachedStatement;
 
     // Check to see if the this aaguid has a status report with a "compromised" status
     for (const report of entry.statusReports) {
@@ -282,11 +239,57 @@ export class BaseMetadataService implements MetadataService {
   }
 
   /**
-   * Download and process the latest BLOB from MDS
+   * Refresh every server whose `nextUpdate` has passed
    */
-  private async downloadBlob(cachedMDS: CachedMDS) {
-    const { url } = cachedMDS;
+  private async refreshStaleServers(): Promise<void> {
+    const now = new Date();
+    const staleURLs = this.metadataCache.getStaleMDSServerURLs(now);
 
+    await Promise.all(staleURLs.map((url) => this.refreshServer(url)));
+  }
+
+  /**
+   * Refresh a single server, subscribing to the refresh already in flight if there is one.
+   *
+   * Refresh failures are logged and then rethrown so that lookups fail closed: until the refresh
+   * succeeds the server stays stale, every lookup tries again, and none of them are answered with
+   * statements from the BLOB that was previously cached.
+   */
+  private serverRefreshes: { [url: string]: Promise<void> } = {};
+  private refreshServer(url: string): Promise<void> {
+    const inFlight = this.serverRefreshes[url];
+    if (inFlight) {
+      return inFlight;
+    }
+
+    this.state.set(SERVICE_STATE.REFRESHING);
+
+    const refresh = (async () => {
+      try {
+        const mdsNo = this.metadataCache.getMDSServerDataVersion(url);
+        const blob = await this.downloadBlob(url);
+        await this.verifyBlob(blob, url, mdsNo);
+      } catch (err) {
+        this.logger.error(`Could not download BLOB from ${url}:`, err);
+        throw err;
+      } finally {
+        delete this.serverRefreshes[url];
+        // Only report ready once every refresh has finished
+        if (Object.keys(this.serverRefreshes).length === 0) {
+          this.state.set(SERVICE_STATE.READY);
+        }
+      }
+    })();
+
+    this.serverRefreshes[url] = refresh;
+
+    return refresh;
+  }
+
+  /**
+   * Download the latest BLOB from MDS
+   */
+  private async downloadBlob(url: string) {
     // Get latest "BLOB" (FIDO's terminology, not mine)
     const resp = await fetch(url);
     const data = await resp.text();
@@ -296,11 +299,9 @@ export class BaseMetadataService implements MetadataService {
 
   /**
    * Verify and process the MDS metadata blob. Caches metadata and sets up refreshing when blobs
-   * grow stale.
+   * grow stale. `no` is the serial number of the last BLOB cached from this server.
    */
-  private async verifyBlob(blob: string, cachedMDS: CachedMDS): Promise<void> {
-    const { url, no } = cachedMDS;
-
+  private async verifyBlob(blob: string, url: string, no: number): Promise<void> {
     const { payload, parsedNextUpdate } = await verifyMDSBlob(blob);
 
     if (payload.no <= no) {
@@ -311,20 +312,24 @@ export class BaseMetadataService implements MetadataService {
       );
     }
 
+    // Remove statements from this server's previous BLOB so statements the server has since
+    // dropped don't linger in the cache
+    this.metadataCache.clearMetadataByURL(url);
+
     // Cache statements for FIDO2 devices
     for (const entry of payload.entries) {
       this.cacheMetadataBlobEntry(url, entry);
     }
 
-    if (url) {
+    if (url !== NonRefreshingURL) {
       // Remember info about the server so we can refresh later
-      this.mdsCache[url] = {
-        ...cachedMDS,
+      this.metadataCache.registerMDSServer(
+        url,
         // Store the payload `no` to make sure we're getting the next BLOB in the sequence
-        no: payload.no,
+        payload.no,
         // Remember when we need to refresh this blob
-        nextUpdate: parsedNextUpdate,
-      };
+        parsedNextUpdate,
+      );
     } else {
       /**
        * This blob will not be refreshed, but we should still alert if the blob's `nextUpdate` is
@@ -352,7 +357,7 @@ export class BaseMetadataService implements MetadataService {
       return 0;
     }
 
-    this.statementCache[entry.aaguid] = { entry, url };
+    this.metadataCache.cacheMetadata(entry.aaguid, entry, url);
 
     return 1;
   }

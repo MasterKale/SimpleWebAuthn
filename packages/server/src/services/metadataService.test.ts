@@ -301,6 +301,193 @@ describe('Behavior: BLOB refresh', () => {
     assertEquals(metadata?.friendlyNames, { en: 'Fresh Name' });
   });
 
+  describe('stale BLOB handling', () => {
+    const otherAAGUID = '00000000-0000-0000-0000-000000000002';
+    let statementV1: MetadataStatement;
+    let statementV2: MetadataStatement;
+    let otherStatement: MetadataStatement;
+
+    // Built here because `localStatement` is declared at the bottom of this file
+    beforeEach(() => {
+      statementV1 = { ...localStatement, aaguid: refreshableAAGUID, description: 'Statement v1' };
+      statementV2 = { ...statementV1, description: 'Statement v2' };
+      otherStatement = { ...localStatement, aaguid: otherAAGUID, description: 'Other statement' };
+    });
+
+    /**
+     * Initialize with a BLOB (`no: 1`) that's already stale so that the next lookup attempts a
+     * refresh, and return the follow-up responses in order after that
+     */
+    async function initializeWithStaleBLOB(...followUps: (() => Promise<Response>)[]) {
+      // Follow-ups are created lazily so a rejection isn't left unhandled while the first BLOB is
+      // still being verified
+      const responses = [
+        () =>
+          generateBLOBResponse({
+            no: 1,
+            nextUpdate: '2023-01-01',
+            statements: [statementV1, otherStatement],
+          }),
+        ...followUps,
+      ];
+      let call = 0;
+      mockFetch = stub(_fetchInternals, 'stubThis', () => responses[call++]());
+
+      await MetadataService.initialize({ mdsServers: [mdsServerURL] });
+    }
+
+    it('should fail closed when the refresh cannot reach the server', async () => {
+      await initializeWithStaleBLOB(() => Promise.reject(new Error('Network down')));
+
+      // The previously-cached statement is not used in place of a BLOB that couldn't be refreshed
+      await assertRejects(
+        () => MetadataService.getStatement(refreshableAAGUID),
+        Error,
+        'Network down',
+      );
+      assertSpyCalls(mockFetch, 2);
+    });
+
+    it('should fail closed when the refreshed BLOB has an old serial', async () => {
+      await initializeWithStaleBLOB(
+        () => generateBLOBResponse({ no: 1, nextUpdate: '2999-01-01', statement: statementV2 }),
+      );
+
+      await assertRejects(
+        () => MetadataService.getStatement(refreshableAAGUID),
+        Error,
+        'is not greater than previous no.',
+      );
+      assertSpyCalls(mockFetch, 2);
+    });
+
+    it('should try the refresh again on the next lookup after a failure', async () => {
+      await initializeWithStaleBLOB(
+        () => Promise.reject(new Error('Network down')),
+        () => generateBLOBResponse({ no: 2, nextUpdate: '2999-01-01', statement: statementV2 }),
+      );
+
+      await assertRejects(() => MetadataService.getStatement(refreshableAAGUID));
+      assertSpyCalls(mockFetch, 2);
+
+      // No delay: the very next lookup retries, and the service isn't left stuck refreshing
+      const statement = await MetadataService.getStatement(refreshableAAGUID);
+
+      assertSpyCalls(mockFetch, 3);
+      assertEquals(statement, statementV2);
+    });
+
+    it('should fail every concurrent lookup with a single failed refresh', async () => {
+      // Fail after a short delay so the refresh is still in flight when every lookup arrives
+      await initializeWithStaleBLOB(() =>
+        new Promise<Response>((_resolve, reject) =>
+          setTimeout(() => reject(new Error('Network down')), 50)
+        )
+      );
+
+      const results = await Promise.allSettled([
+        MetadataService.getStatement(refreshableAAGUID),
+        MetadataService.getStatement(refreshableAAGUID),
+        MetadataService.getStatement(otherAAGUID),
+      ]);
+
+      assertSpyCalls(mockFetch, 2);
+      assertEquals(results.map(({ status }) => status), ['rejected', 'rejected', 'rejected']);
+    });
+
+    it('should evict statements the refreshed BLOB no longer includes', async () => {
+      await initializeWithStaleBLOB(
+        () => generateBLOBResponse({ no: 2, nextUpdate: '2999-01-01', statement: statementV2 }),
+      );
+
+      // Trigger the refresh via the AAGUID that's still present
+      assertEquals(await MetadataService.getStatement(refreshableAAGUID), statementV2);
+
+      // The server dropped this AAGUID, so it shouldn't linger in the cache
+      await assertRejects(
+        () => MetadataService.getStatement(otherAAGUID),
+        Error,
+        'No metadata statement found',
+      );
+    });
+
+    it('should keep local statements when a refresh evicts statements from a server', async () => {
+      const localOnlyAAGUID = '00000000-0000-0000-0000-000000000009';
+      const localOnlyStatement: MetadataStatement = {
+        ...localStatement,
+        aaguid: localOnlyAAGUID,
+      };
+      mockFetch = stub(
+        _fetchInternals,
+        'stubThis',
+        returnsNext([
+          generateBLOBResponse({ no: 1, nextUpdate: '2023-01-01', statement: statementV1 }),
+          generateBLOBResponse({ no: 2, nextUpdate: '2999-01-01', statement: statementV2 }),
+        ]),
+      );
+      await MetadataService.initialize({
+        mdsServers: [mdsServerURL],
+        statements: [localOnlyStatement],
+      });
+
+      assertEquals(await MetadataService.getStatement(refreshableAAGUID), statementV2);
+      assertSpyCalls(mockFetch, 2);
+      assertEquals(await MetadataService.getStatement(localOnlyAAGUID), localOnlyStatement);
+    });
+
+    it('should discover a statement added to the server since the last refresh', async () => {
+      const addedAAGUID = '00000000-0000-0000-0000-000000000008';
+      const addedStatement: MetadataStatement = { ...localStatement, aaguid: addedAAGUID };
+      await initializeWithStaleBLOB(
+        () =>
+          generateBLOBResponse({
+            no: 2,
+            nextUpdate: '2999-01-01',
+            statements: [statementV1, addedStatement],
+          }),
+      );
+
+      // The lookup for an uncached AAGUID is what triggers the refresh
+      const statement = await MetadataService.getStatement(addedAAGUID);
+
+      assertSpyCalls(mockFetch, 2);
+      assertEquals(statement, addedStatement);
+    });
+
+    it('should share one refresh between concurrent lookups', async () => {
+      await initializeWithStaleBLOB(
+        () => generateBLOBResponse({ no: 2, nextUpdate: '2999-01-01', statement: statementV2 }),
+      );
+
+      const results = await Promise.all([
+        MetadataService.getStatement(refreshableAAGUID),
+        MetadataService.getStatement(refreshableAAGUID),
+        MetadataService.getProviderMetadata(refreshableAAGUID),
+      ]);
+
+      assertSpyCalls(mockFetch, 2);
+      assertEquals(results[0], statementV2);
+      assertEquals(results[1], statementV2);
+    });
+
+    it('should still serve local statements when a server fails its initial download', async () => {
+      mockFetch = stub(
+        _fetchInternals,
+        'stubThis',
+        returnsNext([Promise.reject(new Error('Network down'))]),
+      );
+
+      await MetadataService.initialize({
+        mdsServers: [mdsServerURL],
+        statements: [localStatement],
+      });
+
+      // The server never provided a BLOB, so it's not tracked for refreshes and can't break lookups
+      assertEquals(await MetadataService.getStatement(localStatementAAGUID), localStatement);
+      assertSpyCalls(mockFetch, 1);
+    });
+  });
+
   it('should not refresh a BLOB that is still current', async () => {
     const statement: MetadataStatement = {
       ...localStatement,
@@ -449,9 +636,10 @@ async function getBLOBSigner(): Promise<BLOBSigner> {
 async function generateBLOBResponse(opts: {
   no: number;
   nextUpdate: string;
-  statement: MetadataStatement;
+  statement?: MetadataStatement;
+  statements?: MetadataStatement[];
 }): Promise<Response> {
-  const { no, nextUpdate, statement } = opts;
+  const { no, nextUpdate, statement, statements = statement ? [statement] : [] } = opts;
 
   const { leafCertBase64, leafKeys } = await getBLOBSigner();
 
@@ -464,14 +652,12 @@ async function generateBLOBResponse(opts: {
     legalHeader: 'https://fidoalliance.org/metadata/metadata-legal-header/',
     no,
     nextUpdate,
-    entries: [
-      {
-        aaguid: statement.aaguid,
-        metadataStatement: statement,
-        statusReports: [],
-        timeOfLastStatusChange: '1970-01-01',
-      },
-    ],
+    entries: statements.map((entryStatement) => ({
+      aaguid: entryStatement.aaguid,
+      metadataStatement: entryStatement,
+      statusReports: [],
+      timeOfLastStatusChange: '1970-01-01',
+    })),
   }));
 
   const signatureBytes = await crypto.subtle.sign(
