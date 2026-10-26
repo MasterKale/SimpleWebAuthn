@@ -1,4 +1,3 @@
-import { convertAAGUIDToString } from '../helpers/convertAAGUIDToString.ts';
 import {
   buildLoggerAllMethods,
   DefaultNoopLogger,
@@ -6,20 +5,8 @@ import {
 } from '../helpers/logging.ts';
 import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 import type { Uint8Array_ } from '../types/index.ts';
+import { MDSCache, NonRefreshingURL } from './helpers/mdsCache.ts';
 import { SERVICE_STATE, ServiceStateTracker } from './helpers/serviceStateTracker.ts';
-
-// Cached C-MDS APIs from which provider metadata entries are downloaded
-type CachedMDS = {
-  url: string;
-  no: number;
-  nextUpdate: Date;
-};
-const NonRefreshingURL = '';
-
-type CachedProviderMetadata = {
-  metadata: ProviderMetadata;
-  url: CachedMDS['url'];
-};
 
 const defaultURLConvenienceMDS = 'https://c-mds.fidoalliance.org/';
 
@@ -50,8 +37,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
   /**
    * Internal caches
    */
-  private mdsCache: { [url: string]: CachedMDS } = {};
-  private convenienceMetadataCache: { [aaguid: string]: CachedProviderMetadata | undefined } = {};
+  private metadataCache = new MDSCache<ProviderMetadata>();
   /**
    * Default service state and configuration
    */
@@ -69,9 +55,8 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
       logger?: SimpleWebAuthnLogger;
     } = {},
   ): Promise<void> {
-    // Reset cache
-    this.mdsCache = {};
-    this.convenienceMetadataCache = {};
+    // Reset server refreshes
+    this.serverRefreshes = {};
 
     const {
       mdsServers = [defaultURLConvenienceMDS],
@@ -81,6 +66,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
 
     this.logger = buildLoggerAllMethods(logger);
     this.state = new ServiceStateTracker(this.serviceName, this.logger);
+    this.metadataCache = new MDSCache<ProviderMetadata>();
 
     this.state.set(SERVICE_STATE.REFRESHING);
 
@@ -103,26 +89,18 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
      */
     if (mdsServers?.length) {
       // Get a current count so we know how many new entries we've added from C-MDS servers
-      const currentCacheCount = Object.keys(this.convenienceMetadataCache).length;
-      let numServers = mdsServers.length;
+      const currentCacheCount = this.metadataCache.count;
+      // Track how many servers we were able to update
+      let numServers = 0;
 
       for (const url of mdsServers) {
-        // Pull convenience metadata
-        try {
-          const payload = await this.downloadConvenienceMDS(url, 0);
+        this.metadataCache.registerMDSServer(url, 0, new Date(0));
 
-          if (payload) {
-            this.cacheConvenienceMDS(url, payload);
-          }
-        } catch (err) {
-          // Notify of the error and move on
-          this.logger.error(`Could not download convenience metadata from ${url}:`, err);
-          numServers -= 1;
-        }
+        numServers += await this.refreshServer(url);
       }
 
       // Calculate the total number of new metadata entries we successfully added
-      const newCacheCount = Object.keys(this.convenienceMetadataCache).length;
+      const newCacheCount = this.metadataCache.count;
       const cacheDiff = newCacheCount - currentCacheCount;
       this.logger.info(
         `Cached ${cacheDiff} metadata entries from ${numServers} convenience metadata server(s)`,
@@ -196,7 +174,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     let entriesAdded = 0;
 
     // Remove existing entries for this URL
-    this.clearCacheEntriesByURL(url);
+    this.metadataCache.clearMetadataByURL(url);
 
     // Cache entries
     Object.keys(payload).forEach((aaguid) => {
@@ -206,37 +184,37 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
       }
 
       // The rest of the keys will be AAGUIDs
-      this.cacheProviderMetadata(aaguid, payload[aaguid], url);
+      this.metadataCache.cacheMetadata(aaguid, payload[aaguid], url);
       entriesAdded += 1;
     });
 
     // Set up convenience metadata refresh
-    this.mdsCache[url] = {
+    this.metadataCache.registerMDSServer(
       url,
-      // Store the payload `no` to skip re-downloading metadata we already have
-      no: payload.no,
+      payload.no,
       // Convenience MDS returns no nextUpdate, so pick a time in the future
-      nextUpdate: new Date(Date.now() + (1000 * 60 * 60 * this.cmdsDefaultRefreshDelayHours)),
-    };
+      new Date(Date.now() + (1000 * 60 * 60 * this.cmdsDefaultRefreshDelayHours)),
+    );
 
     return entriesAdded;
   }
 
   /**
-   * Remove cached Convenience Metadata service data by the URL. If the URL indicates data that
-   * should not be refreshed, then simply exit.
+   * Get a collection of metadata about a credential manager, including localized name(s) and
+   * light and dark iconography when available. Returns `undefined` if no such metadata has been
+   * registered with a Convenience MDS.
    */
-  private clearCacheEntriesByURL(url: string): void {
-    // Do _not_ clear out entries that aren't associated with a Convenience MDS service
-    if (url === NonRefreshingURL) {
+  async getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined> {
+    if (this.state.current === SERVICE_STATE.DISABLED) {
       return;
     }
 
-    for (const [aaguid, cached] of Object.entries(this.convenienceMetadataCache)) {
-      if (cached?.url === url) {
-        delete this.convenienceMetadataCache[aaguid];
-      }
-    }
+    // If a cache refresh is in progress then pause this until the service is ready
+    await this.state.pauseUntilReady();
+
+    const cachedMetadata = this.metadataCache.getMetadata(aaguid);
+
+    return cachedMetadata;
   }
 
   async getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined> {
@@ -302,14 +280,9 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
    * Delay the next refresh attempt of this server by the specified number of hours
    */
   private delayNextRefresh(url: string, numHours: number): void {
-    // This should never happen, but just in case...
-    if (!this.mdsCache[url]) {
-      return;
-    }
-
     this.logger.debug(`Delaying next refresh of ${url} by ${numHours} hours`);
     const numHoursMS = 1000 * 60 * 60 * numHours;
-    this.mdsCache[url].nextUpdate = new Date(Date.now() + numHoursMS);
+    this.metadataCache.setMDSServerNextUpdate(url, new Date(Date.now() + numHoursMS));
   }
 }
 
