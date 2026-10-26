@@ -36,13 +36,7 @@ type CachedBLOBEntry = {
   url: CachedMDS['url'];
 };
 
-type CachedProviderMetadata = {
-  metadata: ProviderMetadata;
-  url: CachedMDS['url'];
-};
-
 const defaultURLMDS = 'https://mds.fidoalliance.org/'; // v3
-const defaultURLConvenienceMDS = 'https://c-mds.fidoalliance.org/';
 
 /**
  * Allow MetadataService to accommodate unregistered AAGUIDs (`"permissive"`), or only allow
@@ -58,15 +52,9 @@ interface MetadataService {
    *
    * @param opts.mdsServers An array of URLs to FIDO Alliance Metadata Service
    * (version 3.0)-compatible servers. Defaults to the official FIDO MDS server
-   * @param opts.convenienceMDSServers An array of URLs to FIDO Alliance Metadata Convenience
-   * Service-compatible servers. Defaults to the official FIDO Convenience MDS
    * @param opts.statements An array of local metadata statements. Statements will be loaded but
    * not refreshed. When combined with `mdsServers`, a statement for the same AAGUID downloaded
    * from an MDS server will replace the local statement and get refreshed from then on
-   * @param opts.conveniencePayloads An array of local convenience MDS metadata. Metadata loaded in
-   * this way will be loaded but not refreshed. When combined with `convenienceMDSServers`, metadata
-   * for the same AAGUID downloaded from a convenience MDS server will replace the local metadata
-   * and get refreshed from then on
    * @param opts.verificationMode How MetadataService will handle unregistered AAGUIDs. Defaults to
    * `"strict"` which throws errors during registration response verification when an
    * unregistered AAGUID is encountered. Set to `"permissive"` to allow registration by
@@ -76,9 +64,7 @@ interface MetadataService {
    */
   initialize(opts?: {
     mdsServers?: string[];
-    convenienceMDSServers?: string[];
     statements?: MetadataStatement[];
-    conveniencePayloads?: ConvenienceMDSPayload[];
     verificationMode?: VerificationMode;
     logger?: SimpleWebAuthnLogger;
   }): Promise<void>;
@@ -104,24 +90,17 @@ export class BaseMetadataService implements MetadataService {
    */
   private mdsCache: { [url: string]: CachedMDS } = {};
   private statementCache: { [aaguid: string]: CachedBLOBEntry | undefined } = {};
-  private convenienceMetadataCache: { [aaguid: string]: CachedProviderMetadata | undefined } = {};
   /**
    * Default service state and configuration
    */
   private state = new ServiceStateTracker('MetadataService', DefaultNoopLogger);
   private verificationMode: VerificationMode = 'strict';
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
-  /** How many hours to wait to refresh Convenience MDS data */
-  private readonly cmdsDefaultRefreshDelayHours = 24;
-  /** How many hours to wait to retry a _failed_ attempt to refresh Convenience MDS data */
-  private readonly cmdsDefaultRetryDelayHours = 4;
 
   async initialize(
     opts: {
       mdsServers?: string[];
-      convenienceMDSServers?: string[];
       statements?: MetadataStatement[];
-      conveniencePayloads?: ConvenienceMDSPayload[];
       verificationMode?: VerificationMode;
       logger?: SimpleWebAuthnLogger;
     } = {},
@@ -129,13 +108,10 @@ export class BaseMetadataService implements MetadataService {
     // Reset caches
     this.mdsCache = {};
     this.statementCache = {};
-    this.convenienceMetadataCache = {};
 
     const {
       mdsServers = [defaultURLMDS],
-      convenienceMDSServers = [defaultURLConvenienceMDS],
       statements,
-      conveniencePayloads,
       verificationMode,
       logger = DefaultNoopLogger,
     } = opts;
@@ -200,51 +176,6 @@ export class BaseMetadataService implements MetadataService {
       const cacheDiff = newCacheCount - currentCacheCount;
       this.logger.info(
         `Cached ${cacheDiff} statements from ${numServers} metadata server(s)`,
-      );
-    }
-
-    /**
-     * If passkey provider metadata is provided, load them into the cache first.
-     */
-    if (conveniencePayloads?.length) {
-      let entriesAdded = 0;
-
-      conveniencePayloads.forEach((payload) => {
-        entriesAdded += this.cacheConvenienceMDS(NonRefreshingMDS.url, payload);
-      });
-
-      this.logger.info(`Cached ${entriesAdded} local metadata entries`);
-    }
-
-    /**
-     * If Convenience MDS server URLs are provided, then download and cache the current collection
-     * of metadata from them.
-     */
-    if (convenienceMDSServers?.length) {
-      // Get a current count so we know how many new statements we've added from MDS servers
-      const currentCacheCount = Object.keys(this.convenienceMetadataCache).length;
-      let numServers = convenienceMDSServers.length;
-
-      for (const url of convenienceMDSServers) {
-        // Pull convenience metadata
-        try {
-          const payload = await this.downloadConvenienceMDS(url, 0);
-
-          if (payload) {
-            this.cacheConvenienceMDS(url, payload);
-          }
-        } catch (err) {
-          // Notify of the error and move on
-          this.logger.error(`Could not download convenience metadata from ${url}:`, err);
-          numServers -= 1;
-        }
-      }
-
-      // Calculate the total number of new metadata entries we successfully added
-      const newCacheCount = Object.keys(this.convenienceMetadataCache).length;
-      const cacheDiff = newCacheCount - currentCacheCount;
-      this.logger.info(
-        `Cached ${cacheDiff} metadata entries from ${numServers} convenience metadata server(s)`,
       );
     }
 
@@ -336,39 +267,19 @@ export class BaseMetadataService implements MetadataService {
     await this.state.pauseUntilReady();
 
     // Try to grab a cached statement
-    let cachedMetadata = this.convenienceMetadataCache[aaguid];
+    const metadataStatement = await this.getStatement(aaguid);
 
-    // If the metadata points to a convenience MDS API, then check the nextUpdate to see if we need
-    // to refresh it
-    if (cachedMetadata?.url) {
-      const mds = this.mdsCache[cachedMetadata.url];
-      const now = new Date();
-      if (now > mds.nextUpdate) {
-        try {
-          this.setState(SERVICE_STATE.REFRESHING);
-          const payload = await this.downloadConvenienceMDS(mds.url, mds.no);
-          if (payload) {
-            this.cacheConvenienceMDS(mds.url, payload);
-          }
-
-          // Refresh the cached metadata in case the cache got updated just now
-          cachedMetadata = this.convenienceMetadataCache[aaguid];
-        } catch (err) {
-          this.logger.error(`Could not download convenience metadata from ${mds.url}:`, err);
-          this.delayNextRefresh(mds.url, this.cmdsDefaultRetryDelayHours);
-        } finally {
-          this.setState(SERVICE_STATE.READY);
-        }
-      }
-    }
-
-    if (!cachedMetadata) {
+    if (!metadataStatement) {
       return;
     }
 
-    const { metadata } = cachedMetadata;
-
-    return metadata;
+    return {
+      friendlyNames: metadataStatement.friendlyNames,
+      icon: metadataStatement.icon,
+      iconDark: metadataStatement.iconDark,
+      providerLogoDark: metadataStatement.providerLogoDark,
+      providerLogoLight: metadataStatement.providerLogoLight,
+    };
   }
 
   /**
@@ -432,96 +343,6 @@ export class BaseMetadataService implements MetadataService {
   }
 
   /**
-   * Download the convenience metadata, which is surprisingly just a JSON document
-   */
-  private async downloadConvenienceMDS(
-    url: string,
-    no: number,
-  ): Promise<ConvenienceMDSPayload | undefined> {
-    // Get latest convenience MDS JSON, with a query param that can short-circuit the download
-    // if we already have the latest version of metadata
-    const _url = new URL(`/?localCopySerial=${no}`, url);
-    const resp = await fetch(_url.toString(), { signal: AbortSignal.timeout(10_000) });
-
-    /**
-     * We have the latest data, nothing more to do.
-     *
-     * See https://fidoalliance.org/specs/mds/fido-convenience-metadata-service-v1.0-ps-20250521.html#sctn-mds-blob-proc-rules
-     */
-    if (resp.status === 304) {
-      await resp.body?.cancel();
-      this.logger.info(
-        `The Convenience MDS API at ${_url.toString()} reported nothing new to download (HTTP 304)`,
-      );
-      // There's nothing new to download, wait another interval before checking again
-      this.delayNextRefresh(url, this.cmdsDefaultRefreshDelayHours);
-      return;
-    }
-
-    /**
-     * The FIDO convenience MDS API aggressively rate-limits so be prepared for that. We'll have to
-     * try again later.
-     */
-    if (resp.status === 429) {
-      await resp.body?.cancel();
-      this.logger.warn(
-        `The Convenience MDS API at ${_url.toString()} rate-limited this request (HTTP 429)`,
-      );
-      // We checked too soon, wait a bit before checking again
-      this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
-      return;
-    }
-
-    if (!resp.ok) {
-      await resp.body?.cancel();
-      this.logger.warn(
-        `The Convenience MDS API at ${_url.toString()} reported an unsuccessful request (HTTP ${resp.status})`,
-      );
-      // Likely an HTTP 500 error, but anything not within HTTP 200-299. Wait a bit before trying
-      // again
-      this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
-      return;
-    }
-
-    const data: ConvenienceMDSPayload = await resp.json();
-    return data;
-  }
-
-  /**
-   * Cache the AAGUID-keyed entries in a Convenience MDS payload. Returns the number of entries
-   * cached (so you can `count += cacheConvenienceMDS(...)`)
-   */
-  private cacheConvenienceMDS(url: string, payload: ConvenienceMDSPayload): number {
-    let entriesAdded = 0;
-
-    // Remove existing entries for this URL
-    this.clearCacheEntriesByURL(url);
-
-    // Cache entries
-    Object.keys(payload).forEach((aaguid) => {
-      // Skip the versioning property
-      if (aaguid === 'no') {
-        return;
-      }
-
-      // The rest of the keys will be AAGUIDs
-      this.cacheProviderMetadata(aaguid, payload[aaguid], url);
-      entriesAdded += 1;
-    });
-
-    // Set up convenience metadata refresh
-    this.mdsCache[url] = {
-      url,
-      // Store the payload `no` to skip re-downloading metadata we already have
-      no: payload.no,
-      // Convenience MDS returns no nextUpdate, so pick a time in the future
-      nextUpdate: new Date(Date.now() + (1000 * 60 * 60 * this.cmdsDefaultRefreshDelayHours)),
-    };
-
-    return entriesAdded;
-  }
-
-  /**
    * A central place to contain logic and side effects of caching a BLOB entry. Only caches FIDO2
    * statements (i.e. ones with `aaguid` as UAF authenticators won't have one.) Returns `1` if the
    * statement was cached, or `0` if it wasn't (so you can `count += cacheMetadataBlobEntry(...)`)
@@ -534,67 +355,7 @@ export class BaseMetadataService implements MetadataService {
 
     this.statementCache[entry.aaguid] = { entry, url };
 
-    // Cache the convenience metadata contained within the fuller MetadataStatement
-    const { metadataStatement } = entry;
-    if (metadataStatement) {
-      this.cacheProviderMetadata(
-        entry.aaguid,
-        {
-          friendlyNames: metadataStatement.friendlyNames,
-          icon: metadataStatement.icon,
-          iconDark: metadataStatement.iconDark,
-          providerLogoDark: metadataStatement.providerLogoDark,
-          providerLogoLight: metadataStatement.providerLogoLight,
-        },
-        /**
-         * We didn't actually fetch this from a Convenience MDS API, so don't try to update this
-         * metadata like we did. It'll get updated the next time the regular MDS payload gets pulled
-         * down
-         */
-        NonRefreshingMDS.url,
-      );
-    }
-
     return 1;
-  }
-
-  /**
-   * Cache convenience metadata, whether pulled out of a full-fat `MetadataStatement` or retrieved
-   * directly from the Convenience MDS
-   */
-  private cacheProviderMetadata(aaguid: string, metadata: ProviderMetadata, url: string): void {
-    this.convenienceMetadataCache[aaguid] = { metadata, url };
-  }
-
-  /**
-   * Remove cached Convenience Metadata service data by the URL. If the URL indicates data that
-   * should not be refreshed, then simply exit.
-   */
-  private clearCacheEntriesByURL(url: string): void {
-    // Do _not_ clear out entries that aren't associated with a Convenience MDS service
-    if (url === NonRefreshingMDS.url) {
-      return;
-    }
-
-    for (const [aaguid, cached] of Object.entries(this.convenienceMetadataCache)) {
-      if (cached?.url === url) {
-        delete this.convenienceMetadataCache[aaguid];
-      }
-    }
-  }
-
-  /**
-   * Delay the next refresh attempt of this server by the specified number of hours
-   */
-  private delayNextRefresh(url: string, numHours: number): void {
-    // This should never happen, but just in case...
-    if (!this.mdsCache[url]) {
-      return;
-    }
-
-    this.logger.debug(`Delaying next refresh of ${url} by ${numHours} hours`);
-    const numHoursMS = 1000 * 60 * 60 * numHours;
-    this.mdsCache[url].nextUpdate = new Date(Date.now() + numHoursMS);
   }
 }
 
