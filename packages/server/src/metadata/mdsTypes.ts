@@ -321,7 +321,17 @@ export type AuthenticatorGetInfo = {
 };
 
 /**
- * Localized names, typically a company's trade name for a given region.
+ * Localized names, typically a company's trade name for a given region. Language codes are...
+ *
+ * > IETF language codes ([[RFC5646]](https://www.rfc-editor.org/info/rfc5646/)), defined by a
+ * > primary language subtag, followed by a region subtag based on a two-letter country code from
+ * > [ISO3166] alpha-2 (usually written in upper case), e.g: Austrian-German - "de-AT". In case of
+ * > absence of the specific territorial language definition, vendor should fallback to the more
+ * > general language option, e.g: If "de" is given, but "de-AT" is missing, the use "de" entry
+ * > instead. Description values can contain any UTF-8 characters.
+ * >
+ * > A name in English language ("en-US") is mandatory, localized names for other languages are
+ * > optional.
  *
  * Example:
  * ```json
