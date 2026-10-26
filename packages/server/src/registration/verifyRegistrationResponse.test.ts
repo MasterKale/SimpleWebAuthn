@@ -21,6 +21,7 @@ import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
 import { denoSupportsPQC } from '../helpers/tests/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
 import { MetadataService } from '../services/metadataService.ts';
+import { ConvenienceMetadataService } from '../services/convenienceMetadataService.ts';
 import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 import { SimpleWebAuthnError } from '../errors/index.ts';
 
@@ -969,6 +970,11 @@ Deno.test('should not return passkey provider metadata when none exists for the 
     'getProviderMetadata',
     resolvesNext([undefined]),
   );
+  using _mockGetConvenienceProviderMetadata = stub(
+    ConvenienceMetadataService,
+    'getProviderMetadata',
+    resolvesNext([undefined]),
+  );
 
   const verification = await verifyRegistrationResponse({
     response: attestationNone,
@@ -979,6 +985,65 @@ Deno.test('should not return passkey provider metadata when none exists for the 
 
   assert(verification.verified);
   assertEquals(verification.registrationInfo?.passkeyProviderMetadata, undefined);
+});
+
+Deno.test('should fall back to ConvenienceMetadataService for passkey provider metadata when MetadataService has none', async () => {
+  const providerMetadata: ProviderMetadata = { friendlyNames: { en: 'Convenience MDS Provider' } };
+  using mockGetProviderMetadata = stub(
+    MetadataService,
+    'getProviderMetadata',
+    resolvesNext([undefined]),
+  );
+  using mockGetConvenienceProviderMetadata = stub(
+    ConvenienceMetadataService,
+    'getProviderMetadata',
+    resolvesNext([providerMetadata]),
+  );
+
+  const verification = await verifyRegistrationResponse({
+    response: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.passkeyProviderMetadata, providerMetadata);
+  // MDS is tried first, then Convenience MDS, both with the AAGUID string in `registrationInfo`
+  assertSpyCalls(mockGetProviderMetadata, 1);
+  assertSpyCalls(mockGetConvenienceProviderMetadata, 1);
+  assertSpyCall(mockGetConvenienceProviderMetadata, 0, {
+    args: [verification.registrationInfo.aaguid],
+  });
+});
+
+Deno.test('should prefer MDS over Convenience MDS for passkey provider metadata', async () => {
+  const mdsMetadata: ProviderMetadata = { friendlyNames: { en: 'MDS Provider' } };
+  const convenienceMetadata: ProviderMetadata = {
+    friendlyNames: { en: 'Convenience MDS Provider' },
+  };
+  using _mockGetProviderMetadata = stub(
+    MetadataService,
+    'getProviderMetadata',
+    resolvesNext([mdsMetadata]),
+  );
+  using mockGetConvenienceProviderMetadata = stub(
+    ConvenienceMetadataService,
+    'getProviderMetadata',
+    resolvesNext([convenienceMetadata]),
+  );
+
+  const verification = await verifyRegistrationResponse({
+    response: attestationNone,
+    expectedChallenge: attestationNoneChallenge,
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+  });
+
+  assert(verification.verified);
+  assertEquals(verification.registrationInfo?.passkeyProviderMetadata, mdsMetadata);
+  // There's no need to consult Convenience MDS when MDS already had an answer
+  assertSpyCalls(mockGetConvenienceProviderMetadata, 0);
 });
 
 Deno.test('should return authenticator extension output', async () => {

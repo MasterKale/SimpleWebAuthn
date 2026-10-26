@@ -22,6 +22,7 @@ import { matchExpectedRPID } from '../helpers/matchExpectedRPID.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
 import { MetadataService } from '../services/metadataService.ts';
+import { ConvenienceMetadataService } from '../services/convenienceMetadataService.ts';
 import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 
 import { getDefaultSupportedAlgorithmIDs } from './generateRegistrationOptions.ts';
@@ -297,7 +298,9 @@ export async function verifyRegistrationResponse(
 
   const { credentialDeviceType, credentialBackedUp } = parseBackupFlags(flags);
   const formattedAAGUID = convertAAGUIDToString(aaguid);
-  const providerMetadata = await MetadataService.getProviderMetadata(formattedAAGUID);
+  // Try to pull provider metadata from either MDS service,
+  const providerMetadata = await MetadataService.getProviderMetadata(formattedAAGUID) ??
+    await ConvenienceMetadataService.getProviderMetadata(formattedAAGUID);
 
   return {
     verified: true,
