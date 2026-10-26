@@ -9,6 +9,7 @@ import {
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
 import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
+import { SERVICE_STATE, ServiceStateTracker } from './helpers/serviceStateTracker.ts';
 
 // Cached MDS APIs from which BLOBs are downloaded
 type CachedMDS = {
@@ -42,12 +43,6 @@ type CachedProviderMetadata = {
 
 const defaultURLMDS = 'https://mds.fidoalliance.org/'; // v3
 const defaultURLConvenienceMDS = 'https://c-mds.fidoalliance.org/';
-
-enum SERVICE_STATE {
-  DISABLED,
-  REFRESHING,
-  READY,
-}
 
 /**
  * Allow MetadataService to accommodate unregistered AAGUIDs (`"permissive"`), or only allow
@@ -113,7 +108,7 @@ export class BaseMetadataService implements MetadataService {
   /**
    * Default service state and configuration
    */
-  private state: SERVICE_STATE = SERVICE_STATE.DISABLED;
+  private state = new ServiceStateTracker('MetadataService', DefaultNoopLogger);
   private verificationMode: VerificationMode = 'strict';
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
   /** How many hours to wait to refresh Convenience MDS data */
@@ -146,8 +141,9 @@ export class BaseMetadataService implements MetadataService {
     } = opts;
 
     this.logger = buildLoggerAllMethods(logger);
+    this.state = new ServiceStateTracker('MetadataService', this.logger);
 
-    this.setState(SERVICE_STATE.REFRESHING);
+    this.state.set(SERVICE_STATE.REFRESHING);
 
     /**
      * If metadata statements are provided, load them into the cache first. These statements will
@@ -256,11 +252,11 @@ export class BaseMetadataService implements MetadataService {
       this.verificationMode = verificationMode;
     }
 
-    this.setState(SERVICE_STATE.READY);
+    this.state.set(SERVICE_STATE.READY);
   }
 
   async getStatement(aaguid: string | Uint8Array_): Promise<MetadataStatement | undefined> {
-    if (this.state === SERVICE_STATE.DISABLED) {
+    if (this.state.current === SERVICE_STATE.DISABLED) {
       return;
     }
 
@@ -273,7 +269,7 @@ export class BaseMetadataService implements MetadataService {
     }
 
     // If a cache refresh is in progress then pause this until the service is ready
-    await this.pauseUntilReady();
+    await this.state.pauseUntilReady();
 
     // Try to grab a cached statement
     let cachedStatement = this.statementCache[aaguid];
@@ -284,13 +280,13 @@ export class BaseMetadataService implements MetadataService {
       const now = new Date();
       if (now > mds.nextUpdate) {
         try {
-          this.setState(SERVICE_STATE.REFRESHING);
+          this.state.set(SERVICE_STATE.REFRESHING);
           const blob = await this.downloadBlob(mds);
           await this.verifyBlob(blob, mds);
           // Refresh the cached statement in case the cache got updated just now
           cachedStatement = this.statementCache[aaguid];
         } finally {
-          this.setState(SERVICE_STATE.READY);
+          this.state.set(SERVICE_STATE.READY);
         }
       }
     }
@@ -324,7 +320,7 @@ export class BaseMetadataService implements MetadataService {
   }
 
   async getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined> {
-    if (this.state === SERVICE_STATE.DISABLED) {
+    if (this.state.current === SERVICE_STATE.DISABLED) {
       return;
     }
 
@@ -337,7 +333,7 @@ export class BaseMetadataService implements MetadataService {
     }
 
     // If a cache refresh is in progress then pause this until the service is ready
-    await this.pauseUntilReady();
+    await this.state.pauseUntilReady();
 
     // Try to grab a cached statement
     let cachedMetadata = this.convenienceMetadataCache[aaguid];
@@ -599,56 +595,6 @@ export class BaseMetadataService implements MetadataService {
     this.logger.debug(`Delaying next refresh of ${url} by ${numHours} hours`);
     const numHoursMS = 1000 * 60 * 60 * numHours;
     this.mdsCache[url].nextUpdate = new Date(Date.now() + numHoursMS);
-  }
-
-  /**
-   * A helper method to pause execution until the service is ready
-   */
-  private pauseUntilReady(): Promise<void> {
-    if (this.state === SERVICE_STATE.READY) {
-      return new Promise((resolve) => {
-        resolve();
-      });
-    }
-
-    // State isn't ready, so set up polling
-    const readyPromise = new Promise<void>((resolve, reject) => {
-      const totalTimeoutMS = 70000;
-      const intervalMS = 100;
-      let iterations = totalTimeoutMS / intervalMS;
-
-      // Check service state every `intervalMS` milliseconds
-      const intervalID = globalThis.setInterval(() => {
-        if (iterations < 1) {
-          clearInterval(intervalID);
-          reject(
-            `State did not become ready in ${totalTimeoutMS / 1000} seconds`,
-          );
-        } else if (this.state === SERVICE_STATE.READY) {
-          clearInterval(intervalID);
-          resolve();
-        }
-
-        iterations -= 1;
-      }, intervalMS);
-    });
-
-    return readyPromise;
-  }
-
-  /**
-   * Report service status on change
-   */
-  private setState(newState: SERVICE_STATE) {
-    this.state = newState;
-
-    if (newState === SERVICE_STATE.DISABLED) {
-      this.logger.debug('MetadataService is DISABLED');
-    } else if (newState === SERVICE_STATE.REFRESHING) {
-      this.logger.debug('MetadataService is REFRESHING');
-    } else if (newState === SERVICE_STATE.READY) {
-      this.logger.debug('MetadataService is READY');
-    }
   }
 }
 
