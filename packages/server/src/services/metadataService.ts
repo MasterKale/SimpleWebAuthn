@@ -8,7 +8,7 @@ import {
 } from '../helpers/logging.ts';
 import { fetch } from '../helpers/fetch.ts';
 import type { Uint8Array_ } from '../types/index.ts';
-import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
+import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 import { SERVICE_STATE, ServiceStateTracker } from './helpers/serviceStateTracker.ts';
 
 // Cached MDS APIs from which BLOBs are downloaded
@@ -180,9 +180,7 @@ export class BaseMetadataService implements MetadataService {
       );
     }
 
-    if (verificationMode) {
-      this.verificationMode = verificationMode;
-    }
+    this.verificationMode = verificationMode ?? 'strict';
 
     this.state.set(SERVICE_STATE.READY);
   }
