@@ -72,6 +72,10 @@ export class BaseMetadataService implements MetadataService {
    */
   private state = new ServiceStateTracker(this.serviceName, DefaultNoopLogger);
   private verificationMode: VerificationMode = 'strict';
+  // How long to wait before checking again when the server has nothing newer than our local copy
+  private readonly mdsDefaultRefreshDelayHours = 24;
+  // How long to wait before trying again after a failed BLOB download
+  private readonly mdsDefaultRetryDelayHours = 3;
   private logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
 
   async initialize(
@@ -131,12 +135,16 @@ export class BaseMetadataService implements MetadataService {
     if (mdsServers?.length) {
       for (const url of mdsServers) {
         try {
-          const blob = await this.downloadBlob(url);
+          const blob = await this.downloadBlob(url, 0);
+
           // A server is only registered for refreshes once a BLOB from it has been verified. One
-          // that fails here is skipped, so it can't cause lookups of other statements to fail
-          const entriesAdded = await this.verifyBlob(blob, url, 0);
-          numServers += 1;
-          this.logger.debug(`Cached ${entriesAdded} metadata entries from "${url}"`);
+          // that fails here, or that doesn't respond with data, is skipped so it can't cause
+          // lookups of other statements to fail
+          if (blob) {
+            const entriesAdded = await this.verifyBlob(blob, url, 0);
+            numServers += 1;
+            this.logger.debug(`Cached ${entriesAdded} metadata entries from "${url}"`);
+          }
         } catch (err) {
           // Notify of the error and move on
           this.logger.error(`Could not download BLOB from "${url}":`, err);
@@ -261,8 +269,10 @@ export class BaseMetadataService implements MetadataService {
     const refresh = (async () => {
       try {
         const mdsNo = this.metadataCache.getMDSServerDataVersion(url);
-        const blob = await this.downloadBlob(url);
-        await this.verifyBlob(blob, url, mdsNo);
+        const blob = await this.downloadBlob(url, mdsNo);
+        if (blob) {
+          await this.verifyBlob(blob, url, mdsNo);
+        }
       } catch (err) {
         this.logger.error(`Could not download BLOB from "${url}":`, err);
         throw err;
@@ -281,14 +291,74 @@ export class BaseMetadataService implements MetadataService {
   }
 
   /**
-   * Download the latest BLOB from MDS
+   * Download the latest BLOB from MDS. `no` is the serial number of the last BLOB cached from this
+   * server. Returns `undefined` if the server didn't respond with a BLOB and the next refresh has
+   * been delayed.
    */
-  private async downloadBlob(url: string) {
-    // Get latest "BLOB" (FIDO's terminology, not mine)
-    const resp = await fetch(url);
-    const data = await resp.text();
+  private async downloadBlob(url: string, no: number): Promise<string | undefined> {
+    // Get latest "BLOB" (FIDO's terminology, not mine), with a query param that can short-circuit
+    // the download if we already have the latest version
+    const _url = new URL(url);
+    _url.searchParams.set('localCopySerial', String(no));
+    const resp = await fetch(_url.toString());
 
-    return data;
+    /**
+     * We have the latest data, nothing more to do.
+     *
+     * See https://fidoalliance.org/specs/mds/fido-metadata-service-v3.1-ps-20250521.html#sctn-mds-blob-proc-rules
+     */
+    if (resp.status === 304) {
+      await resp.body?.cancel();
+      this.logger.info(
+        `The MDS server at "${_url.toString()}" reported nothing new to download (HTTP 304)`,
+      );
+      this.delayNextRefresh(url, this.mdsDefaultRefreshDelayHours);
+      return;
+    }
+
+    /**
+     * The FIDO convenience MDS server aggressively rate-limits so be prepared for that. We'll have to
+     * try again later.
+     */
+    if (resp.status === 429) {
+      await resp.body?.cancel();
+      this.logger.warn(
+        `The MDS server at "${_url.toString()}" rate-limited this request (HTTP 429)`,
+      );
+      // We checked too soon, wait a bit before checking again
+      this.delayNextRefresh(url, this.mdsDefaultRetryDelayHours);
+      return;
+    }
+
+    /**
+     * Rate-limiting (HTTP 429) or any other non-2xx response (likely HTTP 500). We'll have to try
+     * again later.
+     */
+    if (!resp.ok) {
+      await resp.body?.cancel();
+      this.logger.warn(
+        `The MDS server at "${_url.toString()}" reported an unsuccessful request (HTTP ${resp.status})`,
+      );
+      this.delayNextRefresh(url, this.mdsDefaultRetryDelayHours);
+      return;
+    }
+
+    return await resp.text();
+  }
+
+  /**
+   * Delay the next refresh attempt of this server by the specified number of hours
+   */
+  private delayNextRefresh(url: string, numHours: number): void {
+    // Servers that haven't been cached from yet (i.e. still initializing) aren't refreshed so
+    // there's no refresh to delay
+    if (!this.metadataCache.mdsServerIsRegistered(url)) {
+      return;
+    }
+
+    this.logger.debug(`Delaying next refresh of "${url}" by ${numHours} hours`);
+    const numHoursMS = 1000 * 60 * 60 * numHours;
+    this.metadataCache.setMDSServerNextUpdate(url, new Date(Date.now() + numHoursMS));
   }
 
   /**

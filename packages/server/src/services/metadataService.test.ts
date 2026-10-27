@@ -33,7 +33,7 @@ describe('Method: initialize()', () => {
     await MetadataService.initialize();
 
     assertSpyCalls(mockFetch, 1);
-    assertSpyCallArg(mockFetch, 0, 0, 'https://mds.fidoalliance.org/');
+    assertSpyCallArg(mockFetch, 0, 0, 'https://mds.fidoalliance.org/?localCopySerial=0');
   });
 
   it('should query provided MDS server URLs', async () => {
@@ -42,8 +42,8 @@ describe('Method: initialize()', () => {
     await MetadataService.initialize({ mdsServers });
 
     assertSpyCalls(mockFetch, mdsServers.length);
-    assertSpyCallArg(mockFetch, 0, 0, mdsServers[0]);
-    assertSpyCallArg(mockFetch, 1, 0, mdsServers[1]);
+    assertSpyCallArg(mockFetch, 0, 0, `${mdsServers[0]}/?localCopySerial=0`);
+    assertSpyCallArg(mockFetch, 1, 0, `${mdsServers[1]}/?localCopySerial=0`);
   });
 
   it('should not query any servers on empty list of URLs', async () => {
@@ -266,7 +266,7 @@ describe('Behavior: BLOB refresh', () => {
 
     // The stale BLOB should have been re-downloaded...
     assertSpyCalls(mockFetch, 2);
-    assertSpyCallArg(mockFetch, 1, 0, mdsServerURL);
+    assertSpyCallArg(mockFetch, 1, 0, `${mdsServerURL}?localCopySerial=1`);
     // ...and the statement from the newer BLOB returned
     assertEquals(statement, freshStatement);
     assertNotEquals(statement, staleStatement);
