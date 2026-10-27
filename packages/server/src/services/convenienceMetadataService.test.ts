@@ -532,6 +532,7 @@ describe('Behavior: logging', () => {
      * provided logger to communicate internal goings on.
      */
     assertSpyCallArg(debugSpy, 0, 0, 'ConvenienceMetadataService is REFRESHING');
-    assertSpyCallArg(debugSpy, 1, 0, 'ConvenienceMetadataService is READY');
+    assertSpyCallArg(debugSpy, 1, 0, 'Cached 1 metadata entries from "https://cmds.example.com/"');
+    assertSpyCallArg(debugSpy, 2, 0, 'ConvenienceMetadataService is READY');
   });
 });
