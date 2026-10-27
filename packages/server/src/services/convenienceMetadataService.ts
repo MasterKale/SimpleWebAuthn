@@ -95,7 +95,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
         entriesAdded += this.cacheConvenienceMDS(NonRefreshingURL, payload);
       });
 
-      this.logger.info(`Cached ${entriesAdded} local metadata entries`);
+      this.logger.debug(`Cached ${entriesAdded} total local metadata entries`);
     }
 
     /**
@@ -103,8 +103,6 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
      * of metadata from them.
      */
     if (mdsServers?.length) {
-      // Get a current count so we know how many new entries we've added from C-MDS servers
-      const currentCacheCount = this.metadataCache.count;
       // Track how many servers we were able to update
       let numServers = 0;
 
@@ -114,10 +112,13 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
 
           // A server is only registered for refreshes once data from it has been cached. One that
           // can't be reached, or that doesn't respond with data, is skipped so it isn't tracked
+          let entriesAdded = 0;
           if (payload) {
-            this.cacheConvenienceMDS(url, payload);
+            entriesAdded = this.cacheConvenienceMDS(url, payload);
             numServers += 1;
           }
+
+          this.logger.debug(`Cached ${entriesAdded} metadata entries from "${url}"`);
         } catch (err) {
           // Notify of the error and move on
           this.logger.error(`Could not download convenience metadata from "${url}":`, err);
