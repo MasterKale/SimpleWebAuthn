@@ -169,9 +169,14 @@ export type MetadataStatement = {
   tcDisplayPNGCharacteristics?: DisplayPNGCharacteristicsDescriptor[];
   attestationRootCertificates: string[];
   ecdaaTrustAnchors?: EcdaaTrustAnchor[];
-  icon?: string;
   supportedExtensions?: ExtensionDescriptor[];
   authenticatorGetInfo?: AuthenticatorGetInfo;
+  // Same values as in Convenience Metadata
+  friendlyNames?: FriendlyNames;
+  icon?: DataURLPNGOrSVGString;
+  iconDark?: DataURLSVGString;
+  providerLogoLight?: DataURLSVGString;
+  providerLogoDark?: DataURLSVGString;
 };
 
 /**
@@ -314,3 +319,53 @@ export type AuthenticatorGetInfo = {
   pinProtocols?: number[];
   algorithms?: { type: 'public-key'; alg: number }[];
 };
+
+/**
+ * Localized names, typically a company's trade name for a given region. Language codes are...
+ *
+ * > IETF language codes ([[RFC5646]](https://www.rfc-editor.org/info/rfc5646/)), defined by a
+ * > primary language subtag, followed by a region subtag based on a two-letter country code from
+ * > [ISO3166] alpha-2 (usually written in upper case), e.g: Austrian-German - "de-AT". In case of
+ * > absence of the specific territorial language definition, vendor should fallback to the more
+ * > general language option, e.g: If "de" is given, but "de-AT" is missing, the use "de" entry
+ * > instead. Description values can contain any UTF-8 characters.
+ * >
+ * > A name in English language ("en-US") is mandatory, localized names for other languages are
+ * > optional.
+ *
+ * Example:
+ * ```json
+ * {
+ *   "en-US": "SimpleWebAuthn",
+ *   "ja-JP": "シンプルウェブオースン"
+ * }
+ * ```
+ *
+ * See https://fidoalliance.org/specs/mds/fido-convenience-metadata-service-v1.0-ps-20250521.html#sctn-types-fn
+ */
+export type FriendlyNames = {
+  [ietfLanguageCode: string]: string;
+};
+
+/**
+ * A `data:` URL-encoded string containing base64-encoded PNG or SVG data.
+ *
+ * Example:
+ * ```json
+ * "data:image/svg+xml;base64,..."
+ * ```
+ * ```json
+ * "data:image/png;base64,..."
+ * ```
+ */
+export type DataURLPNGOrSVGString = string;
+
+/**
+ * A `data:` URL-encoded string containing base64-encoded SVG data.
+ *
+ * Example:
+ * ```json
+ * "data:image/svg+xml;base64,..."
+ * ```
+ */
+export type DataURLSVGString = string;

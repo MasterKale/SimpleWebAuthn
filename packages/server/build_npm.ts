@@ -39,7 +39,7 @@ await build({
       access: 'public',
     },
     engines: {
-      node: '>=20.0.0',
+      node: '>=22.0.0',
     },
     bugs: {
       url: 'https://github.com/MasterKale/SimpleWebAuthn/issues',
