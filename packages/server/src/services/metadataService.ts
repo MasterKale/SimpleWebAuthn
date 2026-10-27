@@ -207,20 +207,14 @@ export class BaseMetadataService implements MetadataService {
   }
 
   async getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined> {
-    if (this.state.current === SERVICE_STATE.DISABLED) {
-      return;
-    }
-
+    /**
+     * This is a load-bearing check: without it the `this.verificationMode === 'strict'` check in
+     * `getStatement()` will raise an error on this method when there's no need to do so because
+     * this method's returning `undefined` does not impact the security posture of the RP.
+     */
     if (!aaguid) {
       return;
     }
-
-    if (aaguid instanceof Uint8Array) {
-      aaguid = convertAAGUIDToString(aaguid);
-    }
-
-    // If a cache refresh is in progress then pause this until the service is ready
-    await this.state.pauseUntilReady();
 
     // Try to grab a cached statement
     const metadataStatement = await this.getStatement(aaguid);
