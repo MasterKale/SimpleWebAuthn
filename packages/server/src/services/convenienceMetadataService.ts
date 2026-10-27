@@ -25,20 +25,6 @@ interface ConvenienceMetadataService {
   }): Promise<void>;
   /**
    * Get localized names and icons for the credential provider associated with the given AAGUID.
-   * Localized names
-   *
-   * Example:
-   * ```ts
-   * await ConvenenienceMetadataService.getProviderMetadata('531126d6-e717-415c-9320-3d9aa6981239');
-   * ```
-   * Returns:
-   * ```json
-   * {
-   *   "friendlyNames": { "en-US": "Dashlane" },
-   *   "providerLogoLight": "data:image/svg+xml;base64,...",
-   *   "providerLogoDark": "data:image/svg+xml;base64,..."
-   * }
-   * ```
    */
   getProviderMetadata(aaguid: string | Uint8Array_): Promise<ProviderMetadata | undefined>;
 }
