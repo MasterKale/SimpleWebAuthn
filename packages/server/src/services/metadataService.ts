@@ -140,7 +140,7 @@ export class BaseMetadataService implements MetadataService {
           numServers += 1;
         } catch (err) {
           // Notify of the error and move on
-          this.logger.error(`Could not download BLOB from ${url}:`, err);
+          this.logger.error(`Could not download BLOB from "${url}":`, err);
         }
       }
 
@@ -264,7 +264,7 @@ export class BaseMetadataService implements MetadataService {
         const blob = await this.downloadBlob(url);
         await this.verifyBlob(blob, url, mdsNo);
       } catch (err) {
-        this.logger.error(`Could not download BLOB from ${url}:`, err);
+        this.logger.error(`Could not download BLOB from "${url}":`, err);
         throw err;
       } finally {
         delete this.serverRefreshes[url];

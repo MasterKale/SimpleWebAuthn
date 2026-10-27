@@ -156,7 +156,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     if (resp.status === 304) {
       await resp.body?.cancel();
       this.logger.info(
-        `The Convenience MDS API at ${_url.toString()} reported nothing new to download (HTTP 304)`,
+        `The Convenience MDS API at "${_url.toString()}" reported nothing new to download (HTTP 304)`,
       );
       // There's nothing new to download, wait another interval before checking again
       this.delayNextRefresh(url, this.cmdsDefaultRefreshDelayHours);
@@ -170,7 +170,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     if (resp.status === 429) {
       await resp.body?.cancel();
       this.logger.warn(
-        `The Convenience MDS API at ${_url.toString()} rate-limited this request (HTTP 429)`,
+        `The Convenience MDS API at "${_url.toString()}" rate-limited this request (HTTP 429)`,
       );
       // We checked too soon, wait a bit before checking again
       this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
@@ -180,7 +180,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     if (!resp.ok) {
       await resp.body?.cancel();
       this.logger.warn(
-        `The Convenience MDS API at ${_url.toString()} reported an unsuccessful request (HTTP ${resp.status})`,
+        `The Convenience MDS API at "${_url.toString()}" reported an unsuccessful request (HTTP ${resp.status})`,
       );
       // Likely an HTTP 500 error, but anything not within HTTP 200-299. Wait a bit before trying
       // again
@@ -310,7 +310,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
       return;
     }
 
-    this.logger.debug(`Delaying next refresh of ${url} by ${numHours} hours`);
+    this.logger.debug(`Delaying next refresh of "${url}" by ${numHours} hours`);
     const numHoursMS = 1000 * 60 * 60 * numHours;
     this.metadataCache.setMDSServerNextUpdate(url, new Date(Date.now() + numHoursMS));
   }
