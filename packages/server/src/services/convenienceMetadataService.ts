@@ -156,7 +156,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     if (resp.status === 304) {
       await resp.body?.cancel();
       this.logger.info(
-        `The Convenience MDS API at "${_url.toString()}" reported nothing new to download (HTTP 304)`,
+        `The MDS server at "${_url.toString()}" reported nothing new to download (HTTP 304)`,
       );
       // There's nothing new to download, wait another interval before checking again
       this.delayNextRefresh(url, this.cmdsDefaultRefreshDelayHours);
@@ -164,13 +164,13 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     }
 
     /**
-     * The FIDO convenience MDS API aggressively rate-limits so be prepared for that. We'll have to
+     * The FIDO convenience MDS server aggressively rate-limits so be prepared for that. We'll have to
      * try again later.
      */
     if (resp.status === 429) {
       await resp.body?.cancel();
       this.logger.warn(
-        `The Convenience MDS API at "${_url.toString()}" rate-limited this request (HTTP 429)`,
+        `The MDS server at "${_url.toString()}" rate-limited this request (HTTP 429)`,
       );
       // We checked too soon, wait a bit before checking again
       this.delayNextRefresh(url, this.cmdsDefaultRetryDelayHours);
@@ -180,7 +180,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
     if (!resp.ok) {
       await resp.body?.cancel();
       this.logger.warn(
-        `The Convenience MDS API at "${_url.toString()}" reported an unsuccessful request (HTTP ${resp.status})`,
+        `The MDS server at "${_url.toString()}" reported an unsuccessful request (HTTP ${resp.status})`,
       );
       // Likely an HTTP 500 error, but anything not within HTTP 200-299. Wait a bit before trying
       // again
