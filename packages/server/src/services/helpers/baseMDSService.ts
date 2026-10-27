@@ -27,7 +27,6 @@ export abstract class BaseMDSService<MDSDataType> {
 
   /**
    * @param serviceName Used in logs, e.g. `"MetadataService"`
-   * @param payloadLabel How download errors refer to what was downloaded, e.g. `"BLOB"`
    */
   constructor(
     protected readonly serviceName: string,
