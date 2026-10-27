@@ -5,8 +5,8 @@
  *
  * - "ConvenienceMetadataService cached 322 unique metadata entries from 1 local payload(s) and 1 convenience metadata server(s)"
  * - "ConvenienceMetadataService cached 322 unique metadata entries from 1 local payload(s)"
- * - "ConvenienceMetadataService cached 322 unique metadata entries from 1 convenience metadata server(s)"
- * - "ConvenienceMetadataService cached 0 unique metadata entries"
+ * - "MetadataService cached 285 unique metadata entries from 1 convenience metadata server(s)"
+ * - "MetadataService cached 0 unique metadata entries"
  */
 export function getInitCacheMessage(
   serviceName: string,
@@ -14,7 +14,7 @@ export function getInitCacheMessage(
   numLocalFiles?: number,
   numServers?: number,
 ): string {
-  let message = `${serviceName} cached ${cacheCount} unique metadata entries`;
+  let message = `${serviceName} cached ${cacheCount} unique entries`;
 
   if (cacheCount) {
     const formatter = new Intl.ListFormat('en', {
@@ -26,7 +26,7 @@ export function getInitCacheMessage(
       sources.push(`${numLocalFiles} local file(s)`);
     }
     if (numServers) {
-      sources.push(`${numServers} convenience metadata server(s)`);
+      sources.push(`${numServers} metadata server(s)`);
     }
 
     message = `${message} from ${formatter.format(sources)}`;
