@@ -9,6 +9,8 @@ import {
   stub,
 } from '@std/testing/mock';
 
+import { FakeTime } from '@std/testing/time';
+
 import { _fetchInternals } from '../helpers/fetch.ts';
 import { isoBase64URL } from '../helpers/iso/index.ts';
 import { generateLeafCert, generateRootCert } from '../helpers/tests/x509Utils.ts';
@@ -336,29 +338,124 @@ describe('Behavior: BLOB refresh', () => {
       await MetadataService.initialize({ mdsServers: [mdsServerURL] });
     }
 
-    it('should fail closed when the refresh cannot reach the server', async () => {
-      await initializeWithStaleBLOB(() => Promise.reject(new Error('Network down')));
+    describe('when the refresh does not produce new data', () => {
+      /**
+       * The server's response is reported and the next refresh is delayed, but the cached
+       * statements stay in use in the meantime
+       */
+      const unsuccessfulResponses: [string, () => Promise<Response>][] = [
+        ['responds with HTTP 304', () => Promise.resolve(new Response(null, { status: 304 }))],
+        ['responds with HTTP 429', () => Promise.resolve(new Response(null, { status: 429 }))],
+        ['responds with HTTP 500', () => Promise.resolve(new Response(null, { status: 500 }))],
+      ];
 
-      // The previously-cached statement is not used in place of a BLOB that couldn't be refreshed
-      await assertRejects(
-        () => MetadataService.getStatement(refreshableAAGUID),
-        Error,
-        'Network down',
-      );
-      assertSpyCalls(mockFetch, 2);
+      for (const [description, followUp] of unsuccessfulResponses) {
+        it(`should keep cached statements when the server ${description}`, async () => {
+          await initializeWithStaleBLOB(followUp);
+
+          const statement = await MetadataService.getStatement(refreshableAAGUID);
+
+          assertSpyCalls(mockFetch, 2);
+          assertEquals(statement, statementV1);
+
+          // A subsequent call shouldn't hang waiting for a ready state
+          assertEquals(await MetadataService.getStatement(refreshableAAGUID), statementV1);
+        });
+      }
+
+      it('should report HTTP failures during initialization as warnings, not errors', async () => {
+        const warnSpy = spy();
+        const errorSpy = spy();
+        mockFetch = stub(
+          _fetchInternals,
+          'stubThis',
+          returnsNext([Promise.resolve(new Response(null, { status: 500 }))]),
+        );
+
+        await MetadataService.initialize({
+          mdsServers: [mdsServerURL],
+          logger: { warn: warnSpy, error: errorSpy },
+        });
+
+        assertSpyCalls(warnSpy, 1);
+        assertSpyCalls(errorSpy, 0);
+      });
     });
 
-    it('should fail closed when the refreshed BLOB has an old serial', async () => {
-      await initializeWithStaleBLOB(
-        () => generateBLOBResponse({ no: 1, nextUpdate: '2999-01-01', statement: statementV2 }),
-      );
+    describe('refresh delays', () => {
+      const hourMS = 1000 * 60 * 60;
 
-      await assertRejects(
-        () => MetadataService.getStatement(refreshableAAGUID),
-        Error,
-        'is not greater than previous no.',
-      );
-      assertSpyCalls(mockFetch, 2);
+      /**
+       * Make a stale refresh attempt that gets `followUp`, then confirm no further requests happen
+       * until `delayHours` has passed, and that one more happens right after.
+       */
+      async function assertDelay(followUp: () => Promise<Response>, delayHours: number) {
+        using time = new FakeTime(new Date());
+        await initializeWithStaleBLOB(
+          followUp,
+          // The attempt made once the delay has elapsed
+          () => Promise.resolve(new Response(null, { status: 304 })),
+        );
+
+        await MetadataService.getStatement(refreshableAAGUID);
+        // `mockFetch` was called a second time to try and refresh data
+        assertSpyCalls(mockFetch, 2);
+
+        // Still within the delay, so no new request
+        time.tick((delayHours * hourMS) - 1000);
+        assertEquals(await MetadataService.getStatement(refreshableAAGUID), statementV1);
+        assertSpyCalls(mockFetch, 2);
+
+        // Delay elapsed, so another attempt is made
+        time.tick(2000);
+        assertEquals(await MetadataService.getStatement(refreshableAAGUID), statementV1);
+        assertSpyCalls(mockFetch, 3);
+      }
+
+      it('should wait 24 hours after an HTTP 304', async () => {
+        await assertDelay(() => Promise.resolve(new Response(null, { status: 304 })), 24);
+      });
+
+      it('should wait 3 hours after an HTTP 429', async () => {
+        await assertDelay(() => Promise.resolve(new Response(null, { status: 429 })), 3);
+      });
+
+      it('should wait 3 hours after an HTTP 500', async () => {
+        await assertDelay(() => Promise.resolve(new Response(null, { status: 500 })), 3);
+      });
+    });
+
+    describe('when the refresh throws', () => {
+      /**
+       * Anything that isn't a plain unsuccessful HTTP response fails closed: the cached statement
+       * is not used in place of a BLOB that couldn't be refreshed
+       */
+      const throwingResponses: [string, () => Promise<Response>, string][] = [
+        ['cannot be reached', () => Promise.reject(new Error('Network down')), 'Network down'],
+        [
+          'responds with an invalid BLOB',
+          () => Promise.resolve(new Response('not a blob', { status: 200 })),
+          '',
+        ],
+        [
+          'responds with a BLOB with an old serial',
+          () => generateBLOBResponse({ no: 1, nextUpdate: '2999-01-01', statement: statementV2 }),
+          'is not greater than previous no.',
+        ],
+      ];
+
+      for (const [description, followUp, message] of throwingResponses) {
+        it(`should fail closed when the server ${description}`, async () => {
+          await initializeWithStaleBLOB(followUp);
+
+          await assertRejects(
+            () => MetadataService.getStatement(refreshableAAGUID),
+            Error,
+            message,
+          );
+          assertSpyCalls(mockFetch, 2);
+        });
+      }
     });
 
     it('should try the refresh again on the next lookup after a failure', async () => {
@@ -468,6 +565,36 @@ describe('Behavior: BLOB refresh', () => {
       assertSpyCalls(mockFetch, 2);
       assertEquals(results[0], statementV2);
       assertEquals(results[1], statementV2);
+    });
+
+    describe('when a server responds unsuccessfully to its initial download', () => {
+      const unsuccessfulResponses: [string, () => Promise<Response>][] = [
+        ['HTTP 304', () => Promise.resolve(new Response(null, { status: 304 }))],
+        ['HTTP 429', () => Promise.resolve(new Response(null, { status: 429 }))],
+        ['HTTP 500', () => Promise.resolve(new Response(null, { status: 500 }))],
+      ];
+
+      for (const [description, response] of unsuccessfulResponses) {
+        it(`should not track the server when it responds with ${description}`, async () => {
+          using time = new FakeTime(new Date());
+          mockFetch = stub(_fetchInternals, 'stubThis', returnsNext([response()]));
+
+          await MetadataService.initialize({
+            mdsServers: [mdsServerURL],
+            statements: [localStatement],
+            verificationMode: 'permissive',
+          });
+          assertSpyCalls(mockFetch, 1);
+
+          // No BLOB was cached from the server, so it isn't refreshed no matter how long it's been
+          time.tick(1000 * 60 * 60 * 24 * 8);
+          assertEquals(await MetadataService.getStatement(refreshableAAGUID), undefined);
+          assertSpyCalls(mockFetch, 1);
+
+          // Local statements are unaffected
+          assertEquals(await MetadataService.getStatement(localStatementAAGUID), localStatement);
+        });
+      }
     });
 
     it('should still serve local statements when a server fails its initial download', async () => {
@@ -602,7 +729,8 @@ let blobSigner: BLOBSigner | undefined;
 async function getBLOBSigner(): Promise<BLOBSigner> {
   if (!blobSigner) {
     const notBefore = new Date(Date.now() - 60_000);
-    const notAfter = new Date(Date.now() + 3_600_000);
+    // Valid long enough for tests that fake the passage of a day or more
+    const notAfter = new Date(Date.now() + 172_800_000);
 
     const root = await generateRootCert({
       notBefore,
