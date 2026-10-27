@@ -61,7 +61,7 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
   /** How many hours to wait to refresh Convenience MDS data */
   private readonly cmdsDefaultRefreshDelayHours = 24;
   /** How many hours to wait to retry a _failed_ attempt to refresh Convenience MDS data */
-  private readonly cmdsDefaultRetryDelayHours = 4;
+  private readonly cmdsDefaultRetryDelayHours = 3;
 
   async initialize(
     opts: {

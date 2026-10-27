@@ -459,16 +459,16 @@ describe('Behavior: refreshing stale metadata', () => {
       await assertDelay(Promise.resolve(new Response(null, { status: 304 })), 24);
     });
 
-    it('should wait 4 hours after an HTTP 429', async () => {
-      await assertDelay(Promise.resolve(new Response(null, { status: 429 })), 4);
+    it('should wait 3 hours after an HTTP 429', async () => {
+      await assertDelay(Promise.resolve(new Response(null, { status: 429 })), 3);
     });
 
-    it('should wait 4 hours after an HTTP 500', async () => {
-      await assertDelay(Promise.resolve(new Response(null, { status: 500 })), 4);
+    it('should wait 3 hours after an HTTP 500', async () => {
+      await assertDelay(Promise.resolve(new Response(null, { status: 500 })), 3);
     });
 
-    it('should wait 4 hours after a fetch error', async () => {
-      await assertDelay(Promise.reject(new Error('Network down')), 4);
+    it('should wait 3 hours after a fetch error', async () => {
+      await assertDelay(Promise.reject(new Error('Network down')), 3);
     });
 
     it('should wait 24 hours after a successful refresh', async () => {
