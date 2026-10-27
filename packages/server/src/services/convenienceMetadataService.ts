@@ -8,6 +8,7 @@ import type { ConvenienceMDSPayload, ProviderMetadata } from '../metadata/conven
 import type { Uint8Array_ } from '../types/index.ts';
 import { MDSCache, NonRefreshingURL } from './helpers/mdsCache.ts';
 import { SERVICE_STATE, ServiceStateTracker } from './helpers/serviceStateTracker.ts';
+import { getInitCacheMessage } from './helpers/getInitCacheMessage.ts';
 
 const defaultURLConvenienceMDS = 'https://c-mds.fidoalliance.org/';
 
@@ -102,36 +103,34 @@ export class BaseConvenienceMetadataService implements ConvenienceMetadataServic
      * If Convenience MDS server URLs are provided, then download and cache the current collection
      * of metadata from them.
      */
+    // Track how many servers we were able to cache entries from
+    let numServers = 0;
     if (mdsServers?.length) {
-      // Track how many servers we were able to update
-      let numServers = 0;
-
       for (const url of mdsServers) {
         try {
           const payload = await this.downloadConvenienceMDS(url, 0);
 
           // A server is only registered for refreshes once data from it has been cached. One that
           // can't be reached, or that doesn't respond with data, is skipped so it isn't tracked
-          let entriesAdded = 0;
           if (payload) {
-            entriesAdded = this.cacheConvenienceMDS(url, payload);
+            const entriesAdded = this.cacheConvenienceMDS(url, payload);
             numServers += 1;
+            this.logger.debug(`Cached ${entriesAdded} metadata entries from "${url}"`);
           }
-
-          this.logger.debug(`Cached ${entriesAdded} metadata entries from "${url}"`);
         } catch (err) {
           // Notify of the error and move on
           this.logger.error(`Could not download convenience metadata from "${url}":`, err);
         }
       }
-
-      // Calculate the total number of new metadata entries we successfully added
-      const newCacheCount = this.metadataCache.count;
-      const cacheDiff = newCacheCount - currentCacheCount;
-      this.logger.info(
-        `Cached ${cacheDiff} metadata entries from ${numServers} convenience metadata server(s)`,
-      );
     }
+
+    const cacheMessage = getInitCacheMessage(
+      this.serviceName,
+      this.metadataCache.count,
+      payloads?.length,
+      numServers,
+    );
+    this.logger.info(cacheMessage);
 
     this.state.set(SERVICE_STATE.READY);
   }

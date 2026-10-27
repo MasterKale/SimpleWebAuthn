@@ -11,6 +11,7 @@ import type { Uint8Array_ } from '../types/index.ts';
 import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 import { SERVICE_STATE, ServiceStateTracker } from './helpers/serviceStateTracker.ts';
 import { MDSCache, NonRefreshingURL } from './helpers/mdsCache.ts';
+import { getInitCacheMessage } from './helpers/getInitCacheMessage.ts';
 
 const defaultURLMDS = 'https://mds.fidoalliance.org/'; // v3
 
@@ -117,7 +118,7 @@ export class BaseMetadataService implements MetadataService {
         );
       });
 
-      this.logger.info(`Cached ${statementsAdded} local statements`);
+      this.logger.info(`Cached ${statementsAdded} total local metadata statements`);
     }
 
     /**
@@ -125,34 +126,33 @@ export class BaseMetadataService implements MetadataService {
      * entries to the cache. Blobs loaded in this way will be refreshed when a stale entry within is
      * detected.
      */
+    // Track how many servers we were able to cache entries from
+    let numServers = 0;
     if (mdsServers?.length) {
-      // Get a current count so we know how many new statements we've added from MDS servers
-      const currentCacheCount = this.metadataCache.count;
-      // Track how many servers we were able to update
-      let numServers = 0;
-
       for (const url of mdsServers) {
         try {
           const blob = await this.downloadBlob(url);
           // A server is only registered for refreshes once a BLOB from it has been verified. One
           // that fails here is skipped, so it can't cause lookups of other statements to fail
-          await this.verifyBlob(blob, url, 0);
+          const entriesAdded = await this.verifyBlob(blob, url, 0);
           numServers += 1;
+          this.logger.debug(`Cached ${entriesAdded} metadata entries from "${url}"`);
         } catch (err) {
           // Notify of the error and move on
           this.logger.error(`Could not download BLOB from "${url}":`, err);
         }
       }
-
-      // Calculate the difference to get the total number of new statements we successfully added
-      const newCacheCount = this.metadataCache.count;
-      const cacheDiff = newCacheCount - currentCacheCount;
-      this.logger.info(
-        `Cached ${cacheDiff} statements from ${numServers} metadata server(s)`,
-      );
     }
 
     this.verificationMode = verificationMode ?? 'strict';
+
+    const cacheMessage = getInitCacheMessage(
+      this.serviceName,
+      this.metadataCache.count,
+      statements?.length,
+      numServers,
+    );
+    this.logger.info(cacheMessage);
 
     this.state.set(SERVICE_STATE.READY);
   }
@@ -294,8 +294,10 @@ export class BaseMetadataService implements MetadataService {
   /**
    * Verify and process the MDS metadata blob. Caches metadata and sets up refreshing when blobs
    * grow stale. `no` is the serial number of the last BLOB cached from this server.
+   *
+   * Returns the number of FIDO2 metadata statements that were cached.
    */
-  private async verifyBlob(blob: string, url: string, no: number): Promise<void> {
+  private async verifyBlob(blob: string, url: string, no: number): Promise<number> {
     const { payload, parsedNextUpdate } = await verifyMDSBlob(blob);
 
     if (payload.no <= no) {
@@ -311,8 +313,9 @@ export class BaseMetadataService implements MetadataService {
     this.metadataCache.clearMetadataByURL(url);
 
     // Cache statements for FIDO2 devices
+    let totalEntries = 0;
     for (const entry of payload.entries) {
-      this.cacheMetadataBlobEntry(url, entry);
+      totalEntries += this.cacheMetadataBlobEntry(url, entry);
     }
 
     if (url !== NonRefreshingURL) {
@@ -338,6 +341,8 @@ export class BaseMetadataService implements MetadataService {
         );
       }
     }
+
+    return totalEntries;
   }
 
   /**
