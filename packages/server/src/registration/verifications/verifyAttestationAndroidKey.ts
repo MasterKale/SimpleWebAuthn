@@ -117,7 +117,7 @@ export async function verifyAttestationAndroidKey(
 
   if (softwareEnforced.allApplications !== undefined) {
     throw new Error(
-      'teeEnforced contained "allApplications [600]" tag (Android Key)',
+      'softwareEnforced contained "allApplications [600]" tag (Android Key)',
     );
   }
 
