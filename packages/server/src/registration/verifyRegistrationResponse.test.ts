@@ -18,7 +18,7 @@ import { _verifySignatureInternals } from '../helpers/verifySignature.ts';
 import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { COSEALG, COSEKEYS } from '../helpers/cose.ts';
-import { denoSupportsPQC } from '../helpers/tests/index.ts';
+import { denoSupportsPQC, FIDO_Conformance_Fake_Root } from '../helpers/tests/index.ts';
 import { SettingsService } from '../services/settingsService.ts';
 import { MetadataService } from '../services/metadataService.ts';
 import { ConvenienceMetadataService } from '../services/convenienceMetadataService.ts';
@@ -26,12 +26,12 @@ import type { ProviderMetadata } from '../metadata/convenienceMDSTypes.ts';
 import { SimpleWebAuthnError } from '../errors/index.ts';
 
 /**
- * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
+ * Trust the fake root for android-key since responses were captured from FIDO Conformance testing
  * and have cert paths that can't be validated with known root certs from Google
  */
 SettingsService.setRootCertificates({
   identifier: 'android-key',
-  certificates: [],
+  certificates: [FIDO_Conformance_Fake_Root],
 });
 
 Deno.test('should verify FIDO U2F attestation', async () => {

@@ -1,20 +1,18 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
+import { assertSpyCallArgs, assertSpyCalls, stub } from '@std/testing/mock';
 import { lessThan, parse } from '@std/semver';
 
+import { FIDO_Conformance_Fake_Root } from '../../helpers/tests/index.ts';
+import { _fetchInternals } from '../../helpers/fetch.ts';
 import { SettingsService } from '../../services/settingsService.ts';
 import { verifyRegistrationResponse } from '../verifyRegistrationResponse.ts';
 import { Google_Hardware_Attestation_Root_2 } from '../../services/defaultRootCerts/android-key.ts';
 
-/**
- * Clear out root certs for android-key since responses were captured from FIDO Conformance testing
- * and have cert paths that can't be validated with known root certs from Google
- */
-
 Deno.test('should verify Android Keystore response from FIDO Conformance in 2020', async () => {
   SettingsService.setRootCertificates({
     identifier: 'android-key',
-    certificates: [],
+    certificates: [FIDO_Conformance_Fake_Root],
   });
 
   /**
@@ -29,31 +27,11 @@ Deno.test('should verify Android Keystore response from FIDO Conformance in 2020
    *   notAfter: 2046-09-10T05:49:32.000Z
    * }
    */
-  const mockDate = new FakeTime(new Date('2025-01-26T19:00:00.000Z'));
+  using _mockDate = new FakeTime(new Date('2025-01-26T19:00:00.000Z'));
 
-  const verification = await verifyRegistrationResponse({
-    response: {
-      id: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
-      rawId: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
-      response: {
-        attestationObject:
-          'o2NmbXRrYW5kcm9pZC1rZXlnYXR0U3RtdKNjYWxnJmNzaWdYRzBFAiAbZhfcF0KSXj5rdEevvnBcC8ZfRQlNl9XYWRTiIGKSHwIhAIerc7jWjOF_lJ71n_GAcaHwDUtPxkjAAdYugnZ4QxkmY3g1Y4JZAxowggMWMIICvaADAgECAgEBMAoGCCqGSM49BAMCMIHkMUUwQwYDVQQDDDxGQUtFIEFuZHJvaWQgS2V5c3RvcmUgU29mdHdhcmUgQXR0ZXN0YXRpb24gSW50ZXJtZWRpYXRlIEZBS0UxMTAvBgkqhkiG9w0BCQEWImNvbmZvcm1hbmNlLXRvb2xzQGZpZG9hbGxpYW5jZS5vcmcxFjAUBgNVBAoMDUZJRE8gQWxsaWFuY2UxIjAgBgNVBAsMGUF1dGhlbnRpY2F0b3IgQXR0ZXN0YXRpb24xCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJNWTESMBAGA1UEBwwJV2FrZWZpZWxkMCAXDTcwMDIwMTAwMDAwMFoYDzIwOTkwMTMxMjM1OTU5WjApMScwJQYDVQQDDB5GQUtFIEFuZHJvaWQgS2V5c3RvcmUgS2V5IEZBS0UwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARuowgSu5AoRj8Vi_ZNSFBbGUZJXFG9MkDT6jADlr7tOK9NEgjVX53-ergXpyPaFZrAR9py-xnzfjILn_Kzb8Iqo4IBFjCCARIwCwYDVR0PBAQDAgeAMIHhBgorBgEEAdZ5AgERBIHSMIHPAgECCgEAAgEBCgEABCCfVEl83pSDSerk9I3pcICNTdzc5N3u4jt21cXdzBuJjgQAMGm_hT0IAgYBXtPjz6C_hUVZBFcwVTEvMC0EKGNvbS5hbmRyb2lkLmtleXN0b3JlLmFuZHJvaWRrZXlzdG9yZWRlbW8CAQExIgQgdM_LUHSI9SkQhZHHpQWRnzJ3MvvB2ANSauqYAAbS2JgwMqEFMQMCAQKiAwIBA6MEAgIBAKUFMQMCAQSqAwIBAb-DeAMCAQK_hT4DAgEAv4U_AgUAMB8GA1UdIwQYMBaAFKPSqizvDYzyJALVHLRgvL9qWyQUMAoGCCqGSM49BAMCA0cAMEQCIC7WHb2PyULnjp1M1TVI3Wti_eDhe6sFweuQAdecXtHhAiAS_eZkFsx_VNsrTu3XfZ2D7wIt-vT6nTljfHZ4zqU5xlkDGDCCAxQwggK6oAMCAQICAQIwCgYIKoZIzj0EAwIwgdwxPTA7BgNVBAMMNEZBS0UgQW5kcm9pZCBLZXlzdG9yZSBTb2Z0d2FyZSBBdHRlc3RhdGlvbiBSb290IEZBS0UxMTAvBgkqhkiG9w0BCQEWImNvbmZvcm1hbmNlLXRvb2xzQGZpZG9hbGxpYW5jZS5vcmcxFjAUBgNVBAoMDUZJRE8gQWxsaWFuY2UxIjAgBgNVBAsMGUF1dGhlbnRpY2F0b3IgQXR0ZXN0YXRpb24xCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJNWTESMBAGA1UEBwwJV2FrZWZpZWxkMB4XDTE5MDQyNTA1NDkzMloXDTQ2MDkxMDA1NDkzMlowgeQxRTBDBgNVBAMMPEZBS0UgQW5kcm9pZCBLZXlzdG9yZSBTb2Z0d2FyZSBBdHRlc3RhdGlvbiBJbnRlcm1lZGlhdGUgRkFLRTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk1ZMRIwEAYDVQQHDAlXYWtlZmllbGQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASrUGErYk0Xu8O1GwRJOwVJC4wfi52883my3tygfFKh17YN0yF13Ct-3bwm2wjVX4b2cbaU3DBNpKKKjE4DpvXHo2MwYTAPBgNVHRMBAf8EBTADAQH_MA4GA1UdDwEB_wQEAwIChDAdBgNVHQ4EFgQUo9KqLO8NjPIkAtUctGC8v2pbJBQwHwYDVR0jBBgwFoAUUpobMuBWqs1RD-9fgDcGi_KRIx0wCgYIKoZIzj0EAwIDSAAwRQIhALFvLkAvtHrObTmN8P0-yLIT496P_weSEEbB6vCJWSh9AiBu-UOorCeLcF4WixOG9E5Li2nXe4uM2q6mbKGkll8u-WhhdXRoRGF0YVikPdxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KBBAAAAYFUOS1SqR0CfmpUat2wTATEAIFedRhNvbRm4W8u7G4NXGf6i_FfJ46hLF6QJ8EAaG74MpQECAyYgASFYIG6jCBK7kChGPxWL9k1IUFsZRklcUb0yQNPqMAOWvu04Ilggr00SCNVfnf56uBenI9oVmsBH2nL7GfN-Mguf8rNvwio',
-        clientDataJSON:
-          'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiI0YWI3ZGZkMS1hNjk1LTQ3NzctOTg1Zi1hZDI5OTM4MjhlOTkiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
-        transports: ['internal'],
-      },
-      type: 'public-key',
-      clientExtensionResults: {},
-    },
-    expectedChallenge: '4ab7dfd1-a695-4777-985f-ad2993828e99',
-    expectedOrigin: 'https://dev.dontneeda.pw',
-    expectedRPID: 'dev.dontneeda.pw',
-    requireUserVerification: false,
-  });
+  const verification = await verifyFIDOConformanceResponse();
 
   assertEquals(verification.verified, true);
-
-  mockDate.restore();
 });
 
 Deno.test('should verify Android Keystore response from a Pixel 8a in January 2025', async () => {
@@ -86,7 +64,7 @@ Deno.test('should verify Android Keystore response from a Pixel 8a in January 20
    *   notAfter: 2034-11-18T20:37:58.000Z
    * }
    */
-  const mockDate = new FakeTime(new Date('2025-02-02T10:00:00.000Z'));
+  using _mockDate = new FakeTime(new Date('2025-02-02T10:00:00.000Z'));
 
   const verification = await verifyRegistrationResponse({
     response: {
@@ -112,8 +90,6 @@ Deno.test('should verify Android Keystore response from a Pixel 8a in January 20
   });
 
   assertEquals(verification.verified, true);
-
-  mockDate.restore();
 });
 
 Deno.test({
@@ -152,7 +128,17 @@ Deno.test({
    *   notAfter: 2026-05-24T16:28:52.000Z
    * }
    */
-  const mockDate = new FakeTime(new Date('2025-07-15T10:00:00.000Z'));
+  using _mockDate = new FakeTime(new Date('2025-07-15T10:00:00.000Z'));
+
+  /**
+   * The certs in this chain have CRL distribution points. Fail the CRL fetches so the test doesn't
+   * make real network requests (a CRL that can't be fetched is treated as "not revoked".)
+   */
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.reject(new Error('Network disabled in tests')),
+  );
 
   const verification = await verifyRegistrationResponse({
     response: {
@@ -174,8 +160,14 @@ Deno.test({
   });
 
   assertEquals(verification.verified, true);
-
-  mockDate.restore();
+  assertSpyCalls(_mockFetch, 3);
+  assertSpyCallArgs(_mockFetch, 0, [
+    'https://android.googleapis.com/attestation/crl/03701661152506932490',
+  ]);
+  assertSpyCallArgs(_mockFetch, 1, [
+    'https://android.googleapis.com/attestation/crl/E8FA196314D2FA18',
+  ]);
+  assertSpyCallArgs(_mockFetch, 2, ['https://android.googleapis.com/attestation/crl/']);
 });
 
 /**
@@ -225,3 +217,73 @@ MDSXYrB4I4WHXPGjxhZuCuPBLTdOLU8YRvMYdEvYebWHMpvwGCF6bAx3JBpIeOQ1
 wDB5y0USicV3YgYGmi+NZfhA4URSh77Yd6uuJOJENRaNVTzk
 -----END CERTIFICATE-----
 `;
+
+Deno.test('should reject android-key attestation when no root certificates are registered', async () => {
+  SettingsService.setRootCertificates({
+    identifier: 'android-key',
+    certificates: [],
+  });
+
+  using _mockTime = new FakeTime(new Date('2025-01-26T19:00:00.000Z'));
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.reject(new Error('Unexpected network request')),
+  );
+
+  await assertRejects(
+    verifyFIDOConformanceResponse,
+    Error,
+    'No root certificates were set',
+  );
+
+  assertSpyCalls(_mockFetch, 0);
+});
+
+Deno.test('should reject android-key attestation with an unknown root before validating the cert path', async () => {
+  // The x5c's final cert is not any of Google's roots, so it must be rejected up front
+  SettingsService.setRootCertificates({
+    identifier: 'android-key',
+    certificates: [Google_Hardware_Attestation_Root_2],
+  });
+
+  using _mockTime = new FakeTime(new Date('2025-01-26T19:00:00.000Z'));
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.reject(new Error('Unexpected network request')),
+  );
+
+  await assertRejects(
+    verifyFIDOConformanceResponse,
+    Error,
+    'x5c root certificate was not a known root certificate',
+  );
+
+  assertSpyCalls(_mockFetch, 0);
+});
+
+/**
+ * Response captured from FIDO Conformance testing (2020). Its x5c is [leaf, fake root].
+ */
+function verifyFIDOConformanceResponse() {
+  return verifyRegistrationResponse({
+    response: {
+      id: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
+      rawId: 'V51GE29tGbhby7sbg1cZ_qL8V8njqEsXpAnwQBobvgw',
+      response: {
+        attestationObject:
+          'o2NmbXRrYW5kcm9pZC1rZXlnYXR0U3RtdKNjYWxnJmNzaWdYRzBFAiAbZhfcF0KSXj5rdEevvnBcC8ZfRQlNl9XYWRTiIGKSHwIhAIerc7jWjOF_lJ71n_GAcaHwDUtPxkjAAdYugnZ4QxkmY3g1Y4JZAxowggMWMIICvaADAgECAgEBMAoGCCqGSM49BAMCMIHkMUUwQwYDVQQDDDxGQUtFIEFuZHJvaWQgS2V5c3RvcmUgU29mdHdhcmUgQXR0ZXN0YXRpb24gSW50ZXJtZWRpYXRlIEZBS0UxMTAvBgkqhkiG9w0BCQEWImNvbmZvcm1hbmNlLXRvb2xzQGZpZG9hbGxpYW5jZS5vcmcxFjAUBgNVBAoMDUZJRE8gQWxsaWFuY2UxIjAgBgNVBAsMGUF1dGhlbnRpY2F0b3IgQXR0ZXN0YXRpb24xCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJNWTESMBAGA1UEBwwJV2FrZWZpZWxkMCAXDTcwMDIwMTAwMDAwMFoYDzIwOTkwMTMxMjM1OTU5WjApMScwJQYDVQQDDB5GQUtFIEFuZHJvaWQgS2V5c3RvcmUgS2V5IEZBS0UwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARuowgSu5AoRj8Vi_ZNSFBbGUZJXFG9MkDT6jADlr7tOK9NEgjVX53-ergXpyPaFZrAR9py-xnzfjILn_Kzb8Iqo4IBFjCCARIwCwYDVR0PBAQDAgeAMIHhBgorBgEEAdZ5AgERBIHSMIHPAgECCgEAAgEBCgEABCCfVEl83pSDSerk9I3pcICNTdzc5N3u4jt21cXdzBuJjgQAMGm_hT0IAgYBXtPjz6C_hUVZBFcwVTEvMC0EKGNvbS5hbmRyb2lkLmtleXN0b3JlLmFuZHJvaWRrZXlzdG9yZWRlbW8CAQExIgQgdM_LUHSI9SkQhZHHpQWRnzJ3MvvB2ANSauqYAAbS2JgwMqEFMQMCAQKiAwIBA6MEAgIBAKUFMQMCAQSqAwIBAb-DeAMCAQK_hT4DAgEAv4U_AgUAMB8GA1UdIwQYMBaAFKPSqizvDYzyJALVHLRgvL9qWyQUMAoGCCqGSM49BAMCA0cAMEQCIC7WHb2PyULnjp1M1TVI3Wti_eDhe6sFweuQAdecXtHhAiAS_eZkFsx_VNsrTu3XfZ2D7wIt-vT6nTljfHZ4zqU5xlkDGDCCAxQwggK6oAMCAQICAQIwCgYIKoZIzj0EAwIwgdwxPTA7BgNVBAMMNEZBS0UgQW5kcm9pZCBLZXlzdG9yZSBTb2Z0d2FyZSBBdHRlc3RhdGlvbiBSb290IEZBS0UxMTAvBgkqhkiG9w0BCQEWImNvbmZvcm1hbmNlLXRvb2xzQGZpZG9hbGxpYW5jZS5vcmcxFjAUBgNVBAoMDUZJRE8gQWxsaWFuY2UxIjAgBgNVBAsMGUF1dGhlbnRpY2F0b3IgQXR0ZXN0YXRpb24xCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJNWTESMBAGA1UEBwwJV2FrZWZpZWxkMB4XDTE5MDQyNTA1NDkzMloXDTQ2MDkxMDA1NDkzMlowgeQxRTBDBgNVBAMMPEZBS0UgQW5kcm9pZCBLZXlzdG9yZSBTb2Z0d2FyZSBBdHRlc3RhdGlvbiBJbnRlcm1lZGlhdGUgRkFLRTExMC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9yZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEiMCAGA1UECwwZQXV0aGVudGljYXRvciBBdHRlc3RhdGlvbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk1ZMRIwEAYDVQQHDAlXYWtlZmllbGQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASrUGErYk0Xu8O1GwRJOwVJC4wfi52883my3tygfFKh17YN0yF13Ct-3bwm2wjVX4b2cbaU3DBNpKKKjE4DpvXHo2MwYTAPBgNVHRMBAf8EBTADAQH_MA4GA1UdDwEB_wQEAwIChDAdBgNVHQ4EFgQUo9KqLO8NjPIkAtUctGC8v2pbJBQwHwYDVR0jBBgwFoAUUpobMuBWqs1RD-9fgDcGi_KRIx0wCgYIKoZIzj0EAwIDSAAwRQIhALFvLkAvtHrObTmN8P0-yLIT496P_weSEEbB6vCJWSh9AiBu-UOorCeLcF4WixOG9E5Li2nXe4uM2q6mbKGkll8u-WhhdXRoRGF0YVikPdxHEOnAiLIp26idVjIguzn3Ipr_RlsKZWsa-5qK-KBBAAAAYFUOS1SqR0CfmpUat2wTATEAIFedRhNvbRm4W8u7G4NXGf6i_FfJ46hLF6QJ8EAaG74MpQECAyYgASFYIG6jCBK7kChGPxWL9k1IUFsZRklcUb0yQNPqMAOWvu04Ilggr00SCNVfnf56uBenI9oVmsBH2nL7GfN-Mguf8rNvwio',
+        clientDataJSON:
+          'eyJvcmlnaW4iOiJodHRwczovL2Rldi5kb250bmVlZGEucHciLCJjaGFsbGVuZ2UiOiI0YWI3ZGZkMS1hNjk1LTQ3NzctOTg1Zi1hZDI5OTM4MjhlOTkiLCJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIn0',
+        transports: ['internal'],
+      },
+      type: 'public-key',
+      clientExtensionResults: {},
+    },
+    expectedChallenge: '4ab7dfd1-a695-4777-985f-ad2993828e99',
+    expectedOrigin: 'https://dev.dontneeda.pw',
+    expectedRPID: 'dev.dontneeda.pw',
+    requireUserVerification: false,
+  });
+}
