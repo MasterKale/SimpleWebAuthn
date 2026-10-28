@@ -5,7 +5,6 @@ import { runtimeSupportsWebCryptoKeyAlg } from '../helpers/iso/isoCrypto/runtime
 
 import { GlobalSign_Root_CA } from './defaultRootCerts/android-safetynet.ts';
 import {
-  Google_Hardware_Attestation_Root_1,
   Google_Android_Key_Attestation_CA1,
   Google_Hardware_Attestation_Root_2,
   Google_Hardware_Attestation_Root_3,
@@ -99,7 +98,6 @@ export const SettingsService: SettingsService = new BaseSettingsService();
 SettingsService.setRootCertificates({
   identifier: 'android-key',
   certificates: [
-    Google_Hardware_Attestation_Root_1,
     Google_Hardware_Attestation_Root_2,
     Google_Hardware_Attestation_Root_3,
     Google_Hardware_Attestation_Root_4,
