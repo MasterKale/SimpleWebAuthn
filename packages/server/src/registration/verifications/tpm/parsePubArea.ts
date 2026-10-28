@@ -76,13 +76,37 @@ export function parsePubArea(pubArea: Uint8Array_): ParsedPubArea {
     const scheme = TPM_ALG[dataView.getUint16(pointer)];
     pointer += 2;
 
+    /**
+     * In TPM 2.0, a non-TPM_ALG_NULL scheme is followed by alg-specific "details" bytes.
+     * For TPM_ALG_ECC this is defined as TPMT_ECC_SCHEME, which is the
+     * scheme (TPMI_ALG_ECC_SCHEME) followed by details (TPMU_ECC_SCHEME).
+     *
+     * See 11.2.5.7 TPMT_ECC_SCHEME here:
+     * https://medias.cdn.trustedcomputinggroup.org/production/Trusted_Platform_Module_2_0_Library_Part_2_Structures_Version_185_pub_c0a962a931.pdf >
+     */
+    const details: { [key: string]: unknown } = {};
+    if (scheme === 'TPM_ALG_NULL') {
+      // No details
+    } else if (scheme === 'TPM_ALG_ECDSA') {
+      details.hashAlg = TPM_ALG[dataView.getUint16(pointer)];
+      pointer += 2;
+    } else if (scheme === 'TPM_ALG_ECSCHNORR') {
+      details.hashAlg = TPM_ALG[dataView.getUint16(pointer)];
+      pointer += 2;
+    } else if (scheme === 'TPM_ALG_ECDAA') {
+      details.hashAlg = TPM_ALG[dataView.getUint16(pointer)];
+      pointer += 2;
+      details.count = dataView.getUint16(pointer);
+      pointer += 2;
+    }
+
     const curveID = TPM_ECC_CURVE[dataView.getUint16(pointer)];
     pointer += 2;
 
     const kdf = TPM_ALG[dataView.getUint16(pointer)];
     pointer += 2;
 
-    parameters.ecc = { symmetric, scheme, curveID, kdf };
+    parameters.ecc = { symmetric, scheme, details, curveID, kdf };
 
     /**
      * See 11.2.5.1 TPM2B_ECC_PARAMETER here:
@@ -149,6 +173,7 @@ type RSAParameters = {
 type ECCParameters = {
   symmetric: string;
   scheme: string;
+  details: { [key: string]: unknown };
   curveID: string;
   kdf: string;
 };
