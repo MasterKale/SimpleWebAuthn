@@ -135,6 +135,18 @@ export async function verifyAttestationAndroidKey(
       throw new Error(`${_err.message} (Android Key)`, { cause: _err });
     }
   } else {
+    /**
+     * Fail closed if for some reason no root certificates were registered with SettingsService
+     * for this attestation format. Android Key attestation statements are a bit unique in that they
+     * contain a full certificate chain, which an attacker could abuse to perform arbitrary network
+     * requests within the RP's boundary if we simply validated x5c like other attestation formats.
+     */
+    if (rootCertificates.length === 0) {
+      throw new Error(
+        'No root certificates were set with SettingsService for "android-key" attestation (Android Key)',
+      );
+    }
+
     const x5cNoRootPEM = x5c.slice(0, -1).map(convertCertBufferToPEM);
     const x5cRootPEM = x5c.slice(-1).map(convertCertBufferToPEM);
 
@@ -144,7 +156,7 @@ export async function verifyAttestationAndroidKey(
      *
      * https://developer.android.com/privacy-and-security/security-key-attestation#root_certificate
      */
-    if (rootCertificates.length > 0 && rootCertificates.indexOf(x5cRootPEM[0]) < 0) {
+    if (rootCertificates.indexOf(x5cRootPEM[0]) < 0) {
       throw new Error('x5c root certificate was not a known root certificate (Android Key)');
     }
 
