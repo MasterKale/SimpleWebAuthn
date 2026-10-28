@@ -149,21 +149,26 @@ export async function verifyAttestationTPM(
       );
     }
 
-    const crv = cosePublicKey.get(COSEKEYS.crv);
-    const x = cosePublicKey.get(COSEKEYS.x);
-    const y = cosePublicKey.get(COSEKEYS.y);
+    const pubKeyAlg = cosePublicKey.get(COSEKEYS.alg);
+    const pubKeyCrv = cosePublicKey.get(COSEKEYS.crv);
+    const pubKeyX = cosePublicKey.get(COSEKEYS.x);
+    const pubKeyY = cosePublicKey.get(COSEKEYS.y);
 
-    if (!crv) {
+    if (!pubKeyAlg) {
       throw new Error('COSE public key missing crv (TPM|ECC)');
     }
-    if (!x) {
+
+    if (!pubKeyCrv) {
+      throw new Error('COSE public key missing crv (TPM|ECC)');
+    }
+    if (!pubKeyX) {
       throw new Error('COSE public key missing x (TPM|ECC)');
     }
-    if (!y) {
+    if (!pubKeyY) {
       throw new Error('COSE public key missing y (TPM|ECC)');
     }
 
-    if (!isoUint8Array.areEqual(unique, isoUint8Array.concat([x, y]))) {
+    if (!isoUint8Array.areEqual(unique, isoUint8Array.concat([pubKeyX, pubKeyY]))) {
       throw new Error(
         'PubArea unique is not same as public key x and y (TPM|ECC)',
       );
@@ -177,9 +182,9 @@ export async function verifyAttestationTPM(
 
     const pubAreaCurveID = parameters.ecc.curveID;
     const pubAreaCurveIDMapToCOSECRV = TPM_ECC_CURVE_COSE_CRV_MAP[pubAreaCurveID];
-    if (pubAreaCurveIDMapToCOSECRV !== crv) {
+    if (pubAreaCurveIDMapToCOSECRV !== pubKeyCrv) {
       throw new Error(
-        `Public area key curve ID "${pubAreaCurveID}" mapped to "${pubAreaCurveIDMapToCOSECRV}" which did not match public key crv of "${crv}" (TPM|ECC)`,
+        `Public area key curve ID "${pubAreaCurveID}" mapped to "${pubAreaCurveIDMapToCOSECRV}" which did not match public key crv of "${pubKeyCrv}" (TPM|ECC)`,
       );
     }
   } else {
