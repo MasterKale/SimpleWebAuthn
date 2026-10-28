@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { FakeTime } from '@std/testing/time';
-import { assertSpyCalls, stub } from '@std/testing/mock';
+import { assertSpyCallArgs, assertSpyCalls, stub } from '@std/testing/mock';
 import { lessThan, parse } from '@std/semver';
 
 import { FIDO_Conformance_Fake_Root } from '../../helpers/tests/index.ts';
@@ -130,6 +130,16 @@ Deno.test({
    */
   using _mockDate = new FakeTime(new Date('2025-07-15T10:00:00.000Z'));
 
+  /**
+   * The certs in this chain have CRL distribution points. Fail the CRL fetches so the test doesn't
+   * make real network requests (a CRL that can't be fetched is treated as "not revoked".)
+   */
+  using _mockFetch = stub(
+    _fetchInternals,
+    'stubThis',
+    () => Promise.reject(new Error('Network disabled in tests')),
+  );
+
   const verification = await verifyRegistrationResponse({
     response: {
       id: 'AZNJEB2RcdcMJ0kZ1X1lyA6d7ENiKF5K945bpbZXxdVqoyjENSnHSZuxZz9sBMVyKAArpVBhwWr7WTutT_epNsk',
@@ -150,6 +160,14 @@ Deno.test({
   });
 
   assertEquals(verification.verified, true);
+  assertSpyCalls(_mockFetch, 3);
+  assertSpyCallArgs(_mockFetch, 0, [
+    'https://android.googleapis.com/attestation/crl/03701661152506932490',
+  ]);
+  assertSpyCallArgs(_mockFetch, 1, [
+    'https://android.googleapis.com/attestation/crl/E8FA196314D2FA18',
+  ]);
+  assertSpyCallArgs(_mockFetch, 2, ['https://android.googleapis.com/attestation/crl/']);
 });
 
 /**
