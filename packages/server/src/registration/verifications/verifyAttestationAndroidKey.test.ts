@@ -232,7 +232,7 @@ Deno.test('should reject android-key attestation when no root certificates are r
   );
 
   await assertRejects(
-    () => verifyFIDOConformanceResponse(),
+    verifyFIDOConformanceResponse,
     Error,
     'No root certificates were set',
   );
@@ -255,7 +255,7 @@ Deno.test('should reject android-key attestation with an unknown root before val
   );
 
   await assertRejects(
-    () => verifyFIDOConformanceResponse(),
+    verifyFIDOConformanceResponse,
     Error,
     'x5c root certificate was not a known root certificate',
   );
