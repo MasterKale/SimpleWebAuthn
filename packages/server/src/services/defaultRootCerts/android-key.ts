@@ -130,7 +130,7 @@ w1IdYIg2Wxg7yHcQZemFQg==
 `;
 
 /**
- * Google Hardware Attestation Root 2
+ * Google Android Key Attestation CA1
  *
  * Downloaded from https://developer.android.com/privacy-and-security/security-key-attestation#root_certificate
  *
