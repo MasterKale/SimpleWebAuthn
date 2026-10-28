@@ -1,3 +1,28 @@
 import { greaterOrEqual, parse } from '@std/semver';
 
 export const denoSupportsPQC = greaterOrEqual(parse(Deno.version.deno), parse('2.8.2'));
+
+/**
+ * A fake root cert from FIDO Conformance testing. This is the final cert in the x5c of an
+ * Android Keystore response from back in 2020 (needless to say it is not a Google-issued root.)
+ */
+export const FIDO_Conformance_Fake_Root = `-----BEGIN CERTIFICATE-----
+MIIDFDCCArqgAwIBAgIBAjAKBggqhkjOPQQDAjCB3DE9MDsGA1UEAww0RkFLRSBB
+bmRyb2lkIEtleXN0b3JlIFNvZnR3YXJlIEF0dGVzdGF0aW9uIFJvb3QgRkFLRTEx
+MC8GCSqGSIb3DQEJARYiY29uZm9ybWFuY2UtdG9vbHNAZmlkb2FsbGlhbmNlLm9y
+ZzEWMBQGA1UECgwNRklETyBBbGxpYW5jZTEiMCAGA1UECwwZQXV0aGVudGljYXRv
+ciBBdHRlc3RhdGlvbjELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAk1ZMRIwEAYDVQQH
+DAlXYWtlZmllbGQwHhcNMTkwNDI1MDU0OTMyWhcNNDYwOTEwMDU0OTMyWjCB5DFF
+MEMGA1UEAww8RkFLRSBBbmRyb2lkIEtleXN0b3JlIFNvZnR3YXJlIEF0dGVzdGF0
+aW9uIEludGVybWVkaWF0ZSBGQUtFMTEwLwYJKoZIhvcNAQkBFiJjb25mb3JtYW5j
+ZS10b29sc0BmaWRvYWxsaWFuY2Uub3JnMRYwFAYDVQQKDA1GSURPIEFsbGlhbmNl
+MSIwIAYDVQQLDBlBdXRoZW50aWNhdG9yIEF0dGVzdGF0aW9uMQswCQYDVQQGEwJV
+UzELMAkGA1UECAwCTVkxEjAQBgNVBAcMCVdha2VmaWVsZDBZMBMGByqGSM49AgEG
+CCqGSM49AwEHA0IABKtQYStiTRe7w7UbBEk7BUkLjB+LnbzzebLe3KB8UqHXtg3T
+IXXcK37dvCbbCNVfhvZxtpTcME2kooqMTgOm9cejYzBhMA8GA1UdEwEB/wQFMAMB
+Af8wDgYDVR0PAQH/BAQDAgKEMB0GA1UdDgQWBBSj0qos7w2M8iQC1Ry0YLy/alsk
+FDAfBgNVHSMEGDAWgBRSmhsy4FaqzVEP71+ANwaL8pEjHTAKBggqhkjOPQQDAgNI
+ADBFAiEAsW8uQC+0es5tOY3w/T7IshPj3o//B5IQRsHq8IlZKH0CIG75Q6isJ4tw
+XhaLE4b0TkuLadd7i4zarqZsoaSWXy75
+-----END CERTIFICATE-----
+`;
