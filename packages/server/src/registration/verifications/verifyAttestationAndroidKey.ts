@@ -135,26 +135,27 @@ export async function verifyAttestationAndroidKey(
       throw new Error(`${_err.message} (Android Key)`, { cause: _err });
     }
   } else {
-    /**
-     * Verify that x5c contains a full certificate path.
-     */
     const x5cNoRootPEM = x5c.slice(0, -1).map(convertCertBufferToPEM);
     const x5cRootPEM = x5c.slice(-1).map(convertCertBufferToPEM);
 
-    try {
-      await validateCertificatePath(x5cNoRootPEM, x5cRootPEM);
-    } catch (err) {
-      const _err = err as Error;
-      throw new Error(`${_err.message} (Android Key)`, { cause: _err });
-    }
-
     /**
-     * Make sure the root certificate is one of the Google Hardware Attestation Root certificates
+     * Make sure the final cert in x5c is one of the Google Hardware Attestation Root certificates
+     * before we attempt to validate the certificate chain.
      *
      * https://developer.android.com/privacy-and-security/security-key-attestation#root_certificate
      */
     if (rootCertificates.length > 0 && rootCertificates.indexOf(x5cRootPEM[0]) < 0) {
       throw new Error('x5c root certificate was not a known root certificate (Android Key)');
+    }
+
+    /**
+     * Verify that x5c contains a full certificate path.
+     */
+    try {
+      await validateCertificatePath(x5cNoRootPEM, x5cRootPEM);
+    } catch (err) {
+      const _err = err as Error;
+      throw new Error(`${_err.message} (Android Key)`, { cause: _err });
     }
   }
 
