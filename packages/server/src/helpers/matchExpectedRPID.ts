@@ -1,6 +1,8 @@
 import { toHash } from './toHash.ts';
 import { isoUint8Array } from './iso/index.ts';
 import type { Uint8Array_ } from '../types/index.ts';
+import { assertValidExpectedRPID } from './assertValidExpectedRPID.ts';
+import { SimpleWebAuthnError } from '../errors/index.ts';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Returns the unhashed RP ID
@@ -12,6 +14,10 @@ export async function matchExpectedRPID(
   rpIDHash: Uint8Array_,
   expectedRPIDs: string[],
 ): Promise<string> {
+  for (const rpID of expectedRPIDs) {
+    assertValidExpectedRPID(rpID);
+  }
+
   try {
     const matchedRPID = await Promise.any<string>(
       expectedRPIDs.map((expected) => {
@@ -35,18 +41,13 @@ export async function matchExpectedRPID(
 
     // This means no matches were found
     if (_err.name === 'AggregateError') {
-      throw new UnexpectedRPIDHash();
+      throw new SimpleWebAuthnError({
+        message: 'Unexpected RP ID hash',
+        code: 'UNEXPECTED_RP_ID',
+      });
     }
 
     // An unexpected error occurred
     throw err;
-  }
-}
-
-class UnexpectedRPIDHash extends Error {
-  constructor() {
-    const message = 'Unexpected RP ID hash';
-    super(message);
-    this.name = 'UnexpectedRPIDHash';
   }
 }

@@ -17,6 +17,7 @@ import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.
 import { COSEKEYS, isPQCCOSEAlg } from '../helpers/cose.ts';
 import { SettingsService } from '../services/settingsService.ts';
 import { PQCNotSupportedError } from '../errors/index.ts';
+import { matchExpectedOrigin } from '../helpers/matchExpectedOrigin.ts';
 
 /**
  * Configurable options when calling `verifyAuthenticationResponse()`
@@ -173,20 +174,7 @@ export async function verifyAuthenticationResponse(
   }
 
   // Check that the origin is our site
-  if (Array.isArray(expectedOrigin)) {
-    if (!expectedOrigin.includes(origin)) {
-      const joinedExpectedOrigin = expectedOrigin.join(', ');
-      throw new Error(
-        `Unexpected authentication response origin "${origin}", expected one of: ${joinedExpectedOrigin}`,
-      );
-    }
-  } else {
-    if (origin !== expectedOrigin) {
-      throw new Error(
-        `Unexpected authentication response origin "${origin}", expected "${expectedOrigin}"`,
-      );
-    }
-  }
+  matchExpectedOrigin(origin, expectedOrigin);
 
   if (!isoBase64URL.isBase64URL(assertionResponse.authenticatorData)) {
     throw new Error(

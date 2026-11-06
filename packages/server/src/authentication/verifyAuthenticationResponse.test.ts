@@ -19,7 +19,7 @@ import {
 import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { denoSupportsPQC } from '../helpers/tests/index.ts';
-import { PQCNotSupportedError } from '../errors/index.ts';
+import { PQCNotSupportedError, SimpleWebAuthnError } from '../errors/index.ts';
 
 Deno.test('should verify an assertion response', async () => {
   const verification = await verifyAuthenticationResponse({
@@ -79,7 +79,7 @@ Deno.test('should throw when response origin is not expected value', async () =>
         credential,
       }),
     Error,
-    'authentication response origin',
+    'Unexpected response origin',
   );
 });
 
@@ -300,8 +300,8 @@ Deno.test('should throw an error if origin not in list of expected origins', asy
         expectedRPID: 'dev.dontneeda.pw',
         credential,
       }),
-    Error,
-    'Unexpected authentication response origin',
+    SimpleWebAuthnError,
+    'Unexpected response origin',
   );
 });
 
@@ -907,6 +907,122 @@ Deno.test('should verify ML-DSA-44 authentication response', async () => {
 /**
  * Assertion examples below
  */
+
+Deno.test('should raise on UTF-8 string for expectedRPID (needs to be ASCII)', async () => {
+  const error = await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: {
+          id: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          rawId: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          response: {
+            authenticatorData: 'iVlCKrqHEeyBVPxA_IPVx0Z3mxBQBPn04wKrdN5rU28dAAAAAA',
+            clientDataJSON:
+              'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTWdUSEtLcHVKaW82R1lRcHJwR3MwZkgwU1BMRTNGOS1hc3FWSEVZQkNCbyIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWwueG4tLW1sbHJ0bS1ydmFkM2FmLmRldiIsImNyb3NzT3JpZ2luIjpmYWxzZX0',
+            signature:
+              'MEUCIQDvTEa5-AlzvYLLX1zt0isZ4e0dUXTYpirucCkzIkFOlgIgKVTJCyGMPjYXSi29sUt_S5VQDxt0jo1A5YlGCq7sPVs',
+            userHandle: 'kzuKhNuTl-fcgRoRrYoE6Fl5FiWLUfLEhVGor6Xxoso',
+          },
+          type: 'public-key',
+          clientExtensionResults: {},
+          authenticatorAttachment: 'platform',
+        },
+        expectedChallenge: 'MgTHKKpuJio6GYQprpGs0fH0SPLE3F9-asqVHEYBCBo',
+        expectedOrigin: 'https://local.xn--mllrtm-rvad3af.dev',
+        expectedRPID: 'local.mïllërtïmë.dev',
+        // A placeholder public key is fine, response verification should error out before
+        // this becomes a problem
+        credential: {
+          id: '',
+          counter: 7,
+          publicKey: isoBase64URL.toBuffer(''),
+        },
+      }),
+    SimpleWebAuthnError,
+  );
+
+  assert(error.message.includes('local.mïllërtïmë.dev'), 'did not include bad RP ID');
+  assert(
+    error.message.includes('local.xn--mllrtm-rvad3af.dev'),
+    'did not include punycode representation',
+  );
+});
+
+Deno.test('should raise on UTF-8 string for expectedOrigin (needs to be ASCII)', async () => {
+  const error = await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: {
+          id: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          rawId: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          response: {
+            authenticatorData: 'iVlCKrqHEeyBVPxA_IPVx0Z3mxBQBPn04wKrdN5rU28dAAAAAA',
+            clientDataJSON:
+              'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTWdUSEtLcHVKaW82R1lRcHJwR3MwZkgwU1BMRTNGOS1hc3FWSEVZQkNCbyIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWwueG4tLW1sbHJ0bS1ydmFkM2FmLmRldiIsImNyb3NzT3JpZ2luIjpmYWxzZX0',
+            signature:
+              'MEUCIQDvTEa5-AlzvYLLX1zt0isZ4e0dUXTYpirucCkzIkFOlgIgKVTJCyGMPjYXSi29sUt_S5VQDxt0jo1A5YlGCq7sPVs',
+            userHandle: 'kzuKhNuTl-fcgRoRrYoE6Fl5FiWLUfLEhVGor6Xxoso',
+          },
+          type: 'public-key',
+          clientExtensionResults: {},
+          authenticatorAttachment: 'platform',
+        },
+        expectedChallenge: 'MgTHKKpuJio6GYQprpGs0fH0SPLE3F9-asqVHEYBCBo',
+        expectedRPID: 'local.xn--mllrtm-rvad3af.dev',
+        expectedOrigin: 'https://local.mïllërtïmë.dev',
+        // A placeholder public key is fine, response verification should error out before
+        // this becomes a problem
+        credential: {
+          id: '',
+          counter: 7,
+          publicKey: isoBase64URL.toBuffer(''),
+        },
+      }),
+    SimpleWebAuthnError,
+  );
+
+  assert(error.message.includes('https://local.mïllërtïmë.dev'), 'did not include bad origin');
+  assert(
+    error.message.includes('https://local.xn--mllrtm-rvad3af.dev'),
+    'did not include punycode representation',
+  );
+});
+
+Deno.test('should raise on trailing slash in origin for expectedOrigin', async () => {
+  const error = await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: {
+          id: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          rawId: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          response: {
+            authenticatorData: 'iVlCKrqHEeyBVPxA_IPVx0Z3mxBQBPn04wKrdN5rU28dAAAAAA',
+            clientDataJSON:
+              'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTWdUSEtLcHVKaW82R1lRcHJwR3MwZkgwU1BMRTNGOS1hc3FWSEVZQkNCbyIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWwueG4tLW1sbHJ0bS1ydmFkM2FmLmRldiIsImNyb3NzT3JpZ2luIjpmYWxzZX0',
+            signature:
+              'MEUCIQDvTEa5-AlzvYLLX1zt0isZ4e0dUXTYpirucCkzIkFOlgIgKVTJCyGMPjYXSi29sUt_S5VQDxt0jo1A5YlGCq7sPVs',
+            userHandle: 'kzuKhNuTl-fcgRoRrYoE6Fl5FiWLUfLEhVGor6Xxoso',
+          },
+          type: 'public-key',
+          clientExtensionResults: {},
+          authenticatorAttachment: 'platform',
+        },
+        expectedChallenge: 'MgTHKKpuJio6GYQprpGs0fH0SPLE3F9-asqVHEYBCBo',
+        expectedRPID: 'local.xn--mllrtm-rvad3af.dev',
+        expectedOrigin: 'https://local.xn--mllrtm-rvad3af.dev/',
+        // A placeholder public key is fine, response verification should error out before
+        // this becomes a problem
+        credential: {
+          id: '',
+          counter: 7,
+          publicKey: isoBase64URL.toBuffer(''),
+        },
+      }),
+    SimpleWebAuthnError,
+  );
+
+  assert(error.message.includes('Remove the trailing "/"'), 'did not include remediation');
+});
 
 const assertionResponse: AuthenticationResponseJSON = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',

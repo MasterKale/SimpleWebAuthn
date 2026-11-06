@@ -32,6 +32,7 @@ import { verifyAttestationAndroidSafetyNet } from './verifications/verifyAttesta
 import { verifyAttestationTPM } from './verifications/tpm/verifyAttestationTPM.ts';
 import { verifyAttestationAndroidKey } from './verifications/verifyAttestationAndroidKey.ts';
 import { verifyAttestationApple } from './verifications/verifyAttestationApple.ts';
+import { matchExpectedOrigin } from '../helpers/matchExpectedOrigin.ts';
 
 /**
  * Configurable options when calling `verifyRegistrationResponse()`
@@ -134,23 +135,7 @@ export async function verifyRegistrationResponse(
   }
 
   // Check that the origin is our site
-  if (Array.isArray(expectedOrigin)) {
-    if (!expectedOrigin.includes(origin)) {
-      throw new Error(
-        `Unexpected registration response origin "${origin}", expected one of: ${
-          expectedOrigin.join(
-            ', ',
-          )
-        }`,
-      );
-    }
-  } else {
-    if (origin !== expectedOrigin) {
-      throw new Error(
-        `Unexpected registration response origin "${origin}", expected "${expectedOrigin}"`,
-      );
-    }
-  }
+  matchExpectedOrigin(origin, expectedOrigin);
 
   if (tokenBinding) {
     if (typeof tokenBinding !== 'object') {
