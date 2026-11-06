@@ -3,8 +3,8 @@ import { isoCrypto, isoUint8Array } from './iso/index.ts';
 import type { Uint8Array_ } from '../types/index.ts';
 
 /**
- * Returns hash digest of the given data, using the given algorithm when provided. Defaults to using
- * SHA-256.
+ * Returns the hash of the given data, using the given algorithm when provided. If `data` is
+ * a string, then it's treated like a UTF-8 string. Defaults to hashing using SHA-256.
  */
 export function toHash(
   data: Uint8Array_ | string,
