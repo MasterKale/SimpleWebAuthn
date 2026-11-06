@@ -14,7 +14,7 @@ import { SERVICE_STATE, ServiceStateTracker } from './serviceStateTracker.ts';
  * parsing and caching what a server returns.
  */
 export abstract class BaseMDSService<MDSDataType> {
-  protected readonly metadataCache = new MDSCache<MDSDataType>();
+  protected readonly metadataCache: MDSCache<MDSDataType> = new MDSCache<MDSDataType>();
   protected state: ServiceStateTracker;
   protected logger: Required<SimpleWebAuthnLogger> = DefaultNoopLogger;
 
