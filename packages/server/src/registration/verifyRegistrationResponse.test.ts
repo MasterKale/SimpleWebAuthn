@@ -207,8 +207,8 @@ Deno.test('should throw when response origin is not expected value', async () =>
         expectedOrigin: 'https://different.address',
         expectedRPID: 'dev.dontneeda.pw',
       }),
-    Error,
-    'registration response origin',
+    SimpleWebAuthnError,
+    'Unexpected response origin',
   );
 });
 
@@ -783,7 +783,7 @@ Deno.test('should throw an error if origin not in list of expected origins', asy
         expectedRPID: 'dev.dontneeda.pw',
       }),
     Error,
-    'Unexpected registration response origin',
+    'Unexpected response origin',
   );
 });
 
@@ -1331,6 +1331,78 @@ Deno.test('should verify ML-DSA-87 registration response', async () => {
 
     assertEquals(error.code, 'RUNTIME_NO_PQC_SUPPORT');
   }
+});
+
+Deno.test('should raise on UTF-8 string for expectedRPID (needs to be ASCII)', async () => {
+  const error = await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: {
+          id: 'PZcxw5aq8x6LqVUkxrSf9tw_pZGuafM4Khubef0KoHy4eGJDLsGibfjRVp8c0fZaVA',
+          rawId: 'PZcxw5aq8x6LqVUkxrSf9tw_pZGuafM4Khubef0KoHy4eGJDLsGibfjRVp8c0fZaVA',
+          response: {
+            attestationObject:
+              'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi1iVlCKrqHEeyBVPxA_IPVx0Z3mxBQBPn04wKrdN5rU29dAAAAALraVWanqkAfvZZFYZpVEg0AMT2XMcOWqvMei6lVJMa0n_bcP6WRrmnzOCobm3n9CqB8uHhiQy7Bom340VafHNH2WlSlAQIDJiABIVgg_hK7iLkM9zc4RpkDm7JgVw1vSDOaFnjJB3ps9lv8O2wiWCCIKh-zRK2G0-FU51GGSZQhln08f3S8ZZoSjEDUFVns-w',
+            clientDataJSON:
+              'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoialMyQ0pFeVVhMkw5TlRzd3padnA4N2JoMWdfUWZhei1IaVg0X3g5aXRmbyIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWwueG4tLW1sbHJ0bS1ydmFkM2FmLmRldiIsImNyb3NzT3JpZ2luIjpmYWxzZX0',
+          },
+          type: 'public-key',
+          clientExtensionResults: {
+            credProps: {
+              rk: true,
+            },
+          },
+          authenticatorAttachment: 'platform',
+        },
+        expectedChallenge: 'jS2CJEyUa2L9NTswzZvp87bh1g_Qfaz-HiX4_x9itfo',
+        expectedOrigin: 'https://local.xn--mllrtm-rvad3af.dev',
+        expectedRPID: 'local.mïllërtïmë.dev',
+      }),
+    SimpleWebAuthnError,
+  );
+
+  assert(error.message.includes('local.mïllërtïmë.dev'), 'did not include bad RP ID');
+  assert(
+    error.message.includes('local.xn--mllrtm-rvad3af.dev'),
+    'did not include punycode representation',
+  );
+});
+
+Deno.test('should raise on UTF-8 string for expectedOrigin (needs to be ASCII)', async () => {
+  const error = await assertRejects(
+    () =>
+      verifyRegistrationResponse({
+        response: {
+          id: 'PZcxw5aq8x6LqVUkxrSf9tw_pZGuafM4Khubef0KoHy4eGJDLsGibfjRVp8c0fZaVA',
+          rawId: 'PZcxw5aq8x6LqVUkxrSf9tw_pZGuafM4Khubef0KoHy4eGJDLsGibfjRVp8c0fZaVA',
+          response: {
+            attestationObject:
+              'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVi1iVlCKrqHEeyBVPxA_IPVx0Z3mxBQBPn04wKrdN5rU29dAAAAALraVWanqkAfvZZFYZpVEg0AMT2XMcOWqvMei6lVJMa0n_bcP6WRrmnzOCobm3n9CqB8uHhiQy7Bom340VafHNH2WlSlAQIDJiABIVgg_hK7iLkM9zc4RpkDm7JgVw1vSDOaFnjJB3ps9lv8O2wiWCCIKh-zRK2G0-FU51GGSZQhln08f3S8ZZoSjEDUFVns-w',
+            clientDataJSON:
+              'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoialMyQ0pFeVVhMkw5TlRzd3padnA4N2JoMWdfUWZhei1IaVg0X3g5aXRmbyIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWwueG4tLW1sbHJ0bS1ydmFkM2FmLmRldiIsImNyb3NzT3JpZ2luIjpmYWxzZX0',
+          },
+          type: 'public-key',
+          clientExtensionResults: {
+            credProps: {
+              rk: true,
+            },
+          },
+          authenticatorAttachment: 'platform',
+        },
+        expectedChallenge: 'jS2CJEyUa2L9NTswzZvp87bh1g_Qfaz-HiX4_x9itfo',
+        expectedOrigin: 'https://local.mïllërtïmë.dev',
+        expectedRPID: 'local.xn--mllrtm-rvad3af.dev',
+      }),
+    SimpleWebAuthnError,
+  );
+
+  console.log(error);
+
+  assert(error.message.includes('https://local.mïllërtïmë.dev'), 'did not include bad origin');
+  assert(
+    error.message.includes('https://local.xn--mllrtm-rvad3af.dev'),
+    'did not include punycode representation',
+  );
 });
 
 /**

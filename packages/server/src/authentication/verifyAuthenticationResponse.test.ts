@@ -19,7 +19,7 @@ import {
 import { toHash } from '../helpers/toHash.ts';
 import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { denoSupportsPQC } from '../helpers/tests/index.ts';
-import { PQCNotSupportedError } from '../errors/index.ts';
+import { PQCNotSupportedError, SimpleWebAuthnError } from '../errors/index.ts';
 
 Deno.test('should verify an assertion response', async () => {
   const verification = await verifyAuthenticationResponse({
@@ -79,7 +79,7 @@ Deno.test('should throw when response origin is not expected value', async () =>
         credential,
       }),
     Error,
-    'authentication response origin',
+    'Unexpected response origin',
   );
 });
 
@@ -300,8 +300,8 @@ Deno.test('should throw an error if origin not in list of expected origins', asy
         expectedRPID: 'dev.dontneeda.pw',
         credential,
       }),
-    Error,
-    'Unexpected authentication response origin',
+    SimpleWebAuthnError,
+    'Unexpected response origin',
   );
 });
 
@@ -907,6 +907,48 @@ Deno.test('should verify ML-DSA-44 authentication response', async () => {
 /**
  * Assertion examples below
  */
+
+Deno.test('should raise on UTF-8 string for expectedRPID (needs to be ASCII)', async () => {
+  const error = await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: {
+          id: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          rawId: 'oHodRPd9pf_KVdGQDFOzyxMrTlIQdTY85MS9zPvdCq1hn8Fwp2H4ix3H8DySXeC6lykwi_2BlnC9PBY',
+          response: {
+            authenticatorData: 'iVlCKrqHEeyBVPxA_IPVx0Z3mxBQBPn04wKrdN5rU28dAAAAAA',
+            clientDataJSON:
+              'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiTWdUSEtLcHVKaW82R1lRcHJwR3MwZkgwU1BMRTNGOS1hc3FWSEVZQkNCbyIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWwueG4tLW1sbHJ0bS1ydmFkM2FmLmRldiIsImNyb3NzT3JpZ2luIjpmYWxzZX0',
+            signature:
+              'MEUCIQDvTEa5-AlzvYLLX1zt0isZ4e0dUXTYpirucCkzIkFOlgIgKVTJCyGMPjYXSi29sUt_S5VQDxt0jo1A5YlGCq7sPVs',
+            userHandle: 'kzuKhNuTl-fcgRoRrYoE6Fl5FiWLUfLEhVGor6Xxoso',
+          },
+          type: 'public-key',
+          clientExtensionResults: {},
+          authenticatorAttachment: 'platform',
+        },
+        expectedChallenge: 'MgTHKKpuJio6GYQprpGs0fH0SPLE3F9-asqVHEYBCBo',
+        expectedOrigin: 'https://local.xn--mllrtm-rvad3af.dev',
+        expectedRPID: 'local.mïllërtïmë.dev',
+        // Not the actual matching public key but it's fine, the response should error out before
+        // this becomes a problem
+        credential: {
+          id: '',
+          counter: 7,
+          publicKey: isoBase64URL.toBuffer(
+            'owEHAzgvIFkFIC4AIUrgARve17AEk0W30POluaL08p91eLXkktSjmAlmZdNTWhtUFj3wkseZEt4xpmWarG28Za86i7yq-B4df3uOuq3zQVTKOQUWJLWGJ3-wUUuyywPtkdgSqzQdcli6xMgwnVqh9r6FVL9Xp7x3kgjUVDqhux_k1D2d4ts2zqi1rUrSF6FNX139g3dd1VnUNQrMLdrwohR9CmE0fZ6Am4Df_OV2JxOrUEPzMFi5SeBcrU1oSj2lX_91gY179PO0wIOtTa1KzWvwOYa_KjOj9Ow16AtmsXrcpL-jYW4_bFn4kpT9G-vDG4qPFDpint62g0DDjEt7JrF288aIZXOpsbVmnjw2_O_5pFFvFpH32gD7_NdmvE6PSymNxPcTCnMzY3xv5wJXiEDhO21E85n78Oay4k7PzWHvzQxlJldIYw-9TfKZXqZa6sIbE-LyZj_Y2FV1Owd4WLvKCNcO-IIP3XFcZ7__XPZtAsBTJ5Z5w18jRnlMNKTygva-F2Ec65tA2skED9PnVyS_WjtZN5VjbhuU-D9DIDXEgUjitdcXWbCruDjxaBwjuDFXOI9cYdp4n-KWCZGJdX9QFHDGkvX6zDXupFrFV1q1JeKCayuMJjL3Z44AMF2UtjNODzhlviE8neX5NSfXdf36FWGFER6D6YCGGvooW8EBCx8OLPRNGGwoKBrEflr_ISYIdyw8-rDkAG0-bka_ulzfg8uTY8BXNu0HhqsteUPni4HlhUXMb0yI1DbLi5hTTkpBEBfmjzTJ8JMDe9sOOaqU2PrOzvIs5c7fx_VBqQZbF6amei2Y41okZJWwW0LWNvL2JQ_Yj9deHMczichCHWVX3uCL-SfPL3AaLeWLPjTAejU-H1Lnn2jWQeHtiRxBL1eleZNmJVqFbrgclcMXirM6rrmPrsbFe41fDF3Hm1KgcKkpZMPSICijfDCT4csVeLDxmsg9aDYwboxigOVHZa-zAmePLBZrPJIWDNEHNBG9CdEG-RfeshvnRbPerB1zLzA9jP-Jj55_Xd4igau4FEc7dLWgyn2b2Q3aMAaDnKCzEScd301WeuZtutm6flzqDPCUTJnoniUHuO__bALWkzIxe5rHW6wQ_wPBEX32bQNN-gtI6_yiw-UTwu3egro3tDp7ZzHkMSslF9FHD7divbmeEzsE8N4iOwO5kWFt2jY9VpjGXAhyCcGZtWU68SzllOpWzvuacFjlE5KZ_c4nHhYdaphJAjXvbkog-vGUwjffCXe9gQhIliwPzREtccZdgyLKiBAlypp0pwVKe6disU9-2kflk_BXPRf1PkBEqO41ySFZWLb6eSij9FrIXtPAo4RFmeKPLoYT-ce3gi8_XftVv7MDl9s0hoFlgh5vTh1xMdpxEt-6BxdesEF3zJycxNY4QFVkUKE78geXogQFz2QE7kW4ncTXjq4IydHOKX9Bp2P8uGcCJ6dzW3PFE-Zurf1klV-rkvT7xE-Tds7CPeWkrRr_Ckhn6rQ2Z3-Sjz5bgIRHiBnd0iZfm6ZgD77nVHY7ztaSmUQ7JWbeFSz0eoYExgXi7HfSdV77DlHxIjcNlrSh58SGWfkSwUVboOUJKy_B3EbBDeweqn1pf7QIjAJnYL7WiogmAku2UxEBQijtPAusmyhLf0_aTEFFc3zdGutHim3dzAKfJucy2aBm8ViQxY_U1N26WVO6sfui7dZVhqkQniZLCq8N_xqEMqWV6utksRHOvITvB_SqmeDacy2ZfiSogU8K5G0',
+          ),
+        },
+      }),
+    SimpleWebAuthnError,
+  );
+
+  assert(error.message.includes('local.mïllërtïmë.dev'), 'did not include bad RP ID');
+  assert(
+    error.message.includes('local.xn--mllrtm-rvad3af.dev'),
+    'did not include punycode representation',
+  );
+});
 
 const assertionResponse: AuthenticationResponseJSON = {
   id: 'KEbWNCc7NgaYnUyrNeFGX9_3Y-8oJ3KwzjnaiD1d1LVTxR7v3CaKfCz2Vy_g_MHSh7yJ8yL0Pxg6jo_o0hYiew',
