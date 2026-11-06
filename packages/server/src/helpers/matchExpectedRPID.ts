@@ -1,6 +1,7 @@
 import { toHash } from './toHash.ts';
 import { isoUint8Array } from './iso/index.ts';
 import type { Uint8Array_ } from '../types/index.ts';
+import { assertASCIIRPID } from './assertASCIIRPID.ts';
 
 /**
  * Go through each expected RP ID and try to find one that matches. Returns the unhashed RP ID
@@ -12,6 +13,10 @@ export async function matchExpectedRPID(
   rpIDHash: Uint8Array_,
   expectedRPIDs: string[],
 ): Promise<string> {
+  for (const rpID of expectedRPIDs) {
+    assertASCIIRPID(rpID);
+  }
+
   try {
     const matchedRPID = await Promise.any<string>(
       expectedRPIDs.map((expected) => {
