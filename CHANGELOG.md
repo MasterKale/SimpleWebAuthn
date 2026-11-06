@@ -1,5 +1,25 @@
 # Changelog
 
+## v14.1.0
+
+**Changes:**
+
+- **[server]** Support for the FIDO Convenience Metadata Service has been added with the new
+  `ConvenienceMetadataService`. See
+  https://simplewebauthn.dev/docs/advanced/server/metadata-service#convenience-metadata-service for
+  more info ([#812](https://github.com/MasterKale/SimpleWebAuthn/pull/812))
+- **[server]** `verifyRegistrationResponse()` and `verifyAuthenticationResponse()` will now raise a
+  `SimpleWebAuthnError` when `expectedRPID` or `expectedOrigin` are not valid values
+  ([#824](https://github.com/MasterKale/SimpleWebAuthn/pull/824))
+- **[server]** `"android-key"` attestation statement verification now checks that the `x5c` root
+  certificate is a known one _before_ verifying the certificate chain
+  ([#821](https://github.com/MasterKale/SimpleWebAuthn/pull/821))
+- **[server]** `"android-key"` attestation statement verification now knows about the new **Google
+  Android Key Attestation CA1** trust anchor
+  ([#820](https://github.com/MasterKale/SimpleWebAuthn/pull/820))
+- **[server]** `"tpm"` attestation statement verification now properly parses non-`TPM_ALG_NULL`
+  schemes in `pubArea` ([#822](https://github.com/MasterKale/SimpleWebAuthn/pull/822))
+
 ## v14.0.3
 
 **Changes:**
