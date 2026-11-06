@@ -1,11 +1,12 @@
 import { SimpleWebAuthnError } from '../errors/index.ts';
 
 /**
- * Check the RP ID to make sure it's in an ASCII representation (a.k.a. punycode).
+ * Check the RP ID to make sure it's valid to compare against what's reported in a WebAuthn
+ * response.
  *
- * UTF-8 strings will raise a `SimpleWebAuthnError` with `code: 'BAD_ARGUMENT'`
+ * Invalid RP IDs will raise a `SimpleWebAuthnError` with `code: 'BAD_ARGUMENT'`
  */
-export function assertASCIIRPID(rpID: string): void {
+export function assertValidExpectedRPID(rpID: string): void {
   const asciiRPID = new URL(`https://${rpID}`).hostname;
 
   if (asciiRPID !== rpID) {

@@ -1,7 +1,7 @@
 import { toHash } from './toHash.ts';
 import { isoUint8Array } from './iso/index.ts';
 import type { Uint8Array_ } from '../types/index.ts';
-import { assertASCIIRPID } from './assertASCIIRPID.ts';
+import { assertValidExpectedRPID } from './assertValidExpectedRPID.ts';
 import { SimpleWebAuthnError } from '../errors/index.ts';
 
 /**
@@ -15,7 +15,7 @@ export async function matchExpectedRPID(
   expectedRPIDs: string[],
 ): Promise<string> {
   for (const rpID of expectedRPIDs) {
-    assertASCIIRPID(rpID);
+    assertValidExpectedRPID(rpID);
   }
 
   try {

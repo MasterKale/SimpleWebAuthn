@@ -1,5 +1,5 @@
 import { SimpleWebAuthnError } from '../errors/index.ts';
-import { assertASCIIOrigin } from './assertASCIIOrigin.ts';
+import { assertValidExpectedOrigin } from './assertValidExpectedOrigin.ts';
 
 /**
  * Check that the origin reported in a WebAuthn response is an expected one.
@@ -15,7 +15,7 @@ export function matchExpectedOrigin(origin: string, expectedOrigin: string | str
   }
 
   for (const _origin of _expectedOrigins) {
-    assertASCIIOrigin(_origin);
+    assertValidExpectedOrigin(_origin);
   }
 
   if (!_expectedOrigins.includes(origin)) {
