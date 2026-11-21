@@ -1,5 +1,12 @@
 import 'reflect-metadata';
-import { X509Certificate, type X509Certificates, X509ChainBuilder } from '@peculiar/x509';
+import {
+  BasicConstraintsExtension,
+  KeyUsageFlags,
+  KeyUsagesExtension,
+  X509Certificate,
+  type X509Certificates,
+  X509ChainBuilder,
+} from '@peculiar/x509';
 
 import { isCertRevoked } from './isCertRevoked.ts';
 import { SimpleWebAuthnError } from '../errors/index.ts';
@@ -54,7 +61,17 @@ export async function validateCertificatePath(
   }
 
   // Prepare to work with x5c certs
-  const x5cCertsParsed = x5cCertsPEM.map((certPEM) => new X509Certificate(certPEM));
+  const x5cCertsParsed = x5cCertsPEM.map((certPEM) => {
+    try {
+      return new X509Certificate(certPEM);
+    } catch (err) {
+      throw new SimpleWebAuthnError({
+        message: `Could not parse x5c certificate:\n${certPEM}`,
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        cause: err as Error,
+      });
+    }
+  });
 
   // Break apart x5c into leaf + intermediates
   const x5cLeafCert = x5cCertsParsed[0];
@@ -150,6 +167,108 @@ export async function validateCertificatePath(
           code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
         });
       }
+    }
+
+    /**
+     * Ensure the leaf cert cannot issue certificates
+     */
+    const leafCert = validatedChain[0];
+    const leafExtBasicConstraints = leafCert.getExtension(BasicConstraintsExtension);
+    const leafExtKeyUsages = leafCert.getExtension(KeyUsagesExtension);
+
+    /**
+     * Check that the leaf cert does not have basicConstraints.ca: true, and that it does not
+     * indicate that it can sign other certificates.
+     */
+    if (leafExtBasicConstraints?.ca) {
+      throw new SimpleWebAuthnError({
+        message: 'Leaf certificate contained basicConstraints.ca: true',
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+      });
+    }
+
+    if (leafExtKeyUsages && (leafExtKeyUsages.usages & KeyUsageFlags.keyCertSign)) {
+      throw new SimpleWebAuthnError({
+        message:
+          `Leaf certificate included the keyCertSign bit in KeyUsages (value: ${leafExtKeyUsages.usages})`,
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+      });
+    }
+
+    /**
+     * Check that every cert but the leaf has basicConstraints.ca: true, and that keyUsage
+     * contains "keyCertSign" when present. Also validate that basicConstraints.pathLength is
+     * valid for a certificate's position in the chain.
+     *
+     * And I'm taking a position here: while v1 and v2 X.509 certificates technically exist and
+     * predate extensions that were added in v3, given that v3 was defined in 1996 and that FIDO2
+     * didn't practically exist until around 2019, I think it's fine to assume use of v3 in
+     * FIDO2-related PKI. Thus I'm enforcing the presence of basicConstraints, and
+     * validating keyUsages when present.
+     *
+     * Only the basicConstraints and keyUsage extensions are evaluated here right now. Other
+     * extensions that are present and marked critical are intentionally being ignored here for sake
+     * of implementation simplicity (I don't want to make this a full-fat X.509 chain validation
+     * method if I can help it.) Other certificate extensions are processed in other attestation
+     * verification methods where applicable.
+     */
+    for (let i = 1; i < validatedChain.length; i++) {
+      const cert = validatedChain[i];
+
+      const certExtBasicConstraints = cert.getExtension(BasicConstraintsExtension);
+
+      if (!certExtBasicConstraints) {
+        throw new SimpleWebAuthnError({
+          message: `Certificate at chain index ${i} was missing the basicConstraints extension`,
+          code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        });
+      }
+
+      if (certExtBasicConstraints.ca !== true) {
+        throw new SimpleWebAuthnError({
+          message:
+            `Certificate at chain index ${i} with serial number ${cert.serialNumber} did not contain basicConstraints.ca: true (value: ${certExtBasicConstraints.ca})`,
+          code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        });
+      }
+
+      const certExtKeyUsage = cert.getExtension(KeyUsagesExtension);
+
+      if (certExtKeyUsage && !(certExtKeyUsage.usages & KeyUsageFlags.keyCertSign)) {
+        throw new SimpleWebAuthnError({
+          message:
+            `Certificate at chain index ${i} with serial number ${cert.serialNumber} did not include the keyCertSign bit in KeyUsages (value: ${certExtKeyUsage.usages})`,
+          code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        });
+      }
+
+      if (typeof certExtBasicConstraints.pathLength !== 'undefined') {
+        // Make sure pathLength is a positive integer
+        if (
+          typeof certExtBasicConstraints.pathLength !== 'number' ||
+          certExtBasicConstraints.pathLength < 0
+        ) {
+          throw new SimpleWebAuthnError({
+            message:
+              `Certificate at chain index ${i} with serial number ${cert.serialNumber} contained an invalid pathLength (value: ${certExtBasicConstraints.pathLength})`,
+            code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+          });
+        }
+
+        // Make sure the value is adequate for this certificate's position in the chain
+        if (certExtBasicConstraints.pathLength < (i - 1)) {
+          throw new SimpleWebAuthnError({
+            message:
+              `Certificate at chain index ${i} of chain length ${validatedChain.length} with serial number ${cert.serialNumber} contained a pathLength of ${certExtBasicConstraints.pathLength}`,
+            code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+          });
+        }
+      }
+    }
+
+    // Check for any revoked certificates
+    for (let i = 0; i < validatedChain.length; i++) {
+      const cert = validatedChain[i];
 
       /**
        * Checking revocation is very expensive so do it only at the end when we're certain a cert
