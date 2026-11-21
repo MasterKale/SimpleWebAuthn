@@ -189,7 +189,7 @@ export async function validateCertificatePath(
     if (leafExtKeyUsages && (leafExtKeyUsages.usages & KeyUsageFlags.keyCertSign)) {
       throw new SimpleWebAuthnError({
         message:
-          `Leaf certificate included "keyCertSign" in KeyUsage (value: ${leafExtKeyUsages.usages})`,
+          `Leaf certificate included the keyCertSign bit in KeyUsage (value: ${leafExtKeyUsages.usages})`,
         code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
       });
     }

@@ -643,6 +643,6 @@ Deno.test('should reject a leaf cert whose keyUsage includes keyCertSign', async
     () =>
       validateCertificatePath([leafCert.certificate.toString()], [rootCert.certificate.toString()]),
     SimpleWebAuthnError,
-    'Leaf certificate included "keyCertSign" in KeyUsage',
+    'Leaf certificate included the keyCertSign bit in KeyUsage',
   );
 });
