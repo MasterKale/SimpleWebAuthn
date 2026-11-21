@@ -190,7 +190,7 @@ export async function validateCertificatePath(
     if (leafExtKeyUsages && (leafExtKeyUsages.usages & KeyUsageFlags.keyCertSign)) {
       throw new SimpleWebAuthnError({
         message:
-          `Leaf certificate included the keyCertSign bit in KeyUsage (value: ${leafExtKeyUsages.usages})`,
+          `Leaf certificate included the keyCertSign bit in KeyUsages (value: ${leafExtKeyUsages.usages})`,
         code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
       });
     }
@@ -237,7 +237,7 @@ export async function validateCertificatePath(
       if (certExtKeyUsage && !(certExtKeyUsage.usages & KeyUsageFlags.keyCertSign)) {
         throw new SimpleWebAuthnError({
           message:
-            `Certificate at chain index ${i} with serial number ${cert.serialNumber} did not include the keyCertSign bit in KeyUsage (value: ${certExtKeyUsage.usages})`,
+            `Certificate at chain index ${i} with serial number ${cert.serialNumber} did not include the keyCertSign bit in KeyUsages (value: ${certExtKeyUsage.usages})`,
           code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
         });
       }
