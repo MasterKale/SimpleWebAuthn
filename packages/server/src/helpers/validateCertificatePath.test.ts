@@ -1,4 +1,6 @@
+import 'reflect-metadata';
 import { assert, assertRejects } from '@std/assert';
+import * as x509 from '@peculiar/x509';
 import { FakeTime } from '@std/testing/time';
 import { assertSpyCalls, stub } from '@std/testing/mock';
 
@@ -434,4 +436,213 @@ Deno.test('should reject a chain with complete chain in x5c that does not chain 
   );
 
   assertSpyCalls(_mockFetch, 0);
+});
+
+Deno.test('should reject a chain with an intermediate cert missing basicConstraints', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-10-08'));
+
+  const notBefore = new Date('2026-10-07');
+  const notAfter = new Date('2026-10-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+    baseExtensions: [new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true)],
+  });
+  const leafCert = await generateLeafCert({ notBefore, notAfter, issuer: intermediateCert });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert.certificate.toString(), intermediateCert.certificate.toString()],
+        [rootCert.certificate.toString()],
+      ),
+    SimpleWebAuthnError,
+    'was missing the basicConstraints extension',
+  );
+});
+
+Deno.test('should reject a chain with an intermediate cert with basicConstraints.ca: false', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-10-08'));
+
+  const notBefore = new Date('2026-10-07');
+  const notAfter = new Date('2026-10-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+    baseExtensions: [
+      new x509.BasicConstraintsExtension(false, undefined, true),
+      new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true),
+    ],
+  });
+  const leafCert = await generateLeafCert({ notBefore, notAfter, issuer: intermediateCert });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert.certificate.toString(), intermediateCert.certificate.toString()],
+        [rootCert.certificate.toString()],
+      ),
+    SimpleWebAuthnError,
+    'did not contain basicConstraints.ca: true',
+  );
+});
+
+Deno.test('should reject a chain with an intermediate cert whose keyUsage lacks keyCertSign', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-10-08'));
+
+  const notBefore = new Date('2026-10-07');
+  const notAfter = new Date('2026-10-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+    baseExtensions: [
+      new x509.BasicConstraintsExtension(true, undefined, true),
+      new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
+    ],
+  });
+  const leafCert = await generateLeafCert({ notBefore, notAfter, issuer: intermediateCert });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [leafCert.certificate.toString(), intermediateCert.certificate.toString()],
+        [rootCert.certificate.toString()],
+      ),
+    SimpleWebAuthnError,
+    'did not include the keyCertSign bit in KeyUsage',
+  );
+});
+
+Deno.test('should validate a chain with a CA intermediate cert that has no keyUsage extension', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-10-08'));
+
+  const notBefore = new Date('2026-10-07');
+  const notAfter = new Date('2026-10-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const intermediateCert = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+    baseExtensions: [new x509.BasicConstraintsExtension(true, undefined, true)],
+  });
+  const leafCert = await generateLeafCert({ notBefore, notAfter, issuer: intermediateCert });
+
+  assert(
+    await validateCertificatePath(
+      [leafCert.certificate.toString(), intermediateCert.certificate.toString()],
+      [rootCert.certificate.toString()],
+    ),
+  );
+});
+
+Deno.test("should reject a chain that exceeds an intermediate cert's basicConstraints.pathLength", async () => {
+  using _fakedNow = new FakeTime(new Date('2026-10-08'));
+
+  const notBefore = new Date('2026-10-07');
+  const notAfter = new Date('2026-10-09');
+
+  /**
+   * leaf
+   * v
+   * intermediateB
+   * v
+   * intermediateA (pathLength: 0, so it may not have any CA certs beneath it)
+   * v
+   * root
+   */
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const intermediateA = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+    // Give this a distinct subject from intermediateB
+    subject: await generateRootCert({ notBefore, notAfter, name: 'CN=Unit Test Intermediate A' }),
+    baseExtensions: [
+      new x509.BasicConstraintsExtension(true, 0, true),
+      new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true),
+    ],
+  });
+  const intermediateB = await generateIntermediateCert({
+    notBefore,
+    notAfter,
+    issuer: intermediateA,
+  });
+  const leafCert = await generateLeafCert({ notBefore, notAfter, issuer: intermediateB });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath(
+        [
+          leafCert.certificate.toString(),
+          intermediateB.certificate.toString(),
+          intermediateA.certificate.toString(),
+        ],
+        [rootCert.certificate.toString()],
+      ),
+    SimpleWebAuthnError,
+    'contained a pathLength of 0',
+  );
+});
+
+Deno.test('should reject a leaf cert with basicConstraints.ca: true', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-10-08'));
+
+  const notBefore = new Date('2026-10-07');
+  const notAfter = new Date('2026-10-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+    baseExtensions: [
+      new x509.BasicConstraintsExtension(true, undefined, true),
+      new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
+    ],
+  });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath([leafCert.certificate.toString()], [rootCert.certificate.toString()]),
+    SimpleWebAuthnError,
+    'Leaf certificate contained basicConstraints.ca: true',
+  );
+});
+
+Deno.test('should reject a leaf cert whose keyUsage includes keyCertSign', async () => {
+  using _fakedNow = new FakeTime(new Date('2026-10-08'));
+
+  const notBefore = new Date('2026-10-07');
+  const notAfter = new Date('2026-10-09');
+
+  const rootCert = await generateRootCert({ notBefore, notAfter });
+  const leafCert = await generateLeafCert({
+    notBefore,
+    notAfter,
+    issuer: rootCert,
+    baseExtensions: [
+      new x509.BasicConstraintsExtension(false, undefined, true),
+      new x509.KeyUsagesExtension(
+        x509.KeyUsageFlags.digitalSignature | x509.KeyUsageFlags.keyCertSign,
+        true,
+      ),
+    ],
+  });
+
+  await assertRejects(
+    () =>
+      validateCertificatePath([leafCert.certificate.toString()], [rootCert.certificate.toString()]),
+    SimpleWebAuthnError,
+    'Leaf certificate included "keyCertSign" in KeyUsage',
+  );
 });

@@ -72,6 +72,11 @@ export async function generateIntermediateCert(opts: {
   signingAlgorithm?: Algorithm | EcdsaParams;
   /** Additional certificate extensions (e.g. AuthorityKeyIdentifier, CRLDistributionPoints) */
   extensions?: x509.Extension[];
+  /**
+   * Replace the default BasicConstraints and KeyUsages extensions, e.g. to generate a malformed
+   * intermediate cert. Pass `[]` to generate a cert with neither extension.
+   */
+  baseExtensions?: x509.Extension[];
 }): Promise<{ certificate: x509.X509Certificate; keys: CryptoKeyPair }> {
   const {
     notBefore,
@@ -81,6 +86,11 @@ export async function generateIntermediateCert(opts: {
     keyAlgorithm = defaultKeyAlgorithm,
     signingAlgorithm = defaultSigningAlgorithm,
     extensions = [],
+    baseExtensions = [
+      // Explicitly state this cert can sign other certs
+      new x509.BasicConstraintsExtension(true, undefined, true),
+      new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true),
+    ],
   } = opts;
 
   const webCrypto = await getWebCrypto();
@@ -100,12 +110,7 @@ export async function generateIntermediateCert(opts: {
     signingKey: issuer.keys.privateKey,
     signingAlgorithm,
     publicKey: certKeys.publicKey,
-    extensions: [
-      // Explicitly state this cert can sign other certs
-      new x509.BasicConstraintsExtension(true, undefined, true),
-      new x509.KeyUsagesExtension(x509.KeyUsageFlags.keyCertSign, true),
-      ...extensions,
-    ],
+    extensions: [...baseExtensions, ...extensions],
   });
 
   return { certificate, keys: certKeys };
@@ -129,6 +134,11 @@ export async function generateLeafCert(opts: {
   signingAlgorithm?: Algorithm | EcdsaParams;
   /** Additional certificate extensions (e.g. AuthorityKeyIdentifier, CRLDistributionPoints) */
   extensions?: x509.Extension[];
+  /**
+   * Replace the default BasicConstraints and KeyUsages extensions, e.g. to generate a malformed
+   * leaf cert. Pass `[]` to generate a cert with neither extension.
+   */
+  baseExtensions?: x509.Extension[];
 }): Promise<{ certificate: x509.X509Certificate; keys: CryptoKeyPair }> {
   const {
     notBefore,
@@ -138,6 +148,11 @@ export async function generateLeafCert(opts: {
     keyAlgorithm = defaultKeyAlgorithm,
     signingAlgorithm = defaultSigningAlgorithm,
     extensions = [],
+    baseExtensions = [
+      // Explicitly state this is an end-entity and thus cannot sign other certs
+      new x509.BasicConstraintsExtension(false, undefined, true),
+      new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
+    ],
   } = opts;
   const webCrypto = await getWebCrypto();
 
@@ -151,12 +166,7 @@ export async function generateLeafCert(opts: {
     signingKey: issuer.keys.privateKey,
     signingAlgorithm,
     publicKey: keys.publicKey,
-    extensions: [
-      // Explicitly state this is an end-entity and thus cannot sign other certs
-      new x509.BasicConstraintsExtension(false, undefined, true),
-      new x509.KeyUsagesExtension(x509.KeyUsageFlags.digitalSignature, true),
-      ...extensions,
-    ],
+    extensions: [...baseExtensions, ...extensions],
   });
 
   return { certificate, keys };
