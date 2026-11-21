@@ -28,7 +28,8 @@ export class PQCNotSupportedError extends SimpleWebAuthnError {
 
 export type SimpleWebAuthnErrorCode =
   | 'BAD_ARGUMENT'
-  | 'RUNTIME_NO_PQC_SUPPORT'
   | 'CERTIFICATE_PATH_VERIFICATION_FAILED'
+  | 'INVALID_X509_CERTIFICATE'
+  | 'RUNTIME_NO_PQC_SUPPORT'
   | 'UNEXPECTED_RP_ID'
   | 'UNEXPECTED_ORIGIN';
