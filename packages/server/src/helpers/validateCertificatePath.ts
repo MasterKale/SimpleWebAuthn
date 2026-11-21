@@ -54,7 +54,17 @@ export async function validateCertificatePath(
   }
 
   // Prepare to work with x5c certs
-  const x5cCertsParsed = x5cCertsPEM.map((certPEM) => new X509Certificate(certPEM));
+  const x5cCertsParsed = x5cCertsPEM.map((certPEM) => {
+    try {
+      return new X509Certificate(certPEM);
+    } catch (err) {
+      throw new SimpleWebAuthnError({
+        message: `Could not parse x5c certificate:\n${certPEM}`,
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+        cause: err as Error,
+      });
+    }
+  });
 
   // Break apart x5c into leaf + intermediates
   const x5cLeafCert = x5cCertsParsed[0];
