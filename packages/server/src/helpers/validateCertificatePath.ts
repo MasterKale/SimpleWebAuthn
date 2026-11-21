@@ -172,8 +172,9 @@ export async function validateCertificatePath(
     /**
      * Ensure the leaf cert cannot issue certificates
      */
-    const leafExtBasicConstraints = x5cLeafCert.getExtension(BasicConstraintsExtension);
-    const leafExtKeyUsages = x5cLeafCert.getExtension(KeyUsagesExtension);
+    const leafCert = validatedChain[0];
+    const leafExtBasicConstraints = leafCert.getExtension(BasicConstraintsExtension);
+    const leafExtKeyUsages = leafCert.getExtension(KeyUsagesExtension);
 
     /**
      * Check that the leaf cert does not have basicConstraints.ca: true, and that it does not
