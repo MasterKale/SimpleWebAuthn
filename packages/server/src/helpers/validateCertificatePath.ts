@@ -1,5 +1,12 @@
 import 'reflect-metadata';
-import { X509Certificate, type X509Certificates, X509ChainBuilder } from '@peculiar/x509';
+import {
+  BasicConstraintsExtension,
+  KeyUsageFlags,
+  KeyUsagesExtension,
+  X509Certificate,
+  type X509Certificates,
+  X509ChainBuilder,
+} from '@peculiar/x509';
 
 import { isCertRevoked } from './isCertRevoked.ts';
 import { SimpleWebAuthnError } from '../errors/index.ts';
@@ -160,6 +167,32 @@ export async function validateCertificatePath(
           code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
         });
       }
+    }
+
+    /**
+     * Ensure the leaf cert cannot issue certificates
+     */
+    const leafExtBasicConstraints = x5cLeafCert.getExtension(BasicConstraintsExtension);
+    const leafExtKeyUsages = x5cLeafCert.getExtension(KeyUsagesExtension);
+
+    /**
+     * Check that the leaf cert does not have basicConstraints.ca: true, and that it does not
+     * indicate that it can sign other certificates.
+     */
+    if (leafExtBasicConstraints?.ca) {
+      throw new SimpleWebAuthnError({
+        message: 'Leaf certificate contained basicConstraints.ca: true',
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+      });
+    }
+
+    if (leafExtKeyUsages && (leafExtKeyUsages.usages & KeyUsageFlags.keyCertSign)) {
+      throw new SimpleWebAuthnError({
+        message:
+          `Leaf certificate included "keyCertSign" in KeyUsage (value: ${leafExtKeyUsages.usages})`,
+        code: 'CERTIFICATE_PATH_VERIFICATION_FAILED',
+      });
+    }
 
       /**
        * Checking revocation is very expensive so do it only at the end when we're certain a cert
