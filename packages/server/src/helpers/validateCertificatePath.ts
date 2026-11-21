@@ -194,6 +194,10 @@ export async function validateCertificatePath(
       });
     }
 
+    // Check for any revoked certificates
+    for (let i = 0; i < validatedChain.length; i++) {
+      const cert = validatedChain[i];
+
       /**
        * Checking revocation is very expensive so do it only at the end when we're certain a cert
        * is otherwise valid
