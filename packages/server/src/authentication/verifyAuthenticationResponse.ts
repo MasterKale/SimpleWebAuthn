@@ -16,7 +16,7 @@ import { isoBase64URL, isoUint8Array } from '../helpers/iso/index.ts';
 import { decodeCredentialPublicKey } from '../helpers/decodeCredentialPublicKey.ts';
 import { COSEKEYS, isPQCCOSEAlg } from '../helpers/cose.ts';
 import { SettingsService } from '../services/settingsService.ts';
-import { PQCNotSupportedError } from '../errors/index.ts';
+import { PQCNotSupportedError, SimpleWebAuthnError } from '../errors/index.ts';
 import { matchExpectedOrigin } from '../helpers/matchExpectedOrigin.ts';
 
 /**
@@ -263,6 +263,18 @@ export async function verifyAuthenticationResponse(
   const signatureBase = isoUint8Array.concat([authDataBuffer, clientDataHash]);
 
   const signature = isoBase64URL.toBuffer(assertionResponse.signature);
+
+  /**
+   * Not validating that this is indeed a number can lead to incorrect evaluation of the counter
+   * check below due to how JavaScript compares numbers to non-numeric values.
+   */
+  if (typeof credential.counter !== 'number' || credential.counter < 0) {
+    throw new SimpleWebAuthnError({
+      message:
+        `credential.counter was not a number greater than or equal to 0 (value: ${credential.counter})`,
+      code: 'BAD_ARGUMENT',
+    });
+  }
 
   if (
     (counter > 0 || credential.counter > 0) &&
