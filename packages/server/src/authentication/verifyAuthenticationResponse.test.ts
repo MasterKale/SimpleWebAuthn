@@ -166,6 +166,44 @@ Deno.test('should throw error if previous counter value is not less than in resp
   );
 });
 
+Deno.test('should throw error if credential.counter is not a number', async () => {
+  const badCredential = {
+    ...credential,
+    // Simulate a value that slipped past type checking, e.g. loaded from a DB as a string
+    counter: '5' as unknown as number,
+  };
+
+  await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: assertionResponse,
+        expectedChallenge: assertionChallenge,
+        expectedOrigin: assertionOrigin,
+        expectedRPID: 'dev.dontneeda.pw',
+        credential: badCredential,
+        requireUserVerification: false,
+      }),
+    SimpleWebAuthnError,
+    'credential.counter was not a number',
+  );
+});
+
+Deno.test('should throw error if credential.counter is negative', async () => {
+  await assertRejects(
+    () =>
+      verifyAuthenticationResponse({
+        response: assertionResponse,
+        expectedChallenge: assertionChallenge,
+        expectedOrigin: assertionOrigin,
+        expectedRPID: 'dev.dontneeda.pw',
+        credential: { ...credential, counter: -1 },
+        requireUserVerification: false,
+      }),
+    SimpleWebAuthnError,
+    'credential.counter was not a number',
+  );
+});
+
 Deno.test('should throw error if assertion RP ID is unexpected value', async () => {
   const mockParseAuthData = stub(
     _parseAuthenticatorDataInternals,
